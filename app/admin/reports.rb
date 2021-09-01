@@ -10,20 +10,31 @@ ActiveAdmin.register_page "Reports" do
           li link_to "report - registered but not applied", admin_reports_registered_but_not_applied_path
           li link_to "report- enrolled_with_addresses", admin_reports_enrolled_with_addresses_path
           li link_to "report - course_assignments_with_students", admin_reports_course_assignments_with_students_path
-          # li link_to "batch process (non-citizens)- completed apps (choose year, status and event)", admin_reports_path
-          # li link_to "datasheet- financial transactions within dates (choose dates)", admin_reports_path
-          # li link_to "datasheet- assigned courses (choose year)", admin_reports_path
-          # li link_to "datasheet- all fees paid (choose year)", admin_reports_path
-          # li link_to "splitsheet- applicants course pref (choose year, status, course)", admin_reports_path
-          # li link_to "datasheet- registrants by year (choose year and start date)", admin_reports_path
-          # li link_to "datasheet- applicants services with payments (choose year and status)", admin_reports_path
-          # li link_to "form- multiple service session (choose year)", admin_reports_path
+          li link_to "report - demographic_report", admin_reports_demographic_report_path
         end
       end
     end
   end # content
 
   controller do
+
+    def demographic_report
+      query = "COPY (SELECT distinct(REPLACE(ad.lastname, ',', ' ') || ' ' || REPLACE(ad.firstname, ',', ' ')) AS name, ad.country,
+      CASE gender WHEN '' THEN NULL ELSE 
+      (SELECT genders.name AS gender FROM genders WHERE CAST(ad.gender AS INTEGER) = genders.id) END,
+      e.year_in_school,
+      CASE demographic WHEN '' THEN NULL ELSE 
+      (SELECT demographics.name AS demographic FROM demographics WHERE CAST(ad.demographic AS INTEGER) = demographics.id) END,
+      e.international
+      FROM enrollments AS e 
+      LEFT JOIN users AS u ON e.user_id = u.id
+      LEFT JOIN applicant_details AS ad ON ad.user_id = e.user_id
+      WHERE e.application_status = 'enrolled' AND e.campyear = 2021 ORDER BY country, gender, year_in_school)
+      to STDOUT with csv header;"
+      make_demographic_csv(query, "demographic_report")
+      
+    end
+
     def registered_but_not_applied
       query = "COPY (SELECT u.id, u.email, (ad.firstname || ' ' || ad.lastname) AS name FROM users AS u
       JOIN applicant_details AS ad on u.id = ad.user_id WHERE ad.user_id NOT IN (SELECT e.user_id FROM enrollments AS e))
@@ -89,6 +100,29 @@ ActiveAdmin.register_page "Reports" do
       raw_connection  = connection.raw_connection
       raw_connection.copy_data(query) do
         while row = raw_connection.get_copy_data
+          csv.push(row)
+        end
+      end
+      connection_pool.checkin connection
+      sql_data_as_string = csv.join("")
+
+      respond_to do |format|
+        format.html { send_data sql_data_as_string.force_encoding("UTF-8"), filename: "#{title}-#{Date.today}.csv" }
+      end
+    end
+
+    def make_demographic_csv(query, title)
+      csv = []
+      connection_pool = ActiveRecord::Base.connection_pool
+      connection = connection_pool.checkout
+      raw_connection  = connection.raw_connection
+      raw_connection.copy_data(query) do
+        while row = raw_connection.get_copy_data
+          row = row.split(',', 2).last
+          c = row.split(",")[0]
+          if c != 'country'
+            row = ISO3166::Country[c].name + " - " +  row
+          end
           csv.push(row)
         end
       end
