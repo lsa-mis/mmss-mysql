@@ -1,4 +1,6 @@
 # encoding : utf-8
+money_gem_dir = Gem::Specification.find_by_name("money-rails").gem_dir
+require "#{money_gem_dir}/lib/money-rails/helpers/action_view_extension"
 
 MoneyRails.configure do |config|
 

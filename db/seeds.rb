@@ -28,32 +28,26 @@ applicant_detail = ApplicantDetail.create([
   {user_id: 11, firstname: "Marge", gender: "2", lastname: "Simpson", us_citizen: true, birthdate: "2008-01-02", shirt_size: "medium", address1: "123 Main St", city: "Ann Arbor", state: "MI", postalcode: "48103", country: "US", phone: "555-123-4567", parentname: "My Mom", parentphone: "555-098-8765", parentemail: "parent@test.com"}
 ])
 
-# enrollment_detail = Enrollment.create([
-#   {user_id: 2, international: false, high_school_name: "Pioneer", high_school_address1: "123 Main St", high_school_address2: "", high_school_city: "Ann Arbor", high_school_state: "MI", high_school_non_us: "", high_school_postalcode: "48103", high_school_country: "US", year_in_school: "12", anticipated_graduation_year: "2021", room_mate_request: "", personal_statement: "Hello!\r\nPlease complete the Student Personal Statement by either typing or pasting it into the field below. This required part of your application MUST be at least 100 characters or more. You should include courses you have taken, external influences, computer experience, and research interests that draw you to this program, or other relevant information to help us evaluate your application material."},
-# ])
-
-
-
 admins = Admin.create([
-  {email: 'rsmoke@umich.edu', password:'secret', password_confirmation: 'secret'}
+  {email: 'rsmoke@umich.edu', password:'secretsecret', password_confirmation: 'secretsecret'}
   ])
-  Admin.create!(email: 'admin@example.com', password: 'password', password_confirmation: 'password') if Rails.env.development?
-
+  Admin.create!(email: 'admin@example.com', password: 'passwordpassword', password_confirmation: 'passwordpassword') if Rails.env.development?
 
 gender = Gender.create([
-  {name: "Female", description; "dudette"},
-  {name: "Male", description; "dude"}
+  {name: "Female", description: "dudette"},
+  {name: "Male", description: "dude"}
 ])
-
 
 camp_configuration = CampConfiguration.create([
-  {camp_year: 2021, application_open: "2021-01-01", application_close: "2021-05-01", priority: "2021-04-01", application_materials_due: "2021-05-20", camper_acceptance_due: "2021-06-01", active: true}
+  {camp_year: 2021, application_open: "2021-01-01", application_close: "2021-05-01", priority: "2021-04-01", application_materials_due: "2021-05-20", camper_acceptance_due: "2021-06-01", application_fee_cents: 10000, active: true}
 ])
 
-camp_occurrence = CampOccurrence.create([
-  {camp_configuration_id: CampConfiguration.last, description: "Session 1", begin_date: "2021-09-14", end_date: "2021-09-21", active: true},
-  {camp_configuration_id: CampConfiguration.last, description: "Session 2", begin_date: "2021-09-23", end_date: "2021-09-30", active: true},
-  {camp_configuration_id: CampConfiguration.last, description: "Session 3", begin_date: "2021-10-3", end_date: "2021-10-10", active: true}
+camp_config = CampConfiguration.first
+
+camp_occurrence = camp_config.camp_occurrences.create([
+  {description: "Session 1", begin_date: "2021-09-14", end_date: "2021-09-21", cost_cents: 20000, active: true},
+  {description: "Session 2", begin_date: "2021-09-23", end_date: "2021-09-30", cost_cents: 20000, active: true},
+  {description: "Session 3", begin_date: "2021-10-3", end_date: "2021-10-10", cost_cents: 20000, active: true}
   ])
 
   camp1 = CampOccurrence.first

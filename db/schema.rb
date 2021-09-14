@@ -2,8 +2,8 @@
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
 #
-# This file is the source Rails uses to define your schema when running `rails
-# db:schema:load`. When creating a new database, `rails db:schema:load` tends to
+# This file is the source Rails uses to define your schema when running `bin/rails
+# db:schema:load`. When creating a new database, `bin/rails db:schema:load` tends to
 # be faster and is potentially less error prone than running all of your
 # migrations from scratch. Old migrations may fail to apply correctly if those
 # migrations use external dependencies or application code.
@@ -12,10 +12,7 @@
 
 ActiveRecord::Schema.define(version: 2021_04_06_122231) do
 
-  # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
-
-  create_table "active_admin_comments", force: :cascade do |t|
+  create_table "active_admin_comments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "namespace"
     t.text "body"
     t.string "resource_type"
@@ -29,7 +26,7 @@ ActiveRecord::Schema.define(version: 2021_04_06_122231) do
     t.index ["resource_type", "resource_id"], name: "index_active_admin_comments_on_resource_type_and_resource_id"
   end
 
-  create_table "active_storage_attachments", force: :cascade do |t|
+  create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
     t.bigint "record_id", null: false
@@ -39,7 +36,7 @@ ActiveRecord::Schema.define(version: 2021_04_06_122231) do
     t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
   end
 
-  create_table "active_storage_blobs", force: :cascade do |t|
+  create_table "active_storage_blobs", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "key", null: false
     t.string "filename", null: false
     t.string "content_type"
@@ -50,37 +47,25 @@ ActiveRecord::Schema.define(version: 2021_04_06_122231) do
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
 
-  create_table "activities", force: :cascade do |t|
-    t.bigint "camp_occurrence_id", null: false
-    t.string "description", null: false
-    t.integer "cost_cents", null: false
-    t.date "date_occurs", null: false
-    t.boolean "active", default: false, null: false
+  create_table "activities", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.bigint "camp_occurrence_id"
+    t.string "description"
+    t.integer "cost_cents"
+    t.date "date_occurs"
+    t.boolean "active", default: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["camp_occurrence_id"], name: "index_activities_on_camp_occurrence_id"
   end
 
-  create_table "admin_users", force: :cascade do |t|
-    t.string "email", default: "", null: false
-    t.string "encrypted_password", default: "", null: false
-    t.string "reset_password_token"
-    t.datetime "reset_password_sent_at"
-    t.datetime "remember_created_at"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["email"], name: "index_admin_users_on_email", unique: true
-    t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
-  end
-
-  create_table "admins", force: :cascade do |t|
+  create_table "admins", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.integer "sign_in_count", default: 0, null: false
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
-    t.inet "current_sign_in_ip"
-    t.inet "last_sign_in_ip"
+    t.string "current_sign_in_ip"
+    t.string "last_sign_in_ip"
     t.integer "failed_attempts", default: 0, null: false
     t.string "unlock_token"
     t.datetime "locked_at"
@@ -93,7 +78,7 @@ ActiveRecord::Schema.define(version: 2021_04_06_122231) do
     t.index ["reset_password_token"], name: "index_admins_on_reset_password_token", unique: true
   end
 
-  create_table "applicant_details", force: :cascade do |t|
+  create_table "applicant_details", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "firstname", null: false
     t.string "middlename"
@@ -102,7 +87,7 @@ ActiveRecord::Schema.define(version: 2021_04_06_122231) do
     t.boolean "us_citizen", default: false, null: false
     t.string "demographic"
     t.date "birthdate", null: false
-    t.string "diet_restrictions"
+    t.text "diet_restrictions"
     t.string "shirt_size"
     t.string "address1", null: false
     t.string "address2"
@@ -128,7 +113,7 @@ ActiveRecord::Schema.define(version: 2021_04_06_122231) do
     t.index ["user_id"], name: "index_applicant_details_on_user_id"
   end
 
-  create_table "camp_configurations", force: :cascade do |t|
+  create_table "camp_configurations", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.integer "camp_year", null: false
     t.date "application_open", null: false
     t.date "application_close", null: false
@@ -146,7 +131,7 @@ ActiveRecord::Schema.define(version: 2021_04_06_122231) do
     t.index ["camp_year"], name: "index_camp_configurations_on_camp_year", unique: true
   end
 
-  create_table "camp_occurrences", force: :cascade do |t|
+  create_table "camp_occurrences", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "camp_configuration_id", null: false
     t.string "description", null: false
     t.date "begin_date", null: false
@@ -158,7 +143,7 @@ ActiveRecord::Schema.define(version: 2021_04_06_122231) do
     t.index ["camp_configuration_id"], name: "index_camp_occurrences_on_camp_configuration_id"
   end
 
-  create_table "campnotes", force: :cascade do |t|
+  create_table "campnotes", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "note"
     t.datetime "opendate"
     t.datetime "closedate"
@@ -167,7 +152,7 @@ ActiveRecord::Schema.define(version: 2021_04_06_122231) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  create_table "course_assignments", force: :cascade do |t|
+  create_table "course_assignments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "enrollment_id", null: false
     t.bigint "course_id", null: false
     t.datetime "created_at", precision: 6, null: false
@@ -176,7 +161,7 @@ ActiveRecord::Schema.define(version: 2021_04_06_122231) do
     t.index ["enrollment_id"], name: "index_course_assignments_on_enrollment_id"
   end
 
-  create_table "course_preferences", force: :cascade do |t|
+  create_table "course_preferences", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "enrollment_id", null: false
     t.bigint "course_id", null: false
     t.integer "ranking"
@@ -186,7 +171,7 @@ ActiveRecord::Schema.define(version: 2021_04_06_122231) do
     t.index ["enrollment_id"], name: "index_course_preferences_on_enrollment_id"
   end
 
-  create_table "courses", force: :cascade do |t|
+  create_table "courses", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "camp_occurrence_id", null: false
     t.string "title"
     t.integer "available_spaces"
@@ -196,14 +181,14 @@ ActiveRecord::Schema.define(version: 2021_04_06_122231) do
     t.index ["camp_occurrence_id"], name: "index_courses_on_camp_occurrence_id"
   end
 
-  create_table "demographics", force: :cascade do |t|
+  create_table "demographics", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "description", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  create_table "enrollment_activities", force: :cascade do |t|
+  create_table "enrollment_activities", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "enrollment_id", null: false
     t.bigint "activity_id", null: false
     t.datetime "created_at", precision: 6, null: false
@@ -212,7 +197,7 @@ ActiveRecord::Schema.define(version: 2021_04_06_122231) do
     t.index ["enrollment_id"], name: "index_enrollment_activities_on_enrollment_id"
   end
 
-  create_table "enrollments", force: :cascade do |t|
+  create_table "enrollments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.boolean "international", default: false, null: false
     t.string "high_school_name", null: false
@@ -238,16 +223,16 @@ ActiveRecord::Schema.define(version: 2021_04_06_122231) do
     t.index ["user_id"], name: "index_enrollments_on_user_id"
   end
 
-  create_table "feedbacks", force: :cascade do |t|
+  create_table "feedbacks", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.string "genre"
+    t.string "message"
+    t.bigint "user_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.bigint "user_id", null: false
-    t.string "genre", null: false
-    t.string "message", null: false
     t.index ["user_id"], name: "index_feedbacks_on_user_id"
   end
 
-  create_table "financial_aids", force: :cascade do |t|
+  create_table "financial_aids", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "enrollment_id", null: false
     t.integer "amount_cents", default: 0
     t.string "source"
@@ -259,14 +244,14 @@ ActiveRecord::Schema.define(version: 2021_04_06_122231) do
     t.index ["enrollment_id"], name: "index_financial_aids_on_enrollment_id"
   end
 
-  create_table "genders", force: :cascade do |t|
+  create_table "genders", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "description"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  create_table "payments", force: :cascade do |t|
+  create_table "payments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "transaction_type"
     t.string "transaction_status"
     t.string "transaction_id"
@@ -286,7 +271,7 @@ ActiveRecord::Schema.define(version: 2021_04_06_122231) do
     t.index ["user_id"], name: "index_payments_on_user_id"
   end
 
-  create_table "recommendations", force: :cascade do |t|
+  create_table "recommendations", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "enrollment_id", null: false
     t.string "email", null: false
     t.string "lastname", null: false
@@ -308,7 +293,7 @@ ActiveRecord::Schema.define(version: 2021_04_06_122231) do
     t.index ["enrollment_id"], name: "index_recommendations_on_enrollment_id"
   end
 
-  create_table "recuploads", force: :cascade do |t|
+  create_table "recuploads", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.text "letter"
     t.string "authorname", null: false
     t.string "studentname", null: false
@@ -318,7 +303,7 @@ ActiveRecord::Schema.define(version: 2021_04_06_122231) do
     t.index ["recommendation_id"], name: "index_recuploads_on_recommendation_id"
   end
 
-  create_table "rejections", force: :cascade do |t|
+  create_table "rejections", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "enrollment_id", null: false
     t.text "reason"
     t.datetime "created_at", precision: 6, null: false
@@ -326,7 +311,7 @@ ActiveRecord::Schema.define(version: 2021_04_06_122231) do
     t.index ["enrollment_id"], name: "index_rejections_on_enrollment_id"
   end
 
-  create_table "session_activities", force: :cascade do |t|
+  create_table "session_activities", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "enrollment_id", null: false
     t.bigint "camp_occurrence_id", null: false
     t.datetime "created_at", precision: 6, null: false
@@ -335,7 +320,7 @@ ActiveRecord::Schema.define(version: 2021_04_06_122231) do
     t.index ["enrollment_id"], name: "index_session_activities_on_enrollment_id"
   end
 
-  create_table "session_assignments", force: :cascade do |t|
+  create_table "session_assignments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "enrollment_id", null: false
     t.bigint "camp_occurrence_id", null: false
     t.datetime "created_at", precision: 6, null: false
@@ -345,7 +330,7 @@ ActiveRecord::Schema.define(version: 2021_04_06_122231) do
     t.index ["enrollment_id"], name: "index_session_assignments_on_enrollment_id"
   end
 
-  create_table "travels", force: :cascade do |t|
+  create_table "travels", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "enrollment_id", null: false
     t.string "direction"
     t.string "transport_needed"
@@ -359,7 +344,7 @@ ActiveRecord::Schema.define(version: 2021_04_06_122231) do
     t.index ["enrollment_id"], name: "index_travels_on_enrollment_id"
   end
 
-  create_table "users", force: :cascade do |t|
+  create_table "users", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "reset_password_token"
@@ -368,8 +353,8 @@ ActiveRecord::Schema.define(version: 2021_04_06_122231) do
     t.integer "sign_in_count", default: 0, null: false
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
-    t.inet "current_sign_in_ip"
-    t.inet "last_sign_in_ip"
+    t.string "current_sign_in_ip"
+    t.string "last_sign_in_ip"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["email"], name: "index_users_on_email", unique: true
