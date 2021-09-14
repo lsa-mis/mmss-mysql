@@ -5,11 +5,11 @@ class CreateApplicantDetails < ActiveRecord::Migration[6.0]
       t.string :firstname, null: false
       t.string :middlename
       t.string :lastname, null: false
-      t.string :gender, null: false
+      t.string :gender
       t.boolean :us_citizen, null: false, default: false
-      t.string :demographic, null: false
+      t.string :demographic
       t.date :birthdate, null: false
-      t.text :diet_restrictions, null: false
+      t.text :diet_restrictions
       t.string :shirt_size, null: false
       t.string :address1, null: false
       t.string :address2
@@ -20,13 +20,13 @@ class CreateApplicantDetails < ActiveRecord::Migration[6.0]
       t.string :country, null: false
       t.string :phone, null: false
       t.string :parentname, null: false
-      t.string :parentaddress1, null: false
+      t.string :parentaddress1
       t.string :parentaddress2
-      t.string :parentcity, null: false
+      t.string :parentcity
       t.string :parentstate
       t.string :parentstate_non_us
-      t.string :parentzip, null: false
-      t.string :parentcountry, null: false
+      t.string :parentzip
+      t.string :parentcountry
       t.string :parentphone, null: false
       t.string :parentworkphone
       t.string :parentemail
