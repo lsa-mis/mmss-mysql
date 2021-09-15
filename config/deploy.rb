@@ -2,7 +2,7 @@
 lock "~> 3.16.0"
 
 set :rbenv_type, :user
-set :rbenv_ruby, '2.7.1'
+set :rbenv_ruby, '3.0.2'
 
 server 'lsa-math-mmss.miserver.it.umich.edu', roles: %w{app db web}, primary: true
 

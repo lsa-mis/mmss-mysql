@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '3.0.1'
+ruby '3.0.2'
 
 gem 'activeadmin', '~> 2.9'
 gem 'bootsnap', '~> 1.8', '>= 1.8.1', require: false
