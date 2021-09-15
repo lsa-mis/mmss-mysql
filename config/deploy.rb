@@ -2,12 +2,12 @@
 lock "~> 3.16.0"
 
 set :rbenv_type, :user
-set :rbenv_ruby, '2.7.1'
+set :rbenv_ruby, '3.0.2'
 
-server 'lsa-math-mmss.miserver.it.umich.edu', roles: %w{app db web}, primary: true
+server 'lsa-math-mmss-app.miserver.it.umich.edu', roles: %w{app db web}, primary: true
 
-set :application, "mmss"
-set :repo_url, "git@github.com:rsmoke/mmss.git"
+set :application, "mmss-mysql"
+set :repo_url, "git@github.com:lsa-mis/mmss-mysql.git"
 set :user, "deployer"
 set :puma_threads,    [4, 16]
 set :puma_workers,    0

@@ -80,7 +80,7 @@ Rails.application.configure do
 
 
   # Devise setting - Ensure you have defined default url options
-  config.action_mailer.default_url_options = { host: 'lsa-math-mmss.miserver.it.umich.edu' }
+  config.action_mailer.default_url_options = { host: 'lsa-math-mmss-app.miserver.it.umich.edu' }
 
   config.action_mailer.perform_caching = false
 
