@@ -17,10 +17,10 @@ ActiveAdmin.register Payment do
   # end
   actions :index, :show, :new, :create, :update, :edit
 
-  filter :user_id, as: :select, collection: User.all
-  filter :account_type, as: :select
-  filter :camp_year, as: :select
-  filter :created_at
+  # filter :user_id, as: :select, collection: User.all
+  # filter :account_type, as: :select
+  # filter :camp_year, as: :select
+  # filter :created_at
 
 
 

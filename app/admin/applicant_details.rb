@@ -47,13 +47,13 @@ ActiveAdmin.register ApplicantDetail do
     f.actions 
   end
 
-  filter :gender, as: :select, collection: Gender.all.map{|a| [a.name, a.id]}
-  filter :demographic, as: :select, collection: Demographic.all.map{|a| [a.name, a.id]}
-  filter :lastname, as: :select
-  filter :us_citizen
-  filter :birthdate
-  filter :diet_restrictions
-  filter :parentname
+  # filter :gender, as: :select, collection: Gender.all.map{|a| [a.name, a.id]}
+  # filter :demographic, as: :select, collection: Demographic.all.map{|a| [a.name, a.id]}
+  # filter :lastname, as: :select
+  # filter :us_citizen
+  # filter :birthdate
+  # filter :diet_restrictions
+  # filter :parentname
 
   index do 
     selectable_column

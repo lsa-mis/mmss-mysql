@@ -16,11 +16,11 @@ ActiveAdmin.register Activity do
   #   permitted
   # end
 
-  filter :camp_occurrence_id, label: "Session", as: :select, collection: CampOccurrence.order(begin_date: :desc).no_any_session
-  filter :description, as: :select
-  filter :cost_cents
-  filter :date_occurs
-  filter :active
+  # filter :camp_occurrence_id, label: "Session", as: :select, collection: CampOccurrence.order(begin_date: :desc).no_any_session
+  # filter :description, as: :select
+  # filter :cost_cents
+  # filter :date_occurs
+  # filter :active
 
   form do |f|
     f.semantic_errors
