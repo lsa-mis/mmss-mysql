@@ -1,5 +1,5 @@
 {
-  "name": "mmss-mysql",
+  "name": "mmss",
   "private": true,
   "dependencies": {
     "@activeadmin/activeadmin": "^2.8.1",
