@@ -18,6 +18,8 @@ test:
 
 production:
   <<: *default
-  username: <%= Rails.application.credentials.PRODUCTION_DB_USERNAME %>
-  password: <%= Rails.application.credentials.PRODUCTION_DB_PASSWORD %>
-  database: mmss-mysql_production
+  database: mmssprod
+  username: <%= Rails.application.credentials.mysql[:prod_user] %>
+  password: <%= Rails.application.credentials.mysql[:prod_password] %>
+  host: <%= Rails.application.credentials.mysql[:prod_servername] %>
+  sslca: <%= Rails.application.credentials.mysql[:prod_sslca] %>
