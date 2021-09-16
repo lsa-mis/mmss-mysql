@@ -85,7 +85,6 @@ namespace :deploy do
   end
 
   before :starting,     :check_revision
-  before "deploy:assets:precompile", "deploy:yarn_install"
   after  :finishing,    'puma:restart'
 end
 
