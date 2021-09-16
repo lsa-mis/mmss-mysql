@@ -77,6 +77,7 @@ namespace :deploy do
      upload! "config/puma_prod.rb",  "#{shared_path}/config/puma.rb"
      upload! "config/nginx_prod.conf",  "#{shared_path}/config/nginx.conf"
      upload! "config/lsa-was-base-c096c776ead3.json",  "#{shared_path}/config/lsa-was-base-c096c776ead3.json"
+     upload! "config/InCommon.CA.crt",  "#{shared_path}/mysql/InCommon.CA.crt"
     end
   end
 
