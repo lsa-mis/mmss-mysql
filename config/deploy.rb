@@ -16,57 +16,53 @@ set :puma_workers,    0
 # Don't change these unless you know what you're doing
 set :pty,             true
 set :stage,           :production
+set :deploy_via,      :remote_cache     
 set :deploy_to,       "/home/#{fetch(:user)}/apps/#{fetch(:application)}"
-set :puma_bind,       "unix://#{shared_path}/tmp/sockets/#{fetch(:application)}-puma.sock"
-set :puma_state,      "#{shared_path}/tmp/pids/puma.state"
-set :puma_pid,        "#{shared_path}/tmp/pids/puma.pid"
-set :puma_access_log, "#{release_path}/log/puma.error.log"
-set :puma_error_log,  "#{release_path}/log/puma.access.log"
+set :shared_path,     "#{fetch(:deploy_to)}/shared"
 set :ssh_options,     { forward_agent: true, user: fetch(:user), keys: %w(~/.ssh/id_rsa.pub) }
-set :puma_preload_app, true
-set :puma_init_active_record, true  # Change to false when not using ActiveRecord
 # Avoid permissions issues with using /tmp
 set :tmp_dir, '/home/deployer/tmp'
 
 # Default value for keep_releases is 5
 set :keep_releases, 3
 
+# Default value for :linked_files and linked_dirs is []
+set :linked_files, %w{config/puma.rb config/nginx.conf config/master.key config/puma.service config/lsa-was-base-c096c776ead3.json mysql/InCommon.CA.crt}
+set :linked_dirs,  %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system}
+set :linked_dirs, fetch(:linked_dirs, []).push('public/packs', 'node_modules')
+
 namespace :puma do
-  desc 'Create Directories for Puma Pids and Socket'
-  task :make_dirs do
+  desc 'Stop the PUMA service'
+  task :stop do
     on roles(:app) do
-      execute "mkdir #{shared_path}/tmp/sockets -p"
-      execute "mkdir #{shared_path}/tmp/pids -p"
+      execute "cd #{fetch(:deploy_to)}/current; #{fetch(:rbenv_prefix)} bundle exec pumactl -P ~/apps/#{fetch(:application)}/current/tmp/pids/puma.pid stop"
     end
   end
 
-  before :start, :make_dirs
+  desc 'Restart the PUMA service'
+  task :restart do
+    on roles(:app) do
+      execute "cd #{fetch(:deploy_to)}/current; #{fetch(:rbenv_prefix)} bundle exec pumactl -P ~/apps/#{fetch(:application)}/current/tmp/pids/puma.pid phased-restart"
+    end
+  end
+
+  desc 'Start the PUMA service'
+  task :start do
+    on roles(:app) do
+      puts "You must intially start the puma service using sudo on the server"
+    end
+  end
 end
 
 namespace :deploy do
   desc "Make sure local git is in sync with remote."
   task :check_revision do
     on roles(:app) do
-      unless `git rev-parse HEAD` == `git rev-parse origin/master`
-        puts "WARNING: HEAD is not the same as origin/master"
+      unless `git rev-parse HEAD` == `git rev-parse origin/main`
+        puts "WARNING: HEAD is not the same as origin/main"
         puts "Run `git push` to sync changes."
         exit
       end
-    end
-  end
-
-  desc 'Initial Deploy'
-  task :initial do
-    on roles(:app) do
-      before 'deploy:restart', 'puma:start'
-      invoke 'deploy'
-    end
-  end
-
-  desc 'Restart application'
-  task :restart do
-    on roles(:app), in: :sequence, wait: 5 do
-      invoke 'puma:restart'
     end
   end
 
@@ -76,6 +72,7 @@ namespace :deploy do
      upload! "config/master.key",  "#{shared_path}/config/master.key"
      upload! "config/puma_prod.rb",  "#{shared_path}/config/puma.rb"
      upload! "config/nginx_prod.conf",  "#{shared_path}/config/nginx.conf"
+     upload! "config/puma_prod.service",  "#{fetch(:shared_path)}/config/puma.service"
      upload! "config/lsa-was-base-c096c776ead3.json",  "#{shared_path}/config/lsa-was-base-c096c776ead3.json"
      upload! "config/InCommon.CA.crt",  "#{shared_path}/mysql/InCommon.CA.crt"
     end
@@ -90,10 +87,7 @@ namespace :deploy do
 
 
   before :starting,     :check_revision
-  after  :finishing,    :compile_assets
-  after  :finishing,    :cleanup
-  after  :finishing,    :restart
-  after "deploy:updated", "newrelic:notice_deployment"
+  after  :finishing,    'puma:restart'
 end
 
 namespace :maintenance do
@@ -111,8 +105,3 @@ namespace :maintenance do
     end
   end
 end
-
-# Default value for :linked_files and linked_dirs is []
-set :linked_files, %w{config/puma.rb config/nginx.conf config/master.key config/lsa-was-base-c096c776ead3.json}
-set :linked_dirs,  %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle .bundle public/system public/uploads}
-set :linked_dirs, fetch(:linked_dirs, []).push('public/packs', 'node_modules')
