@@ -78,13 +78,11 @@ namespace :deploy do
     end
   end
 
-
   desc "reload the database with seed data"
   task :seed do
     puts "Seeding db with seed file located at db/seeds.rb"
     run "cd #{current_path}; bin/rails db:seed RAILS_ENV=production"
   end
-
 
   before :starting,     :check_revision
   after  :finishing,    'puma:restart'
