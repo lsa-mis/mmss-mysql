@@ -1,0 +1,45 @@
+# =====================================================================================================
+# This file is to be created and installed on the production application server at /etc/systemd/system
+#
+# https://github.com/puma/puma/blob/master/docs/systemd.md
+# https://github.com/seuros/capistrano-puma#systemd
+# =====================================================================================================
+
+[Unit]
+Description=Puma HTTP Server
+After=network.target
+
+# Uncomment for socket activation (see below)
+# Requires=puma.socket
+
+[Service]
+# Puma supports systemd's `Type=notify` and watchdog service
+# monitoring, if the [sd_notify](https://github.com/agis/ruby-sdnotify) gem is installed,
+# as of Puma 5.1 or later.
+Type=notify
+
+# If your Puma process locks up, systemd's watchdog will restart it within seconds.
+WatchdogSec=10
+
+# Preferably configure a non-privileged user
+User=deployer
+Group=www-data
+
+# The path to the your application code root directory.
+# Also replace the "<YOUR_APP_PATH>" place holders below with this path.
+WorkingDirectory=/home/deployer/apps/mmss-mysql/current
+
+# SystemD will not run puma even if it is in your path. You must specify
+# an absolute URL to puma. For example /usr/local/bin/puma
+
+ExecStart=/home/deployer/.rbenv/shims/bundle exec puma -e production -C ./config/puma.rb config.ru
+PIDFile=/home/deployer/apps/mmss-mysql/shared/tmp/pids/puma.pid
+
+ExecStop=/home/deployer/.rbenv/bin/rbenv exec bundle exec pumactl -F /home/deployer/apps/mmss-mysql/current/config/puma.rb stop
+
+ExecReload=/home/deployer/.rbenv/bin/rbenv exec bundle exec pumactl -F /home/deployer/apps/mmss-mysql/current/config/puma.rb phased-restart
+
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
