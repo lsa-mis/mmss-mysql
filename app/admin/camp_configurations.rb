@@ -21,12 +21,12 @@ ActiveAdmin.register CampConfiguration do
   # end
 
 
-  filter :application_open
-  filter :application_close
-  filter :priority
-  filter :application_materials_due
-  filter :camper_acceptance_due
-  filter :active
+  # filter :application_open
+  # filter :application_close
+  # filter :priority
+  # filter :application_materials_due
+  # filter :camper_acceptance_due
+  # filter :active
   
   index do
     selectable_column

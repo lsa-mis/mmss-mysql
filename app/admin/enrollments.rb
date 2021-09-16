@@ -106,14 +106,14 @@ ActiveAdmin.register Enrollment, as: "Application" do
     f.actions         # adds the 'Submit' and 'Cancel' button
   end
   
-  filter :user_id, label: "Last Name", as: :select, collection: -> { Enrollment.all.map { |enrol| [enrol.last_name, enrol.user_id]}.sort}
-  filter :international
-  filter :year_in_school, as: :select
-  filter :anticipated_graduation_year, as: :select
-  filter :application_status, as: :select
-  filter :offer_status, as: :select
-  filter :application_deadline
-  filter :campyear, as: :select
+  # filter :user_id, label: "Last Name", as: :select, collection: -> { Enrollment.all.map { |enrol| [enrol.last_name, enrol.user_id]}.sort}
+  # filter :international
+  # filter :year_in_school, as: :select
+  # filter :anticipated_graduation_year, as: :select
+  # filter :application_status, as: :select
+  # filter :offer_status, as: :select
+  # filter :application_deadline
+  # filter :campyear, as: :select
 
   index do
     selectable_column

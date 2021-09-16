@@ -15,9 +15,9 @@ ActiveAdmin.register FinancialAid, as: "Financial Aid Request" do
   #   permitted << :other if params[:action] == 'create' && current_user.admin?
   #   permitted
   # end
-  filter :enrollment_id, as: :select, collection: Enrollment.current_camp_year_applications
-  filter :status, as: :select 
-  filter :source, as: :select
+  # filter :enrollment_id, as: :select, collection: Enrollment.current_camp_year_applications
+  # filter :status, as: :select 
+  # filter :source, as: :select
 
   form do |f| # This is a formtastic form builder
     f.semantic_errors # shows errors on :base
