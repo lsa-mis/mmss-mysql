@@ -1,8 +1,8 @@
 # config valid for current version and patch releases of Capistrano
 lock "~> 3.16.0"
 
-set :rbenv_type, :user
-set :rbenv_ruby, '3.0.2'
+# set :rbenv_type, :user
+# set :rbenv_ruby, '3.0.2'
 
 server 'lsa-math-mmss-app.miserver.it.umich.edu', roles: %w{app db web}, primary: true
 
@@ -11,7 +11,7 @@ set :repo_url, "git@github.com:lsa-mis/mmss-mysql.git"
 set :user, "deployer"
 set :puma_threads,    [4, 16]
 set :puma_workers,    0
-# Default branch is :master
+set :branch, "main"
 
 # Don't change these unless you know what you're doing
 set :pty,             true
@@ -35,14 +35,14 @@ namespace :puma do
   desc 'Stop the PUMA service'
   task :stop do
     on roles(:app) do
-      execute "cd #{fetch(:deploy_to)}/current; #{fetch(:rbenv_prefix)} bundle exec pumactl -P ~/apps/#{fetch(:application)}/current/tmp/pids/puma.pid stop"
+      execute "cd #{fetch(:deploy_to)}/current; /usr/bin/bundle exec pumactl -P ~/apps/#{fetch(:application)}/current/tmp/pids/puma.pid stop"
     end
   end
 
   desc 'Restart the PUMA service'
   task :restart do
     on roles(:app) do
-      execute "cd #{fetch(:deploy_to)}/current; #{fetch(:rbenv_prefix)} bundle exec pumactl -P ~/apps/#{fetch(:application)}/current/tmp/pids/puma.pid phased-restart"
+      execute "cd #{fetch(:deploy_to)}/current; /usr/bin/bundle exec pumactl -P ~/apps/#{fetch(:application)}/current/tmp/pids/puma.pid phased-restart"
     end
   end
 
