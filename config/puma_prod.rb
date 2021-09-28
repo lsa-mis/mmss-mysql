@@ -15,7 +15,7 @@ threads 4,16
 
 
 
-bind "unix:///home/deployer/apps/mmss-mysql/shared/tmp/sockets/mmss-puma.sock"
+bind "unix:///home/deployer/apps/mmss-mysql/shared/tmp/sockets/mmss-mysql-puma.sock"
 
 workers 2
 
