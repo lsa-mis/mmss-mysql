@@ -32,12 +32,12 @@ WorkingDirectory=/home/deployer/apps/mmss-mysql/current
 # SystemD will not run puma even if it is in your path. You must specify
 # an absolute URL to puma. For example /usr/local/bin/puma
 
-ExecStart=/usr/bin/bundle exec puma -e production -C ./config/puma.rb config.ru
+ExecStart=/snap/bin/bundle exec puma -e production -C ./config/puma.rb config.ru
 PIDFile=/home/deployer/apps/mmss-mysql/shared/tmp/pids/puma.pid
 
-ExecStop=/usr/bin/bundle exec pumactl -F /home/deployer/apps/mmss-mysql/current/config/puma.rb stop
+ExecStop=/snap/bin/bundle exec pumactl -F /home/deployer/apps/mmss-mysql/current/config/puma.rb stop
 
-ExecReload=/usr/bin/bundle exec pumactl -F /home/deployer/apps/mmss-mysql/current/config/puma.rb phased-restart
+ExecReload=/snap/bin/bundle exec pumactl -F /home/deployer/apps/mmss-mysql/current/config/puma.rb phased-restart
 
 Restart=always
 
