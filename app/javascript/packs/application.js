@@ -12,4 +12,5 @@ require("stylesheets/_footer.sass")
 
 import 'controllers'
 
+
 const images = require.context('../images', true)
