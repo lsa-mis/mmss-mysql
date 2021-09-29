@@ -7,8 +7,8 @@ require("@rails/ujs").start()
 require("turbolinks").start()
 require("@rails/activestorage").start()
 require("channels")
-require("css/application.sass")
-require("css/_footer.sass")
+require("stylesheets/application.sass")
+require("stylesheets/_footer.sass")
 
 import 'controllers'
 
