@@ -8,7 +8,7 @@ class OfferMailer < ApplicationMailer
     @enrollment = Enrollment.current_camp_year_applications.find_by(user_id: user)
     @assigned_courses = @enrollment.course_assignments
     @assigned_sessions = @enrollment.session_assignments
-    @url = "https://lsa-math-mmss.miserver.it.umich.edu"
+    @url = ConstantData::HOST_URL
     @camp_config = CampConfiguration.find_by(active: true)
     mail(to: @user.email, subject: "UM MMSS: Offer to attend Michigan Math and Science Scholars")
     @enrollment.update(application_status: "application complete") unless @enrollment.application_status == "application complete"
@@ -25,7 +25,7 @@ class OfferMailer < ApplicationMailer
     else
       @course_assignment =  "Contact MMSS admin to get a course assignment"
     end
-    @url = "https://lsa-math-mmss.miserver.it.umich.edu"
+    @url = ConstantData::HOST_URL
     @camp_config = CampConfiguration.find_by(active: true)
     mail(to: @user.email, subject: "UM MMSS: Offer Accepted")
   end
@@ -41,7 +41,7 @@ class OfferMailer < ApplicationMailer
     else
       @course_assignment =  ""
     end
-    @url = "https://lsa-math-mmss.miserver.it.umich.edu"
+    @url = ConstantData::HOST_URL
     @camp_config = CampConfiguration.find_by(active: true)
     mail(to: @user.email, subject: "UM MMSS: Offer Declined")
   end
