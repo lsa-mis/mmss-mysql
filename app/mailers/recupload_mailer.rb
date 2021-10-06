@@ -5,12 +5,12 @@ class RecuploadMailer < ApplicationMailer
     @recupload = params[:recupload]
     @recommendation = Recommendation.find(@recupload.recommendation_id)
     @student = @recommendation.enrollment.user.applicant_detail
-    @url = "https://lsa-math-mmss.miserver.it.umich.edu"
+    @url = ConstantData::HOST_URL
     mail(to: @recommendation.email, subject: "Recommendation for #{@student.firstname} #{@student.lastname}")
   end
 
   def applicant_received_email
-    @url = "https://lsa-math-mmss.miserver.it.umich.edu"
+    @url = ConstantData::HOST_URL
     @recupload = params[:recupload]
     @recommendation = Recommendation.find(@recupload.recommendation_id)
     @student_email = @recommendation.enrollment.user.email

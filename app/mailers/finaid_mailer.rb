@@ -3,7 +3,7 @@ class FinaidMailer < ApplicationMailer
   default from: 'University of Michigan MMSS High School Summer Program <mmss@umich.edu>'
 
   def fin_aid_awarded_email(finaid, balance_due)
-    @url = "https://lsa-math-mmss.miserver.it.umich.edu"
+    @url = ConstantData::HOST_URL
     @finaid = finaid
     @email = finaid.enrollment.user.email
     @balance_due = balance_due
@@ -12,7 +12,7 @@ class FinaidMailer < ApplicationMailer
   end
 
   def fin_aid_rejected_email(finaid, balance_due)
-    @url = "https://lsa-math-mmss.miserver.it.umich.edu"
+    @url = ConstantData::HOST_URL
     @email = finaid.enrollment.user.email
     @finaid = finaid
     @balance_due = balance_due
