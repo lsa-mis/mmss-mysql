@@ -29,15 +29,20 @@ class ApplicantDetailsController < ApplicationController
   # POST /applicant_details
   # POST /applicant_details.json
   def create
-    @applicant_detail = current_user.create_applicant_detail(applicant_detail_params)
+    if current_user.applicant_detail.present?
+      flash[:notice] = "Applicant Details exist. Click Edit, if you want to change something."
+      redirect_to(applicant_detail_path(current_user))
+    else
+      @applicant_detail = current_user.create_applicant_detail(applicant_detail_params)
 
-    respond_to do |format|
-      if @applicant_detail.save
-        format.html { redirect_to root_path, notice: 'Applicant detail was successfully created.' }
-        format.json { render :show, status: :created, location: @applicant_detail }
-      else
-        format.html { render :new }
-        format.json { render json: @applicant_detail.errors, status: :unprocessable_entity }
+      respond_to do |format|
+        if @applicant_detail.save
+          format.html { redirect_to root_path, notice: 'Applicant detail was successfully created.' }
+          format.json { render :show, status: :created, location: @applicant_detail }
+        else
+          format.html { render :new }
+          format.json { render json: @applicant_detail.errors, status: :unprocessable_entity }
+        end
       end
     end
   end
