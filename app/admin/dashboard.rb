@@ -51,6 +51,12 @@ ActiveAdmin.register_page "Dashboard" do
           end
         end
 
+        panel "Admin Alerts" do
+          div do
+            render("/admin/dashboard_admin_alert", model: "dashboard")
+          end
+        end
+
         panel "Active Camp Note" do
           div do
             render("/admin/dashboard_camp_note", model: "dashboard")

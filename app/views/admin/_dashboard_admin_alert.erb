@@ -1,0 +1,22 @@
+<% if CampConfiguration.active.pick(:offer_letter).blank? ||
+      CampConfiguration.active.pick(:reject_letter).blank? ||
+      CampConfiguration.active.pick(:waitlist_letter).blank? %>
+  <div style="display:flex;align-items:center;">
+    <div style="display: inline-block;white-space: nowrap;margin-right: 4px;padding-top: 4px;">
+      <%= render :partial => 'svg/alert' %>
+    </div>
+    <div class="self-center" style="display: inline-block;white-space: nowrap;">
+      <% if CampConfiguration.active.pick(:offer_letter).blank? %>
+          Please add offer_letter text to the current Camp Configuration
+          <br>
+      <% end %>
+      <% if CampConfiguration.active.pick(:reject_letter).blank? %>
+          Please add reject_letter text to the current Camp Configuration
+          <br>
+      <% end %>
+      <% if CampConfiguration.active.pick(:waitlist_letter).blank? %>
+          Please add waitlist_letter text to the current Camp Configuration
+      <% end %>
+    </div>
+<% end %>
+
