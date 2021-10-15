@@ -7,15 +7,15 @@
     </div>
     <div class="self-center" style="display: inline-block;white-space: nowrap;">
       <% if CampConfiguration.active.pick(:offer_letter).blank? %>
-          Please add offer_letter text to the current Camp Configuration
+          Please add the Offer letter's text to the current Camp Configuration
           <br>
       <% end %>
       <% if CampConfiguration.active.pick(:reject_letter).blank? %>
-          Please add reject_letter text to the current Camp Configuration
+          Please add the Reject letter's text to the current Camp Configuration
           <br>
       <% end %>
       <% if CampConfiguration.active.pick(:waitlist_letter).blank? %>
-          Please add waitlist_letter text to the current Camp Configuration
+          Please add the Waitlist letter's text to the current Camp Configuration
       <% end %>
     </div>
 <% end %>

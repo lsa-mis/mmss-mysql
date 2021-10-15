@@ -34,7 +34,7 @@ class Rejection < ApplicationRecord
 
   def reject_letter_presence
     if CampConfiguration.active.pick(:reject_letter).blank?
-      errors.add(:base, "reject_letter text must be added to the Camp Configuration")
+      errors.add(:base, "Reject letter's text must be added to the Camp Configuration")
     end
   end
 end

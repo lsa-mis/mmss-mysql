@@ -141,7 +141,7 @@ class Enrollment < ApplicationRecord
     if previous_changes[:offer_status]
       if self.offer_status == "offered"
         if CampConfiguration.active.pick(:offer_letter).blank?
-          errors.add(:base, "offer_letter text must be added to the Camp Configuration")
+          errors.add(:base, "Offer letter's text must be added to the Camp Configuration")
         else
           OfferMailer.offer_email(self.user_id).deliver_now
         end

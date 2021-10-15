@@ -87,7 +87,7 @@ class EnrollmentsController < ApplicationController
   def add_to_waitlist
     @enrollment = Enrollment.find(params[:id])
     if CampConfiguration.active.pick(:waitlist_letter).blank?
-      flash[:error] = "waitlist_letter text must be added to the Camp Configuration"
+      flash[:error] = "Waitlist letter's text must be added to the Camp Configuration"
       redirect_to(admin_application_path(@enrollment))
     else
       @enrollment.update(application_status: 'waitlisted')
