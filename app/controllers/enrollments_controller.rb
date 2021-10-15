@@ -86,10 +86,15 @@ class EnrollmentsController < ApplicationController
 
   def add_to_waitlist
     @enrollment = Enrollment.find(params[:id])
-    @enrollment.update(application_status: 'waitlisted')
-    respond_to do |format|
-      format.html { redirect_to admin_applications_path, notice: 'Application was placed on waitlist.' }
-      format.json { head :no_content }
+    if CampConfiguration.active.pick(:waitlist_letter).blank?
+      flash[:error] = "waitlist_letter text must be added to the Camp Configuration"
+      redirect_to(admin_application_path(@enrollment))
+    else
+      @enrollment.update(application_status: 'waitlisted')
+      respond_to do |format|
+        format.html { redirect_to admin_applications_path, notice: 'Application was placed on waitlist.' }
+        format.json { head :no_content }
+      end
     end
   end
 
