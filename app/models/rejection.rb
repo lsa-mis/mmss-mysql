@@ -13,6 +13,7 @@ class Rejection < ApplicationRecord
   belongs_to :enrollment
 
   validates :reason, presence: true
+  validate :reject_letter_presence
 
 
   def set_rejection_status
@@ -31,4 +32,9 @@ class Rejection < ApplicationRecord
     Enrollment.find(enrollment_id).update!(application_status: "rejected", offer_status: "")
   end
 
+  def reject_letter_presence
+    if CampConfiguration.active.pick(:reject_letter).blank?
+      errors.add(:base, "reject_letter text must be added to the Camp Configuration")
+    end
+  end
 end
