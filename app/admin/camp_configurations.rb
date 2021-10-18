@@ -20,6 +20,13 @@ ActiveAdmin.register CampConfiguration do
   #   permitted
   # end
 
+  controller do
+    # Custom new method
+    def new
+      @camp_configuration = CampConfiguration.last.dup
+    end
+  end
+
 
   filter :application_open
   filter :application_close

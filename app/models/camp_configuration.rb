@@ -54,4 +54,19 @@ class CampConfiguration < ApplicationRecord
       errors.add(:active, 'cannot have another active camp')
     end
   end
+
+  def dup
+    super.tap do |new_camp_configuration|
+
+      new_camp_configuration.camp_year = ""
+      new_camp_configuration.application_open = ""
+      new_camp_configuration.application_close = ""
+      new_camp_configuration.application_materials_due = ""
+      new_camp_configuration.priority = ""
+      new_camp_configuration.camper_acceptance_due = ""
+      new_camp_configuration.active = ""
+      new_camp_configuration.student_packet_url = ""
+
+    end
+  end
 end
