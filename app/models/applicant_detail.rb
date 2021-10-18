@@ -74,10 +74,10 @@ def gender_name
 end
 
 def demographic_name
-  if self.demographic.empty?
-    "None Selected"
-  else
+  if self.demographic.present?
     Demographic.find(self.demographic).name
+  else
+    "None Selected"
   end
 end
 
