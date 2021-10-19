@@ -23,7 +23,7 @@ ActiveAdmin.register CampConfiguration do
   controller do
     # Custom new method
     def new
-      flash[:alert] = "Letters texts were copied from the last year camp. Don't forget to edit them."
+      flash[:alert] = "Each letter's text and camp fee were copied from previous camp. Don't forget to edit them."
       @camp_configuration = CampConfiguration.last.dup
     end
   end
