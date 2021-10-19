@@ -27,6 +27,7 @@ class Payment < ApplicationRecord
 
   validates :transaction_id, presence: true, uniqueness: true
   validates :total_amount, presence: true
+  validates :transaction_date, presence: true
 
   belongs_to :user
 
