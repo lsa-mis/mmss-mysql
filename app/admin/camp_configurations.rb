@@ -20,6 +20,14 @@ ActiveAdmin.register CampConfiguration do
   #   permitted
   # end
 
+  controller do
+    # Custom new method
+    def new
+      flash[:alert] = "Each letter's text and camp fee were copied from previous camp. Don't forget to edit them."
+      @camp_configuration = CampConfiguration.last.dup
+    end
+  end
+
 
   filter :application_open
   filter :application_close
