@@ -87,7 +87,7 @@
             <% else %>
               <div class="my-2">
                 <%= link_to "Accept", accept_session_offer_path(as.id), method: "POST", class: "btn btn-blue" %> |
-                <%= link_to "Decline", decline_session_offer_path(as.id), method: "POST", class: "btn btn-red" %>
+                <%= link_to "Decline", decline_session_offer_path(as.id), method: "POST", data: { confirm: "Are you sure you want to decline this session?"}, class: "btn btn-red" %>
               </div>
             <% end %>
             <hr>
@@ -96,6 +96,11 @@
           <hr>
           <div>
             <span class="text-green-700 font-semibold">You have accepted admission</span>
+            <div class="text-sm">(You may email any questions to 
+              <%= mail_to "mmss@umich.edu", subject: "Question about MMSS"  do %>
+                <strong>mmss@umich.edu)</strong>
+              <% end %>
+            </div>
             <% current_enrollment.session_assignments.each do |sa| %>
               <% if sa.offer_status == "accepted" %>
               <div>
@@ -148,6 +153,11 @@
           <hr>
           <div>
             <span class="text-red-700 font-semibold">You have declined admission</span>
+            <div class="text-sm">(You may email any questions to 
+              <%= mail_to "mmss@umich.edu", subject: "Question about MMSS"  do %>
+                <strong>mmss@umich.edu)</strong>
+              <% end %>
+            </div>
           </div>
         <% else %>
           <hr>
