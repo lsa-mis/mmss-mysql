@@ -4,7 +4,11 @@
   <% if current_user.applicant_detail.present? && current_user.applicant_detail.persisted? %>
     <div id="sidebox">
       <p><strong>Progress Window</strong><p>
-
+      <div class="text-xs">(You may email any questions to 
+      <%= mail_to "mmss@umich.edu", subject: "Question about MMSS"  do %>
+        <strong>mmss@umich.edu</strong>)
+      <% end %>
+    </div>
       <% if @current_enrollment.present? && @current_enrollment.persisted? %>
         <% if @current_enrollment.application_status.present? %>
           <span class="text-green-800 font-semibold"><%= @current_enrollment.application_status.titleize %></span>
@@ -86,8 +90,8 @@
               </div>
             <% else %>
               <div class="my-2">
-                <%= link_to "Accept", accept_session_offer_path(as.id), method: "POST", class: "btn btn-blue" %> |
-                <%= link_to "Decline", decline_session_offer_path(as.id), method: "POST", class: "btn btn-red" %>
+                <%= link_to "Accept", accept_session_offer_path(as.id), method: "POST", data: { confirm: "Are you sure you want to accept this session?"}, class: "btn btn-blue" %> |
+                <%= link_to "Decline", decline_session_offer_path(as.id), method: "POST", data: { confirm: "Are you sure you want to decline this session?"}, class: "btn btn-red" %>
               </div>
             <% end %>
             <hr>
