@@ -17,7 +17,7 @@ ActiveAdmin.register_page "Reports" do
   end # content
 
   controller do
-
+    
     def demographic_report
       query = "SELECT distinct(REPLACE(ad.lastname, ',', ' ') || ' ' || REPLACE(ad.firstname, ',', ' ')) AS name, ad.country,
       (CASE WHEN ad.gender = '' THEN NULL ELSE 
@@ -29,7 +29,7 @@ ActiveAdmin.register_page "Reports" do
       FROM enrollments AS e 
       LEFT JOIN users AS u ON e.user_id = u.id
       LEFT JOIN applicant_details AS ad ON ad.user_id = e.user_id
-      WHERE e.application_status = 'enrolled' AND e.campyear = 2022 ORDER BY country, gender, year_in_school"
+      WHERE e.application_status = 'enrolled' AND e.campyear = #{CampConfiguration.active.last.camp_year} ORDER BY country, gender, year_in_school"
       title = "Demographic report"
 
       data = data_to_csv_demographic(query, title)
@@ -79,7 +79,7 @@ ActiveAdmin.register_page "Reports" do
       LEFT JOIN applicant_details AS ad ON ad.user_id = e.user_id
       LEFT JOIN recommendations AS r ON r.enrollment_id = e.id
       LEFT JOIN financial_aids AS fa ON fa.enrollment_id = e.id
-      WHERE e.application_status = 'application complete' AND e.campyear = 2022 ORDER BY name"
+      WHERE e.application_status = 'application complete' AND e.campyear = #{CampConfiguration.active.last.camp_year} ORDER BY name"
       title = "All complete applications"
 
       data = data_to_csv(query, title)
@@ -95,7 +95,7 @@ ActiveAdmin.register_page "Reports" do
               FROM enrollments AS e 
               LEFT JOIN users AS u ON e.user_id = u.id
               JOIN applicant_details AS ad ON ad.user_id = e.user_id
-              WHERE e.application_status = 'enrolled' AND e.campyear = 2021 ORDER BY name"
+              WHERE e.application_status = 'enrolled' AND e.campyear = #{CampConfiguration.active.last.camp_year} ORDER BY name"
       title = "Enrolled with addresses"
 
       data = data_to_csv(query, title)
@@ -113,7 +113,7 @@ ActiveAdmin.register_page "Reports" do
       JOIN camp_occurrences AS co ON cor.camp_occurrence_id = co.id
       LEFT JOIN users AS u ON en.user_id = u.id
       ORDER BY co.description, cor.title"
-      title = "Enrolled with addresses"
+      title = "Course assignments with students"
 
       data = data_to_csv(query, title)
       respond_to do |format|
