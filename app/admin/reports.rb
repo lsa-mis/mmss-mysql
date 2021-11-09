@@ -30,11 +30,11 @@ ActiveAdmin.register_page "Reports" do
       LEFT JOIN users AS u ON e.user_id = u.id
       LEFT JOIN applicant_details AS ad ON ad.user_id = e.user_id
       WHERE e.application_status = 'enrolled' AND e.campyear = #{CampConfiguration.active.last.camp_year} ORDER BY country, gender, year_in_school"
-      title = "Demographic report"
+      title = "demographic"
 
       data = data_to_csv_demographic(query, title)
       respond_to do |format|
-        format.html { send_data data, filename: "MMSS-report-#{DateTime.now.strftime('%-d-%-m-%Y at %I-%M%p')}.csv"}
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv"}
       end
     end
 
@@ -43,11 +43,11 @@ ActiveAdmin.register_page "Reports" do
       FROM users AS u
       JOIN applicant_details AS ad on u.id = ad.user_id 
       WHERE ad.user_id NOT IN (SELECT e.user_id FROM enrollments AS e)"
-      title = "Registered but not applied"
+      title = "registered_but_not_applied"
 
       data = data_to_csv(query, title)
       respond_to do |format|
-        format.html { send_data data, filename: "MMSS-report-#{DateTime.now.strftime('%-d-%-m-%Y at %I-%M%p')}.csv"}
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv"}
       end
     end
 
@@ -80,11 +80,11 @@ ActiveAdmin.register_page "Reports" do
       LEFT JOIN recommendations AS r ON r.enrollment_id = e.id
       LEFT JOIN financial_aids AS fa ON fa.enrollment_id = e.id
       WHERE e.application_status = 'application complete' AND e.campyear = #{CampConfiguration.active.last.camp_year} ORDER BY name"
-      title = "All complete applications"
+      title = "all_complete_applications"
 
       data = data_to_csv(query, title)
       respond_to do |format|
-        format.html { send_data data, filename: "MMSS-report-#{DateTime.now.strftime('%-d-%-m-%Y at %I-%M%p')}.csv"}
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv"}
       end
       
     end
@@ -96,11 +96,11 @@ ActiveAdmin.register_page "Reports" do
               LEFT JOIN users AS u ON e.user_id = u.id
               JOIN applicant_details AS ad ON ad.user_id = e.user_id
               WHERE e.application_status = 'enrolled' AND e.campyear = #{CampConfiguration.active.last.camp_year} ORDER BY name"
-      title = "Enrolled with addresses"
+      title = "enrolled_with_addresses"
 
       data = data_to_csv(query, title)
       respond_to do |format|
-        format.html { send_data data, filename: "MMSS-report-#{DateTime.now.strftime('%-d-%-m-%Y at %I-%M%p')}.csv"}
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv"}
       end
     end
 
@@ -113,11 +113,11 @@ ActiveAdmin.register_page "Reports" do
       JOIN camp_occurrences AS co ON cor.camp_occurrence_id = co.id
       LEFT JOIN users AS u ON en.user_id = u.id
       ORDER BY co.description, cor.title"
-      title = "Course assignments with students"
+      title = "course_assignments_with_students"
 
       data = data_to_csv(query, title)
       respond_to do |format|
-        format.html { send_data data, filename: "MMSS-report-#{DateTime.now.strftime('%-d-%-m-%Y at %I-%M%p')}.csv"}
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv"}
       end
     end
 
@@ -127,7 +127,7 @@ ActiveAdmin.register_page "Reports" do
       result.push({"total" => records_array.count, "header" => records_array.columns, "rows" => records_array.rows})
 
       CSV.generate(headers: false) do |csv|
-        csv << Array(title)
+        csv << Array(title.titleize)
         result.each do |res|
           line =[]
           line << "Total number of records: " + res['total'].to_s
@@ -147,7 +147,7 @@ ActiveAdmin.register_page "Reports" do
       result.push({"total" => records_array.count, "header" => records_array.columns, "rows" => records_array.rows})
 
       CSV.generate(headers: false) do |csv|
-        csv << Array(title)
+        csv << Array(title.titleize)
         result.each do |res|
           line =[]
           line << "Total number of records: " + res['total'].to_s
