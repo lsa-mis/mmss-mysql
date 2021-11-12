@@ -60,7 +60,7 @@ ActiveAdmin.register_page "Dashboard" do
         end
       else
         panel "Notifications" do
-          "No Active Camps"
+          "No active camps"
         end
       end
     end
