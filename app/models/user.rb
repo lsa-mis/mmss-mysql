@@ -38,7 +38,7 @@ class User < ApplicationRecord
   end
 
   def archive_associated_payments
-    self.payments do |payment|
+    self.payments.each do |payment|
       archive_attr = payment.attributes.except!("user_id")
       archive_payment = PaymentArchive.new(archive_attr)
       archive_payment.user_email = self.email
