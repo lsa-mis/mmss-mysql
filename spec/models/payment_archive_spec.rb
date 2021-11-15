@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: payments
+# Table name: payment_archives
 #
 #  id                 :bigint           not null, primary key
 #  transaction_type   :string(255)
@@ -15,13 +15,15 @@
 #  payer_identity     :string(255)
 #  timestamp          :string(255)
 #  transaction_hash   :string(255)
-#  user_id            :bigint           not null
+#  camp_year          :integer
+#  user_email         :string(255)
+#  first_name         :string(255)
+#  last_name          :string(255)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
-#  camp_year          :integer
 #
 require 'rails_helper'
 
-RSpec.describe Payment, type: :model do
+RSpec.describe PaymentArchive, type: :model do
   pending "add some examples to (or delete) #{__FILE__}"
 end

@@ -12,11 +12,11 @@
 #  active                    :boolean          default(FALSE), not null
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
-#  offer_letter              :text
-#  student_packet_url        :string
+#  offer_letter              :text(65535)
+#  student_packet_url        :string(255)
 #  application_fee_cents     :integer
-#  reject_letter             :text
-#  waitlist_letter           :text
+#  reject_letter             :text(65535)
+#  waitlist_letter           :text(65535)
 #
 require 'rails_helper'
 

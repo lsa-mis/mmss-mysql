@@ -3,11 +3,11 @@
 # Table name: feedbacks
 #
 #  id         :bigint           not null, primary key
+#  genre      :string(255)
+#  message    :string(255)
+#  user_id    :bigint
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
-#  user_id    :bigint           not null
-#  genre      :string           not null
-#  message    :string           not null
 #
 class Feedback < ApplicationRecord
   belongs_to :user
