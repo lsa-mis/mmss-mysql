@@ -17,4 +17,10 @@ ActiveAdmin.register Travel do
   #   permitted
   # end
 
+  if CampConfiguration.active.present?
+    actions :all
+  else
+    actions :all, :except => [:new]
+  end
+  
 end

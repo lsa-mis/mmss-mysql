@@ -18,6 +18,12 @@ ActiveAdmin.register Recommendation do
   #   permitted
   # end
 
+  if CampConfiguration.active.present?
+    actions :all
+  else
+    actions :all, :except => [:new]
+  end
+  
   form do |f|
     f.semantic_errors
     f.inputs do

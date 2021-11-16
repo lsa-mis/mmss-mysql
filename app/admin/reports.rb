@@ -3,15 +3,21 @@ ActiveAdmin.register_page "Reports" do
 
   content title: "Reports" do
 
-    columns do
-      panel "queries" do
-        ul do
-          li link_to "report - all complete apps", admin_reports_all_complete_apps_path
-          li link_to "report - registered but not applied", admin_reports_registered_but_not_applied_path
-          li link_to "report- enrolled_with_addresses", admin_reports_enrolled_with_addresses_path
-          li link_to "report - course_assignments_with_students", admin_reports_course_assignments_with_students_path
-          li link_to "report - demographic_report", admin_reports_demographic_report_path
+    if CampConfiguration.active.present?
+      columns do
+        panel "queries" do
+          ul do
+            li link_to "report - all complete apps", admin_reports_all_complete_apps_path
+            li link_to "report - registered but not applied", admin_reports_registered_but_not_applied_path
+            li link_to "report- enrolled_with_addresses", admin_reports_enrolled_with_addresses_path
+            li link_to "report - course_assignments_with_students", admin_reports_course_assignments_with_students_path
+            li link_to "report - demographic_report", admin_reports_demographic_report_path
+          end
         end
+      end
+    else
+      panel "Notifications" do
+        "No active camps"
       end
     end
   end # content

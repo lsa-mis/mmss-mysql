@@ -15,6 +15,13 @@ ActiveAdmin.register Rejection do
   #   permitted << :other if params[:action] == 'create' && current_user.admin?
   #   permitted
   # end
+
+  if CampConfiguration.active.present?
+    actions :all
+  else
+    actions :all, :except => [:new]
+  end
+  
   form do |f| # This is a formtastic form builder
     f.semantic_errors # shows errors on :base
     f.inputs do

@@ -15,8 +15,16 @@ ActiveAdmin.register SessionActivity, as: 'Session Selection' do
   #   permitted
   # end
 
-  filter :enrollment_id, as: :select, collection: -> { Enrollment.current_camp_year_applications.map { |enrol| [enrol.last_name, enrol.id]}.sort}
-  filter :camp_occurrence_id, label: "Session", as: :select, collection: CampOccurrence.active.no_any_session
+  if CampConfiguration.active.present?
+    actions :all
+  else
+    actions :all, :except => [:new]
+  end
+
+  if CampConfiguration.active.present?
+    filter :enrollment_id, as: :select, collection: -> { Enrollment.current_camp_year_applications.map { |enrol| [enrol.last_name, enrol.id]}.sort}
+    filter :camp_occurrence_id, label: "Session", as: :select, collection: CampOccurrence.active.no_any_session
+  end
 
   form do |f|
     f.inputs do

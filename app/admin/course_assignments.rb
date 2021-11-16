@@ -8,16 +8,26 @@ ActiveAdmin.register CourseAssignment do
   #
    permit_params :enrollment_id, :course_id
 
-   filter :enrollment_id, as: :select, collection: -> { Enrollment.current_camp_year_applications.map { |enrol| [enrol.last_name, enrol.id]}.sort}
-   filter :course_id, as: :select, collection: Course.where(camp_occurrence_id: CampOccurrence.active).order(camp_occurrence_id: :asc, title: :asc)
+  if CampConfiguration.active.present?
 
-   form do |f|
+    filter :enrollment_id, as: :select, collection: -> { Enrollment.current_camp_year_applications.map { |enrol| [enrol.last_name, enrol.id]}.sort}
+    filter :course_id, as: :select, collection: Course.where(camp_occurrence_id: CampOccurrence.active).order(camp_occurrence_id: :asc, title: :asc)
+  end
+
+  if CampConfiguration.active.present?
+    actions :all
+  else
+    actions :all, :except => [:new]
+  end
+
+  form do |f|
     f.inputs do
       f.input :enrollment_id, as: :select, collection: Enrollment.current_camp_year_applications
       f.input :course_id, label: "Course", as: :select, collection: Course.where(camp_occurrence_id: CampOccurrence.active)
     end
     f.actions
   end
+  
 
   index do
     selectable_column

@@ -9,6 +9,12 @@ ActiveAdmin.register Recupload do
   #
    permit_params :letter, :authorname, :studentname, :recommendation_id, :rechash, :recletter
 
+  if CampConfiguration.active.present?
+    actions :all
+  else
+    actions :all, :except => [:new]
+  end
+
   form do |f|
     f.semantic_errors
     f.inputs do

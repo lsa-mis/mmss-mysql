@@ -22,7 +22,11 @@ ActiveAdmin.register Payment do
   filter :camp_year, as: :select
   filter :created_at
 
-
+  if CampConfiguration.active.present?
+    actions :all
+  else
+    actions :all, :except => [:new]
+  end
 
   form do |f| # This is a formtastic form builder
     f.semantic_errors # shows errors on :base

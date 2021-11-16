@@ -19,15 +19,25 @@ ActiveAdmin.register Enrollment, as: "Application" do
                   session_assignments_attributes: [:id, :camp_occurrence_id, :_destroy ],
                   course_assignments_attributes: [:id, :course_id, :_destroy ]
 
-  scope :current_camp_year_applications, :default => true, label: "Current years Applications"
-  scope :all
+  if CampConfiguration.active.present?
+    scope :current_camp_year_applications, :default => true, label: "Current years Applications"
+    scope :all
 
-  scope :offered, group: :offer_status
-  scope :accepted, group: :offer_status
+    scope :offered, group: :offer_status
+    scope :accepted, group: :offer_status
 
-  scope :application_complete, group: :application_status
-  scope :application_complete_not_offered, group: :application_status
-  scope :enrolled, group: :application_status
+    scope :application_complete, group: :application_status
+    scope :application_complete_not_offered, group: :application_status
+    scope :enrolled, group: :application_status
+  end
+
+  # controller do
+  #   if CampConfiguration.active.present?
+  #     actions :all
+  #   else
+  #     actions :all, :except => [:new]
+  #   end
+  # end
 
   action_item :set_waitlisted, only: :show do
     text_node link_to("Place on Wait List", waitlisted_path(application), data: { confirm: 'Are you sure you want to wait list this application?'}, method: :post ) if ["", "submitted", "application complete"].include? application.application_status
@@ -141,8 +151,8 @@ ActiveAdmin.register Enrollment, as: "Application" do
     column "Camp Year" do |app|
       app.campyear
     end
-
   end
+
 
   show do
     attributes_table do
