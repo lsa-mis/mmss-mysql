@@ -32,6 +32,7 @@ ActiveAdmin.register Enrollment, as: "Application" do
   scope :no_recomendation, group: :missing
   scope :no_letter, group: :missing
   scope :no_payments, group: :missing
+  scope :no_student_packet, group: :missing
 
   action_item :set_waitlisted, only: :show do
     text_node link_to("Place on Wait List", waitlisted_path(application), data: { confirm: 'Are you sure you want to wait list this application?'}, method: :post ) if ["", "submitted", "application complete"].include? application.application_status
