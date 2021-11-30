@@ -79,11 +79,15 @@ class Enrollment < ApplicationRecord
   validate :acceptable_student_packet
 
   scope :current_camp_year_applications, -> { where('campyear = ? ', CampConfiguration.active_camp_year) }
-  scope :offered, -> { current_camp_year_applications.where("offer_status = 'offered'")}
-  scope :accepted, -> { current_camp_year_applications.where("offer_status = 'accepted'")}
-  scope :enrolled, -> { current_camp_year_applications.where("application_status = 'enrolled'")}
-  scope :application_complete, -> {  current_camp_year_applications.where("application_status = 'application complete'")}
-  scope :application_complete_not_offered, -> {  application_complete.where(offer_status: [nil, ""])}
+  scope :offered, -> { current_camp_year_applications.where("offer_status = 'offered'") }
+  scope :accepted, -> { current_camp_year_applications.where("offer_status = 'accepted'") }
+  scope :enrolled, -> { current_camp_year_applications.where("application_status = 'enrolled'") }
+  scope :application_complete, -> { current_camp_year_applications.where("application_status = 'application complete'") }
+  scope :application_complete_not_offered, -> { application_complete.where(offer_status: [nil, ""])}
+  scope :no_recomendation, -> { current_camp_year_applications.where.missing(:recommendation) }
+  scope :no_letter, -> { current_camp_year_applications.where(id: Recommendation.where.missing(:recupload).pluck(:enrollment_id)) }
+  scope :no_payments, -> { current_camp_year_applications.where.not(user_id: Payment.where(camp_year: CampConfiguration.active.last.camp_year).pluck(:user_id)) }
+  scope :no_student_packet, -> { current_camp_year_applications.where.not(id: Enrollment.current_camp_year_applications.joins(:student_packet_attachment).pluck(:id)) }
 
   def display_name
     "#{self.applicant_detail.full_name} - #{self.user.email}"
