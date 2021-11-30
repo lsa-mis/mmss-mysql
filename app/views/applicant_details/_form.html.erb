@@ -76,6 +76,11 @@
   </div>
 
   <div class="field">
+    <%= form.label :shirt_size%>
+    <%= form.select :shirt_size, ["small","medium","large","xlarge","2xlarge","No Shirt"], include_blank: "Select", required: true %>
+  </div>
+
+  <div class="field">
     <%= form.label :diet_restrictions, class: 'form-optional'  %>
     <%= form.text_area :diet_restrictions %>
   </div>

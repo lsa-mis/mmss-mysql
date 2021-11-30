@@ -23,7 +23,7 @@ ActiveAdmin.register ApplicantDetail do
       f.input :demographic, as: :select, collection: Demographic.all
       f.input :birthdate
       f.input :diet_restrictions
-      # f.input :shirt_size
+      f.input :shirt_size
       f.input :address1
       f.input :address2
       f.input :city
@@ -79,7 +79,7 @@ ActiveAdmin.register ApplicantDetail do
     end
     column :birthdate
     column :diet_restrictions
-    # column :shirt_size
+    column :shirt_size
     column :address1
     column :address2
     column :city
@@ -122,7 +122,7 @@ ActiveAdmin.register ApplicantDetail do
       end
       row :birthdate
       row :diet_restrictions
-      # row :shirt_size
+      row :shirt_size
       row :address1
       row :address2
       row :city
