@@ -20,11 +20,14 @@ ActiveAdmin.register Course do
   filter :available_spaces, as: :select
   filter :status, as: :select
 
+  scope :current_camp, :default => true, label: "Current Camp Courses"
+  scope :all
+
   form do |f| # This is a formtastic form builder
     f.semantic_errors # shows errors on :base
     # f.inputs           # builds an input field for every attribute
     f.inputs do
-      f.input :camp_occurrence, label: "Session", as: :select, collection: CampOccurrence.order(begin_date: :desc).no_any_session
+      f.input :camp_occurrence, label: "Session", as: :select, collection: CampOccurrence.active.order(begin_date: :desc).no_any_session
       f.input :title
       f.input :available_spaces
       f.input :status, as: :select, collection: course_status
