@@ -55,7 +55,7 @@ class ApplicantDetail < ApplicationRecord
   validates :parentphone, presence: true, format: { with: /\A(\+|00)?[0-9][0-9 \-?\(\)\.]{7,}\z/, message: "number format is incorrect"}
   validates :parentemail, presence: true, length: {maximum: 255},
                     format: {with: URI::MailTo::EMAIL_REGEXP, message: "only allows valid emails"}
-
+  validate :parentemail_not_user_email 
 
 def full_name
   "#{firstname} #{lastname}"
@@ -81,6 +81,13 @@ def demographic_name
   end
 end
 
+def parentemail_not_user_email
+  if self.user.email == self.parentemail
+    errors.add(:base, "Parent/Guardian email should be differen than an applicatnt's email")
+  else
+    return true
+  end
+end
 
   # def applicant_profile_link
   #   if self.find(current_user)
