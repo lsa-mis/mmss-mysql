@@ -9,7 +9,7 @@
       <p>====================================</p>
     <% end %>
 
-    <% if @users_current_payments.count < 1 %>
+    <% if @users_current_payments.count < 1 && CampConfiguration.active.last.application_fee_required %>
       <p class="my-2">You have not made a payment yet. Payment can be made via check or money
         order from a U.S. based bank, or via credit card. International students may
         pay via wire transfer (contact our office for more information regarding wire

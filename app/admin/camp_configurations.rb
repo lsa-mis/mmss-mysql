@@ -9,7 +9,7 @@ ActiveAdmin.register CampConfiguration do
    permit_params  :camp_year, :application_open, :application_close, 
                   :priority, :application_materials_due, 
                   :camper_acceptance_due, :active, :offer_letter, 
-                  :student_packet_url, :application_fee_cents, 
+                  :student_packet_url, :application_fee_cents, :application_fee_required,
                   :reject_letter, :waitlist_letter
   #
   # or
@@ -50,6 +50,7 @@ ActiveAdmin.register CampConfiguration do
     column "Application Fee" do |af|
       humanized_money_with_symbol(af.application_fee)
     end
+    column :application_fee_required
   end
 
   show do
@@ -72,6 +73,7 @@ ActiveAdmin.register CampConfiguration do
     end
     row :student_packet_url
     row :application_fee_cents
+    row :application_fee_required
     row :created_at
     row :updated_at 
     end
