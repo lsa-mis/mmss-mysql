@@ -4,13 +4,13 @@
 #
 #  id               :bigint           not null, primary key
 #  enrollment_id    :bigint           not null
-#  direction        :string
-#  transport_needed :string
+#  direction        :string(255)
+#  transport_needed :string(255)
 #  date             :datetime
-#  mode             :string
-#  carrier          :string
-#  route_num        :string
-#  note             :text
+#  mode             :string(255)
+#  carrier          :string(255)
+#  route_num        :string(255)
+#  note             :text(65535)
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
 #

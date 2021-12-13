@@ -3,9 +3,9 @@
 # Table name: recuploads
 #
 #  id                :bigint           not null, primary key
-#  letter            :text
-#  authorname        :string           not null
-#  studentname       :string           not null
+#  letter            :text(65535)
+#  authorname        :string(255)      not null
+#  studentname       :string(255)      not null
 #  recommendation_id :bigint           not null
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
