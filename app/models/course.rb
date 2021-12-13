@@ -18,6 +18,7 @@ class Course < ApplicationRecord
 
 
   scope :is_open, -> { where(status: "open") }
+  scope :current_camp, -> { where(camp_occurrence_id: CampOccurrence.active) }
 
   def display_name
     "#{self.title} - #{self.camp_occurrence.description}" # or whatever column you want
