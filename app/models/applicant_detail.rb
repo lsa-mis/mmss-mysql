@@ -83,7 +83,7 @@ end
 
 def parentemail_not_user_email
   if self.user.email == self.parentemail
-    errors.add(:base, "Parent/Guardian email should be differen than an applicatnt's email")
+    errors.add(:base, "Parent/Guardian email should be different than an applicant's email")
   else
     return true
   end
