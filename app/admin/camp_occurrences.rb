@@ -6,7 +6,7 @@ ActiveAdmin.register CampOccurrence, as: "Session Configurations" do
   #
   # Uncomment all parameters which should be permitted for assignment
   #
-   permit_params :camp_configuration_id, :description, :cost_cents, :begin_date, :end_date, :active
+   permit_params :camp_configuration_id, :description, :cost, :begin_date, :end_date, :active
   #
   # or
   #
@@ -21,6 +21,18 @@ ActiveAdmin.register CampOccurrence, as: "Session Configurations" do
   filter :end_date 
   filter :active
 
+  form do |f| # This is a formtastic form builder
+    f.semantic_errors *f.object.errors.keys # shows errors on :base
+    f.inputs do
+     f.input :camp_configuration_id
+     f.inputs :description
+     f.inputs :begin_date
+     f.inputs :end_date
+     f.inputs :active
+     f.inputs :cost
+     f.actions         # adds the 'Submit' and 'Cancel' button
+    end
+  end
 
   index do
     selectable_column

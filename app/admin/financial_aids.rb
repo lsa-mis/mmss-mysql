@@ -6,7 +6,7 @@ ActiveAdmin.register FinancialAid, as: "Financial Aid Request" do
   #
   # Uncomment all parameters which should be permitted for assignment
   #
-   permit_params :enrollment_id, :amount_cents, :source, :note, :status, :payments_deadline, :taxform
+   permit_params :enrollment_id, :amount, :source, :note, :status, :payments_deadline, :taxform
   #
   # or
   #
@@ -28,7 +28,7 @@ ActiveAdmin.register FinancialAid, as: "Financial Aid Request" do
       else
         f.input :enrollment_id, as: :select, collection: Enrollment.current_camp_year_applications
       end
-      f.input :amount_cents
+      f.input :amount
       f.input :source
       f.input :note
       f.input :status, as: :select, collection: financial_aid_status
