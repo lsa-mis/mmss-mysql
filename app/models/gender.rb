@@ -10,4 +10,8 @@
 #
 class Gender < ApplicationRecord
   validates :name, presence: true, uniqueness: { case_sensitive: false }
+
+  scope :gender_filter, -> do
+    Gender.table_exists? ? Gender.all.map{|a| [a.name, a.id]} : {}
+  end
 end

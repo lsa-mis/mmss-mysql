@@ -47,8 +47,8 @@ ActiveAdmin.register ApplicantDetail do
     f.actions 
   end
 
-  filter :gender, as: :select, collection: Gender.all.map{|a| [a.name, a.id]}
-  filter :demographic, as: :select, collection: Demographic.all.map{|a| [a.name, a.id]}
+  filter :gender, as: :select, collection: Gender.gender_filter
+  filter :demographic, as: :select, collection: Demographic.demographic_filter
   filter :lastname, as: :select
   filter :us_citizen
   filter :birthdate

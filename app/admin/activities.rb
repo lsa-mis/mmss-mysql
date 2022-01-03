@@ -16,7 +16,7 @@ ActiveAdmin.register Activity do
   #   permitted
   # end
 
-  filter :camp_occurrence_id, label: "Session", as: :select, collection: CampOccurrence.order(begin_date: :desc).no_any_session
+  filter :camp_occurrence_id, label: "Session", as: :select, collection: CampOccurrence.camp_occurrence_filter
   filter :description, as: :select
   filter :cost_cents
   filter :date_occurs

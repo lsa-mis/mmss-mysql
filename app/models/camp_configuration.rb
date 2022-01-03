@@ -31,7 +31,9 @@ class CampConfiguration < ApplicationRecord
 
   monetize :application_fee_cents
 
-  scope :active, -> { where(active: true) }
+  scope :active, -> do 
+    CampConfiguration.table_exists? ? where(active: true) : {}
+  end
 
   scope :active_camp_year, -> { self.active.pick(:camp_year) }
   scope :active_camp_year_application_open, -> { self.active.pick(:application_open) }

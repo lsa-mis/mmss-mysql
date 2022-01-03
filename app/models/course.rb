@@ -20,6 +20,14 @@ class Course < ApplicationRecord
   scope :is_open, -> { where(status: "open") }
   scope :current_camp, -> { where(camp_occurrence_id: CampOccurrence.active) }
 
+  scope :courses_filter, -> do
+    Course.table_exists? ? Course.where(camp_occurrence_id: CampOccurrence.active).order(camp_occurrence_id: :asc, title: :asc) : {}
+  end
+
+  scope :course_preferences_filter, -> do
+    Course.table_exists? ? Course.where(camp_occurrence_id: CampOccurrence.active).order(camp_occurrence_id: :asc, title: :asc) : {}
+  end
+  
   def display_name
     "#{self.title} - #{self.camp_occurrence.description}" # or whatever column you want
   end

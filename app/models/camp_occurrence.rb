@@ -30,10 +30,22 @@ class CampOccurrence < ApplicationRecord
 
   monetize :cost_cents
 
-  scope :active, -> { where(active: true).order(description: :asc) }
-  scope :no_any_session, -> { where.not(description: "Any Session") }
+  scope :active, -> do
+    CampOccurrence.table_exists? ? where(active: true).order(description: :asc) : {}
+  end
+  scope :no_any_session, -> do
+    CampOccurrence.table_exists? ? where.not(description: "Any Session") : {}
+  end
+
+  scope :active_no_any_session, -> do
+    CampOccurrence.table_exists? ? CampOccurrence.where(active: true).where.not(description: "Any Session").order(description: :asc) : {}
+  end
 
   scope :session_description, ->(description="") { where(description: description).active.first}
+
+  scope :camp_occurrence_filter, -> do
+    CampOccurrence.table_exists? ? CampOccurrence.order(begin_date: :desc).no_any_session : {}
+  end
 
   def description_with_date
     if description == "Any Session"

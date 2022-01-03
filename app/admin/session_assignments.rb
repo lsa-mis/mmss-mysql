@@ -52,7 +52,7 @@ ActiveAdmin.register SessionAssignment do
 
 
   filter :enrollment_id, as: :select, collection: -> { Enrollment.current_camp_year_applications.map { |enrol| [enrol.last_name, enrol.id]}.sort}
-  filter :camp_occurrence_id, label: "Session", as: :select, collection: CampOccurrence.active.no_any_session
+  filter :camp_occurrence_id, label: "Session", as: :select, collection: CampOccurrence.active_no_any_session
   filter :offer_status, as: :select
 end
 
