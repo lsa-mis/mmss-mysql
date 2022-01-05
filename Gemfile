@@ -13,8 +13,6 @@ gem 'money-rails', '~> 1.14'
 # gem 'pg', '>= 0.18', '< 2.0'
 # gem install mysql2 -v '0.5.3' -- --with-ldflags=-L/usr/local/opt/openssl/lib --with-cppflags=-I/usr/local/opt/openssl/include
 gem 'mysql2', '~> 0.5.3'
-gem 'newrelic_rpm', '~> 7.2'
-gem 'newrelic-infinite_tracing', '~> 7.2'
 gem 'puma', '~> 5.5'
 gem 'rails', '~> 6.1', '>= 6.1.4.1'
 gem 'sass-rails', '~> 6.0'
@@ -22,6 +20,11 @@ gem 'turbolinks', '~> 5.2', '>= 5.2.1'
 gem 'turnout', '~> 2.5'
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem 'webpacker', '~> 5.4', '>= 5.4.2'
+
+gem 'matrix', '~> 0.4.2', require: false
+gem "net-smtp", require: false
+gem "net-imap", require: false
+gem "net-pop", require: false
 
 group :development, :test do
   gem 'capybara', '~> 3.35', '>= 3.35.3'
@@ -44,5 +47,3 @@ group :development do
   gem 'spring', '~> 3.0'
   gem 'web-console', '~> 4.1'
 end
-
-  gem 'matrix', '~> 0.4.2', require: false
