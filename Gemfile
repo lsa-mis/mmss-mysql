@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '3.0.2'
+ruby '3.1.0'
 
 gem 'activeadmin', '~> 2.9'
 gem 'bootsnap', '~> 1.8', '>= 1.8.1', require: false
@@ -26,7 +26,7 @@ gem 'webpacker', '~> 5.4', '>= 5.4.2'
 group :development, :test do
   gem 'capybara', '~> 3.35', '>= 3.35.3'
   gem 'factory_bot_rails', '~> 6.2'
-  gem 'faker', '~> 2.19'
+  # gem 'faker', '~> 2.19'
   gem 'pry-byebug', '~> 3.9'
   gem 'pry-rails', '~> 0.3.9'
   gem 'rspec-rails', '~> 5.0', '>= 5.0.2'
@@ -44,3 +44,5 @@ group :development do
   gem 'spring', '~> 3.0'
   gem 'web-console', '~> 4.1'
 end
+
+  gem 'matrix', '~> 0.4.2', require: false
