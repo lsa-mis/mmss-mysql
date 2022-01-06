@@ -5,16 +5,16 @@
 body
   @apply bg-white text-gray-800 m-4
 
-h1 
+h1
   @apply text-xl
 
-h2 
+h2
   @apply text-lg
 
-h3 
+h3
   @apply text-base
 
-h4 
+h4
   @apply text-sm
 
 .section-header
@@ -28,8 +28,8 @@ a
   &.btn
     @apply font-normal py-1 px-2 rounded no-underline
 
-    &.btn-sm 
-      @apply text-xs py-1 px-1 
+    &.btn-sm
+      @apply text-xs py-1 px-1
 
   &.btn-blue
     @apply bg-blue-laitan_blue text-gray-100
@@ -48,7 +48,7 @@ a
 
     &:hover
       @apply bg-green-900
-  
+
   &.btn-teal
     @apply bg-teal-700 text-gray-100
 
@@ -62,8 +62,8 @@ button
   &.btn
     @apply font-normal py-1 px-2 rounded no-underline
 
-  &.btn-sm 
-    @apply text-xs py-1 px-1 
+  &.btn-sm
+    @apply text-xs py-1 px-1
 
   &.btn-blue
     @apply bg-blue-laitan_blue text-gray-100
@@ -93,23 +93,22 @@ input
     &:hover
       @apply bg-green-900
 
-
 // Forms styles
 form
   .date_select
     margin-left: 20px
-    width: 210px 
+    width: 210px
     display: flex
     flex-wrap: wrap
     justify-content: flex-start
 
-    select 
+    select
       // flex: 1 1 70px
       flex: 0 1 120px
       margin: 5px
       width: 100%
 
-    label 
+    label
       // flex: 1 1 50px
       flex: 0 1 50px
       margin: 2px
@@ -145,7 +144,7 @@ form
 .form-optional
   @apply text-gray-800
 
-  &::after 
+  &::after
     content: " (optional)"
 
 .important
@@ -178,7 +177,7 @@ hr
     @apply text-green-700 text-lg mt-2
 
   &.alert
-     @apply text-red-700 text-lg mt-2
+    @apply text-red-700 text-lg mt-2
 
 // Errors
 
@@ -194,27 +193,24 @@ hr
 .direction_notes
   @apply bg-yellow-100 text-gray-700 p-2 border-2 border-gray-400
 
-
 .debug_dump
-  @apply bg-blue-100 border-4 border-red-800 rounded-lg p-4 text-sm font-mono
-  text-blue-900 mx-auto my-4 max-w-2xl w-auto
+  @apply bg-blue-100 border-4 border-red-800 rounded-lg p-4 text-sm font-mono text-blue-900 mx-auto my-4 max-w-2xl w-auto
 
 .current-uploaded-docs
-  @apply bg-yellow-100 border border-blue-500 rounded-lg p-2 text-sm
-  font-mono text-yellow-600 mx-1 my-1 max-w-xl w-auto
+  @apply bg-yellow-100 border border-blue-500 rounded-lg p-2 text-sm font-mono text-yellow-600 mx-1 my-1 max-w-xl w-auto
 
 .actions
   input[type=submit]
     @apply bg-blue-laitan_blue text-white
-  
+
     &:hover
       @apply bg-blue-900 cursor-pointer
 
 select
   @apply appearance-none w-1/4 bg-gray-200 border border-gray-400 text-gray-700 py-2 px-4 pr-8 rounded leading-tight m-2
 
-.session--display 
+.session--display
   @apply block
-  
+
 .session--hide
-  @apply hidden  
+  @apply hidden

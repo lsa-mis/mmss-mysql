@@ -42,16 +42,16 @@ camp_configuration = CampConfiguration.create([
   {camp_year: 2021, application_open: "2021-01-01", application_close: "2021-05-01", priority: "2021-04-01", application_materials_due: "2021-05-20", camper_acceptance_due: "2021-06-01", application_fee_cents: 10000, active: true}
 ])
 
-camp_config = CampConfiguration.first
+camp_config = CampConfiguration.active.first
 
 camp_occurrence = camp_config.camp_occurrences.create([
-  {description: "Session 1", begin_date: "2021-09-14", end_date: "2021-09-21", cost_cents: 20000, active: true},
-  {description: "Session 2", begin_date: "2021-09-23", end_date: "2021-09-30", cost_cents: 20000, active: true},
-  {description: "Session 3", begin_date: "2021-10-3", end_date: "2021-10-10", cost_cents: 20000, active: true}
+  {description: "Session 1", begin_date: "2022-07-14", end_date: "2022-07-21", cost_cents: 20000, active: true},
+  {description: "Session 2", begin_date: "2022-08-23", end_date: "2022-08-30", cost_cents: 20000, active: true},
+  {description: "Session 3", begin_date: "2022-10-3", end_date: "2022-10-10", cost_cents: 20000, active: true}
   ])
 
-  camp1 = CampOccurrence.first
-  camp2 = CampOccurrence.second
+  camp1 = CampOccurrence.active.first
+  camp2 = CampOccurrence.active.second
   
   course1 = camp1.courses.create([
   {title: "Survey in Modern Physics",available_spaces: 16,status: "open"},

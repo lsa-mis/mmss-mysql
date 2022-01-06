@@ -1,7 +1,7 @@
 # config valid for current version and patch releases of Capistrano
 lock "~> 3.16.0"
 
-# set ruby version, '3.0.2'
+# set ruby version, '3.1.0'
 set :ruby_version, '/snap/bin/ruby'
 
 server 'lsa-math-mmss-app.miserver.it.umich.edu', roles: %w{app db web}, primary: true
