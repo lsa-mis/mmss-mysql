@@ -12,6 +12,7 @@
     "serialize-javascript": "^3.1.0",
     "stimulus": "^1.1.1",
     "tailwindcss": "^1.4.6",
+    "@tailwindcss/custom-forms": "^0.2.1",
     "turbolinks": "^5.2.0"
   },
   "version": "0.1.0",
