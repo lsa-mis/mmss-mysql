@@ -59,21 +59,21 @@ ActiveAdmin.register_page "Reports" do
       (CASE WHEN ad.demographic = '' THEN NULL ELSE 
       (SELECT demographics.name FROM demographics WHERE CAST(ad.demographic AS UNSIGNED) = demographics.id) END) AS demographic,
       ad.birthdate as birthdate, ad.diet_restrictions as diet_restrictions,
-      ad.shirt_size as shirt_size, (ad.address1 || ' ' || ad.address2 || ' ' || ad.city || ' ' ||
-      ad.state || ' ' || ad.state_non_us || ' ' || ad.postalcode || ' ' || ad.country) AS address,
+      ad.shirt_size as shirt_size, CONCAT(ad.address1, ' ', ad.address2, ' ', ad.city, ' ', 
+      ad.state, ' ', ad.state_non_us, ' ', ad.postalcode, ' ', ad.country) AS address,
       ad.phone as phone, ad.parentname as parentname,
-      (ad.parentaddress1 || ' ' || ad.parentaddress2 || ' ' || ad.parentcity || ' ' || ad.parentstate || ' ' ||
-      ad.parentstate_non_us || ' ' || ad.parentzip || ' ' || ad.parentcountry) as parent_address,
+      CONCAT(ad.parentaddress1, ' ', ad.parentaddress2, ' ', ad.parentcity, ' ', ad.parentstate, ' ',
+      ad.parentstate_non_us, ' ', ad.parentzip, ' ', ad.parentcountry) AS parent_address,
       ad.parentphone as parentphone, ad.parentworkphone as parentworkphone, ad.parentemail as parentemail,
       e.user_id as user_id, e.international as international, e.high_school_name as high_school_name,
-      (e.high_school_address1 || ' ' || e.high_school_address2 || ' ' ||
-      e.high_school_city || ' ' || e.high_school_state || ' ' ||
-      e.high_school_non_us || ' ' || e.high_school_postalcode || ' ' ||
+      CONCAT(e.high_school_address1, ' ', e.high_school_address2, ' ',
+      e.high_school_city, ' ', e.high_school_state, ' ',
+      e.high_school_non_us, ' ', e.high_school_postalcode, ' ',
       e.high_school_country) AS high_school_address, e.year_in_school as year_in_school,
       e.anticipated_graduation_year as anticipated_graduation_year, e.room_mate_request as room_mate_request,
       e.personal_statement as personal_statement, e.notes as notes,
       e.application_status as application_status, e.offer_status as offer_status,
-      r.email AS recommender_email, (r.lastname || ' ' || r.firstname) AS recommender_name, r.organization AS recommender_organization,
+      r.email AS recommender_email, CONCAT(REPLACE(r.lastname, ',', ' '), ' ', REPLACE(r.firstname, ',', ' ')) AS recommender_name, r.organization AS recommender_organization,
       (fa.amount_cents / 100) AS fin_aid_ammount, fa.source AS fin_aid_source, fa.note AS fin_aid_note, fa.status AS fin_aid_status
       FROM enrollments AS e 
       LEFT JOIN applicant_details AS ad ON ad.user_id = e.user_id
