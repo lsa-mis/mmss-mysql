@@ -19,7 +19,7 @@ ActiveAdmin.register_page "Reports" do
   controller do
     
     def demographic_report
-      query = "SELECT distinct(REPLACE(ad.lastname, ',', ' ') || ' ' || REPLACE(ad.firstname, ',', ' ')) AS name, ad.country,
+      query = "SELECT CONCAT(REPLACE(ad.firstname, ',', ' '), ' ', REPLACE(ad.lastname, ',', ' ')) AS name, ad.country,
       (CASE WHEN ad.gender = '' THEN NULL ELSE 
       (SELECT genders.name FROM genders WHERE CAST(ad.gender AS UNSIGNED) = genders.id) END) as gender,
       e.year_in_school,
@@ -39,7 +39,7 @@ ActiveAdmin.register_page "Reports" do
     end
 
     def registered_but_not_applied
-      query = "SELECT u.id, u.email, (ad.firstname || ' ' || ad.lastname) AS name 
+      query = "SELECT u.id, u.email, CONCAT(REPLACE(ad.firstname, ',', ' '), ' ', REPLACE(ad.lastname, ',', ' ')) AS name 
       FROM users AS u
       JOIN applicant_details AS ad on u.id = ad.user_id 
       WHERE ad.user_id NOT IN (SELECT e.user_id FROM enrollments AS e)"
@@ -52,7 +52,7 @@ ActiveAdmin.register_page "Reports" do
     end
 
     def all_complete_apps
-      query = "SELECT distinct(REPLACE(ad.lastname, ',', ' ') || ' ' || REPLACE(ad.firstname, ',', ' ')) AS name, 
+      query = "SELECT CONCAT(REPLACE(ad.firstname, ',', ' '), ' ', REPLACE(ad.lastname, ',', ' ')) AS name, 
       (CASE WHEN ad.gender = '' THEN NULL ELSE 
       (SELECT genders.name FROM genders WHERE CAST(ad.gender AS UNSIGNED) = genders.id) END) as gender, 
       ad.us_citizen as us_citizen,
@@ -90,7 +90,7 @@ ActiveAdmin.register_page "Reports" do
     end
 
     def enrolled_with_addresses
-      query = "Select distinct(ad.lastname || ', ' || ad.firstname) AS name, ad.lastname, ad.firstname, u.email,
+      query = "Select CONCAT(REPLACE(ad.firstname, ',', ' '), ' ', REPLACE(ad.lastname, ',', ' ')) AS name, REPLACE(ad.lastname, ',', ' ') AS lastname, REPLACE(ad.firstname, ',', ' ') AS firstname, u.email,
               ad.address1, ad.address2, ad.city, ad.state, ad.state_non_us, ad.postalcode, ad.country 
               FROM enrollments AS e 
               LEFT JOIN users AS u ON e.user_id = u.id
@@ -105,7 +105,7 @@ ActiveAdmin.register_page "Reports" do
     end
 
     def course_assignments_with_students
-      query = "SELECT co.description, cor.title, en.user_id, ad.lastname, ad.firstname, u.email
+      query = "SELECT co.description, cor.title, en.user_id, REPLACE(ad.lastname, ',', ' ') AS lastname, REPLACE(ad.firstname, ',', ' ') AS firstname, u.email
       FROM course_assignments ca 
       JOIN enrollments en ON ca.enrollment_id = en.id 
       JOIN applicant_details AS ad ON ad.user_id = en.user_id 
