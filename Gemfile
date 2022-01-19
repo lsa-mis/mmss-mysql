@@ -15,6 +15,7 @@ gem 'mysql2', '~> 0.5.3'
 gem 'puma', '~> 5.5'
 gem 'rails', '~> 6.1', '>= 6.1.4.1'
 gem 'sass-rails', '~> 6.0'
+gem "skylight"
 gem 'turbolinks', '~> 5.2', '>= 5.2.1'
 gem 'turnout', '~> 2.5'
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
