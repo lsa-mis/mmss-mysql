@@ -33,7 +33,7 @@ ActiveAdmin.register Payment do
       else
         f.input :user_id, as: :select, collection: Enrollment.current_camp_year_applications.map { |enrol| [enrol.last_name, enrol.user_id]}.sort 
       end
-      f.input :total_amount, label: "Total ammount in cents"
+      f.input :total_amount, label: "Total amount in cents"
       li "Transaction Type #{f.object.transaction_type}" unless f.object.new_record?
       f.input :transaction_type, input_html: {value: "1"} unless f.object.persisted?
       li "Transaction Status #{f.object.transaction_status}" unless f.object.new_record?

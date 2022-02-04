@@ -74,7 +74,7 @@ ActiveAdmin.register_page "Reports" do
       e.personal_statement as personal_statement, e.notes as notes,
       e.application_status as application_status, e.offer_status as offer_status,
       r.email AS recommender_email, CONCAT(REPLACE(r.lastname, ',', ' '), ' ', REPLACE(r.firstname, ',', ' ')) AS recommender_name, r.organization AS recommender_organization,
-      (fa.amount_cents / 100) AS fin_aid_ammount, fa.source AS fin_aid_source, fa.note AS fin_aid_note, fa.status AS fin_aid_status
+      (fa.amount_cents / 100) AS fin_aid_amount, fa.source AS fin_aid_source, fa.note AS fin_aid_note, fa.status AS fin_aid_status
       FROM enrollments AS e 
       LEFT JOIN applicant_details AS ad ON ad.user_id = e.user_id
       LEFT JOIN recommendations AS r ON r.enrollment_id = e.id
