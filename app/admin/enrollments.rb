@@ -111,7 +111,7 @@ ActiveAdmin.register Enrollment, as: "Application" do
     f.actions         # adds the 'Submit' and 'Cancel' button
   end
   
-  filter :user_id, label: "Last Name", as: :select, collection: -> { Enrollment.all.map { |enrol| [enrol.last_name, enrol.user_id]}.sort}
+  filter :user_id, label: "Name", as: :select, collection: Enrollment.display_name_filter
   filter :international
   filter :year_in_school, as: :select
   filter :anticipated_graduation_year, as: :select
@@ -124,7 +124,9 @@ ActiveAdmin.register Enrollment, as: "Application" do
     selectable_column
     actions
     column :updated_at
-    column('Applicant') { |application| link_to application.display_name, admin_user_path(application.user_id) }
+    column "Applicant" do |application| 
+      link_to application.display_name, admin_user_path(application.user_id) 
+    end
     column "Transcript" do |enroll|
       if enroll.transcript.attached?
         link_to enroll.transcript.filename, url_for(enroll.transcript)
