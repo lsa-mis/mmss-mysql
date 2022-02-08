@@ -123,6 +123,7 @@ ActiveAdmin.register Enrollment, as: "Application" do
   index do
     selectable_column
     actions
+    column :updated_at
     column('Applicant') { |application| link_to application.display_name, admin_user_path(application.user_id) }
     column "Transcript" do |enroll|
       if enroll.transcript.attached?
