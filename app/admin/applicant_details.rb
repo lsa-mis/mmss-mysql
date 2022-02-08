@@ -58,7 +58,7 @@ ActiveAdmin.register ApplicantDetail do
   index do 
     selectable_column
     actions
-    column "Fullname" do |appdetail|
+    column "Fullname", sortable: :lastname do |appdetail|
       appdetail.full_name
     end
     column('email') do |app|
