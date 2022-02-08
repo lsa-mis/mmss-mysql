@@ -52,7 +52,7 @@ ActiveAdmin.register_page "Reports" do
     end
 
     def all_complete_apps
-      query = "SELECT CONCAT(REPLACE(ad.firstname, ',', ' '), ' ', REPLACE(ad.lastname, ',', ' ')) AS name, 
+      query = "SELECT DATE_FORMAT(e.updated_at, '%Y-%m-%d') AS 'Last Update', CONCAT(REPLACE(ad.firstname, ',', ' '), ' ', REPLACE(ad.lastname, ',', ' ')) AS name, 
       (CASE WHEN ad.gender = '' THEN NULL ELSE 
       (SELECT genders.name FROM genders WHERE CAST(ad.gender AS UNSIGNED) = genders.id) END) as gender, 
       ad.us_citizen as us_citizen,
