@@ -58,7 +58,7 @@ class ApplicantDetail < ApplicationRecord
 
 
 def full_name
-  "#{firstname} #{lastname}"
+  "#{lastname}, #{firstname}"
 end
 
 def applicant_email
