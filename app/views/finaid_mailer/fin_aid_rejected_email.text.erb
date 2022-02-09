@@ -2,7 +2,7 @@ Hello <%= "#{@student.firstname} #{@student.lastname}" %>
    <%= "\r\n" %>
   Thank you for your interest in the Michigan Math and Science Scholars! 
   Your financial aid application has been reviewed. I am sorry to tell 
-  you that we are not able to award you financial aid this 2021 year.
+  you that we are not able to award you financial aid this <%= @camp_config.camp_year %> year.
    <%= "\r\n" %>
   Your account balance is <%= "#{humanized_money_with_symbol(@balance_due / 100)}" %>. Please log in to your student 
   portal and pay your balance by <%= "#{@finaid.payments_deadline.strftime("%B %d, %Y")}" %> in order to finalize admission.
