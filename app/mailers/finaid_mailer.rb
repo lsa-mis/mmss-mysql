@@ -17,6 +17,7 @@ class FinaidMailer < ApplicationMailer
     @finaid = finaid
     @balance_due = balance_due
     @student = ApplicantDetail.find_by(user_id: finaid.enrollment.user_id)
+    @camp_config = CampConfiguration.find_by(active: true)
     mail(to: @email, subject: "MMSS - Financial Aid for #{@student.firstname} #{@student.lastname}")
   end
 
