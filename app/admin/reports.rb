@@ -112,6 +112,7 @@ ActiveAdmin.register_page "Reports" do
       JOIN courses AS cor ON ca.course_id = cor.id 
       JOIN camp_occurrences AS co ON cor.camp_occurrence_id = co.id
       LEFT JOIN users AS u ON en.user_id = u.id
+      WHERE en.campyear = #{CampConfiguration.active.last.camp_year}
       ORDER BY co.description, cor.title"
       title = "course_assignments_with_students"
 
