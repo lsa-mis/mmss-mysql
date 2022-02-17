@@ -53,7 +53,7 @@ ActiveAdmin.register CourseAssignment do
       ca.course.title
     end
     column "Session" do |ca|
-      ca.course.camp_occurrence.description
+      ca.course.camp_occurrence.display_name
     end
   end
  

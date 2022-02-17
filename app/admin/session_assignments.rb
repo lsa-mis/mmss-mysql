@@ -62,7 +62,7 @@ ActiveAdmin.register SessionAssignment do
       sa.enrollment.user.email
     end
     column "Session" do |sa|
-      sa.camp_occurrence.description
+      sa.camp_occurrence.display_name
     end
   end
 end

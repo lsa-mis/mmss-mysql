@@ -39,7 +39,7 @@ ActiveAdmin.register EnrollmentActivity, as: "Applicant Activities" do
       sa.activity.description
     end
     column "Session" do |sa|
-      sa.activity.camp_occurrence.description
+      sa.activity.camp_occurrence.display_name
     end
   end
 
