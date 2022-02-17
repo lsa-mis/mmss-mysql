@@ -310,4 +310,36 @@ ActiveAdmin.register Enrollment, as: "Application" do
     end
   end
 
+  csv do
+    column :updated_at
+    column "Name" do |app|
+      app.applicant_detail.full_name
+    end
+    column "email" do |app|
+      app.user.email
+    end
+    column "Transcript" do |enroll|
+      if enroll.transcript.attached?
+        "uploaded"
+      end
+    end
+    column "Student Packet" do |sp|
+      if sp.student_packet.attached?
+        "uploaded"
+      end
+    end
+    column :offer_status
+    column :application_deadline
+    column :application_status
+    column :international
+    column :year_in_school
+    column :anticipated_graduation_year
+    column :room_mate_request
+    column :notes
+    column :partner_program
+    column "Camp Year" do |app|
+      app.campyear
+    end
+  end
+
 end
