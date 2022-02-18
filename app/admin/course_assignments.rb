@@ -41,5 +41,20 @@ ActiveAdmin.register CourseAssignment do
     end
     active_admin_comments
   end
+
+  csv do
+    column "Name" do |ca|
+      ca.enrollment.applicant_detail.full_name
+    end
+    column "email" do |ca|
+      ca.enrollment.user.email
+    end
+    column "Course" do |ca|
+      ca.course.title
+    end
+    column "Session" do |ca|
+      ca.course.camp_occurrence.display_name
+    end
+  end
  
 end

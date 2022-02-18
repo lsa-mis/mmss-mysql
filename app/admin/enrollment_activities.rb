@@ -28,4 +28,19 @@ ActiveAdmin.register EnrollmentActivity, as: "Applicant Activities" do
     f.actions
   end
   
+  csv do
+    column "Name" do |ea|
+      ea.enrollment.applicant_detail.full_name
+    end
+    column "email" do |sa|
+      sa.enrollment.user.email
+    end
+    column "Activity" do |sa|
+      sa.activity.description
+    end
+    column "Session" do |sa|
+      sa.activity.camp_occurrence.display_name
+    end
+  end
+
 end
