@@ -57,6 +57,11 @@ ActiveAdmin.register_page "Dashboard" do
               render("/admin/dashboard_camp_note", model: "dashboard")
             end
           end
+          panel "Resources" do
+            ul do
+              li link_to('Admin Documentation', 'https://docs.google.com/document/d/17M9433ybPpvyXc_RwsnydfmSQsWN80Iwg2t0ACItoKo/edit?usp=sharing', :target => "_blank")
+            end
+          end
         end
       else
         panel "Notifications" do
