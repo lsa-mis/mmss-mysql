@@ -204,7 +204,7 @@ ActiveAdmin.register Enrollment, as: "Application" do
       end
 
     panel "Activities/Services" do
-      table_for Activity.where(camp_occurrence_id: application.session_assignments.accepted.pluck(:camp_occurrence_id)).order(:camp_occurrence_id) do
+      table_for Activity.where(camp_occurrence_id: application.session_assignments.accepted.pluck(:camp_occurrence_id)).order(:camp_occurrence_id).where(id: application.enrollment_activities.pluck(:activity_id)) do
         column "Assigned Activities" do |item|
           item.description
         end
