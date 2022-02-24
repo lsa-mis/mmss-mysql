@@ -1,3 +1,7 @@
+<p><strong>Note: This form will only except characters found in the English alphabet.</strong>
+    If you are having troubles submitting your application, check that you are only 
+    using English characters and standard punctuation.<p>
+    <br>
 <p>All fields are required unless marked <span class="text-gray-700">(optional)</span></p>
 <%= form_with(model: enrollment, local: true) do |form| %>
   <% if enrollment.errors.any? %>
@@ -228,6 +232,10 @@
     include courses you have taken, external influences, computer experience, and
     research interests that draw you to this program, or other relevant
     information to help us evaluate your application material.
+    <br><br>
+    <strong>Note: This form will only except characters found in the English alphabet.</strong>
+    If you are having troubles submitting your application, check that you are only 
+    using English characters and standard punctuation.
   </p>
     <div class="field">
       <%= form.label :personal_statement %>
@@ -255,6 +263,8 @@
   <p class="direction_notes">
     <span class="text-red-700">
       Upload a pdf copy of your high school transcript<br> (Maximum size is 5Mb and file format is PDF, JPG, PNG)
+      <br>
+      ** Use only characters found in the English alphabet for file names for any attachments you will upload.
     </span>
     <br>
       This is a required part of your application. It does NOT need to be an
