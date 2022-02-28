@@ -6,11 +6,12 @@ ActiveAdmin.register_page "Reports" do
     columns do
       panel "queries" do
         ul do
-          li link_to "report - all complete apps", admin_reports_all_complete_apps_path
-          li link_to "report - registered but not applied", admin_reports_registered_but_not_applied_path
-          li link_to "report- enrolled_with_addresses", admin_reports_enrolled_with_addresses_path
-          li link_to "report - course_assignments_with_students", admin_reports_course_assignments_with_students_path
-          li link_to "report - demographic_report", admin_reports_demographic_report_path
+          li link_to "report - All Complete Applications", admin_reports_all_complete_apps_path
+          li link_to "report - Registered but not Applied", admin_reports_registered_but_not_applied_path
+          li link_to "report- Enrolled with Addresses", admin_reports_enrolled_with_addresses_path
+          li link_to "report - Pending Course Assignments with Students", admin_reports_pending_course_assignments_with_students_path
+          li link_to "report - Accepted Course Assignments with Students", admin_reports_accepted_course_assignments_with_students_path
+          li link_to "report - Demographic Report", admin_reports_demographic_report_path
         end
       end
     end
@@ -104,7 +105,7 @@ ActiveAdmin.register_page "Reports" do
       end
     end
 
-    def course_assignments_with_students
+    def pending_course_assignments_with_students
       query = "SELECT co.description, cor.title, en.user_id, REPLACE(ad.lastname, ',', ' ') AS lastname, REPLACE(ad.firstname, ',', ' ') AS firstname, u.email
       FROM course_assignments ca 
       JOIN enrollments en ON ca.enrollment_id = en.id 
@@ -114,7 +115,25 @@ ActiveAdmin.register_page "Reports" do
       LEFT JOIN users AS u ON en.user_id = u.id
       WHERE en.campyear = #{CampConfiguration.active.last.camp_year}
       ORDER BY co.description, cor.title"
-      title = "course_assignments_with_students"
+      title = "pending_course_assignments_with_students"
+
+      data = data_to_csv(query, title)
+      respond_to do |format|
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv"}
+      end
+    end
+
+    def accepted_course_assignments_with_students
+      query = "SELECT co.description, cor.title, en.user_id, REPLACE(ad.lastname, ',', ' ') AS lastname, REPLACE(ad.firstname, ',', ' ') AS firstname, u.email
+      FROM course_assignments ca 
+      JOIN enrollments en ON ca.enrollment_id = en.id 
+      JOIN applicant_details AS ad ON ad.user_id = en.user_id 
+      JOIN courses AS cor ON ca.course_id = cor.id 
+      JOIN camp_occurrences AS co ON cor.camp_occurrence_id = co.id
+      LEFT JOIN users AS u ON en.user_id = u.id
+      WHERE en.campyear = #{CampConfiguration.active.last.camp_year} AND en.offer_status = 'accepted'
+      ORDER BY co.description, cor.title"
+      title = "accepted_course_assignments_with_students"
 
       data = data_to_csv(query, title)
       respond_to do |format|
