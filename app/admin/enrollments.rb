@@ -111,7 +111,7 @@ ActiveAdmin.register Enrollment, as: "Application" do
     f.actions         # adds the 'Submit' and 'Cancel' button
   end
   
-  filter :user_id, label: "Name", as: :select, collection: Enrollment.display_name_filter
+  filter :user_id, label: "Name", as: :select, collection: proc{ Enrollment.display_name_filter }
   filter :international
   filter :year_in_school, as: :select
   filter :anticipated_graduation_year, as: :select
