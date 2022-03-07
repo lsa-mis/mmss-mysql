@@ -214,7 +214,9 @@ ActiveAdmin.register Enrollment, as: "Application" do
       end
 
       table_for application.enrollment_activities do
-        column(:activity_id) { |item| item.activity.description }
+        column "User Selected Activites" do |item|
+          item.activity.description
+        end
         column "Session" do |item| 
           item.activity.camp_occurrence.description 
         end
