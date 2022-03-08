@@ -85,4 +85,38 @@ ActiveAdmin.register FinancialAid, as: "Financial Aid Request" do
     active_admin_comments
   end
 
+  csv do
+    column "First Name" do |fa|
+      fa.enrollment.applicant_detail.firstname
+    end
+    column "Last Name" do |fa|
+      fa.enrollment.applicant_detail.lastname
+    end
+    column "email" do |fa|
+      fa.enrollment.user.email
+    end
+    column "Residency Country" do |fa|
+      fa.enrollment.applicant_detail.country
+    end
+    column "US Citizenship" do |fa|
+      fa.enrollment.applicant_detail.us_citizen
+    end
+    column "Partner" do |fa|
+      fa.enrollment.partner_program
+    end
+    column "Offer Status" do |fa|
+      fa.enrollment.offer_status
+    end
+    column "FinAid Status" do |fa|
+      fa.status
+    end
+    column "Funding Amount" do |fa|
+      fa.amount
+    end
+    column "Funding Source" do |fa|
+      fa.source
+    end
+    column :updated_at
+  end
+
 end
