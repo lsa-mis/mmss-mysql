@@ -14,9 +14,9 @@ ActiveAdmin.register_page "Reports" do
         end
         text_node "----- ENROLLED USERS -----".html_safe
         ul do
-          li link_to "report- Enrolled with Addresses", admin_reports_enrolled_with_addresses_path
-          li link_to "report- Events per Session", admin_reports_enrolled_events_per_session_path
-          li link_to "report- Dorm by State", admin_reports_enrolled_dorm_by_state_path
+          li link_to "report - Enrolled with Addresses", admin_reports_enrolled_with_addresses_path
+          li link_to "report - Events per Session", admin_reports_enrolled_events_per_session_path
+          li link_to "report - Dorm by State", admin_reports_enrolled_dorm_by_state_path
         end
       end
     end
