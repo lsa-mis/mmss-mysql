@@ -8,10 +8,15 @@ ActiveAdmin.register_page "Reports" do
         ul do
           li link_to "report - All Complete Applications", admin_reports_all_complete_apps_path
           li link_to "report - Registered but not Applied", admin_reports_registered_but_not_applied_path
-          li link_to "report- Enrolled with Addresses", admin_reports_enrolled_with_addresses_path
           li link_to "report - Pending Course Assignments with Students", admin_reports_pending_course_assignments_with_students_path
           li link_to "report - Accepted Course Assignments with Students", admin_reports_accepted_course_assignments_with_students_path
           li link_to "report - Demographic Report", admin_reports_demographic_report_path
+        end
+        text_node "----- ENROLLED USERS -----".html_safe
+        ul do
+          li link_to "report- Enrolled with Addresses", admin_reports_enrolled_with_addresses_path
+          li link_to "report- Events per Session", admin_reports_enrolled_events_per_session_path
+          li link_to "report- Dorm by State", admin_reports_enrolled_dorm_by_state_path
         end
       end
     end
@@ -20,7 +25,7 @@ ActiveAdmin.register_page "Reports" do
   controller do
     
     def demographic_report
-      query = "SELECT CONCAT(REPLACE(ad.firstname, ',', ' '), ' ', REPLACE(ad.lastname, ',', ' ')) AS name, ad.country,
+      query = "SELECT ad.country,
       (CASE WHEN ad.gender = '' THEN NULL ELSE 
       (SELECT genders.name FROM genders WHERE CAST(ad.gender AS UNSIGNED) = genders.id) END) as gender,
       e.year_in_school,
@@ -141,6 +146,52 @@ ActiveAdmin.register_page "Reports" do
       end
     end
 
+    def events_per_session_for_enrolled
+      query = "SELECT ad.country, a.description AS 'Event Activity', co.description AS Session, ad.lastname, ad.firstname, u.email, ad.city, ad.state, e.id
+      FROM session_assignments AS sa
+      JOIN enrollments AS e ON e.id = sa.enrollment_id
+      JOIN enrollment_activities AS ea ON ea.enrollment_id = sa.enrollment_id
+      JOIN activities as a ON a.id = ea.activity_id AND a.camp_occurrence_id = sa.camp_occurrence_id
+      JOIN camp_occurrences AS co ON co.id = a.camp_occurrence_id
+      JOIN applicant_details AS ad ON ad.user_id = e.user_id
+      JOIN users AS u ON u.id = ad.user_id
+      WHERE sa.enrollment_id IN (
+        SELECT id
+        FROM enrollments
+        WHERE application_status = 'enrolled' AND campyear = #{CampConfiguration.active.last.camp_year}
+      ) AND sa.offer_status = 'accepted'
+      ORDER BY co.description, a.description, ad.lastname, e.id"
+      title = "events_per_session_for_enrolled"
+
+      data = data_to_csv_demographic(query, title)
+      respond_to do |format|
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv"}
+      end
+    end
+
+    def dorm_by_state
+      query = "SELECT ad.country, co.description AS Session, ad.state, a.description AS 'Event Activity', ad.lastname, ad.firstname, u.email, ad.city
+      FROM session_assignments AS sa
+      JOIN enrollments AS e ON e.id = sa.enrollment_id
+      JOIN enrollment_activities AS ea ON ea.enrollment_id = sa.enrollment_id
+      JOIN activities as a ON a.id = ea.activity_id AND a.camp_occurrence_id = sa.camp_occurrence_id
+      JOIN camp_occurrences AS co ON co.id = a.camp_occurrence_id
+      JOIN applicant_details AS ad ON ad.user_id = e.user_id
+      JOIN users AS u ON u.id = ad.user_id
+      WHERE sa.enrollment_id IN (
+        SELECT id
+        FROM enrollments
+        WHERE application_status = 'enrolled' AND campyear = #{CampConfiguration.active.last.camp_year}
+      ) AND sa.offer_status = 'accepted' AND a.description LIKE ('Dormitory%')
+      ORDER BY co.description, ad.state"
+      title = "dorm_by_state"
+
+      data = data_to_csv_demographic(query, title)
+      respond_to do |format|
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv"}
+      end
+    end
+
     def data_to_csv(query, title)
       records_array = ActiveRecord::Base.connection.exec_query(query)
       result = []
@@ -172,11 +223,9 @@ ActiveAdmin.register_page "Reports" do
           line =[]
           line << "Total number of records: " + res['total'].to_s
           csv << line
-          res['header'].shift(1)
           header = res['header'].map! { |e| e.titleize.upcase }
           csv << header
           res['rows'].each do |row|
-            row.shift(1)
             c = row[0]
             if c != 'country'
               row[0] = ISO3166::Country[c].name + " - " + c
