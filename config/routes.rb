@@ -17,6 +17,7 @@ Rails.application.routes.draw do
   get '/admin/reports/demographic_report', to: 'admin/reports#demographic_report', as: :admin_reports_demographic_report
   get '/admin/reports/enrolled_events_per_session', to: 'admin/reports#events_per_session_for_enrolled', as: :admin_reports_enrolled_events_per_session
   get '/admin/reports/enrolled_dorm_by_state', to: 'admin/reports#dorm_by_state', as: :admin_reports_enrolled_dorm_by_state
+  get '/admin/reports/complete_applications_with_course_preferences', to: 'admin/reports#complete_applications_with_course_preferences', as: :admin_reports_complete_applications_with_course_preferences
 
 
   ActiveAdmin.routes(self)
