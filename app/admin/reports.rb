@@ -11,6 +11,7 @@ ActiveAdmin.register_page "Reports" do
           li link_to "report - Pending Course Assignments with Students", admin_reports_pending_course_assignments_with_students_path
           li link_to "report - Accepted Course Assignments with Students", admin_reports_accepted_course_assignments_with_students_path
           li link_to "report - Demographic Report", admin_reports_demographic_report_path
+          li link_to "report - Complete Application with Course Preferences", admin_reports_complete_applications_with_course_preferences_path
         end
         text_node "----- ENROLLED USERS -----".html_safe
         ul do
@@ -187,6 +188,24 @@ ActiveAdmin.register_page "Reports" do
       title = "dorm_by_state"
 
       data = data_to_csv_demographic(query, title)
+      respond_to do |format|
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv"}
+      end
+    end
+
+    def complete_applications_with_course_preferences
+      query = "SELECT u.email, ad.lastname, ad.firstname, cp.ranking, c.title, co.description
+      FROM enrollments AS e
+      JOIN course_preferences AS cp ON cp.enrollment_id = e.id
+      JOIN courses AS c ON cp.course_id = c.id
+      JOIN camp_occurrences AS co ON c.camp_occurrence_id = co.id
+      JOIN applicant_details AS ad ON e.user_id = ad.user_id
+      JOIN users AS u ON u.id = e.user_id
+      WHERE campyear = #{CampConfiguration.active.last.camp_year} AND application_status = 'application complete' AND (offer_status = '' OR offer_status IS NULL)
+      ORDER BY e.id, co.description, cp.ranking"
+      title = "complete_applications_with_course_preferences"
+
+      data = data_to_csv(query, title)
       respond_to do |format|
         format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv"}
       end
