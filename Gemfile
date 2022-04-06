@@ -12,8 +12,8 @@ gem 'google-cloud-storage', '~> 1.34', '>= 1.34.1', require: false
 gem 'money-rails', '~> 1.14'
 # gem install mysql2 -v '0.5.3' -- --with-ldflags=-L/usr/local/opt/openssl/lib --with-cppflags=-I/usr/local/opt/openssl/include
 gem 'mysql2', '~> 0.5.3'
-#gem 'puma', '5.5.1'
-gem 'puma', '5.6.4'
+gem 'puma', '5.5.1'
+#gem 'puma', '5.6.4'
 gem 'rails', '~> 6.1', '>= 6.1.4.1'
 gem 'sass-rails', '~> 6.0'
 gem "skylight"
