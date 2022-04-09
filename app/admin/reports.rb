@@ -12,7 +12,7 @@ ActiveAdmin.register_page "Reports" do
           li link_to "report - Accepted Course Assignments with Students", admin_reports_accepted_course_assignments_with_students_path
           li link_to "report - Demographic Report", admin_reports_demographic_report_path
           li link_to "report - Complete Application with Course Preferences", admin_reports_complete_applications_with_course_preferences_path
-          li link_to "report - Witlisted Application with Course Preferences", admin_reports_waitlisted_applications_with_course_preferences_path
+          li link_to "report - Waitlisted Application with Course Preferences", admin_reports_waitlisted_applications_with_course_preferences_path
         end
         text_node "----- ENROLLED USERS -----".html_safe
         ul do
