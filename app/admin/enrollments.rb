@@ -147,6 +147,9 @@ ActiveAdmin.register Enrollment, as: "Application" do
     column :room_mate_request
     column :notes
     column :partner_program
+    column "Balance Due" do |application|
+       humanized_money_with_symbol(PaymentState.new(application).balance_due / 100)
+    end
     column "Camp Year" do |app|
       app.campyear
     end
@@ -340,6 +343,9 @@ ActiveAdmin.register Enrollment, as: "Application" do
     column :room_mate_request
     column :notes
     column :partner_program
+    column "Balance Due" do |app|
+      humanized_money_with_symbol(PaymentState.new(app).balance_due / 100)
+    end
     column "Camp Year" do |app|
       app.campyear
     end
