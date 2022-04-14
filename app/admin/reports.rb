@@ -149,7 +149,7 @@ ActiveAdmin.register_page "Reports" do
     end
 
     def events_per_session_for_enrolled
-      query = "SELECT ad.country, a.description AS 'Event Activity', co.description AS Session, ad.lastname, ad.firstname, u.email, ad.city, ad.state, e.id
+      query = "SELECT ad.country, a.description AS 'Event Activity', co.description AS Session, ad.lastname, ad.firstname, u.email, e.room_mate_request, ad.city, ad.state, e.id
       FROM session_assignments AS sa
       JOIN enrollments AS e ON e.id = sa.enrollment_id
       JOIN enrollment_activities AS ea ON ea.enrollment_id = sa.enrollment_id
