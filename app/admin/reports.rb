@@ -232,7 +232,7 @@ ActiveAdmin.register_page "Reports" do
     end
 
     def enrolled_with_sessions_and_courses
-      query = "SELECT ad.country, ad.state, co.description, cor.title, en.user_id, REPLACE(ad.lastname, ',', ' ') AS lastname, REPLACE(ad.firstname, ',', ' ') AS firstname, u.email,
+      query = "SELECT ad.country, ad.state, co.description AS session, cor.title AS course, en.user_id, REPLACE(ad.lastname, ',', ' ') AS lastname, REPLACE(ad.firstname, ',', ' ') AS firstname, u.email,
       en.year_in_school
       FROM course_assignments ca 
       JOIN enrollments en ON ca.enrollment_id = en.id 
