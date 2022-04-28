@@ -19,6 +19,7 @@ ActiveAdmin.register_page "Reports" do
           li link_to "report - Enrolled with Addresses", admin_reports_enrolled_with_addresses_path
           li link_to "report - Events per Session", admin_reports_enrolled_events_per_session_path
           li link_to "report - Dorm by State", admin_reports_enrolled_dorm_by_state_path
+          li link_to "report - Enrolled Students with Sessions and Courses", admin_reports_enrolled_with_sessions_and_courses_path
         end
       end
     end
@@ -225,6 +226,25 @@ ActiveAdmin.register_page "Reports" do
       title = "waitlisted_applications_with_course_preferences"
 
       data = data_to_csv(query, title)
+      respond_to do |format|
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv"}
+      end
+    end
+
+    def enrolled_with_sessions_and_courses
+      query = "SELECT ad.country, ad.state, co.description AS session, cor.title AS course, en.user_id, REPLACE(ad.lastname, ',', ' ') AS lastname, REPLACE(ad.firstname, ',', ' ') AS firstname, u.email,
+      en.year_in_school
+      FROM course_assignments ca 
+      JOIN enrollments en ON ca.enrollment_id = en.id 
+      JOIN applicant_details AS ad ON ad.user_id = en.user_id 
+      JOIN courses AS cor ON ca.course_id = cor.id 
+      JOIN camp_occurrences AS co ON cor.camp_occurrence_id = co.id
+      LEFT JOIN users AS u ON en.user_id = u.id
+      WHERE en.campyear = #{CampConfiguration.active.last.camp_year} AND en.application_status = 'enrolled'
+      ORDER BY co.description, cor.title"
+      title = "enrolled_students_with_sessions_and_courses"
+
+      data = data_to_csv_demographic(query, title)
       respond_to do |format|
         format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv"}
       end
