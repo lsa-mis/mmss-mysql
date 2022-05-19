@@ -64,7 +64,7 @@ class EnrollmentsController < ApplicationController
         format.html { redirect_to root_path, notice: 'Application was successfully updated.' }
         format.json { render :show, status: :ok, location: @current_enrollment }
       else
-        if @current_enrollment.errors.include?(:student_packet)
+        if @current_enrollment.errors.include?(:student_packet) || @current_enrollment.errors.include?(:vaccine_record) || @current_enrollment.errors.include?(:covid_test_record)
           format.html { redirect_to root_path, alert: @current_enrollment.errors.full_messages.to_sentence }
         else
           format.html { render :edit }
