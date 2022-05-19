@@ -20,6 +20,7 @@ ActiveAdmin.register_page "Reports" do
           li link_to "report - Events per Session", admin_reports_enrolled_events_per_session_path
           li link_to "report - Dorm by State", admin_reports_enrolled_dorm_by_state_path
           li link_to "report - Enrolled Students with Sessions and Courses", admin_reports_enrolled_with_sessions_and_courses_path
+          li link_to "report - Enrolled Students with Sessions and T-Shirt size", admin_reports_enrolled_with_sessions_and_tshirt_path
         end
       end
     end
@@ -245,6 +246,23 @@ ActiveAdmin.register_page "Reports" do
       title = "enrolled_students_with_sessions_and_courses"
 
       data = data_to_csv_demographic(query, title)
+      respond_to do |format|
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv"}
+      end
+    end
+
+    def enrolled_with_sessions_and_tshirt
+      query = "SELECT co.description AS session, en.user_id, REPLACE(ad.lastname, ',', ' ') AS lastname, REPLACE(ad.firstname, ',', ' ') AS firstname, u.email, ad.shirt_size
+      FROM enrollments en 
+      JOIN applicant_details AS ad ON ad.user_id = en.user_id 
+      JOIN session_assignments AS sa ON sa.enrollment_id = en.id 
+      JOIN camp_occurrences AS co ON sa.camp_occurrence_id = co.id
+      LEFT JOIN users AS u ON en.user_id = u.id
+      WHERE en.campyear = #{CampConfiguration.active.last.camp_year} AND en.application_status = 'enrolled'
+      ORDER BY co.description, ad.shirt_size"
+      title = "enrolled_with_sessions_and_tshirt"
+
+      data = data_to_csv(query, title)
       respond_to do |format|
         format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv"}
       end

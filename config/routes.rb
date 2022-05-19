@@ -20,6 +20,7 @@ Rails.application.routes.draw do
   get '/admin/reports/complete_applications_with_course_preferences', to: 'admin/reports#complete_applications_with_course_preferences', as: :admin_reports_complete_applications_with_course_preferences
   get '/admin/reports/waitlisted_applications_with_course_preferences', to: 'admin/reports#waitlisted_applications_with_course_preferences', as: :admin_reports_waitlisted_applications_with_course_preferences
   get '/admin/reports/enrolled_with_sessions_and_courses', to: 'admin/reports#enrolled_with_sessions_and_courses', as: :admin_reports_enrolled_with_sessions_and_courses
+  get '/admin/reports/enrolled_with_sessions_and_tshirt', to: 'admin/reports#enrolled_with_sessions_and_tshirt', as: :admin_reports_enrolled_with_sessions_and_tshirt
 
   ActiveAdmin.routes(self)
   # authenticated :admin do
