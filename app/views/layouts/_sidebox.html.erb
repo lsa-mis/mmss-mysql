@@ -152,8 +152,8 @@
 
             <hr>
             <hr>
-            <h2 class="text-red-700"> !! Vaccination Records !! </h2>
-            <h4>Upload a copy of your Vaccine Record</h4>
+            <h2 class="text-red-700"> !! COVID Information !! </h2>
+            <h4>* Upload a copy of your Vaccine Record</h4>
             <%= form_with(model: current_enrollment, local: true) do |form| %>
               <p class="text-xs">File uploads are limited to files smaller than 5Mbytes. You can use an 
               <a class="hover:underline text-blue-800" href="https://www.ilovepdf.com/compress_pdf" target="_blank">online pdf compression tool</a>
@@ -181,7 +181,7 @@
             <% end %>
 
             <hr>
-            <h4>Upload a copy of your Covid Test Report</h4>
+            <h4>* Upload a copy of your Covid Test Report</h4>
             <%= form_with(model: current_enrollment, local: true) do |form| %>
               <% if current_enrollment.covid_test_record.attached? %>
                 <div class='current-uploaded-docs'>
