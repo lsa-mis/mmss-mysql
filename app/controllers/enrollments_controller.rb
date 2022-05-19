@@ -148,6 +148,7 @@ class EnrollmentsController < ApplicationController
                           :application_status, :offer_status,
                           :partner_program, :transcript,
                           :student_packet, :campyear,
+                          :vaccine_record, :covid_test_record,
                           registration_activity_ids: [],
                           session_registration_ids: [],
                           course_registration_ids: [])
