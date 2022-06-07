@@ -149,7 +149,7 @@
                 <%= form.submit "Upload Student Packet", id: 'student_packet_submit' %>
               </div>
             <% end %>
-            <div class="hidden covid-panel">
+            <div class="covid-panel">
               <hr>
               <hr>
               <h2 class="text-red-700"> !! COVID Information !! </h2>
@@ -180,30 +180,32 @@
                 </div>
               <% end %>
 
-              <hr>
-              <h4>* Upload a copy of your Covid Test Report</h4>
-              <%= form_with(model: current_enrollment, local: true) do |form| %>
-                <% if current_enrollment.covid_test_record.attached? %>
-                  <div class='current-uploaded-docs'>
-                    <p>
-                      <strong>Covid Test Report currently uploaded:</strong>
-                      <%= link_to current_enrollment.covid_test_record.filename, url_for(current_enrollment.covid_test_record) %>
-                    </p>
-                  </div>
-                  <div class="field">
-                    <%= form.label :covid_test_record, 'Update Covid Test Report' %>
-                    <%= form.file_field :covid_test_record %>
-                  </div>
-                <% else %>
-                  <div class="field">
-                    <%= form.label :covid_test_record, 'Upload Covid Test Report' %>
-                    <%= form.file_field :covid_test_record, required: true %>
+              <div class="hidden covid-test-panel" >
+                <hr>
+                <h4>* Upload a copy of your Covid Test Report</h4>
+                <%= form_with(model: current_enrollment, local: true) do |form| %>
+                  <% if current_enrollment.covid_test_record.attached? %>
+                    <div class='current-uploaded-docs'>
+                      <p>
+                        <strong>Covid Test Report currently uploaded:</strong>
+                        <%= link_to current_enrollment.covid_test_record.filename, url_for(current_enrollment.covid_test_record) %>
+                      </p>
+                    </div>
+                    <div class="field">
+                      <%= form.label :covid_test_record, 'Update Covid Test Report' %>
+                      <%= form.file_field :covid_test_record %>
+                    </div>
+                  <% else %>
+                    <div class="field">
+                      <%= form.label :covid_test_record, 'Upload Covid Test Report' %>
+                      <%= form.file_field :covid_test_record, required: true %>
+                    </div>
+                  <% end %>
+                  <div class="actions">
+                    <%= form.submit "Upload Covid Test Report", id: 'covid_test_record_submit' %>
                   </div>
                 <% end %>
-                <div class="actions">
-                  <%= form.submit "Upload Covid Test Report", id: 'covid_test_record_submit' %>
-                </div>
-              <% end %>
+              </div>
             </div>
           </div>
         <% elsif @current_enrollment.offer_status == "declined" %>
