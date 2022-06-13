@@ -21,6 +21,7 @@ ActiveAdmin.register_page "Reports" do
           li link_to "report - Dorm by State", admin_reports_enrolled_dorm_by_state_path
           li link_to "report - Enrolled Students with Sessions and Courses", admin_reports_enrolled_with_sessions_and_courses_path
           li link_to "report - Enrolled Students with Sessions and T-Shirt size", admin_reports_enrolled_with_sessions_and_tshirt_path
+          li link_to "report - Course Assignments", admin_reports_course_assignments_path
           li link_to "report - Enrolled Students with Covid Verification", admin_reports_enrolled_with_covid_verification_path
 
         end
@@ -270,6 +271,31 @@ ActiveAdmin.register_page "Reports" do
       end
     end
 
+    def course_assignments
+      query = "SELECT co.description AS session, cor.title AS course, 
+      REPLACE(ad.lastname, ',', ' ') AS lastname, REPLACE(ad.firstname, ',', ' ') AS firstname, u.email,
+      ad.country, ad.state, ad.city,
+      (CASE WHEN ad.gender = '' THEN NULL ELSE 
+      (SELECT genders.name FROM genders WHERE CAST(ad.gender AS UNSIGNED) = genders.id) END) as gender,
+      TIMESTAMPDIFF(YEAR, ad.birthdate, CURDATE()) AS age,
+      en.year_in_school, en.personal_statement
+      FROM course_assignments ca 
+      JOIN enrollments en ON ca.enrollment_id = en.id 
+      JOIN applicant_details AS ad ON ad.user_id = en.user_id 
+      JOIN courses AS cor ON ca.course_id = cor.id 
+      JOIN camp_occurrences AS co ON cor.camp_occurrence_id = co.id
+      LEFT JOIN users AS u ON en.user_id = u.id
+      WHERE en.campyear = #{CampConfiguration.active.last.camp_year} AND en.application_status = 'enrolled'
+      ORDER BY co.description ASC, cor.title, lastname"
+      title = "course_assignments"
+
+      data = data_to_csv_list(query, title)
+
+      respond_to do |format|
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv"}
+      end
+    end
+
     def enrolled_with_covid_verification
       query = "SELECT co.description AS session, REPLACE(ad.lastname, ',', ' ') AS lastname, REPLACE(ad.firstname, ',', ' ') AS firstname, u.email, en.id
       FROM enrollments en 
@@ -286,7 +312,6 @@ ActiveAdmin.register_page "Reports" do
         format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv"}
       end
     end
-
 
     def data_to_csv(query, title)
       records_array = ActiveRecord::Base.connection.exec_query(query)
@@ -327,6 +352,46 @@ ActiveAdmin.register_page "Reports" do
               row[0] = ISO3166::Country[c].name + " - " + c
             end
             csv << row
+          end
+        end
+      end
+    end
+
+    def data_to_csv_list(query, title)
+      records_array = ActiveRecord::Base.connection.exec_query(query)
+      result = []
+      result.push({"total" => records_array.count, "header" => records_array.columns, "rows" => records_array.rows})
+
+      CSV.generate(headers: false) do |csv|
+        csv << Array(title.titleize)
+        result.each do |res|
+          line =[]
+          line << "Total number of records: " + res['total'].to_s
+          csv << line
+          header = res['header'].map! { |e| e.titleize.upcase }
+          csv << header
+          s2 = ''
+          c2 = ''
+          res['rows'].each do |row|
+            s1 = row[0]
+            if s1 == s2
+              row[0] = ''
+            else
+              row[0] = s1
+            end
+            c1 = row[1]
+            if c1 == c2
+              row[1] = ''
+            else
+              row[1] = c1
+            end
+            country = row[5]
+            if country != 'country'
+              row[5] = ISO3166::Country[country].name + " - " + country
+            end
+            csv << row
+            s2 = s1
+            c2 = c1
           end
         end
       end
