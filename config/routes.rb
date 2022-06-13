@@ -22,6 +22,7 @@ Rails.application.routes.draw do
   get '/admin/reports/enrolled_with_sessions_and_courses', to: 'admin/reports#enrolled_with_sessions_and_courses', as: :admin_reports_enrolled_with_sessions_and_courses
   get '/admin/reports/enrolled_with_sessions_and_tshirt', to: 'admin/reports#enrolled_with_sessions_and_tshirt', as: :admin_reports_enrolled_with_sessions_and_tshirt
   get '/admin/reports/course_assignments', to: 'admin/reports#course_assignments', as: :admin_reports_course_assignments
+  get '/admin/reports/enrolled_with_covid_verification', to: 'admin/reports#enrolled_with_covid_verification', as: :admin_reports_enrolled_with_covid_verification
 
   ActiveAdmin.routes(self)
   # authenticated :admin do
