@@ -23,6 +23,7 @@ ActiveAdmin.register_page "Reports" do
           li link_to "report - Enrolled Students with Sessions and T-Shirt size", admin_reports_enrolled_with_sessions_and_tshirt_path
           li link_to "report - Course Assignments", admin_reports_course_assignments_path
           li link_to "report - Enrolled Students with Covid Verification", admin_reports_enrolled_with_covid_verification_path
+          li link_to "report - Enrolled with Addresses, Birthdate, Gender, Graduation Year", admin_reports_enrolled_with_addresses_and_more_path
 
         end
       end
@@ -312,6 +313,23 @@ ActiveAdmin.register_page "Reports" do
         format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv"}
       end
     end
+
+    def enrolled_with_addresses_and_more
+      query = "Select CONCAT(REPLACE(ad.firstname, ',', ' '), ' ', REPLACE(ad.lastname, ',', ' ')) AS name, REPLACE(ad.lastname, ',', ' ') AS lastname, REPLACE(ad.firstname, ',', ' ') AS firstname, u.email,
+              ad.address1, ad.address2, ad.city, ad.state, ad.state_non_us, ad.postalcode, ad.country, ad.birthdate, (CASE WHEN ad.gender = '' THEN NULL ELSE 
+              (SELECT genders.name FROM genders WHERE CAST(ad.gender AS UNSIGNED) = genders.id) END) as gender, e.anticipated_graduation_year as graduation_year, e.year_in_school 
+              FROM enrollments AS e 
+              LEFT JOIN users AS u ON e.user_id = u.id
+              JOIN applicant_details AS ad ON ad.user_id = e.user_id
+              WHERE e.application_status = 'enrolled' AND e.campyear = #{CampConfiguration.active.last.camp_year} ORDER BY name"
+      title = "enrolled_with_addresses_and_more"
+
+      data = data_to_csv(query, title)
+      respond_to do |format|
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv"}
+      end
+    end
+
 
     def data_to_csv(query, title)
       records_array = ActiveRecord::Base.connection.exec_query(query)
