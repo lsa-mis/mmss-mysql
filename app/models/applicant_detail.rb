@@ -38,6 +38,8 @@
 class ApplicantDetail < ApplicationRecord
   belongs_to :user, required: true, inverse_of: :applicant_detail
 
+  validates :user_id, uniqueness: true
+
   validates :firstname, presence: true
   validates :lastname, presence: true
   # validates :us_citizen, presence: true
