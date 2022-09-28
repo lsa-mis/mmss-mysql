@@ -56,9 +56,10 @@ class ApplicantDetail < ApplicationRecord
   validates :parentemail, presence: true, length: {maximum: 255},
                     format: {with: URI::MailTo::EMAIL_REGEXP, message: "only allows valid emails"}
 
+scope :current_camp_enrolled, -> { where("user_id IN (?)", Enrollment.enrolled.pluck(:user_id)) }
 
 def full_name
-  "#{firstname} #{lastname}"
+  "#{lastname}, #{firstname}"
 end
 
 def applicant_email

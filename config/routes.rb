@@ -12,8 +12,18 @@ Rails.application.routes.draw do
   get '/admin/reports/all_complete_apps', to: 'admin/reports#all_complete_apps', as: :admin_reports_all_complete_apps
   get '/admin/reports/registered_but_not_applied', to: 'admin/reports#registered_but_not_applied', as: :admin_reports_registered_but_not_applied
   get '/admin/reports/enrolled_with_addresses', to: 'admin/reports#enrolled_with_addresses', as: :admin_reports_enrolled_with_addresses
-  get '/admin/reports/course_assignments_with_students', to: 'admin/reports#course_assignments_with_students', as: :admin_reports_course_assignments_with_students
+  get '/admin/reports/pending_course_assignments_with_students', to: 'admin/reports#pending_course_assignments_with_students', as: :admin_reports_pending_course_assignments_with_students
+  get '/admin/reports/accepted_course_assignments_with_students', to: 'admin/reports#accepted_course_assignments_with_students', as: :admin_reports_accepted_course_assignments_with_students
   get '/admin/reports/demographic_report', to: 'admin/reports#demographic_report', as: :admin_reports_demographic_report
+  get '/admin/reports/enrolled_events_per_session', to: 'admin/reports#events_per_session_for_enrolled', as: :admin_reports_enrolled_events_per_session
+  get '/admin/reports/enrolled_dorm_by_state', to: 'admin/reports#dorm_by_state', as: :admin_reports_enrolled_dorm_by_state
+  get '/admin/reports/complete_applications_with_course_preferences', to: 'admin/reports#complete_applications_with_course_preferences', as: :admin_reports_complete_applications_with_course_preferences
+  get '/admin/reports/waitlisted_applications_with_course_preferences', to: 'admin/reports#waitlisted_applications_with_course_preferences', as: :admin_reports_waitlisted_applications_with_course_preferences
+  get '/admin/reports/enrolled_with_sessions_and_courses', to: 'admin/reports#enrolled_with_sessions_and_courses', as: :admin_reports_enrolled_with_sessions_and_courses
+  get '/admin/reports/enrolled_with_sessions_and_tshirt', to: 'admin/reports#enrolled_with_sessions_and_tshirt', as: :admin_reports_enrolled_with_sessions_and_tshirt
+  get '/admin/reports/course_assignments', to: 'admin/reports#course_assignments', as: :admin_reports_course_assignments
+  get '/admin/reports/enrolled_with_covid_verification', to: 'admin/reports#enrolled_with_covid_verification', as: :admin_reports_enrolled_with_covid_verification
+  get '/admin/reports/enrolled_with_addresses_and_more', to: 'admin/reports#enrolled_with_addresses_and_more', as: :admin_reports_enrolled_with_addresses_and_more
 
   ActiveAdmin.routes(self)
   # authenticated :admin do

@@ -2,7 +2,7 @@
 lock "~> 3.16.0"
 
 # set ruby version, '3.1.0'
-set :ruby_version, '/snap/bin/ruby'
+set :rbenv_ruby, '3.1.0'
 
 server 'lsa-math-mmss-app.miserver.it.umich.edu', roles: %w{app db web}, primary: true
 
@@ -35,14 +35,14 @@ namespace :puma do
   desc 'Stop the PUMA service'
   task :stop do
     on roles(:app) do
-      execute "cd #{fetch(:deploy_to)}/current; /snap/bin/bundle exec pumactl -P ~/apps/#{fetch(:application)}/current/tmp/pids/puma.pid stop"
+      execute "cd #{fetch(:deploy_to)}/current; bin/bundle exec pumactl -P ~/apps/#{fetch(:application)}/current/tmp/pids/puma.pid stop"
     end
   end
 
   desc 'Restart the PUMA service'
   task :restart do
     on roles(:app) do
-      execute "cd #{fetch(:deploy_to)}/current; /snap/bin/bundle exec pumactl -P ~/apps/#{fetch(:application)}/current/tmp/pids/puma.pid phased-restart"
+      execute "cd #{fetch(:deploy_to)}/current; bin/bundle exec pumactl -P ~/apps/#{fetch(:application)}/current/tmp/pids/puma.pid phased-restart"
     end
   end
 

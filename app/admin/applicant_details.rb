@@ -10,6 +10,9 @@ ActiveAdmin.register ApplicantDetail do
   #
   actions :index, :show, :new, :create, :update, :edit
 
+  scope :all, group: :application_status
+  scope :current_camp_enrolled, group: :application_status
+
   form do |f| # This is a formtastic form builder
     f.semantic_errors # shows errors on :base
     # f.inputs           # builds an input field for every attribute
@@ -58,12 +61,12 @@ ActiveAdmin.register ApplicantDetail do
   index do 
     selectable_column
     actions
-    column "Fullname" do |appdetail|
+    column "Fullname", sortable: :lastname do |appdetail|
       appdetail.full_name
     end
     column('email') do |app|
       if app.user.enrollments.exists?
-        div(title: 'Link to Application') do
+        div(title: 'Link to Latest Application') do
           link_to app.applicant_email, admin_application_path(app.user.enrollments.last) 
         end
       else 
@@ -136,5 +139,31 @@ ActiveAdmin.register ApplicantDetail do
       row :parentworkphone
       row :parentemail
     end
+  end
+
+  csv do
+    # see https://activeadmin.info/4-csv-format.html for details
+
+    column :lastname
+    column :firstname
+    column('email') { |app| app.applicant_email }
+    column :us_citizen
+    column :birthdate
+    column :diet_restrictions
+    column :shirt_size
+    column :address1
+    column :address2
+    column :city
+    column :state
+    column :state_non_us
+    column :postalcode
+    column :country
+    column :phone
+    column :parentname
+    column :parentphone
+    column :parentworkphone
+    column :parentemail
+    column :created_at
+    column :updated_at
   end
 end

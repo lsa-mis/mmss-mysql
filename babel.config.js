@@ -66,6 +66,18 @@ module.exports = function(api) {
         {
           async: false
         }
+      ],
+      [
+        require('@babel/plugin-proposal-private-methods').default, 
+        { 
+          loose: true 
+        }
+      ],
+      [
+        require('@babel/plugin-proposal-private-property-in-object').default, 
+        { 
+          loose: true 
+        }
       ]
     ].filter(Boolean)
   }
