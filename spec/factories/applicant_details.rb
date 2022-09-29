@@ -37,34 +37,35 @@
 #
 FactoryBot.define do
   factory :applicant_detail do
-    user
-    firstname { "Chester" }
+    association :user
+    firstname { Faker::Name.first_name }
     # middlename { "The" }
-    lastname { "Tester" }
-    gender { "Male" }
-    us_citizen { true }
-    demographic { "MyString" }
-    birthdate { "2019-07-22" }
+    lastname { Faker::Name.last_name }
+    gender { Faker::Gender.binary_type }
+    us_citizen { Faker::Boolean.boolean }
+    demographic { Faker::Demographic.race }
+    birthdate { Faker::Date.birthday(min_age: 15, max_age: 18) }
     diet_restrictions { "peanuts" }
     shirt_size { "Large" }
-    address1 { "123 Main Street" }
+    address1 { Faker::Address.street_address }
     # address2 { "MyString" }
-    city { "Saline" }
-    # state { "MyString" }
+    city { Faker::Address.city }
+    state { Faker::Address.state_abbr }
     # state_non_us { "MyString" }
-    postalcode { "48896" }
+    postalcode { Faker::Address.zip_code }
     country { "US" }
-    phone { "1234567890" }
-    parentname { "Cheryl Stooge" }
-    parentaddress1 { "123 Main Street" }
+    # phone { Faker::PhoneNumber.cell_phone }
+    phone { "123-444-5555" }
+    parentname { Faker::Name.name }
+    parentaddress1 { Faker::Address.street_address }
     # parentaddress2 { "MyString" }
-    parentcity { "Saline" }
+    parentcity { Faker::Address.city }
     # parentstate { "MyString" }
     # parentstate_non_us { "MyString" }
-    parentzip { "48896" }
+    parentzip { Faker::Address.zip_code  }
     parentcountry { "US" }
-    parentphone { "9876543217" }
+    parentphone { "123-444-5555" }
     # parentworkphone { "MyString" }
-    parentemail { "cheryl.tester@tester.com" }
+    parentemail { Faker::Internet.email }
   end
 end
