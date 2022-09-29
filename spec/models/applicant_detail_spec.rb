@@ -39,10 +39,32 @@ require 'rails_helper'
 
 RSpec.describe ApplicantDetail, type: :model do
   context "all required fields are present" do
-    subject { build(:applicant_detail) } 
+    subject { 
+      FactoryBot.create(:user)
+      FactoryBot.create(:applicant_detail) } 
 
     it 'is valid' do
       expect(subject).to be_valid
+    end
+    
+  end
+
+  context "can't create two ApplicantDetail record" do
+
+    let!(:user) { FactoryBot.create(:user) }
+
+    it 'is valid' do
+      appdet1 = FactoryBot.create(:applicant_detail, user: user)
+      appdet2 = FactoryBot.build(:applicant_detail, user: user)
+      # pp "user all"
+      # pp User.last
+      # pp "one"
+      # pp appdet1
+      # pp "two"
+      # pp appdet2
+      pp ApplicantDetail.all
+      expect(appdet1).to be_valid
+      expect(appdet2).to_not be_valid
     end
     
   end
