@@ -62,7 +62,7 @@ RSpec.describe ApplicantDetail, type: :model do
       # pp appdet1
       # pp "two"
       # pp appdet2
-      pp ApplicantDetail.all
+      # pp ApplicantDetail.all
       expect(appdet1).to be_valid
       expect(appdet2).to_not be_valid
     end
