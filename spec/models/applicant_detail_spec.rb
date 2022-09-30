@@ -38,6 +38,13 @@
 require 'rails_helper'
 
 RSpec.describe ApplicantDetail, type: :model do
+
+  context "the Factory" do
+    it 'is valid' do
+      build(:applicant_detail).should be_valid
+    end
+  end
+
   context "all required fields are present" do
     subject { 
       FactoryBot.create(:user)
@@ -45,6 +52,15 @@ RSpec.describe ApplicantDetail, type: :model do
 
     it 'is valid' do
       expect(subject).to be_valid
+    end
+    
+  end
+
+  context "without first name" do
+    let!(:user) { FactoryBot.create(:user) }
+
+    it 'is not valid' do
+      expect { (FactoryBot.create(:applicant_detail, firstname: "", user: user)) }.to raise_error(ActiveRecord::RecordInvalid, "Validation failed: Firstname can't be blank")
     end
     
   end
