@@ -49,22 +49,12 @@ RSpec.describe ApplicantDetail, type: :model do
     
   end
 
-  context "can't create two ApplicantDetail record" do
-
+  context "prevent to create two ApplicantDetail records for a user (test user uniqueness)" do
     let!(:user) { FactoryBot.create(:user) }
-
     it 'is valid' do
       appdet1 = FactoryBot.create(:applicant_detail, user: user)
-      appdet2 = FactoryBot.build(:applicant_detail, user: user)
-      # pp "user all"
-      # pp User.last
-      # pp "one"
-      # pp appdet1
-      # pp "two"
-      # pp appdet2
-      # pp ApplicantDetail.all
       expect(appdet1).to be_valid
-      expect(appdet2).to_not be_valid
+      expect { (FactoryBot.create(:applicant_detail, user: user)) }.to raise_error(ActiveRecord::RecordInvalid, "Validation failed: User has already been taken")
     end
     
   end
