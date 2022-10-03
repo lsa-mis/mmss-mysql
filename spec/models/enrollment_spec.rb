@@ -40,6 +40,10 @@ RSpec.describe Enrollment, type: :model do
     let!(:session_registration_ids) { CampOccurrence.all.pluck(:id)}
     let!(:course_registration_ids) { Course.where(camp_occurrence_id: session_registration_ids).pluck(:id)}
 
+    it 'test database' do
+      expect(ActiveRecord::Base.connection_config[:database]).to match(/test/)
+    end
+
     it 'is valid' do
       expect(FactoryBot.create(:enrollment, user: user, session_registration_ids: session_registration_ids, course_registration_ids: course_registration_ids))
         .to be_valid
