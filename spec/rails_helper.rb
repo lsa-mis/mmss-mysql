@@ -1,6 +1,6 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 require 'spec_helper'
-ENV['RAILS_ENV'] ||= 'test'
+ENV['RAILS_ENV'] = 'test'
 
 require File.expand_path('../config/environment', __dir__)
 
@@ -65,6 +65,8 @@ RSpec.configure do |config|
 
   # config.include Devise::Test::ControllerHelpers, type: :controller
   config.include Warden::Test::Helpers
+
+  config.use_transactional_fixtures = true
 
 end
 
