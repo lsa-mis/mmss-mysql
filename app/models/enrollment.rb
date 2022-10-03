@@ -81,7 +81,7 @@ class Enrollment < ApplicationRecord
   validate :acceptable_student_packet
   validate :acceptable_image
 
-  validate :one_enrollment_per_camp
+  validates :user_id, uniqueness: { scope: :campyear }
 
   scope :current_camp_year_applications, -> { where('campyear = ? ', CampConfiguration.active_camp_year) }
   scope :offered, -> { current_camp_year_applications.where("offer_status = 'offered'") }
@@ -163,12 +163,6 @@ class Enrollment < ApplicationRecord
           errors.add(image.name, "incorrect file type")
         end
       end
-    end
-  end
-
-  def one_enrollment_per_camp
-    if Enrollment.find_by(user_id: self.user_id, campyear: CampConfiguration.active_camp_year).present?
-      errors.add(:base, "This user has an application already")
     end
   end
 
