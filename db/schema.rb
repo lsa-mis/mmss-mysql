@@ -10,7 +10,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_06_122231) do
+ActiveRecord::Schema.define(version: 2022_10_03_193910) do
+
 
   create_table "active_admin_comments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "namespace"
@@ -221,6 +222,7 @@ ActiveRecord::Schema.define(version: 2021_04_06_122231) do
     t.datetime "updated_at", precision: 6, null: false
     t.integer "campyear"
     t.date "application_deadline"
+    t.index ["user_id", "campyear"], name: "index_enrollments_on_user_id_and_campyear", unique: true
     t.index ["user_id"], name: "index_enrollments_on_user_id"
   end
 
