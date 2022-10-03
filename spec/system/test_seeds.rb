@@ -4,7 +4,7 @@ Gender.create!([
 ])
 
 camp_configuration = CampConfiguration.create([
-  {camp_year: 2022, application_open: "2022-01-01", application_close: "2022-05-01", priority: "2022-04-01", application_materials_due: "2022-05-20", camper_acceptance_due: "2022-06-01", application_fee_cents: 10000, active: true}
+  {camp_year: 2022, application_open: "2022-01-01", application_close: "2022-11-01", priority: "2022-04-01", application_materials_due: "2022-05-20", camper_acceptance_due: "2022-06-01", application_fee_cents: 10000, active: true}
 ])
 
 camp_config = CampConfiguration.first
