@@ -30,6 +30,7 @@ gem "net-pop", require: false
 group :development, :test do
   gem 'capybara', '~> 3.35', '>= 3.35.3'
   gem 'factory_bot_rails', '~> 6.2'
+  gem 'faker', '~> 2.23'
   gem 'pry-byebug', '~> 3.9'
   gem 'pry-rails', '~> 0.3.9'
   gem 'rspec-rails', '~> 5.0', '>= 5.0.2'
