@@ -10,7 +10,7 @@
 #
 FactoryBot.define do
   factory :session_activity do
-    enrollment { nil }
-    camp_occurrence { nil }
+    association :enrollment 
+    camp_occurrence { CampOccurrence.last }
   end
 end

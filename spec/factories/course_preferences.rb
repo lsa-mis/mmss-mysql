@@ -11,8 +11,8 @@
 #
 FactoryBot.define do
   factory :course_preference do
-    enrollment { nil }
-    course { nil }
+    association :enrollment 
+    association :course
     ranking { 1 }
   end
 end
