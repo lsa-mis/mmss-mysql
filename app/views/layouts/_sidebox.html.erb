@@ -11,7 +11,8 @@
     </div>
       <% if @current_enrollment.present? && @current_enrollment.persisted? %>
         <% if @current_enrollment.application_status.present? %>
-          <span class="text-green-800 font-semibold"><%= @current_enrollment.application_status.titleize %></span>
+          <span class="text-green-800 font-semibold"><%= @current_enrollment.application_status.titleize %>
+                                                    on <%= @current_enrollment.application_status_updated_on %></span>
         <% else %>
           <span class="text-red-700 font-semibold">Application incomplete</span>
         <% end %>
