@@ -13,7 +13,7 @@ ActiveAdmin.register Enrollment, as: "Application" do
                   :high_school_postalcode, :high_school_country, 
                   :year_in_school, :anticipated_graduation_year, 
                   :room_mate_request, :personal_statement, 
-                  :shirt_size, :notes, :application_status, :campyear,
+                  :shirt_size, :notes, :application_status, :application_status_updated_on, :campyear,
                   :offer_status, :partner_program, :transcript, :student_packet, 
                   :application_deadline, :vaccine_record, :covid_test_record,
                   session_assignments_attributes: [:id, :camp_occurrence_id, :_destroy ],
@@ -190,6 +190,7 @@ ActiveAdmin.register Enrollment, as: "Application" do
       row :offer_status
       row :application_deadline
       row :application_status
+      row :application_status_updated_on
       row :partner_program
       row :campyear
     end
@@ -373,6 +374,7 @@ ActiveAdmin.register Enrollment, as: "Application" do
     column :offer_status
     column :application_deadline
     column :application_status
+    column :application_status_updated_on
     column :international
     column :year_in_school
     column :anticipated_graduation_year
