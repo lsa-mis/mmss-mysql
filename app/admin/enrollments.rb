@@ -167,6 +167,7 @@ ActiveAdmin.register Enrollment, as: "Application" do
     column :offer_status
     column :application_deadline
     column :application_status
+    column :application_status_updated_on
     column :international
     column :year_in_school
     column :anticipated_graduation_year
