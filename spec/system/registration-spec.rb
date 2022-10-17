@@ -8,7 +8,7 @@ RSpec.describe 'Registration process', type: :system do
     login_as(@user)
   end
 
-  describe 'login to registration' do
+  context 'login to registration' do
     it 'shows the right content' do
       visit root_path
       click_on "Returning User - Sign In"
