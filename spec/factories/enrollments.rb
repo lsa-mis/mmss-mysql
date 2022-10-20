@@ -29,24 +29,28 @@
 #
 FactoryBot.define do
   factory :enrollment do
-    user
+    association :user
     # international { false }
-    high_school_name { "Academy of Smartness" }
-    high_school_address1 { "345 Main Street" }
+    high_school_name { Faker::University.name }
+    high_school_address1 { Faker::Address.street_address}
     # high_school_address2 { "MyString" }
-    high_school_city { "Saline" }
+    high_school_city { Faker::Address.city }
     # high_school_state { "MyString" }
     # high_school_non_us { "MyString" }
     # high_school_postalcode { "MyString" }
     high_school_country { "US" }
     year_in_school { "Junior" }
-    anticipated_graduation_year { "2018" }
+    anticipated_graduation_year { "2023" }
     # room_mate_request { "MyString" }
-    personal_statement { "I was born in a shed" }
+    personal_statement { Faker::Lorem.paragraph_by_chars(number: 100, supplemental: false)  }
     # shirt_size { "MyString" }
     # notes { "MyText" }
     # application_status { "MyString" }
     # offer_status { "MyString" }
     # partner_program { "MyString" }
+    campyear { 2022 }
+
+    link_to_default_transcript = "#{Rails.root}/spec/files/test.pdf"
+    transcript { Rack::Test::UploadedFile.new link_to_default_transcript, "application/pdf" }
   end
 end
