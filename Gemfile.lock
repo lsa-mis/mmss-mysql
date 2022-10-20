@@ -449,7 +449,7 @@ DEPENDENCIES
   listen (~> 3.7)
   matrix (~> 0.4.2)
   money-rails (~> 1.14)
-  mysql2 (~> 0.5.3)
+  mysql2 (~> 0.5.4)
   net-imap
   net-pop
   net-smtp
