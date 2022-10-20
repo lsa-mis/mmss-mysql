@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe 'Create user', type: :system do
 
   before :each do
-    load "#{Rails.root}/spec/system/test_seeds.rb" 
+    load "#{Rails.root}/spec/test_seeds.rb" 
   end
 
   context 'create new user' do

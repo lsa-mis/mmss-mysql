@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe 'Registration process', type: :system do
 
   before :each do
-    load "#{Rails.root}/spec/system/test_seeds.rb" 
+    load "#{Rails.root}/spec/test_seeds.rb" 
     @user = FactoryBot.create(:user)
     login_as(@user)
   end
