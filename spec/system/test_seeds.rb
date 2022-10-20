@@ -1,6 +1,6 @@
 Gender.create!([
-  {name: "Female-1", description: "dudette"},
-  {name: "Male-1", description: "dude"}
+  {name: "Female", description: "dudette"},
+  {name: "Male", description: "dude"}
 ])
 
 camp_configuration = CampConfiguration.create([
