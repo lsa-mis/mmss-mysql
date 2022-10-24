@@ -172,9 +172,9 @@
 
   <div class="actions">
     <% if applicant_detail.new_record? %>
-      <%= form.submit "Register" %>
+      <%= form.submit "Register", data: { disable_with: "Please wait..." } %>
     <% else %>
-      <%= form.submit "Update" %>
+      <%= form.submit "Update", data: { disable_with: "Please wait..." } %>
     <% end %>
   </div>
 <% end %>
