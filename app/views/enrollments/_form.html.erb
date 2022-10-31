@@ -303,10 +303,10 @@
   <% end %>
     <div class="actions">
       <% if enrollment.new_record? %>
-        <%= form.submit "Submit Application" %>
+        <%= form.submit "Submit Application", data: { disable_with: "Please wait..." } %>
       <% else %>
         <% if @current_enrollment.application_status == "" || @current_enrollment.application_status == nil %>
-          <%= form.submit "Update Application" %>
+          <%= form.submit "Update Application", data: { disable_with: "Please wait..." } %>
         <% end %>
       <% end %>
     </div>
