@@ -11,7 +11,7 @@ class OfferMailer < ApplicationMailer
     @url = ConstantData::HOST_URL
     @camp_config = CampConfiguration.find_by(active: true)
     mail(to: @user.email, subject: "UM MMSS: Offer to attend Michigan Math and Science Scholars")
-    @enrollment.update(application_status: "application complete") unless @enrollment.application_status == "application complete"
+    @enrollment.update(application_status: "application complete", application_status_updated_on: Date.today) unless @enrollment.application_status == "application complete"
   end
 
   def offer_accepted_email(user, session_assignment, course_assignment)

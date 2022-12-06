@@ -38,6 +38,8 @@
 class ApplicantDetail < ApplicationRecord
   belongs_to :user, required: true, inverse_of: :applicant_detail
 
+  validates :user_id, uniqueness: true
+
   validates :firstname, presence: true
   validates :lastname, presence: true
   # validates :us_citizen, presence: true
@@ -57,8 +59,10 @@ class ApplicantDetail < ApplicationRecord
                     format: {with: URI::MailTo::EMAIL_REGEXP, message: "only allows valid emails"}
   validate :parentemail_not_user_email 
 
+scope :current_camp_enrolled, -> { where("user_id IN (?)", Enrollment.enrolled.pluck(:user_id)) }
+
 def full_name
-  "#{firstname} #{lastname}"
+  "#{lastname}, #{firstname}"
 end
 
 def applicant_email

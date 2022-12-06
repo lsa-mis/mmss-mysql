@@ -6,7 +6,7 @@ ActiveAdmin.register Activity do
   #
   # Uncomment all parameters which should be permitted for assignment
   #
-   permit_params :camp_occurrence_id, :description, :cost_cents, :date_occurs, :active
+   permit_params :camp_occurrence_id, :description, :cost, :date_occurs, :active
   #
   # or
   #
@@ -27,7 +27,7 @@ ActiveAdmin.register Activity do
     f.inputs do
       f.input :camp_occurrence, label: "Session", as: :select, collection: CampOccurrence.order(begin_date: :desc).no_any_session
       f.input :description
-      f.input :cost_cents
+      f.input :cost
       f.input :date_occurs
       f.input :active
     end

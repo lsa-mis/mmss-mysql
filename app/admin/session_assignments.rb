@@ -50,9 +50,20 @@ ActiveAdmin.register SessionAssignment do
     active_admin_comments
   end
 
-
-  filter :enrollment_id, as: :select, collection: -> { Enrollment.current_camp_year_applications.map { |enrol| [enrol.last_name, enrol.id]}.sort}
+  filter :enrollment_id, as: :select, collection: -> { Enrollment.current_camp_year_applications.map { |enrol| [enrol.display_name, enrol.id]}.sort}
   filter :camp_occurrence_id, label: "Session", as: :select, collection: CampOccurrence.active.no_any_session
   filter :offer_status, as: :select
+
+  csv do
+    column "Name" do |sa|
+      sa.enrollment.applicant_detail.full_name
+    end
+    column "email" do |sa|
+      sa.enrollment.user.email
+    end
+    column "Session" do |sa|
+      sa.camp_occurrence.display_name
+    end
+  end
 end
 

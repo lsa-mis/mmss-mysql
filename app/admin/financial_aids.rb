@@ -1,12 +1,12 @@
 ActiveAdmin.register FinancialAid, as: "Financial Aid Request" do
-  menu parent: 'Applicant Info', priority: 2
+  menu parent: 'Applicant Info', priority: 3
 
   # See permitted parameters documentation:
   # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
   #
   # Uncomment all parameters which should be permitted for assignment
   #
-   permit_params :enrollment_id, :amount_cents, :source, :note, :status, :payments_deadline, :taxform
+   permit_params :enrollment_id, :amount, :source, :note, :status, :payments_deadline, :taxform
   #
   # or
   #
@@ -28,7 +28,7 @@ ActiveAdmin.register FinancialAid, as: "Financial Aid Request" do
       else
         f.input :enrollment_id, as: :select, collection: Enrollment.current_camp_year_applications
       end
-      f.input :amount_cents
+      f.input :amount
       f.input :source
       f.input :note
       f.input :status, as: :select, collection: financial_aid_status
@@ -83,6 +83,40 @@ ActiveAdmin.register FinancialAid, as: "Financial Aid Request" do
       row :payments_deadline
     end
     active_admin_comments
+  end
+
+  csv do
+    column "First Name" do |fa|
+      fa.enrollment.applicant_detail.firstname
+    end
+    column "Last Name" do |fa|
+      fa.enrollment.applicant_detail.lastname
+    end
+    column "email" do |fa|
+      fa.enrollment.user.email
+    end
+    column "Residency Country" do |fa|
+      fa.enrollment.applicant_detail.country
+    end
+    column "US Citizenship" do |fa|
+      fa.enrollment.applicant_detail.us_citizen
+    end
+    column "Partner" do |fa|
+      fa.enrollment.partner_program
+    end
+    column "Offer Status" do |fa|
+      fa.enrollment.offer_status
+    end
+    column "FinAid Status" do |fa|
+      fa.status
+    end
+    column "Funding Amount" do |fa|
+      fa.amount
+    end
+    column "Funding Source" do |fa|
+      fa.source
+    end
+    column :updated_at
   end
 
 end

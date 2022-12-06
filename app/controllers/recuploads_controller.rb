@@ -49,7 +49,7 @@ class RecuploadsController < InheritedResources::Base
         recom_id = @recupload.recommendation_id
         enroll_id = Recommendation.find(recom_id).enrollment_id
         if Payment.where(user_id: Enrollment.find(enroll_id).user_id).current_camp_payments.exists?
-         Enrollment.find(enroll_id).update!(application_status: "application complete")
+         Enrollment.find(enroll_id).update!(application_status: "application complete", application_status_updated_on: Date.today)
         end
       else
         format.html { render :new }

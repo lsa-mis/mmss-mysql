@@ -59,12 +59,12 @@ class EnrollmentsController < ApplicationController
     respond_to do |format|
       if @current_enrollment.update(enrollment_params)
         if @current_enrollment.student_packet.attached? && balance_due == 0
-          @current_enrollment.update!(application_status: "enrolled")
+          @current_enrollment.update!(application_status: "enrolled", application_status_updated_on: Date.today)
         end
         format.html { redirect_to root_path, notice: 'Application was successfully updated.' }
         format.json { render :show, status: :ok, location: @current_enrollment }
       else
-        if @current_enrollment.errors.include?(:student_packet)
+        if @current_enrollment.errors.include?(:student_packet) || @current_enrollment.errors.include?(:vaccine_record) || @current_enrollment.errors.include?(:covid_test_record)
           format.html { redirect_to root_path, alert: @current_enrollment.errors.full_messages.to_sentence }
         else
           format.html { render :edit }
@@ -86,7 +86,7 @@ class EnrollmentsController < ApplicationController
 
   def add_to_waitlist
     @enrollment = Enrollment.find(params[:id])
-    @enrollment.update(application_status: 'waitlisted')
+    @enrollment.update(application_status: 'waitlisted', application_status_updated_on: Date.today)
     respond_to do |format|
       format.html { redirect_to admin_applications_path, notice: 'Application was placed on waitlist.' }
       format.json { head :no_content }
@@ -148,6 +148,7 @@ class EnrollmentsController < ApplicationController
                           :application_status, :offer_status,
                           :partner_program, :transcript,
                           :student_packet, :campyear,
+                          :vaccine_record, :covid_test_record,
                           registration_activity_ids: [],
                           session_registration_ids: [],
                           course_registration_ids: [])

@@ -28,7 +28,7 @@ ActiveAdmin.register_page "Dashboard" do
 
           panel link_to("Financial Aid Requests", admin_financial_aid_requests_path) do
             div do
-              render("/admin/finaid_requests", model: "dashboard")
+              render("/admin/pending_finaid_requests", model: "dashboard")
             end
           end
         end
@@ -55,6 +55,11 @@ ActiveAdmin.register_page "Dashboard" do
           panel "Active Camp Note" do
             div do
               render("/admin/dashboard_camp_note", model: "dashboard")
+            end
+          end
+          panel "Resources" do
+            ul do
+              li link_to('Admin Documentation', 'https://docs.google.com/document/d/17M9433ybPpvyXc_RwsnydfmSQsWN80Iwg2t0ACItoKo/edit?usp=sharing', :target => "_blank")
             end
           end
         end

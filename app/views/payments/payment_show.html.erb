@@ -169,13 +169,13 @@
           <% end %>
           <hr/>
           <div class="text-gray-700">
-            <% if @current_application_status == "offer accepted" %>
+            <% if ((["offer accepted","enrolled"].include? @current_application_status) && (@balance_due > 0)) %>
               <%= "#{'balance_due'.humanize.ljust(37, '.')} #{humanized_money_with_symbol(@balance_due.to_i / 100 ).rjust(12,'.')}" %>
             <% end %>
           </div>
         </div>
 
-        <% if @current_application_status == "offer accepted" && @balance_due > 0 %>
+        <% if ((["offer accepted","enrolled"].include? @current_application_status) && (@balance_due > 0)) %>
           <div class="w-2/3">
             <p>Enter a payment up to the balance due amount:</p>
               <%= form_with url: make_payment_path, local: true do |f| %>

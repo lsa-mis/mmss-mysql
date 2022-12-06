@@ -17,7 +17,7 @@ ActiveAdmin.register Payment do
   # end
   actions :index, :show, :new, :create, :update, :edit
 
-  filter :user_id, as: :select, collection: User.all
+  filter :user_id, as: :select, collection: User.all.order(:email)
   filter :account_type, as: :select
   filter :camp_year, as: :select
   filter :created_at
@@ -33,7 +33,7 @@ ActiveAdmin.register Payment do
       else
         f.input :user_id, as: :select, collection: Enrollment.current_camp_year_applications.map { |enrol| [enrol.last_name, enrol.user_id]}.sort 
       end
-      f.input :total_amount
+      f.input :total_amount, label: "Total amount in cents"
       li "Transaction Type #{f.object.transaction_type}" unless f.object.new_record?
       f.input :transaction_type, input_html: {value: "1"} unless f.object.persisted?
       li "Transaction Status #{f.object.transaction_status}" unless f.object.new_record?
@@ -72,6 +72,30 @@ ActiveAdmin.register Payment do
     column :timestamp       
     column :camp_year
  
+  end
+
+  show do
+    attributes_table do
+      row :user_id do |p| 
+        link_to(p.user.email) end
+      
+      row :transaction_type
+      row :transaction_status
+      row :transaction_id
+      row "Total amount" do |p|
+        humanized_money_with_symbol(p.total_amount.to_i/100)
+      end
+      row :transaction_date
+      row :account_type
+      row :result_code
+      row :result_message
+      row :user_account
+      row :timestamp
+      row :transaction_hash
+      row :camp_year
+      row :created_at
+      row :updated_at 
+    end
   end
 
 end

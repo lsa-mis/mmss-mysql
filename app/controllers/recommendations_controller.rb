@@ -21,8 +21,12 @@ class RecommendationsController < ApplicationController
 
   # GET /recommendations/new
   def new
-    @enrollment = Enrollment.find_by(id: params[:enrollment_id])
-    @recommendation = @enrollment.build_recommendation
+    if Recommendation.find_by(enrollment_id: @current_enrollment).present?
+      redirect_to root_path
+    else
+      @enrollment = Enrollment.find_by(id: params[:enrollment_id])
+      @recommendation = @enrollment.build_recommendation
+    end
   end
 
   # GET /recommendations/1/edit
