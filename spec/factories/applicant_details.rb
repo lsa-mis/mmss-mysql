@@ -39,33 +39,33 @@ FactoryBot.define do
   factory :applicant_detail do
     association :user
     firstname { Faker::Name.first_name }
-    # middlename { "The" }
+    middlename { Faker::Name.middle_name }
     lastname { Faker::Name.last_name }
     gender { Faker::Gender.binary_type }
-    us_citizen { Faker::Boolean.boolean }
+    # us_citizen { Faker::Boolean.boolean }
     demographic { Faker::Demographic.race }
     birthdate { Faker::Date.birthday(min_age: 15, max_age: 18) }
     diet_restrictions { "peanuts" }
     shirt_size { "Large" }
     address1 { Faker::Address.street_address }
-    # address2 { "MyString" }
+    address2 { Faker::Address.secondary_address }
     city { Faker::Address.city }
     state { Faker::Address.state_abbr }
     # state_non_us { "MyString" }
     postalcode { Faker::Address.zip_code }
     country { "US" }
     # phone { Faker::PhoneNumber.cell_phone }
-    phone { "123-444-5555" }
+    phone { "123-333-5555" }
     parentname { Faker::Name.name }
     parentaddress1 { Faker::Address.street_address }
-    # parentaddress2 { "MyString" }
+    parentaddress2 { Faker::Address.secondary_address }
     parentcity { Faker::Address.city }
-    # parentstate { "MyString" }
+    parentstate { Faker::Address.state_abbr }
     # parentstate_non_us { "MyString" }
     parentzip { Faker::Address.zip_code  }
     parentcountry { "US" }
     parentphone { "123-444-5555" }
-    # parentworkphone { "MyString" }
+    parentworkphone { "123-666-5555" }
     parentemail { Faker::Internet.email }
   end
 end

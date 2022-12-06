@@ -33,15 +33,15 @@ FactoryBot.define do
     # international { false }
     high_school_name { Faker::University.name }
     high_school_address1 { Faker::Address.street_address}
-    # high_school_address2 { "MyString" }
+    high_school_address2 { Faker::Address.secondary_address }
     high_school_city { Faker::Address.city }
-    # high_school_state { "MyString" }
+    high_school_state { Faker::Address.state_abbr }
     # high_school_non_us { "MyString" }
-    # high_school_postalcode { "MyString" }
+    high_school_postalcode { Faker::Address.zip_code }
     high_school_country { "US" }
     year_in_school { "Junior" }
     anticipated_graduation_year { "2023" }
-    # room_mate_request { "MyString" }
+    room_mate_request { Faker::Name.name}
     personal_statement { Faker::Lorem.paragraph_by_chars(number: 100, supplemental: false)  }
     # shirt_size { "MyString" }
     # notes { "MyText" }

@@ -1,8 +1,0 @@
-<% if FinancialAid.where(enrollment_id: Enrollment.current_camp_year_applications).present? %>
-  <% FinancialAid.where(enrollment_id: Enrollment.current_camp_year_applications).limit(10).each do |fa| %>
-    <li><%= link_to fa.enrollment.display_name, admin_financial_aid_request_path(fa) %>
-    <%= "#{humanized_money_with_symbol(fa.amount)} -- #{fa.status}" %>
-  <% end %>
-<% else %>
-  There are no requests in the system
-<% end %>

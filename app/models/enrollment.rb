@@ -82,6 +82,8 @@ class Enrollment < ApplicationRecord
   validate :acceptable_student_packet
   validate :acceptable_image
 
+  validates :user_id, uniqueness: { scope: :campyear }
+
   scope :current_camp_year_applications, -> { where('campyear = ? ', CampConfiguration.active_camp_year) }
   scope :offered, -> { current_camp_year_applications.where("offer_status = 'offered'") }
   scope :accepted, -> { current_camp_year_applications.where("offer_status = 'accepted'") }

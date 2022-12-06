@@ -1,0 +1,8 @@
+<% if fin_aid_pending.present? %>
+  <% fin_aid_pending.each do |fa| %>
+    <li><%= link_to fa.enrollment.display_name, admin_financial_aid_request_path(fa) %>
+    <%= "#{humanized_money_with_symbol(fa.amount)} -- #{fa.status}" %>
+  <% end %>
+<% else %>
+  There are no pending requests in the system
+<% end %>
