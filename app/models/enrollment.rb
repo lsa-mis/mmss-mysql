@@ -25,6 +25,7 @@
 #  updated_at                  :datetime         not null
 #  campyear                    :integer
 #  application_deadline        :date
+#  application_status_updated_on :date
 #
 class Enrollment < ApplicationRecord
   after_update :send_offer_letter

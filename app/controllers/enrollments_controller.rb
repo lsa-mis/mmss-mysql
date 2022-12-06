@@ -59,7 +59,7 @@ class EnrollmentsController < ApplicationController
     respond_to do |format|
       if @current_enrollment.update(enrollment_params)
         if @current_enrollment.student_packet.attached? && balance_due == 0
-          @current_enrollment.update!(application_status: "enrolled")
+          @current_enrollment.update!(application_status: "enrolled", application_status_updated_on: Date.today)
         end
         format.html { redirect_to root_path, notice: 'Application was successfully updated.' }
         format.json { render :show, status: :ok, location: @current_enrollment }
@@ -86,7 +86,7 @@ class EnrollmentsController < ApplicationController
 
   def add_to_waitlist
     @enrollment = Enrollment.find(params[:id])
-    @enrollment.update(application_status: 'waitlisted')
+    @enrollment.update(application_status: 'waitlisted', application_status_updated_on: Date.today)
     respond_to do |format|
       format.html { redirect_to admin_applications_path, notice: 'Application was placed on waitlist.' }
       format.json { head :no_content }
