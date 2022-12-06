@@ -59,45 +59,38 @@ class ApplicantDetail < ApplicationRecord
                     format: {with: URI::MailTo::EMAIL_REGEXP, message: "only allows valid emails"}
   validate :parentemail_not_user_email 
 
-scope :current_camp_enrolled, -> { where("user_id IN (?)", Enrollment.enrolled.pluck(:user_id)) }
+  scope :current_camp_enrolled, -> { where("user_id IN (?)", Enrollment.enrolled.pluck(:user_id)) }
 
-def full_name
-  "#{lastname}, #{firstname}"
-end
-
-def applicant_email
-  User.find(self.user_id).email
-end# or whatever column you wantend
-
-def full_name_and_email
-  "#{full_name} - #{applicant_email}"
-end
-
-def gender_name
-  Gender.find(self.gender).name
-end
-
-def demographic_name
-  if self.demographic.present?
-    Demographic.find(self.demographic).name
-  else
-    "None Selected"
+  def full_name
+    "#{lastname}, #{firstname}"
   end
-end
 
-def parentemail_not_user_email
-  if self.user.email == self.parentemail
-    errors.add(:base, "Parent/Guardian email should be different than an applicant's email")
-  else
-    return true
+  def applicant_email
+    User.find(self.user_id).email
+  end# or whatever column you wantend
+
+  def full_name_and_email
+    "#{full_name} - #{applicant_email}"
   end
-end
 
-  # def applicant_profile_link
-  #   if self.find(current_user)
-  #     edit_applicant_detail_path(current_user)
-  #   else
-  #     new_applicant_detail_path(current_user)
-  #   end
-  # end
+  def gender_name
+    Gender.find(self.gender).name
+  end
+
+  def demographic_name
+    if self.demographic.present?
+      Demographic.find(self.demographic).name
+    else
+      "None Selected"
+    end
+  end
+
+  def parentemail_not_user_email
+    if self.user.email == self.parentemail
+      errors.add(:base, "Parent/Guardian email should be different than the applicant's email")
+    else
+      return true
+    end
+  end
+
 end
