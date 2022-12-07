@@ -1,6 +1,10 @@
 Rails.application.routes.draw do
 
 
+  devise_for :faculties, controllers: {
+    sessions: 'faculties/sessions'
+  }
+
   resources :rejections
   resources :campnotes
   resources :recuploads
@@ -113,5 +117,7 @@ Rails.application.routes.draw do
   end
 
   get 'send_request_email', to: 'recommendations#send_request_email', as: :send_request_email
+
+  get 'faculties', to: 'faculties#index'
 
 end
