@@ -2,7 +2,7 @@
 
 class Faculties::SessionsController < Devise::SessionsController
 
-  after_action :after_login
+  # after_action :after_login
 
   # GET /resource/sign_in
    def new
@@ -24,12 +24,10 @@ class Faculties::SessionsController < Devise::SessionsController
     def after_login
       if faculty_signed_in?
         uniqname = current_faculty.email.split('@').first
-        if Course.current_camp.pluck(:faculty_uniqname).uniq.compact.include?(uniqname)
-          flash.now[:alert] = "hello"
-        else
-          flash.now[:alert] = "hell"
+        unless Course.current_camp.pluck(:faculty_uniqname).uniq.compact.include?(uniqname)
+          # flash.now[:alert] = "hell"
           # redirect_todestroy_faculty_session_path
-          redirect_to session.delete(:return_to)
+          redirect_to(controller: 'faculties/sessions', action: 'destroy', method: :delete) and return
         end
       end
     end
