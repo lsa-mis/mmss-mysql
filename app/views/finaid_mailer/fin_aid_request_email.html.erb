@@ -1,0 +1,23 @@
+
+<h4>Hello <%= "#{ @student.firstname } #{ @student.lastname }" %></h4>
+<p>
+  You are a student applying to the University
+  of Michigan's - Michigan Math & Science Scholars High School Summer
+  Program. Applicants may apply for MMSS Financial Aid by either clicking on or pasting the link below into
+  the address line of your favorite web browser.
+  <br>
+  <%= link_to "Financial Aid Request", @url %>
+</p>
+<div style="padding: 4px;border: 2px solid black;">
+  <strong>Trouble clicking the link above?</strong>
+  <br>
+  Copy the following link and paste it into a browser to view.
+  <br>
+    <%= @url %>
+  <br>
+  <i>The link provided in this email starts with “https://mmss-registration.math.lsa.umich.edu”.</i>
+</div>
+
+<p>
+  You will be notified by email of any financial award decisions Thank you, 
+</p>
