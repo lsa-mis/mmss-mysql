@@ -114,4 +114,6 @@ Rails.application.routes.draw do
 
   get 'send_request_email', to: 'recommendations#send_request_email', as: :send_request_email
 
+  get 'send_finaid_request_email', to: 'enrollments#send_finaid_request_email', as: :send_finaid_request_email
+
 end
