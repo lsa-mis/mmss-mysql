@@ -36,4 +36,9 @@ class Recommendation < ApplicationRecord
   def full_name
     "#{firstname} #{lastname}"
   end
+
+  def display_name
+    "#{lastname}, #{firstname}"
+  end
+
 end

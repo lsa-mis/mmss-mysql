@@ -17,7 +17,7 @@ ActiveAdmin.register ApplicantDetail do
     f.semantic_errors # shows errors on :base
     # f.inputs           # builds an input field for every attribute
     f.inputs do
-      f.input :user_id, as: :select, collection: User.all
+      f.input :user_id, as: :select, collection: User.all.order(:email)
       f.input :firstname
       f.input :middlename
       f.input :lastname

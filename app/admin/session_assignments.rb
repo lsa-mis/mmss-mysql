@@ -18,7 +18,7 @@ ActiveAdmin.register SessionAssignment do
 
   form do |f|
     f.inputs do
-      f.input :enrollment_id, as: :select, collection: Enrollment.current_camp_year_applications
+      f.input :enrollment_id, as: :select, collection: Enrollment.current_camp_year_applications.map { |enrol| [enrol.display_name.downcase, enrol.id]}.sort
       f.input :camp_occurrence_id, label: "Session", as: :select, collection: CampOccurrence.active
       f.input :offer_status, as: :select, collection: ['accepted','declined']
     end
@@ -50,7 +50,7 @@ ActiveAdmin.register SessionAssignment do
     active_admin_comments
   end
 
-  filter :enrollment_id, as: :select, collection: -> { Enrollment.current_camp_year_applications.map { |enrol| [enrol.display_name, enrol.id]}.sort}
+  filter :enrollment_id, as: :select, collection: -> { Enrollment.current_camp_year_applications.map { |enrol| [enrol.display_name.downcase, enrol.id]}.sort }
   filter :camp_occurrence_id, label: "Session", as: :select, collection: CampOccurrence.active.no_any_session
   filter :offer_status, as: :select
 
