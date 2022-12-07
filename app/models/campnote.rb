@@ -3,10 +3,10 @@
 # Table name: campnotes
 #
 #  id         :bigint           not null, primary key
-#  note       :string
+#  note       :string(255)
 #  opendate   :datetime
 #  closedate  :datetime
-#  notetype   :string
+#  notetype   :string(255)
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
