@@ -1,0 +1,27 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Courses</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Camp occurrence</th>
+      <th>Title</th>
+      <th>Available spaces</th>
+      <th>Status</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @courses.each do |course| %>
+      <tr>
+        <td><%= course.title %></td>
+        <td><%= course.available_spaces %></td>
+        <td><%= course.status %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
