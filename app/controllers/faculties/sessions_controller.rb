@@ -2,33 +2,29 @@
 
 class Faculties::SessionsController < Devise::SessionsController
 
-  # after_action :after_login
-
   # GET /resource/sign_in
-   def new
-     super
-   end
+  def new
+    super 
+  end
 
   # POST /resource/sign_in
-   def create
-     super
-   end
+  def create
+    faculty = Faculty.find_by(email: params[:faculty][:email].downcase)
+    if faculty 
+      uniqname = faculty.email.split('@').first
+      if Course.current_camp.pluck(:faculty_uniqname).uniq.compact.include?(uniqname)
+        sign_in_and_redirect faculty
+      else
+        redirect_to root_path, :alert => "You don't have any courses, please contact the administrator"
+      end
+    else
+      redirect_to new_faculty_session_path, :alert => "Please sign up first!"
+    end
+  end
 
   # DELETE /resource/sign_out
-   def destroy
-     super
-   end
+  def destroy
+    super
+  end
 
-   private
-
-    def after_login
-      if faculty_signed_in?
-        uniqname = current_faculty.email.split('@').first
-        unless Course.current_camp.pluck(:faculty_uniqname).uniq.compact.include?(uniqname)
-          # flash.now[:alert] = "hell"
-          # redirect_todestroy_faculty_session_path
-          redirect_to(controller: 'faculties/sessions', action: 'destroy', method: :delete) and return
-        end
-      end
-    end
 end
