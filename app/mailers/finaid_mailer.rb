@@ -21,4 +21,11 @@ class FinaidMailer < ApplicationMailer
     mail(to: @email, subject: "MMSS - Financial Aid for #{@student.firstname} #{@student.lastname}")
   end
 
+  def fin_aid_request_email
+    @enrollment = Enrollment.find_by(id: params[:enrollment])
+    @student = ApplicantDetail.find_by(user_id: @enrollment.user_id)
+    @url  = "#{ ConstantData::HOST_URL }/financial_aids/new"
+    mail(to: @enrollment.user.email, subject: "Financial Aid Request Form for #{ @student.firstname } #{ @student.lastname }")
+  end
+
 end

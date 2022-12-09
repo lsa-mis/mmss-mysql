@@ -93,6 +93,14 @@ class EnrollmentsController < ApplicationController
     end
   end
 
+  def send_finaid_request_email
+    @enrollment = Enrollment.find_by(id: params[:enrollment_id])
+    FinaidMailer.with(enrollment: @enrollment).fin_aid_request_email.deliver_now
+    respond_to do |format|
+      format.html { redirect_to admin_application_path(@enrollment), notice: 'Request was sent!' }
+    end
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_current_enrollment
