@@ -21,4 +21,15 @@ class Faculty < ApplicationRecord
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
+
+  validate :faculty_has_courses
+
+  private
+
+    def faculty_has_courses
+      uniqname = self.email.split('@').first
+      unless Course.current_camp.pluck(:faculty_uniqname).uniq.compact.include?(uniqname)
+        errors.add(:base, "You don't have any courses, please contact the administrator")
+      end
+    end
 end
