@@ -1,9 +1,11 @@
 Rails.application.routes.draw do
 
-
   devise_for :faculties, controllers: {
     sessions: 'faculties/sessions'
   }
+
+  get 'faculties', to: 'faculties#index'
+  get 'faculties/student_list/:id', to: 'faculties#student_list', as: :student_list
 
   resources :rejections
   resources :campnotes
