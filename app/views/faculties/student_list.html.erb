@@ -1,0 +1,88 @@
+<p>
+  <strong>Course Title:</strong>
+  <%= @course.display_name %>
+</p>
+
+<p>
+  <strong>Available spaces:</strong>
+  <%= @course.available_spaces %>
+</p>
+
+<p>
+  <strong>Status:</strong>
+  <%= @course.status %>
+</p>
+
+<p>
+  <strong>Student List:</strong>
+</p>
+
+<table class="px-2 min-w-full w-full divide-y divide-gray-300">
+  <thead class="bg-gray-300">
+    <tr>
+      <th scope="col" class="py-3.5 text-sm font-semibold text-gray-900 text-center">Email</th>
+      <th scope="col" class="pl-4 py-3.5 text-left text-sm font-semibold text-gray-900 lg:table-cell">Name</th>
+      <th scope="col" class="pl-4 py-3.5 text-left text-sm font-semibold text-gray-900 lg:table-cell">Personal Statement</th>
+      <th scope="col" class="pl-4 py-3.5 text-left text-sm font-semibold text-gray-900 lg:table-cell">International</th>
+      <th scope="col" class="pl-4 py-3.5 text-left text-sm font-semibold text-gray-900 lg:table-cell">Transcript</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @students.each do |student| %>
+      <% if @students.index(student).odd? %>
+        <tr class="relative py-2 pl-4 sm:pl-6 pr-3 text-sm border-t border-grey-700 bg-gray-200">
+      <% else %>
+        <tr class="relative py-2 pl-4 sm:pl-6 pr-3 text-sm border-t border-grey-700 bg-white">
+      <% end %>
+        <td class="relative py-2 pl-4 sm:pl-6 pr-3 text-sm">
+          <div class="font-medium text-gray-900 text-center">
+            <%= student.user.email %>
+          </div>
+        </td>
+        <td class="relative py-2 pl-4 sm:pl-6 pr-3 text-sm">
+          <div class="font-medium text-gray-900">
+            <%= student.applicant_detail.full_name %>
+          </div>
+        <td class="relative py-2 pl-4 sm:pl-6 pr-3 text-sm">
+          <div class="font-medium text-gray-900">
+            <%= student.personal_statement %>
+          </div>
+        </td>
+        <td class="relative py-2 pl-4 sm:pl-6 pr-3 text-sm">
+          <div class="font-medium text-gray-900">
+            <%= show_international(student.international) %>
+          </div>
+        </td>
+        <td class="relative py-2 pl-4 sm:pl-6 pr-3 text-sm">
+          <div class="font-medium text-gray-900 hover:underline">
+            <% if student.transcript.attached? %>
+              <%= link_to student.transcript.filename, url_for(student.transcript) %>
+            <% else %>
+              Not avalable
+            <% end %>
+          </div>
+        </td>
+        <% if student.recommendation.present? && student.recommendation.recupload.present? %>
+          <td class="relative py-2 pl-4 sm:pl-6 pr-3 text-sm">
+            <div class="font-medium text-gray-900 hover:underline">
+              <% if student.recommendation.recupload.recletter.attached? %>
+                <%= link_to student.recommendation.recupload.recletter.filename, url_for(student.recommendation.recupload.recletter) %>
+              <% end %>
+            </div>
+          </td>
+          <td class="relative py-2 pl-4 sm:pl-6 pr-3 text-sm">
+            <div class="font-medium text-gray-900">
+              <% unless student.recommendation.recupload.letter.empty? %>
+                <%= student.recommendation.recupload.letter %>
+              <% end %>
+            </div>
+          </td>
+        <% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<p>
+  <%= link_to 'Back', faculties_path %>
+</p>
