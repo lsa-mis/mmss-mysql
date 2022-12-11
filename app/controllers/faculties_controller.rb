@@ -3,8 +3,15 @@ class FacultiesController < ApplicationController
 
   def index
     faculty = current_faculty.email.split('@').first
-    @courses = Course.where(faculty_uniqname: faculty)
+    @courses = Course.current_camp.where(faculty_uniqname: faculty)
 
+  end
+
+  def student_list
+    @course = Course.find(params[:id])
+    enrollment_ids = CourseAssignment.where(course_id: params[:id]).pluck(:enrollment_id)
+    @students = Enrollment.where(id: enrollment_ids)
+    render layout: 'student_list'
   end
 
 end
