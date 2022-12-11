@@ -3,6 +3,7 @@ class StaticPagesController < ApplicationController
   # devise_group :logged_in, contains: [:user, :admin]
   # before_action :authenticate_logged_in!, except: [:contact :privacy]
   # before_action :authenticate_admin!, only: [:destroy]
+  before_action :default_redirect
   before_action :set_current_enrollment
 
   def index
@@ -21,6 +22,12 @@ class StaticPagesController < ApplicationController
     def set_current_enrollment
       if user_signed_in?
         @current_enrollment = current_user.enrollments.current_camp_year_applications.last
+      end
+    end
+
+    def default_redirect
+      if faculty_signed_in?
+        redirect_to faculties_path
       end
     end
 end
