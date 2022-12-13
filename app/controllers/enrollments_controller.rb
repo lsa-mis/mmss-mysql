@@ -106,7 +106,7 @@ class EnrollmentsController < ApplicationController
     end
     send_remove_from_waitlist_email(@enrollment)
     respond_to do |format|
-      format.html { redirect_to admin_applications_path, notice: 'Application was removed from waitlist.' }
+      format.html { redirect_to admin_applications_path, notice: 'Application was removed from waitlist. Send an email to an applicant with further instructions.' }
       format.json { head :no_content }
     end
   end
