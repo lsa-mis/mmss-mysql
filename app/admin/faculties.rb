@@ -17,7 +17,7 @@ ActiveAdmin.register Faculty do
   # end
 
   config.filters = false
-  actions :index, :show
+  actions :index, :show, :destroy
 
   index do
     selectable_column
