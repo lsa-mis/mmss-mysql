@@ -135,4 +135,13 @@ module ApplicationHelper
       ['Notice','notice']
     ]
   end
+
+  def show_international(international)
+    if international
+      "yes"
+    else
+      "no"
+    end
+  end
+
 end

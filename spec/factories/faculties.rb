@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: users
+# Table name: faculties
 #
 #  id                     :bigint           not null, primary key
 #  email                  :string(255)      default(""), not null
@@ -17,8 +17,7 @@
 #  updated_at             :datetime         not null
 #
 FactoryBot.define do
-  factory :user do
-    email { Faker::Internet.email }
-    password { Faker::Internet.password(min_length: 10) }
+  factory :faculty do
+    
   end
 end

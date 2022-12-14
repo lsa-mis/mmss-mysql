@@ -5,9 +5,9 @@
 #  id                :bigint           not null, primary key
 #  enrollment_id     :bigint           not null
 #  amount_cents      :integer          default(0)
-#  source            :string
-#  note              :text
-#  status            :string           default("pending")
+#  source            :string(255)
+#  note              :text(65535)
+#  status            :string(255)      default("pending")
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  payments_deadline :date

@@ -1,5 +1,13 @@
 Rails.application.routes.draw do
 
+  devise_for :faculties, controllers: {
+    sessions: 'faculties/sessions'
+  }
+
+  get 'faculty', to: 'faculties#index'
+  get 'faculty/student_list/:id', to: 'faculties#student_list', as: :student_list
+  get 'faculty/student_page/:id', to: 'faculties#student_page', as: :student_page
+  get 'faculty_login', to: 'static_pages#faculty_login', as: :faculty_login
 
   resources :rejections
   resources :campnotes
@@ -96,7 +104,6 @@ Rails.application.routes.draw do
   get 'static_pages/index'
   get 'static_pages/contact'
   get 'static_pages/privacy'
-
 
   get 'payments', to: 'payments#index'
   get 'payment_receipt', to: 'payments#payment_receipt'
