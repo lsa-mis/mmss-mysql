@@ -1,4 +1,5 @@
 class FacultiesController < ApplicationController
+  layout 'faculty'
   before_action :authenticate_faculty!
 
   def index
@@ -11,7 +12,11 @@ class FacultiesController < ApplicationController
     @course = Course.find(params[:id])
     enrollment_ids = CourseAssignment.where(course_id: params[:id]).pluck(:enrollment_id)
     @students = Enrollment.where(id: enrollment_ids)
-    render layout: 'student_list'
+  end
+
+  def student_page
+    @student = Enrollment.find_by(id: params[:id])
+
   end
 
 end

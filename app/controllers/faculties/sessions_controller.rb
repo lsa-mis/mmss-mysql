@@ -24,7 +24,21 @@ class Faculties::SessionsController < Devise::SessionsController
 
   # DELETE /resource/sign_out
   def destroy
-    super
+    signed_out = (Devise.sign_out_all_scopes ? sign_out : sign_out(resource_name))
+    set_flash_message! :notice, :signed_out if signed_out
+    yield if block_given?
+    respond_to_on_destroy
   end
+
+  private
+
+    def respond_to_on_destroy
+      # We actually need to hardcode this as Rails default responder doesn't
+      # support returning empty response on GET request
+      respond_to do |format|
+        format.all { head :no_content }
+        format.any(*navigational_formats) { redirect_to faculty_login_path }
+      end
+    end
 
 end

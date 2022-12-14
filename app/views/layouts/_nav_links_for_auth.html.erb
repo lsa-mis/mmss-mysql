@@ -3,7 +3,7 @@
 <nav class="flex items-center justify-between flex-wrap border-blue-900 border-b-2 p-6">
   <div class="flex items-center flex-shrink-0 text-blue-900 mr-6">
     <% if faculty_signed_in? %>
-      <%= link_to faculties_path do %>
+      <%= link_to faculty_path do %>
         <%= image_pack_tag "MMSS_Logo.png", alt:"MMSS Logo", size: "250x36"  %>
       <% end %>
     <% elsif admin_signed_in? %>
@@ -28,6 +28,9 @@
       <% elsif faculty_signed_in? %>
         <div>
           <%= link_to current_faculty.email, edit_faculty_registration_path, class: "inline-block btn btn-sm btn-blue mr-1", title: "Edit profile" %>
+        </div>
+        <div>
+          <%= link_to 'Sign out', destroy_faculty_session_path, method: :delete, class: "inline-block btn btn-sm btn-teal ml-1" %>
         </div>
       <% end %>
     </div>
