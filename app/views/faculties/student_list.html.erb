@@ -24,12 +24,13 @@
 <table class="px-2 min-w-full w-full divide-y divide-gray-300">
   <thead class="bg-gray-300">
     <tr>
-      <th scope="col" class="py-3.5 text-sm font-semibold text-gray-900 text-center">Email</th>
-      <th scope="col" class="pl-4 py-3.5 text-left text-sm font-semibold text-gray-900 lg:table-cell">Name</th>
-      <th scope="col" class="pl-4 py-3.5 text-left text-sm font-semibold text-gray-900 lg:table-cell">Gender</th>
-      <th scope="col" class="pl-4 py-3.5 text-left text-sm font-semibold text-gray-900 lg:table-cell">Year in School</th>
-      <th scope="col" class="pl-4 py-3.5 text-left text-sm font-semibold text-gray-900 lg:table-cell">Country</th>
-      <th scope="col" class="pl-4 py-3.5 text-left text-sm font-semibold text-gray-900 lg:table-cell">City - State</th>
+      <th scope="col" class="py-3.5 text-sm font-semibold text-gray-900 text-center">Name</th>
+      <th scope="col" class="pl-4 py-3.5 text-center text-sm font-semibold text-gray-900 lg:table-cell">Email</th>
+      <th scope="col" class="pl-4 py-3.5 text-center text-sm font-semibold text-gray-900 lg:table-cell">Gender</th>
+      <th scope="col" class="pl-4 py-3.5 text-center text-sm font-semibold text-gray-900 lg:table-cell">Year in School</th>
+      <th scope="col" class="pl-4 py-3.5 text-center text-sm font-semibold text-gray-900 lg:table-cell">Country</th>
+      <th scope="col" class="pl-4 py-3.5 text-center text-sm font-semibold text-gray-900 lg:table-cell">City - State</th>
+      <th scope="col" class="pl-4 py-3.5 text-center text-sm font-semibold text-gray-900 lg:table-cell"></th>
     </tr>
   </thead>
   <tbody>
@@ -40,13 +41,13 @@
         <tr class="relative py-2 pl-4 sm:pl-6 pr-3 text-sm border-t border-grey-700 bg-white">
       <% end %>
         <td class="relative py-2 pl-4 sm:pl-6 pr-3 text-sm">
-          <div class="font-medium text-gray-900 text-center hover:underline">
-            <%= link_to student.user.email, student_page_path(student) %>
+          <div class="font-medium text-gray-900">
+            <%= student.applicant_detail.full_name %>
           </div>
         </td>
         <td class="relative py-2 pl-4 sm:pl-6 pr-3 text-sm">
-          <div class="font-medium text-gray-900">
-            <%= student.applicant_detail.full_name %>
+          <div class="font-medium text-gray-900 hover:underline">
+            <%= student.user.email %>
           </div>
         </td>
         <td class="relative py-2 pl-4 sm:pl-6 pr-3 text-sm">
@@ -67,6 +68,11 @@
         <td class="relative py-2 pl-4 sm:pl-6 pr-3 text-sm">
           <div class="font-medium text-gray-900">
             <%= student.applicant_detail.city %> - <%= student.applicant_detail.state %>
+          </div>
+        </td>
+        <td class="relative py-2 pl-4 sm:pl-6 pr-3 text-sm">
+          <div class="font-medium text-gray-900 hover:underline">
+            <%= link_to "More info ...",  student_page_path(student) %>
           </div>
         </td>
       </tr>
