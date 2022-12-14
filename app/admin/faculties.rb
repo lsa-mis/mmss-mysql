@@ -16,14 +16,16 @@ ActiveAdmin.register Faculty do
   #   permitted
   # end
 
+  config.filters = false
+  actions :index, :show
+
   index do
     selectable_column
-    id_column
+    actions
     column :email
     column :current_sign_in_at
     column :sign_in_count
     column :created_at
-    actions
   end
 
   show do
