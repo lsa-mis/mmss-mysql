@@ -4,11 +4,13 @@
 #
 #  id                 :bigint           not null, primary key
 #  camp_occurrence_id :bigint           not null
-#  title              :string
+#  title              :string(255)
 #  available_spaces   :integer
-#  status             :string
+#  status             :string(255)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
+#  faculty_uniqname   :string(255)
+#  faculty_name       :string(255)
 #
 class Course < ApplicationRecord
   belongs_to :camp_occurrence

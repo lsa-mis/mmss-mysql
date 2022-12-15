@@ -4,7 +4,7 @@
 #
 #  id                    :bigint           not null, primary key
 #  camp_configuration_id :bigint           not null
-#  description           :string           not null
+#  description           :string(255)      not null
 #  begin_date            :date             not null
 #  end_date              :date             not null
 #  active                :boolean          default(FALSE), not null

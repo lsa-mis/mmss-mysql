@@ -17,10 +17,14 @@ class StaticPagesController < ApplicationController
   def privacy
   end
 
+  def faculty_login
+  end
+
   private
     def set_current_enrollment
       if user_signed_in?
         @current_enrollment = current_user.enrollments.current_camp_year_applications.last
       end
     end
+
 end

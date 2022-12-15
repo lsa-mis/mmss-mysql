@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>MMSS Application</title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_pack_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+
+    <noscript>
+      <meta http-equiv="refresh" content="2;url=nojavascript.html">
+    </noscript>
+  </head>
+
+  <body data-environment = Rails.env >
+    <header class="w-full h-auto">
+      <%= render 'layouts/nav_links_for_auth' %>
+    </header>
+    <main class="container mx-auto px-2">
+      <%= render 'layouts/notifications' %>
+      <div class="flex mb-4">
+        <div class="h-auto">
+          <%= yield %>
+        </div>
+      </div>
+    </main>
+    <footer class="w-full h-auto">
+      <%= render '/layouts/footer' %>
+    </footer>
+    <div role="debugging" class="w-full h-auto">
+      <%= debug(params) if Rails.env.development? %>
+    </div>
+
+  </body>
+</html>
