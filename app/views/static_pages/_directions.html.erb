@@ -124,6 +124,16 @@
           We look forward to seeing you at the <%= @current_camp_year %> University of Michigan MMSS High School Summer Program.
         </p>
       </div>
+      <div class="m-2">
+        <%= link_to 'Travel', new_enrollment_travel_path(@current_enrollment),
+                    class: 'btn btn-blue' %>
+      <p class ="mt-2">
+        Information about filling the travel form.
+      </p>
+    </div>
+    <p class='direction_notes'>
+      Watch here for special information related travel.
+    </p>
     <% else %>
       <div class="m-2">
         <p class="direction_notes">

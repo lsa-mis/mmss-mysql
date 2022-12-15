@@ -16,6 +16,9 @@
 #  depart_route_num  :time
 #  depart_date       :date
 #  depart_time       :time
+#  depart_carrier    :string(255)
+#  arrival_session   :string(255)
+#  depart_session    :string(255)
 #
 class Travel < ApplicationRecord
   belongs_to :enrollment

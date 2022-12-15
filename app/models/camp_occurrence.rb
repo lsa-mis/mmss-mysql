@@ -55,4 +55,8 @@ class CampOccurrence < ApplicationRecord
     "#{self.description} - #{self.begin_date} to #{self.end_date}" # or whatever column you want
   end
 
+  def description_with_start_day
+    "#{self.description} - #{self.begin_date.strftime('%B %d')}"
+  end
+
 end

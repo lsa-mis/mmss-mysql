@@ -2,8 +2,9 @@ class TravelsController < ApplicationController
   devise_group :logged_in, contains: [:user, :admin]
   before_action :authenticate_logged_in!
   before_action :authenticate_admin!, only: [:index, :destroy]
+  before_action :set_enrollment
   
-  before_action :set_travel, only: [:show, :edit, :update, :destroy]
+  # before_action :set_travel, only: [:show, :edit, :update, :destroy]
 
   # GET /travels
   # GET /travels.json
@@ -18,7 +19,9 @@ class TravelsController < ApplicationController
 
   # GET /travels/new
   def new
-    @travel = Travel.new
+    @travel = @enrollment.travels.new
+    @sessions = @enrollment.session_assignments.map { |s| s.camp_occurrence.description_with_start_day }
+    Rails.logger.debug "*********************** @sessios #{@enrollment.id}"
   end
 
   # GET /travels/1/edit
@@ -67,8 +70,12 @@ class TravelsController < ApplicationController
 
   private
     # Use callbacks to share common setup or constraints between actions.
-    def set_travel
-      @travel = Travel.find(params[:id])
+    # def set_travel
+    #   @travel = Travel.find(params[:id])
+    # end
+
+    def set_enrollment
+      @enrollment = Enrollment.find(params[:enrollment_id])
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
