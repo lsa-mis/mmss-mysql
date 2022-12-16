@@ -21,12 +21,12 @@ h4
   @apply bg-blue-um_blue text-yellow-500 p-1 w-1/2 tracking-wider mt-2
 
 .display-box
-  @apply bg-blue-200 border border-blue-500 w-full px-2
+  @apply bg-blue-200 border-0 border-blue-500 w-full px-2
 
 a
 
   &.btn
-    @apply font-normal py-1 px-2 rounded no-underline
+    @apply font-normal py-1 px-2 rounded-sm no-underline
 
     &.btn-sm
       @apply text-xs py-1 px-1
@@ -60,7 +60,7 @@ a
 
 button
   &.btn
-    @apply font-normal py-1 px-2 rounded no-underline
+    @apply font-normal py-1 px-2 rounded-sm no-underline
 
   &.btn-sm
     @apply text-xs py-1 px-1
@@ -85,7 +85,7 @@ button
 
 input
   &.btn
-    @apply font-normal py-1 px-2 rounded no-underline
+    @apply font-normal py-1 px-2 rounded-sm no-underline
 
   &.btn-green
     @apply bg-green-700 text-gray-100
@@ -154,7 +154,7 @@ hr
   @apply w-2/3 border-blue-900 border-2 mt-2
 
 .hr-thin
-  @apply border w-2/3
+  @apply border-0 w-2/3
 
 #sidebox
   @apply mt-4 p-2 flex flex-col border-2 border-yellow-400 bg-yellow-200
@@ -182,7 +182,7 @@ hr
 // Errors
 
 #error_explanation
-  @apply m-4 p-2 rounded bg-yellow-200 border-red-500 border
+  @apply m-4 p-2 rounded-sm bg-yellow-200 border-red-500 border-0
 
   h2
     @apply text-red-700 text-lg
@@ -197,7 +197,7 @@ hr
   @apply bg-blue-100 border-4 border-red-800 rounded-lg p-4 text-sm font-mono text-blue-900 mx-auto my-4 max-w-2xl w-auto
 
 .current-uploaded-docs
-  @apply bg-yellow-100 border border-blue-500 rounded-lg p-2 text-sm font-mono text-yellow-600 mx-1 my-1 max-w-xl w-auto
+  @apply bg-yellow-100 border-0 border-blue-500 rounded-lg p-2 text-sm font-mono text-yellow-600 mx-1 my-1 max-w-xl w-auto
 
 .actions
   input[type=submit]
@@ -207,7 +207,7 @@ hr
       @apply bg-blue-900 cursor-pointer
 
 select
-  @apply appearance-none w-1/4 bg-gray-200 border border-gray-400 text-gray-700 py-2 px-4 pr-8 rounded leading-tight m-2
+  @apply appearance-none w-1/4 bg-gray-200 border-0 border-gray-400 text-gray-700 py-2 px-4 pr-8 rounded-sm leading-tight m-2
 
 .session--display
   @apply block
@@ -216,11 +216,11 @@ select
   @apply hidden
 
 .student-page-table
-  @apply table-auto border-collapse border
+  @apply table-auto border-collapse border-0
 
   th
-    @apply bg-gray-200 py-3 text-sm font-semibold text-gray-900 border border-gray-300
+    @apply bg-gray-200 py-3 text-sm font-semibold text-gray-900 border-0 border-gray-300
   tr
     @apply py-2 pl-4 pr-3 text-sm bg-white
   td
-    @apply py-2 pl-4 pr-3 text-sm font-medium text-gray-900 border border-gray-300
+    @apply py-2 pl-4 pr-3 text-sm font-medium text-gray-900 border-0 border-gray-300
