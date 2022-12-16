@@ -144,4 +144,12 @@ module ApplicationHelper
     end
   end
 
+  def transportation
+    ['Airplane', 'Bus', 'Train', 
+      'Automobile - parent or permitted designee is driving me to the University of Michigan campus', 
+      'Automobile - parent or permitted designee is driving me to the University of Michigan campus',
+      'N/A - I am a daily MMSS commuter', 'N/A - I am a daily MMSS commuter'
+    ]
+  end
+
 end
