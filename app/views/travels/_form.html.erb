@@ -1,9 +1,7 @@
-<p>All fields are required unless marked <span class="text-gray-700">(optional)</span></p>
-<%= form_with(model: [@enrollment, @travel], local: true) do |form| %>
+<%= form_with(model: [@current_enrollment, @travel], local: true) do |form| %>
   <% if @travel.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(@travel.errors.count, "error") %> prohibited this travel from being saved:</h2>
-
       <ul>
         <% @travel.errors.full_messages.each do |message| %>
           <li><%= message %></li>
@@ -11,150 +9,180 @@
       </ul>
     </div>
   <% end %>
-  <h2 class="section-header">Applicant Travel Information</h2>
+  <div class="text-sm">
+    <span>
+      We are excited for you to join us for the Michigan Math and Science Scholars program! 
+      We would like to know your travel information so that we may plan for your arrival to, and departure from, the campus. 
+      Please take a moment to answer the questions below. 
+      If you are attending more than one session, you will receive a travel information request for the additional session as well.
 
-  <p>
-    We are excited for you to join us for the Michigan Math and Science Scholars program! 
-    We would like to know your travel information so that we may plan for your arrival to, and departure from, the campus. P
-    lease take a moment to answer the questions below. 
-    If you are attending more than one session, you will receive a travel information request for the additional session as well.
+      PLEASE NOTE:  If you are no longer in need of the shuttle service you may have selected in your MMSS application, 
+      or if you have any questions about shuttle service, please email mmss@umich.edu as soon as possible.
+    </span>
+    <div class="py-2">
+      All fields are required unless marked <span class="text-gray-700">(optional)</span>
+    </div>
+    <hr>
+    <%= form.label 'travel[arrival_session]', 'Session of Arrival *' %>
+    <div class="form-check">
+      <% @sessions.each_with_index do |s, index| %>
+        <div>
+          <% if index == 0 %>
+            <input class="form-check-input appearance-none rounded-full h-4 w-4 border border-gray-600 bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" 
+            type="radio" name="travel[arrival_session]" id="<%= s %>" value="<%= s %>" 
+            <%= radio_button_checked(@travel, "arrival_session", s) %> required >
+          <% else %>
+            <input class="form-check-input appearance-none rounded-full h-4 w-4 border border-gray-600 bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" 
+              type="radio" name="travel[arrival_session]" id="<%= s %>" value="<%= s %>"
+              <%= radio_button_checked(@travel, "arrival_session", s) %> >
+          <% end %>
+          <label class="form-check-label inline-block text-gray-800" for="<%= s %>">
+            <%= s %>
+          </label>
+        </div>
+      <% end %>
+    </div>
+    <hr>
 
-    PLEASE NOTE:  If you are no longer in need of the shuttle service you may have selected in your MMSS application, 
-    or if you have any questions about shuttle service, please email mmss@umich.edu as soon as possible.
-  </p>
-  <hr>
-  <%= form.label :arrival_session %>
-  <div class="form-check">
-    <% @sessions.each do |s| %>
-      <div>
-        <input class="form-check-input appearance-none rounded-full h-4 w-4 border border-gray-600 bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" 
-          type="radio" name="arrival_session" id="<%= s %>" value="0">
-        <label class="form-check-label inline-block text-gray-800" for="<%= s %>">
-          <%= s %>
-        </label>
-      </div>
-    <% end %>
-  </div>
-  <hr>
+    <%= form.label 'travel[depart_session]', 'Session of Departure *' %>
+    <div class="form-check">
+      <% @sessions.each_with_index do |s, index| %>
+        <div>
+          <% if index == 0 %>
+            <input class="form-check-input appearance-none rounded-full h-4 w-4 border border-gray-600 bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" 
+              type="radio" name="travel[depart_session]" id="<%= s %>" value="<%= s %>" 
+              <%= radio_button_checked(@travel, "depart_session", s) %> required>
+          <% else %>
+            <input class="form-check-input appearance-none rounded-full h-4 w-4 border border-gray-600 bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" 
+            type="radio" name="travel[depart_session]" id="<%= s %>" value="<%= s %>"
+            <%= radio_button_checked(@travel, "depart_session", s) %> >
+          <% end %>
+          <label class="form-check-label inline-block text-gray-800" for="<%= s %>">
+            <%= s %>
+          </label>
+        </div>
+      <% end %>
+    </div>
+    <h2 class= "section-header">Arrival Information</h2>
+    <span>
+      Please indicate what type of transportation you will use to arrive to Michigan 
+      (if you will be a daily commuter to the MMSS program, please check "N/A") *
+    </span>
+    <%= form.label 'travel[arrival_transport]', class: "hidden" %>
+    <div class="form-check my-2">
+      <% transportation.each_with_index do |t, index| %>
+        <div>
+          <% if index == 0 %>
+            <input class="form-check-input appearance-none rounded-full h-4 w-4 border border-gray-600 bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" 
+              type="radio" name="travel[arrival_transport]" id="<%= t %>" value="<%= t %>" 
+              <%= radio_button_checked(@travel, "arrival_transport", t) %> required>
+          <% else %>
+            <input class="form-check-input appearance-none rounded-full h-4 w-4 border border-gray-600 bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" 
+              type="radio" name="travel[arrival_transport]" id="<%= t %>" value="<%= t %>"
+              <%= radio_button_checked(@travel, "arrival_transport", t) %> >
+          <% end %>
+          <label class="form-check-label inline-block text-gray-800" for="<%= t %>">
+            <%= t %>
+          </label>
+        </div>
+      <% end %>
+    </div>
+    <hr>
 
-  <%= form.label :depart_session %>
-  <div class="form-check">
-    <% @sessions.each do |s| %>
-      <div>
-        <input class="form-check-input appearance-none rounded-full h-4 w-4 border border-gray-600 bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" 
-          type="radio" name="depart_session" id="<%= s %>" value="0">
-        <label class="form-check-label inline-block text-gray-800" for="<%= s %>">
-          <%= s %>
-        </label>
-      </div>
-    <% end %>
-  </div>
-  <hr>
+    <span>
+      Carrier Name (if traveling by automobile - enter "automobile" OR if a daily commuter - enter "commuter")
+      Airline: (Delta, United, Spirit, etc.), Bus (Greyhound), Train (Amtrak) *
+    </span>
+    <div class="field py-2">
+      <%= form.label :arrival_carrier, class: "hidden" %>
+      <%= form.text_field :arrival_carrier, required: true %>
+    </div>
+    <hr>
 
-  <p>
-    Please indicate what type of transportation you will use to arrive to Michigan 
-    (if you will be a daily commuter to the MMSS program, please check "N/A")
-  </p>
+    <span>
+      Arrival Flight #/Bus #/Train # (Ex: Delta 0025) - (if traveling by automobile - enter N/A OR if a daily commuter - enter commuter) *
+    </span>
+    <div class="field py-2">
+      <%= form.label :arrival_route_num, class: "hidden" %>
+      <%= form.text_field :arrival_route_num, required: true %>
+    </div>
+    <hr>
 
-  <%= form.label :arrival_transport %>
-  <div class="form-check">
-    <% transportation.each do |s| %>
-      <div>
-        <input class="form-check-input appearance-none rounded-full h-4 w-4 border border-gray-600 bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" 
-          type="radio" name="arrival_transport" id="<%= s %>" value="0">
-        <label class="form-check-label inline-block text-gray-800" for="<%= s %>">
-          <%= s %>
-        </label>
-      </div>
-    <% end %>
-  </div>
-  <hr>
+    <div class="field py-2 w-full md:w-1/3">
+      <%= form.label :arrival_date, 'Date of arrival *' %>
+      <%= form.date_field :arrival_date, class: "datepicker", required: true %>
+    </div>
+    <hr>
 
-  <p>
-    Carrier Name (if traveling by automobile - enter "automobile" OR if a daily commuter - enter "commuter")
-    Airline: (Delta, United, Spirit, etc.), Bus (Greyhound), Train (Amtrak)
-  </P>
-  <div class="field">
-    <%= form.label :arrival_carrier %>
-    <%= form.text_field :arrival_transport %>
-  </div>
-  <hr>
+    <div class="field py-2 w-full md:w-1/3">
+      <%= form.label :arrival_time, 'Time of arrival *' %>
+      <%= form.time_field :arrival_time, required: true %>
+    </div>
+    <h2 class= "section-header">Departure Information</h2>
+    <span>
+      Please indicate what type of transportation you will use to depart from Michigan
+      (if you will be a daily commuter to the MMSS program, please check "N/A"). *
+    </span>
 
-  <p>
-  Arrival Flight #/Bus #/Train # (Ex: Delta 0025) -   (if traveling by automobile - enter "N/A" OR if a daily commuter - enter "commuter")  </P>
-  <div class="field py-2">
-    <%= form.label :arrival_route_num %>
-    <%= form.text_field :arrival_route_num %>
-  </div>
-  <hr>
+    <%= form.label 'travel[depart_transport]', class: "hidden" %>
+    <div class="form-check">
+      <% transportation.each_with_index do |t, index| %>
+        <div>
+          <% if index == 0 %>
+            <input class="form-check-input appearance-none rounded-full h-4 w-4 border border-gray-600 bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" 
+              type="radio" name="travel[depart_transport]" id="<%= t %>" value="<%= t %>" 
+              <%= radio_button_checked(@travel, "depart_transport", t) %> required>
+          <% else %>
+            <input class="form-check-input appearance-none rounded-full h-4 w-4 border border-gray-600 bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" 
+              type="radio" name="travel[depart_transport]" id="<%= t %>" value="<%= t %>"
+              <%= radio_button_checked(@travel, "depart_transport", t) %> >
+          <% end %>
+          <label class="form-check-label inline-block text-gray-800" for="<%= t %>">
+            <%= t %>
+          </label>
+        </div>
+      <% end %>
+    </div>
+    <hr>
 
-  <div class="field py-2">
-    <%= form.label :arrival_date %>
-    <%= form.date_field :arrival_date, class: "datepicker" %>
-  </div>
-  <hr>
+    <span>
+      Carrier Name (if traveling by automobile - enter automobile OR if a daily commuter - enter commuter) *
+    </span>
+    <div class="field">
+      <%= form.label :depart_carrier, class: "hidden" %>
+      <%= form.text_field :depart_carrier, required: true %>
+    </div>
+    <hr>
 
-  <div class="field">
-    <%= form.label :arrival_time %>
-    <%= form.text_field :arrival_time %>
-  </div>
-  <hr>
+    <span>
+      Departure Flight #/Bus #/Train # (Ex: Delta 0025) - (if traveling by automobile - enter N/A OR if a daily commuter - enter commuter) *
+    </span>
+    <div class="field">
+      <%= form.label :depart_route_num, class: "hidden" %>
+      <%= form.text_field :depart_route_num, required: true %>
+    </div>
+    <hr>
 
-  <p>
-    Please indicate what type of transportation you will use to depart from Michigan
-    (if you will be a daily commuter to the MMSS program, please check "N/A").
-  </p>
+    <div class="field py-2 w-full md:w-1/3">
+      <%= form.label :depart_date, 'Date of departure *' %>
+      <%= form.date_field :depart_date, class: "datepicker", required: true %>
+    </div>
+    <hr>
 
-  <%= form.label :depart_transport %>
-  <div class="form-check">
-    <% transportation.each do |s| %>
-      <div>
-        <input class="form-check-input appearance-none rounded-full h-4 w-4 border border-gray-600 bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" 
-          type="radio" name="depart_transport" id="<%= s %>" value="0">
-        <label class="form-check-label inline-block text-gray-800" for="<%= s %>">
-          <%= s %>
-        </label>
-      </div>
-    <% end %>
-  </div>
-  <hr>
+    <div class="field py-2 w-full md:w-1/3">
+      <%= form.label :depart_time, 'Time of departure *' %>
+      <%= form.time_field :depart_time, required: true %>
+    </div>
+    <hr>
 
-  <p>
-    Departure Information - Carrier Name 
-    (if traveling by automobile - enter "automobile" OR if a daily commuter - enter "commuter")
-  <div class="field">
-    <%= form.label :depart_carrier %>
-    <%= form.text_field :depart_carrier %>
-  </div>
-  <hr>
+    <div class="field">
+      <%= form.label :note, 'Additional notes' %>
+      <%= form.text_area :note %>
+    </div>
+    <hr>
 
-  <p>
-  Departure Flight #/Bus #/Train # (Ex: Delta 0025) -   (if traveling by automobile - enter "N/A" OR if a daily commuter - enter "commuter")  </P>
-  <div class="field">
-    <%= form.label :depart_route_num %>
-    <%= form.text_field :depart_route_num %>
-  </div>
-  <hr>
-
-  <div class="field">
-    <%= form.label :depart_date %>
-    <%= form.date_field :depart_date, class: "datepicker" %>
-  </div>
-  <hr>
-
-  <div class="field">
-    <%= form.label :depart_time %>
-    <%= form.text_field :depart_time %>
-  </div>
-  <hr>
-
-  <div class="field">
-    <%= form.label :note %>
-    <%= form.text_area :note %>
-  </div>
-  <hr>
-
-  <div class="actions">
-    <%= form.submit %>
+    <div class="actions">
+      <%= form.submit %>
+    </div>
   </div>
 <% end %>
