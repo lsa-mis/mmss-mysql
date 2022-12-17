@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_12_15_154325) do
+ActiveRecord::Schema.define(version: 2022_12_16_223619) do
 
   create_table "active_admin_comments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "namespace"
@@ -391,7 +391,7 @@ ActiveRecord::Schema.define(version: 2022_12_15_154325) do
     t.date "arrival_date"
     t.time "arrival_time"
     t.string "depart_transport"
-    t.time "depart_route_num"
+    t.string "depart_route_num"
     t.date "depart_date"
     t.time "depart_time"
     t.string "depart_carrier"

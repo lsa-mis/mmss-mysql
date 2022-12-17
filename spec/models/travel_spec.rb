@@ -13,7 +13,7 @@
 #  arrival_date      :date
 #  arrival_time      :time
 #  depart_transport  :string(255)
-#  depart_route_num  :time
+#  depart_route_num  :string(255)
 #  depart_date       :date
 #  depart_time       :time
 #  depart_carrier    :string(255)
