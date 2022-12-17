@@ -2,10 +2,8 @@ class TravelsController < ApplicationController
   devise_group :logged_in, contains: [:user, :admin]
   before_action :authenticate_logged_in!
   before_action :authenticate_admin!, only: [:index, :destroy]
-  before_action :set_enrollment
+  before_action :set_current_enrollment
   
-  # before_action :set_travel, only: [:show, :edit, :update, :destroy]
-
   # GET /travels
   # GET /travels.json
   def index
@@ -15,29 +13,31 @@ class TravelsController < ApplicationController
   # GET /travels/1
   # GET /travels/1.json
   def show
+    @travel = @current_enrollment.travels.find(params[:id])
   end
 
   # GET /travels/new
   def new
-    @travel = @enrollment.travels.new
-    @sessions = @enrollment.session_assignments.map { |s| s.camp_occurrence.description_with_start_day }
-    Rails.logger.debug "*********************** @sessios #{@enrollment.id}"
+    @travel = @current_enrollment.travels.new
+    @sessions = @current_enrollment.session_assignments.map { |s| s.camp_occurrence.description_with_start_day }
   end
 
   # GET /travels/1/edit
   def edit
+    @sessions = @current_enrollment.session_assignments.map { |s| s.camp_occurrence.description_with_start_day }
+    @travel = @current_enrollment.travels.find(params[:id])
   end
 
   # POST /travels
   # POST /travels.json
   def create
-    @travel = Travel.new(travel_params)
-
+    @travel = @current_enrollment.travels.new(travel_params)
     respond_to do |format|
       if @travel.save
-        format.html { redirect_to @travel, notice: 'Travel was successfully created.' }
+        format.html { redirect_to root_path, notice: 'Travel was successfully created.' }
         format.json { render :show, status: :created, location: @travel }
       else
+        @sessions = @current_enrollment.session_assignments.map { |s| s.camp_occurrence.description_with_start_day }
         format.html { render :new }
         format.json { render json: @travel.errors, status: :unprocessable_entity }
       end
@@ -47,11 +47,13 @@ class TravelsController < ApplicationController
   # PATCH/PUT /travels/1
   # PATCH/PUT /travels/1.json
   def update
+
     respond_to do |format|
-      if @travel.update(travel_params)
-        format.html { redirect_to @travel, notice: 'Travel was successfully updated.' }
+      if @current_enrollment.travels.find(params[:id]).update(travel_params)
+        format.html { redirect_to root_path, notice: 'Travel was successfully updated.' }
         format.json { render :show, status: :ok, location: @travel }
       else
+        @sessions = @current_enrollment.session_assignments.map { |s| s.camp_occurrence.description_with_start_day }
         format.html { render :edit }
         format.json { render json: @travel.errors, status: :unprocessable_entity }
       end
@@ -74,12 +76,14 @@ class TravelsController < ApplicationController
     #   @travel = Travel.find(params[:id])
     # end
 
-    def set_enrollment
-      @enrollment = Enrollment.find(params[:enrollment_id])
+    def set_current_enrollment
+      @current_enrollment = Enrollment.find(params[:enrollment_id])
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def travel_params
-      params.require(:travel).permit(:enrollment_id, :direction, :transport_needed, :date, :mode, :carrier, :route_num, :note)
+      params.require(:travel).permit(:enrollment_id, :arrival_session, :depart_session, 
+              :arrival_transport, :arrival_carrier, :arrival_route_num, :arrival_date, :arrival_time, 
+              :depart_transport, :depart_carrier, :depart_route_num, :depart_date, :depart_time, :note)
     end
 end
