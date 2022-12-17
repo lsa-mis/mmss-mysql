@@ -147,9 +147,26 @@ module ApplicationHelper
   def transportation
     ['Airplane', 'Bus', 'Train', 
       'Automobile - parent or permitted designee is driving me to the University of Michigan campus', 
-      'Automobile - parent or permitted designee is driving me to the University of Michigan campus',
-      'N/A - I am a daily MMSS commuter', 'N/A - I am a daily MMSS commuter'
+      'N/A - I am a daily MMSS commuter'
     ]
+  end
+
+  def show_date(field)
+    field.strftime("%A, %d %b %Y") unless field.blank?
+  end
+
+  def show_time(field)
+    field.strftime("%I:%M %p") unless field.blank?
+  end
+
+  def radio_button_checked(object, key, value)
+    checked = ""
+    unless object.new_record?
+      if object.public_send(key) == value
+        checked = "checked" 
+      end
+    end
+    return checked
   end
 
 end
