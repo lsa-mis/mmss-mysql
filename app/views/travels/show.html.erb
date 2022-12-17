@@ -1,44 +1,135 @@
-<p id="notice"><%= notice %></p>
+<div class="rounded overflow-hidden shadow-lg">
+  <h1 class="text-yellow-um_yellow bg-blue-um_blue p-2">
+    <p class="text-center text-lg"><%= @current_enrollment.applicant_detail.firstname %><%= @current_enrollment.applicant_detail.middlename %> <%= @current_enrollment.applicant_detail.lastname %></p>
+  </h1>
+  <div class="px-6 py-4 text-gray-700">
+    <div class="py-2">
+      <label class="flex text-sm font-medium text-gray-900 sm:mt-0 sm:col-span-2 bg-gray-200 p-1">
+        Session of Arrival
+      </label>
+      <div class="ml-2 text-sm text-gray-700 flex-grow">
+        <%= @travel.arrival_session %>
+      </div>
+    </div>
 
-<p>
-  <strong>Enrollment:</strong>
-  <%= @travel.enrollment_id %>
-</p>
+    <div class="py-2">
+      <label class="flex text-sm font-medium text-gray-900 sm:mt-0 sm:col-span-2 bg-gray-200 p-1">
+        Session of Departure
+      </label>
+      <div class="ml-2 text-sm text-gray-700 flex-grow">
+        <%= @travel.depart_session %>
+      </div>
+    </div>
+    <hr>
+    <h2>Arrival Information</h2>
 
-<p>
-  <strong>Direction:</strong>
-  <%= @travel.direction %>
-</p>
+    <div class="py-2">
+      <label class="flex text-sm font-medium text-gray-900 sm:mt-0 sm:col-span-2 bg-gray-200 p-1">
+       What type of transportation you will use to arrive to Michigan (if you will be a daily commuter to the MMSS program, please check "N/A")
+      </label>
+      <div class="ml-2 text-sm text-gray-700 flex-grow">
+        <%= @travel.arrival_transport %>
+      </div>
+    </div>
 
-<p>
-  <strong>Transport needed:</strong>
-  <%= @travel.transport_needed %>
-</p>
+    <div class="py-2">
+      <label class="flex text-sm font-medium text-gray-900 sm:mt-0 sm:col-span-2 bg-gray-200 p-1">
+        Carrier Name (if traveling by automobile - enter "automobile" OR if a daily commuter - enter "commuter")
+        Airline: (Delta, United, Spirit, etc.), Bus (Greyhound), Train (Amtrak)
+      </label>
+      <div class="ml-2 text-sm text-gray-700 flex-grow">
+        <%= @travel.arrival_carrier %>
+      </div>
+    </div>
 
-<p>
-  <strong>Date:</strong>
-  <%= @travel.date %>
-</p>
+    <div class="py-2">
+      <label class="flex text-sm font-medium text-gray-900 sm:mt-0 sm:col-span-2 bg-gray-200 p-1">
+        Arrival Flight #/Bus #/Train # (Ex: Delta 0025) - (if traveling by automobile - enter N/A OR if a daily commuter - enter commuter)
+      </label>
+      <div class="ml-2 text-sm text-gray-700 flex-grow">
+        <%= @travel.arrival_carrier %>
+      </div>
+    </div>
 
-<p>
-  <strong>Mode:</strong>
-  <%= @travel.mode %>
-</p>
+    <div class="py-2">
+      <label class="flex text-sm font-medium text-gray-900 sm:mt-0 sm:col-span-2 bg-gray-200 p-1">
+        Date of arrival
+      </label>
+      <div class="ml-2 text-sm text-gray-700 flex-grow">
+        <%= show_date(@travel.arrival_date) %>
+      </div>
+    </div>
 
-<p>
-  <strong>Carrier:</strong>
-  <%= @travel.carrier %>
-</p>
+    <div class="py-2">
+      <label class="flex text-sm font-medium text-gray-900 sm:mt-0 sm:col-span-2 bg-gray-200 p-1">
+       Time of arrival
+      </label>
+      <div class="ml-2 text-sm text-gray-700 flex-grow">
+        <%= show_time(@travel.arrival_time) %>
+      </div>
+    </div>
+    <hr>
+    <h2>Departure Information</h2>
 
-<p>
-  <strong>Route num:</strong>
-  <%= @travel.route_num %>
-</p>
+    <div class="py-2">
+      <label class="flex text-sm font-medium text-gray-900 sm:mt-0 sm:col-span-2 bg-gray-200 p-1">
+        Please indicate what type of transportation you will use to depart from Michigan
+        (if you will be a daily commuter to the MMSS program, please check "N/A")
+      </label>
+      <div class="ml-2 text-sm text-gray-700 flex-grow">
+        <%= @travel.depart_transport %>
+      </div>
+    </div>
 
-<p>
-  <strong>Note:</strong>
-  <%= @travel.note %>
-</p>
+    <div class="py-2">
+      <label class="flex text-sm font-medium text-gray-900 sm:mt-0 sm:col-span-2 bg-gray-200 p-1">
+        Departure Information - Carrier Name 
+      (if traveling by automobile - enter automobile OR if a daily commuter - enter commuter)
+      </label>
+      <div class="ml-2 text-sm text-gray-700 flex-grow">
+        <%= @travel.depart_carrier %>
+      </div>
+    </div>
 
-<%= link_to 'Edit', edit_travel_path(@travel) %> |
-<%= link_to 'Back', travels_path %>
+    <div class="py-2">
+      <label class="flex text-sm font-medium text-gray-900 sm:mt-0 sm:col-span-2 bg-gray-200 p-1">
+        Departure Flight #/Bus #/Train # (Ex: Delta 0025) - (if traveling by automobile - enter N/A OR if a daily commuter - enter commuter)
+      </label>
+      <div class="ml-2 text-sm text-gray-700 flex-grow">
+        <%= @travel.depart_route_num %>
+      </div>
+    </div>
+
+    <div class="py-2">
+      <label class="flex text-sm font-medium text-gray-900 sm:mt-0 sm:col-span-2 bg-gray-200 p-1">
+        Date of departure
+      </label>
+      <div class="ml-2 text-sm text-gray-700 flex-grow">
+        <%= show_date(@travel.depart_date) %>
+      </div>
+    </div>
+
+    <div class="py-2">
+      <label class="flex text-sm font-medium text-gray-900 sm:mt-0 sm:col-span-2 bg-gray-200 p-1">
+        Time of departure
+      </label>
+      <div class="ml-2 text-sm text-gray-700 flex-grow">
+        <%= show_time(@travel.depart_time) %>
+      </div>
+    </div>
+    <hr>
+    <div class="py-2">
+      <label class="flex text-sm font-medium text-gray-900 sm:mt-0 sm:col-span-2 bg-gray-200 p-1">
+        Additional notes
+      </label>
+      <div class="ml-2 text-sm text-gray-700 flex-grow">
+        <%= @travel.note %>
+      </div>
+    </div>
+
+  </div>
+  <div class="mt-2">
+    <%= link_to 'Edit', edit_enrollment_travel_path(@current_enrollment, @travel) %> |
+    <%= link_to 'Back', root_path %>
+  </div>
+</div>
