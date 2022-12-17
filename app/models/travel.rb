@@ -22,4 +22,9 @@
 #
 class Travel < ApplicationRecord
   belongs_to :enrollment
+
+  validates :arrival_transport, :arrival_carrier, :arrival_route_num, 
+    :arrival_date, :arrival_time, :depart_transport, :depart_route_num, 
+    :depart_date, :depart_time, :depart_carrier, 
+    :arrival_session, :depart_session, presence: true
 end
