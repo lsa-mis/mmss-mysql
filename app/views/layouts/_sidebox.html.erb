@@ -76,8 +76,10 @@
           <% @current_enrollment.travels.each_with_index do |travel, index| %>
             <% if travel.id.present? %>
               <div class="sidebox_element">
-                <%= link_to "Travel Information", enrollment_travel_path(@current_enrollment, index+1) %> 
-                <%= index+1 %> - submitted
+                <%= link_to enrollment_travel_path(@current_enrollment, travel) do %> 
+                  Travel Information <%= index+1 %>
+                <% end %>
+                - submitted
               </div>
             <% end %>
           <% end %>
