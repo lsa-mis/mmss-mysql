@@ -6,7 +6,7 @@ export default class extends Controller {
     let arrival = this.arrivalTarget.value;
     let depart = this.departTarget.value;
 
-    if (typeof arrival !== 'undefined' && typeof arrival !== 'undefined') {
+    if (typeof arrival !== 'undefined' && typeof depart !== 'undefined') {
       var d_arrival = Date.parse(arrival)
       var d_depart = Date.parse(depart)
       if (d_depart < d_arrival) {
