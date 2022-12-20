@@ -45,9 +45,9 @@ class TravelsController < ApplicationController
   # PATCH/PUT /travels/1
   # PATCH/PUT /travels/1.json
   def update
-
+    @travel = @current_enrollment.travels.find(params[:id])
     respond_to do |format|
-      if @current_enrollment.travels.find(params[:id]).update(travel_params)
+      if @travel.update(travel_params)
         format.html { redirect_to root_path, notice: 'Travel was successfully updated.' }
         format.json { render :show, status: :ok, location: @travel }
       else
