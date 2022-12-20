@@ -71,11 +71,11 @@
           <% if index == 0 %>
             <input class="form-check-input appearance-none rounded-full h-4 w-4 border border-gray-600 bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" 
               type="radio" name="travel[arrival_transport]" id="<%= t %>" value="<%= t %>" 
-              <%= radio_button_checked(@travel, "arrival_transport", t) %> required>
+              <%= radio_button_checked(@travel, "arrival_transport", t) %> required data-target="travel.arrival_transport" data-action="click->travel#checkArrivalTransport" >
           <% else %>
             <input class="form-check-input appearance-none rounded-full h-4 w-4 border border-gray-600 bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" 
               type="radio" name="travel[arrival_transport]" id="<%= t %>" value="<%= t %>"
-              <%= radio_button_checked(@travel, "arrival_transport", t) %> >
+              <%= radio_button_checked(@travel, "arrival_transport", t) %> data-target="travel.arrival_transport" data-action="click->travel#checkArrivalTransport">
           <% end %>
           <label class="form-check-label inline-block text-gray-800" for="<%= t %>">
             <%= t %>
@@ -85,35 +85,44 @@
     </div>
     <hr>
 
-    <span>
-      Carrier Name (if traveling by automobile - enter "automobile" OR if a daily commuter - enter "commuter")
-      Airline: (Delta, United, Spirit, etc.), Bus (Greyhound), Train (Amtrak) *
-    </span>
-    <div class="field py-2">
-      <%= form.label :arrival_carrier, class: "hidden" %>
-      <%= form.text_field :arrival_carrier, required: true %>
-    </div>
-    <hr>
+    <% if @travel.new_record? %>
+      <div class="travel-details--hide" data-target="travel.arrrival_details">
+    <% elsif @travel.arrival_transport.include?("Automobile") || @travel.arrival_transport.include?("commuter") %>
+      <div class="travel-details--hide" data-target="travel.arrrival_details">
+    <% else %>
+      <div class="travel-details--show" data-target="travel.arrrival_details">
+    <% end %>
+      <span>
+        Carrier Name (if traveling by automobile - enter "automobile" OR if a daily commuter - enter "commuter")
+        Airline: (Delta, United, Spirit, etc.), Bus (Greyhound), Train (Amtrak) *
+      </span>
+      <div class="field py-2">
+        <%= form.label :arrival_carrier, class: "hidden" %>
+        <%= form.text_field :arrival_carrier %>
+      </div>
+      <hr>
 
-    <span>
-      Arrival Flight #/Bus #/Train # (Ex: Delta 0025) - (if traveling by automobile - enter N/A OR if a daily commuter - enter commuter) *
-    </span>
-    <div class="field py-2">
-      <%= form.label :arrival_route_num, class: "hidden" %>
-      <%= form.text_field :arrival_route_num, required: true %>
-    </div>
-    <hr>
+      <span>
+        Arrival Flight #/Bus #/Train # (Ex: Delta 0025) - (if traveling by automobile - enter N/A OR if a daily commuter - enter commuter) *
+      </span>
+      <div class="field py-2">
+        <%= form.label :arrival_route_num, class: "hidden" %>
+        <%= form.text_field :arrival_route_num %>
+      </div>
+      <hr>
 
-    <div class="field py-2 w-full md:w-1/3">
-      <%= form.label :arrival_date, 'Date of arrival *' %>
-      <%= form.date_field :arrival_date, class: "datepicker", required: true, "data-target": "travel.arrival", "data-action": "change->travel#checkDates" %>
-    </div>
-    <hr>
+      <div class="field py-2 w-full md:w-1/3">
+        <%= form.label :arrival_date, 'Date of arrival *' %>
+        <%= form.date_field :arrival_date, class: "datepicker", "data-target": "travel.arrival", "data-action": "change->travel#checkDates" %>
+      </div>
+      <hr>
 
-    <div class="field py-2 w-full md:w-1/3">
-      <%= form.label :arrival_time, 'Time of arrival *' %>
-      <%= form.time_field :arrival_time, required: true %>
+      <div class="field py-2 w-full md:w-1/3">
+        <%= form.label :arrival_time, 'Time of arrival *' %>
+        <%= form.time_field :arrival_time %>
+      </div>
     </div>
+
     <h2 class= "section-header">Departure Information</h2>
     <span>
       Please indicate what type of transportation you will use to depart from Michigan
@@ -127,51 +136,58 @@
           <% if index == 0 %>
             <input class="form-check-input appearance-none rounded-full h-4 w-4 border border-gray-600 bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" 
               type="radio" name="travel[depart_transport]" id="<%= t %>" value="<%= t %>" 
-              <%= radio_button_checked(@travel, "depart_transport", t) %> required>
+              <%= radio_button_checked(@travel, "depart_transport", t) %> required data-target="travel.depart_transport" data-action="click->travel#checkDepartTransport">
           <% else %>
             <input class="form-check-input appearance-none rounded-full h-4 w-4 border border-gray-600 bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" 
               type="radio" name="travel[depart_transport]" id="<%= t %>" value="<%= t %>"
-              <%= radio_button_checked(@travel, "depart_transport", t) %> >
+              <%= radio_button_checked(@travel, "depart_transport", t) %> data-target="travel.depart_transport" data-action="click->travel#checkDepartTransport">
           <% end %>
-          <label class="form-check-label inline-block text-gray-800" for="<%= t %>">
+          <label class="form-check-label inline-block text-gray-800" for="<%= t %>" >
             <%= t %>
           </label>
         </div>
       <% end %>
     </div>
     <hr>
+    <% if @travel.new_record? %>
+      <div class="travel-details--hide" data-target="travel.depart_details">
+    <% elsif @travel.depart_transport.include?("Automobile") || @travel.depart_transport.include?("commuter") %>
+      <div class="travel-details--hide" data-target="travel.depart_details">
+    <% else %>
+      <div class="travel-details--swow" data-target="travel.depart_details">
+    <% end %>
+      <span>
+        Carrier Name (if traveling by automobile - enter automobile OR if a daily commuter - enter commuter) *
+      </span>
+      <div class="field">
+        <%= form.label :depart_carrier, class: "hidden" %>
+        <%= form.text_field :depart_carrier %>
+      </div>
+      <hr>
 
-    <span>
-      Carrier Name (if traveling by automobile - enter automobile OR if a daily commuter - enter commuter) *
-    </span>
-    <div class="field">
-      <%= form.label :depart_carrier, class: "hidden" %>
-      <%= form.text_field :depart_carrier, required: true %>
-    </div>
-    <hr>
+      <span>
+        Departure Flight #/Bus #/Train # (Ex: Delta 0025) - (if traveling by automobile - enter N/A OR if a daily commuter - enter commuter) *
+      </span>
+      <div class="field">
+        <%= form.label :depart_route_num, class: "hidden" %>
+        <%= form.text_field :depart_route_num %>
+      </div>
+      <hr>
 
-    <span>
-      Departure Flight #/Bus #/Train # (Ex: Delta 0025) - (if traveling by automobile - enter N/A OR if a daily commuter - enter commuter) *
-    </span>
-    <div class="field">
-      <%= form.label :depart_route_num, class: "hidden" %>
-      <%= form.text_field :depart_route_num, required: true %>
-    </div>
-    <hr>
+      <div class="field py-2 w-full md:w-1/3" >
+        <%= form.label :depart_date, 'Date of departure *' %>
+        <%= form.date_field :depart_date, class: "datepicker", "data-target": "travel.depart", "data-action": "change->travel#checkDates" %>
+      </div>
+      <div class="errors date-error--hide" data-target="travel.message">
+      </div>
+      <hr>
 
-    <div class="field py-2 w-full md:w-1/3" >
-      <%= form.label :depart_date, 'Date of departure *' %>
-      <%= form.date_field :depart_date, class: "datepicker", required: true, "data-target": "travel.depart", "data-action": "change->travel#checkDates" %>
+      <div class="field py-2 w-full md:w-1/3">
+        <%= form.label :depart_time, 'Time of departure *' %>
+        <%= form.time_field :depart_time %>
+      </div>
+      <hr>
     </div>
-    <div class="errors date-error--hide" data-target="travel.message">
-    </div>
-    <hr>
-
-    <div class="field py-2 w-full md:w-1/3">
-      <%= form.label :depart_time, 'Time of departure *' %>
-      <%= form.time_field :depart_time, required: true %>
-    </div>
-    <hr>
 
     <div class="field">
       <%= form.label :note, 'Additional notes' %>
