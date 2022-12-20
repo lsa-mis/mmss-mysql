@@ -45,6 +45,7 @@ class ApplicantDetail < ApplicationRecord
   # validates :us_citizen, presence: true
   validates :gender, presence: true
   validates :birthdate, presence: true
+  validates :shirt_size, presence: true
   validates :address1, presence: true
   validates :city, presence: true
   validates :state, presence: { message: "needs to be selected or if you are

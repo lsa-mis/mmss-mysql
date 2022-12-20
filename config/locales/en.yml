@@ -66,6 +66,7 @@ en:
         country: "Country*"
         birthdate: "Birthdate*"
         gender: "Gender*"
+        shirt_size: "Shirt size*"
       
       enrollment:
         high_school_state: "High school state (Select Non-US if international)*"
