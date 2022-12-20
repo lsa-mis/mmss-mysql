@@ -19,12 +19,12 @@ class TravelsController < ApplicationController
   # GET /travels/new
   def new
     @travel = @current_enrollment.travels.new
-    @sessions = @current_enrollment.session_assignments.map { |s| s.camp_occurrence.description_with_start_day }
+    @sessions = @current_enrollment.session_assignments.map { |s| s.camp_occurrence.description_with_month_and_day }
   end
 
   # GET /travels/1/edit
   def edit
-    @sessions = @current_enrollment.session_assignments.map { |s| s.camp_occurrence.description_with_start_day }
+    @sessions = @current_enrollment.session_assignments.map { |s| s.camp_occurrence.description_with_month_and_day }
     @travel = @current_enrollment.travels.find(params[:id])
   end
 
@@ -37,7 +37,7 @@ class TravelsController < ApplicationController
         format.html { redirect_to root_path, notice: 'Travel was successfully created.' }
         format.json { render :show, status: :created, location: @travel }
       else
-        @sessions = @current_enrollment.session_assignments.map { |s| s.camp_occurrence.description_with_start_day }
+        @sessions = @current_enrollment.session_assignments.map { |s| s.camp_occurrence.description_with_month_and_day }
         format.html { render :new }
         format.json { render json: @travel.errors, status: :unprocessable_entity }
       end
@@ -53,7 +53,7 @@ class TravelsController < ApplicationController
         format.html { redirect_to root_path, notice: 'Travel was successfully updated.' }
         format.json { render :show, status: :ok, location: @travel }
       else
-        @sessions = @current_enrollment.session_assignments.map { |s| s.camp_occurrence.description_with_start_day }
+        @sessions = @current_enrollment.session_assignments.map { |s| s.camp_occurrence.description_with_month_and_day }
         format.html { render :edit }
         format.json { render json: @travel.errors, status: :unprocessable_entity }
       end
