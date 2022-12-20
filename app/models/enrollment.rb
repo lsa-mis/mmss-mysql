@@ -126,8 +126,8 @@ class Enrollment < ApplicationRecord
   def acceptable_transcript
     return unless transcript.attached?
 
-    unless transcript.blob.byte_size <= 5.megabyte
-      errors.add(:transcript, "is too big - file size cannot exceed 5Mbyte")
+    unless transcript.blob.byte_size <= 20.megabyte
+      errors.add(:transcript, "is too big - file size cannot exceed 20Mbyte")
     end
 
     acceptable_types = ["image/png", "image/jpeg", "application/pdf"]
@@ -139,8 +139,8 @@ class Enrollment < ApplicationRecord
   def acceptable_student_packet
     return unless student_packet.attached?
 
-    unless student_packet.blob.byte_size <= 5.megabyte
-      errors.add(:student_packet, "is too big - file size cannot exceed 5Mbyte")
+    unless student_packet.blob.byte_size <= 20.megabyte
+      errors.add(:student_packet, "is too big - file size cannot exceed 20Mbyte")
     end
 
     acceptable_types = ["image/png", "image/jpeg", "application/pdf"]

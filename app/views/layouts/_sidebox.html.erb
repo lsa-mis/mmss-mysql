@@ -139,9 +139,9 @@
               </div>
             </h4>
             <%= form_with(model: current_enrollment, local: true) do |form| %>
-              <p class="text-xs">The Student Packet upload is limited to files smaller than 5Mbytes. You can use an 
+              <p class="text-xs">The Student Packet upload is limited to files smaller than 20Mbytes. You can use an 
               <a class="hover:underline text-blue-800" href="https://www.ilovepdf.com/compress_pdf" target="_blank">online pdf compression tool</a>
-              if your file size is larger than 5MBytes.</p>
+              if your file size is larger than 20MBytes.</p>
               <% if current_enrollment.student_packet.attached? %>
                 <div class='current-uploaded-docs'>
                   <p>
@@ -169,9 +169,9 @@
               <h2 class="text-red-700"> !! COVID Information !! </h2>
               <h4>* Upload a copy of your Vaccine Record</h4>
               <%= form_with(model: current_enrollment, local: true) do |form| %>
-                <p class="text-xs">File uploads are limited to files smaller than 5Mbytes. You can use an 
+                <p class="text-xs">File uploads are limited to files smaller than 20Mbytes. You can use an 
                 <a class="hover:underline text-blue-800" href="https://www.ilovepdf.com/compress_pdf" target="_blank">online pdf compression tool</a>
-                if your file size is larger than 5MBytes.</p>
+                if your file size is larger than 20MBytes.</p>
                 <% if current_enrollment.vaccine_record.attached? %>
                   <div class='current-uploaded-docs'>
                     <p>
