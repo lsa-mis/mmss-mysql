@@ -6,6 +6,9 @@ class StaticPagesController < ApplicationController
   before_action :set_current_enrollment
 
   def index
+    if faculty_signed_in?
+      redirect_to faculty_path
+    end
     @application_materials_due_date = CampConfiguration.active_camp_materials_due_date
     @active_camp_exists = CampConfiguration.active.exists?
     @current_camp_year = CampConfiguration.active_camp_year
