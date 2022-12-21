@@ -31,16 +31,28 @@ ActiveAdmin.register Travel do
     column :arrival_carrier
     column :arrival_route_num
     column :arrival_date do |travel|
-      travel.arrival_date.strftime("%A, %d %b %Y")
+      if travel.arrival_date.present?
+        travel.arrival_date.strftime("%A, %d %b %Y")
+      end
     end
     column :arrival_time do |travel|
-      travel.arrival_time.strftime("%I:%M %p")
+      if travel.arrival_time.present?
+        travel.arrival_time.strftime("%I:%M %p")
+      end
     end
     column :depart_transport
     column :depart_carrier
     column :depart_route_num
-    column :depart_date
-    column :depart_time
+    column :depart_date do |travel|
+      if travel.depart_date.present?
+        travel.depart_date.strftime("%A, %d %b %Y")
+      end
+    end
+    column :depart_time do |travel|
+      if travel.depart_time.present?
+        travel.depart_time.strftime("%A, %d %b %Y")
+      end
+    end
     column :note
   end
 
@@ -55,16 +67,28 @@ ActiveAdmin.register Travel do
       row :arrival_carrier
       row :arrival_route_num
       row :arrival_date do |travel|
-        travel.arrival_date.strftime("%A, %d %b %Y")
+        if travel.arrival_date.present?
+          travel.arrival_date.strftime("%A, %d %b %Y")
+        end
       end
       row :arrival_time do |travel|
-        travel.arrival_time.strftime("%I:%M %p")
+        if travel.arrival_time.present?
+          travel.arrival_time.strftime("%I:%M %p")
+        end
       end
       row :depart_transport
       row :depart_carrier
       row :depart_route_num
-      row :depart_date
-      row :depart_time
+      row :depart_date do |travel|
+        if travel.depart_date.present?
+          travel.depart_date.strftime("%I:%M %p")
+        end
+      end
+      row :depart_time do |travel|
+        if travel.depart_time.present?
+          travel.depart_time.strftime("%I:%M %p")
+        end
+      end
       row :note
       row :created_at
       row :updated_at 
