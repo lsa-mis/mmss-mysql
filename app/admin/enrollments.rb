@@ -328,6 +328,8 @@ ActiveAdmin.register Enrollment, as: "Application" do
             link_to("view", admin_travel_path(item))
           end
         end
+      else
+        text_node "There is no travel information"
       end
     end
 

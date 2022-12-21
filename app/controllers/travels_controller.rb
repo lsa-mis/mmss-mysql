@@ -3,6 +3,7 @@ class TravelsController < ApplicationController
   before_action :authenticate_logged_in!
   before_action :authenticate_admin!, only: [:index, :destroy]
   before_action :set_current_enrollment
+  before_action :set_list_of_sessions, only: [:new, :edit, :create, :update]
   
   # GET /travels
   # GET /travels.json
@@ -19,12 +20,10 @@ class TravelsController < ApplicationController
   # GET /travels/new
   def new
     @travel = @current_enrollment.travels.new
-    @sessions = @current_enrollment.session_assignments.map { |s| s.camp_occurrence.description_with_start_day }
   end
 
   # GET /travels/1/edit
   def edit
-    @sessions = @current_enrollment.session_assignments.map { |s| s.camp_occurrence.description_with_start_day }
     @travel = @current_enrollment.travels.find(params[:id])
   end
 
@@ -37,7 +36,6 @@ class TravelsController < ApplicationController
         format.html { redirect_to root_path, notice: 'Travel was successfully created.' }
         format.json { render :show, status: :created, location: @travel }
       else
-        @sessions = @current_enrollment.session_assignments.map { |s| s.camp_occurrence.description_with_start_day }
         format.html { render :new }
         format.json { render json: @travel.errors, status: :unprocessable_entity }
       end
@@ -47,13 +45,12 @@ class TravelsController < ApplicationController
   # PATCH/PUT /travels/1
   # PATCH/PUT /travels/1.json
   def update
-
+    @travel = @current_enrollment.travels.find(params[:id])
     respond_to do |format|
-      if @current_enrollment.travels.find(params[:id]).update(travel_params)
+      if @travel.update(travel_params)
         format.html { redirect_to root_path, notice: 'Travel was successfully updated.' }
         format.json { render :show, status: :ok, location: @travel }
       else
-        @sessions = @current_enrollment.session_assignments.map { |s| s.camp_occurrence.description_with_start_day }
         format.html { render :edit }
         format.json { render json: @travel.errors, status: :unprocessable_entity }
       end
@@ -71,13 +68,13 @@ class TravelsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    # def set_travel
-    #   @travel = Travel.find(params[:id])
-    # end
 
     def set_current_enrollment
       @current_enrollment = Enrollment.find(params[:enrollment_id])
+    end
+
+    def set_list_of_sessions
+      @sessions = @current_enrollment.session_assignments.map { |s| s.camp_occurrence.description_with_month_and_day }
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
