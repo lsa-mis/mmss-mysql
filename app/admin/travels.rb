@@ -99,14 +99,14 @@ ActiveAdmin.register Travel do
     f.semantic_errors *f.object.errors.keys # shows errors on :base
     f.inputs do
       f.input :enrollment_id, as: :select, collection: Enrollment.current_camp_year_applications.map { |enrol| [enrol.display_name.downcase, enrol.id]}.sort
-      f.inputs :arrival_session
-      f.inputs :depart_session
-      f.inputs :arrival_transport
+      f.input :arrival_session, as: :select, collection: Enrollment.find(params[:id]).session_assignments.map { |s| s.camp_occurrence.description_with_month_and_day }
+      f.input :depart_session, as: :select, collection: Enrollment.find(params[:id]).session_assignments.map { |s| s.camp_occurrence.description_with_month_and_day }
+      f.input :arrival_transport, as: :select, collection: transportation
       f.inputs :arrival_carrier
       f.inputs :arrival_route_num
       f.inputs :arrival_date 
       f.inputs :arrival_time 
-      f.inputs :depart_transport
+      f.input :depart_transport, as: :select, collection: transportation
       f.inputs :depart_carrier
       f.inputs :depart_route_num
       f.inputs :depart_date
