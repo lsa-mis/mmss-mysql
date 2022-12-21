@@ -41,4 +41,8 @@ class Recommendation < ApplicationRecord
     "#{lastname}, #{firstname}"
   end
 
+  def applicant_name
+    self.enrollment.user.applicant_detail.full_name
+  end
+
 end
