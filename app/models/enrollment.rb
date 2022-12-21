@@ -29,6 +29,7 @@
 #
 class Enrollment < ApplicationRecord
   after_update :send_offer_letter
+  before_update :if_application_status_changed
   before_update :set_application_deadline
   after_commit :send_enroll_letter, if: :persisted?
   after_commit :send_rejected_letter, if: :persisted?
@@ -202,6 +203,12 @@ class Enrollment < ApplicationRecord
   def set_application_deadline
     if self.session_assignments.present? && self.course_assignments.present?
       self.application_deadline = 30.days.from_now unless self.application_deadline.present?
+    end
+  end
+
+  def if_application_status_changed
+    if self.application_status_changed?
+      self.application_status_updated_on = Date.today
     end
   end
 
