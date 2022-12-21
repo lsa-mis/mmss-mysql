@@ -2,31 +2,31 @@
   <h1 class="text-yellow-um_yellow bg-blue-um_blue p-2 m-4">
     <p class="text-center text-lg"><%= @current_enrollment.applicant_detail.firstname %><%= @current_enrollment.applicant_detail.middlename %> <%= @current_enrollment.applicant_detail.lastname %></p>
   </h1>
-  <div class="pp-4 my-2 text-gray-700">
-    <div class="flex flex-row justify-between">
-      <div class="pl-4">
-        <label class="flex text-sm font-medium text-gray-900 sm:mt-0">
+  <div class="p-2 my-2 text-gray-700">
+    <div class="flex flex-row justify-between px-4">
+      <div class="">
+        <label class="flex text-sm font-medium text-gray-900 pb-1">
           Session of Arrival
         </label>
-        <span class="text-sm text-gray-700 flex-grow border-2 border-gray-400 p-2">
+        <div class="text-sm text-gray-700 flex-grow border-2 border-gray-400 p-2 ml-2">
           <%= @travel.arrival_session %>
-        </span>
+        </div>
       </div>
 
-      <div class="pr-4">
-        <label class="flex text-sm font-medium text-gray-900 sm:mt-0">
+      <div class="">
+        <label class="flex text-sm font-medium text-gray-900 pb-1">
           Session of Departure
         </label>
-        <div class="text-sm text-gray-700 flex-grow border-2 border-gray-400 p-2">
+        <div class="text-sm text-gray-700 flex-grow border-2 border-gray-400 p-2 ml-2">
           <%= @travel.depart_session %>
         </div>
       </div>
     </div>
-    <div class="p-4 my-2">
+    <div class="pt-4 m-2">
       <h2 class="font-medium text-xl">Arrival Information</h2>
 
       <div class="py-2">
-        <label class="flex text-sm font-medium text-gray-900 sm:mt-0 p-1">
+        <label class="flex text-sm font-medium text-gray-900 p-1">
           What type of transportation you will use to arrive to Michigan
         </label>
         <div class="ml-2 text-sm text-gray-700 flex-grow border-2 border-gray-400 p-2">
@@ -35,7 +35,7 @@
       </div>
 
       <div class="py-2">
-        <label class="flex text-sm font-medium text-gray-900 sm:mt-0 p-1">
+        <label class="flex text-sm font-medium text-gray-900 p-1">
           Carrier Name: Airline (Delta, United, Spirit, etc.), Bus (Greyhound), Train (Amtrak)
         </label>
         <div class="ml-2 text-sm text-gray-700 flex-grow border-2 border-gray-400 p-2">
@@ -44,7 +44,7 @@
       </div>
 
       <div class="py-2">
-        <label class="flex text-sm font-medium text-gray-900 sm:mt-0 p-1">
+        <label class="flex text-sm font-medium text-gray-900 p-1">
           Arrival Flight #/Bus #/Train # (Ex: Delta 0025)
         </label>
         <div class="ml-2 text-sm text-gray-700 flex-grow border-2 border-gray-400 p-2">
@@ -53,7 +53,7 @@
       </div>
 
       <div class="">
-        <label class="flex text-sm font-medium text-gray-900 sm:mt-0 p-1">
+        <label class="flex text-sm font-medium text-gray-900 p-1">
           Date of arrival
         </label>
         <div class="ml-2 text-sm text-gray-700 flex-grow border-2 border-gray-400 p-2">
@@ -62,7 +62,7 @@
       </div>
 
       <div class="py-2">
-        <label class="flex text-sm font-medium text-gray-900 sm:mt-0 p-1">
+        <label class="flex text-sm font-medium text-gray-900 p-1">
         Time of arrival
         </label>
         <div class="ml-2 text-sm text-gray-700 flex-grow border-2 border-gray-400 p-2">
@@ -71,11 +71,11 @@
       </div>
     </div>
     
-    <div class="p-4 my-2">
+    <div class="pt-4 m-2">
       <h2 class="font-medium text-xl">Departure Information</h2>
 
       <div class="py-2">
-        <label class="flex text-sm font-medium text-gray-900 sm:mt-0 p-1">
+        <label class="flex text-sm font-medium text-gray-900 p-1">
           Please indicate what type of transportation you will use to depart from Michigan
         </label>
         <div class="ml-2 text-sm text-gray-700 flex-grow border-2 border-gray-400 p-2">
@@ -84,7 +84,7 @@
       </div>
 
       <div class="py-2">
-        <label class="flex text-sm font-medium text-gray-900 sm:mt-0 p-1">
+        <label class="flex text-sm font-medium text-gray-900 p-1">
           Carrier Name 
         </label>
         <div class="ml-2 text-sm text-gray-700 flex-grow border-2 border-gray-400 p-2">
@@ -93,7 +93,7 @@
       </div>
 
       <div class="py-2">
-        <label class="flex text-sm font-medium text-gray-900 sm:mt-0 p-1">
+        <label class="flex text-sm font-medium text-gray-900 p-1">
           Departure Flight #/Bus #/Train # (Ex: Delta 0025)
         </label>
         <div class="ml-2 text-sm text-gray-700 flex-grow border-2 border-gray-400 p-2">
@@ -102,7 +102,7 @@
       </div>
 
       <div class="py-2">
-        <label class="flex text-sm font-medium text-gray-900 sm:mt-0 p-1">
+        <label class="flex text-sm font-medium text-gray-900 p-1">
           Date of departure
         </label>
         <div class="ml-2 text-sm text-gray-700 flex-grow border-2 border-gray-400 p-2">
@@ -111,7 +111,7 @@
       </div>
 
       <div class="py-2">
-        <label class="flex text-sm font-medium text-gray-900 sm:mt-0 p-1">
+        <label class="flex text-sm font-medium text-gray-900 p-1">
           Time of departure
         </label>
         <div class="ml-2 text-sm text-gray-700 flex-grow border-2 border-gray-400 p-2">
@@ -119,16 +119,15 @@
         </div>
       </div>
     </div>
-    <div class="p-4 my-2">
-      <h2 class="font-medium text-xl">Additional notes</h2>
+    <div class="pt-4 m-2">
+      <h2 class="font-medium text-xl mb-2">Additional notes</h2>
       <div class="ml-2 text-sm text-gray-700 flex-grow border-2 border-gray-400 p-2">
         <%= @travel.note %>
       </div>
     </div>
-
   </div>
-  <div class="m-2">
-    <%= link_to 'Edit', edit_enrollment_travel_path(@current_enrollment, @travel), class: "hover:underline" %> |
-    <%= link_to 'Back', root_path, class: "hover:underline" %>
-  </div>
+</div>
+<div class="m-2">
+  <%= link_to 'Edit', edit_enrollment_travel_path(@current_enrollment, @travel), class: "hover:underline" %> |
+  <%= link_to 'Back', root_path, class: "hover:underline" %>
 </div>
