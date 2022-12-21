@@ -61,8 +61,7 @@
     </div>
     <h2 class= "section-header">Arrival Information</h2>
     <span>
-      Please indicate what type of transportation you will use to arrive to Michigan 
-      (if you will be a daily commuter to the MMSS program, please check "N/A") *
+      Please indicate what type of transportation you will use to arrive to Michigan *
     </span>
     <%= form.label 'travel[arrival_transport]', class: "hidden" %>
     <div class="form-check my-2">
@@ -103,7 +102,7 @@
       <hr>
 
       <span>
-        Arrival Flight #/Bus #/Train # (Ex: Delta 0025) - (if traveling by automobile - enter N/A OR if a daily commuter - enter commuter) *
+        Arrival Flight #/Bus #/Train # (Ex: Delta 0025) *
       </span>
       <div class="field py-2">
         <%= form.label :arrival_route_num, class: "hidden" %>
@@ -125,8 +124,7 @@
 
     <h2 class= "section-header">Departure Information</h2>
     <span>
-      Please indicate what type of transportation you will use to depart from Michigan
-      (if you will be a daily commuter to the MMSS program, please check "N/A"). *
+      Please indicate what type of transportation you will use to depart from Michigan *
     </span>
 
     <%= form.label 'travel[depart_transport]', class: "hidden" %>
@@ -157,7 +155,7 @@
       <div class="travel-details--swow" data-target="travel.depart_details">
     <% end %>
       <span>
-        Carrier Name (if traveling by automobile - enter automobile OR if a daily commuter - enter commuter) *
+        Carrier Name *
       </span>
       <div class="field">
         <%= form.label :depart_carrier, class: "hidden" %>
@@ -166,7 +164,7 @@
       <hr>
 
       <span>
-        Departure Flight #/Bus #/Train # (Ex: Delta 0025) - (if traveling by automobile - enter N/A OR if a daily commuter - enter commuter) *
+        Departure Flight #/Bus #/Train # (Ex: Delta 0025) *
       </span>
       <div class="field">
         <%= form.label :depart_route_num, class: "hidden" %>
