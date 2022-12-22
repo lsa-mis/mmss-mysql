@@ -31,7 +31,6 @@ export default class extends Controller {
 
   checkArrivalTransport() {
     let transport = this.arrival_transportTarget.value;
-    console.log(transport)
     if (transport.includes("Automobile")) {
       this.arrival_detailsTarget.classList.remove("travel-details--show")
       this.arrival_detailsTarget.classList.add("travel-details--hide")
@@ -53,8 +52,6 @@ export default class extends Controller {
   }
 
   checkDepartTransport() {
-    console.log("hell");
-
     let transport = this.depart_transportTarget.value;
     if (transport.includes("Automobile")) {
       this.depart_detailsTarget.classList.remove("travel-details--show")
@@ -77,8 +74,6 @@ export default class extends Controller {
   }
 
   submitForm(event) {
-    let no_submit = "false";
-    console.log("submit");
     let arrival_transport = this.arrival_transportTarget.value;
     let depart_transport = this.depart_transportTarget.value;
 
@@ -93,16 +88,10 @@ export default class extends Controller {
     }
 
     if (arrival_transport.includes("Airplane") || arrival_transport.includes("Train") || arrival_transport.includes("Bus")) {
-      console.log("works");
       var arrival_carrier = this.arrival_carrierTarget.value;
-      console.log(this.arrival_carrierTarget);
-      console.log(arrival_carrier);
       var arrival_route_num = this.arrival_route_numTarget.value;
       let arrival = this.arrivalTarget.value;
       var arrival_time = this.arrival_timeTarget.value;
-      console.log(arrival_route_num);
-      console.log(arrival);
-      console.log(arrival_time);
       if (arrival_carrier == "" || arrival_route_num == "" || arrival == "" || arrival_time == "") {
         console.log("empty");
         this.arrival_messageTarget.classList.add("date-error--display")
@@ -118,11 +107,9 @@ export default class extends Controller {
       }
     }
     if (arrival_transport.includes("Automobile")) {
-      console.log("works");
       var arrival = this.arrivalTarget.value;
       var arrival_time = this.arrival_timeTarget.value;
       if (arrival == "" || arrival_time == "") {
-        console.log("empty");
         this.arrival_messageTarget.classList.add("date-error--display")
         this.arrival_messageTarget.classList.remove("date-error--hide")
         this.arrival_messageTarget.innerText = "Fill out all arrival information";
@@ -133,7 +120,6 @@ export default class extends Controller {
         this.arrival_messageTarget.innerText = "";
         this.arrival_messageTarget.classList.remove("date-error--display")
         this.arrival_messageTarget.classList.add("date-error--hide")
-
       }
     }
 
@@ -145,15 +131,10 @@ export default class extends Controller {
     }
 
     if (depart_transport.includes("Airplane") || depart_transport.includes("Train") || depart_transport.includes("Bus")) {
-      console.log("depart works");
       var depart_carrier = this.depart_carrierTarget.value;
-      console.log(depart_carrier);
       var depart_route_num = this.depart_route_numTarget.value;
       var depart = this.departTarget.value;
       var depart_time = this.depart_timeTarget.value;
-      console.log(depart_route_num);
-      console.log(depart);
-      console.log(depart_time);
       if (depart_carrier == "" || depart_route_num == "" || depart == "" || depart_time == "") {
         console.log("depart empty");
         this.depart_messageTarget.classList.add("date-error--display")
@@ -167,17 +148,14 @@ export default class extends Controller {
         this.depart_messageTarget.innerText = "";
         this.depart_messageTarget.classList.remove("date-error--display")
         this.depart_messageTarget.classList.add("date-error--hide")
-
       }
     }
     if (depart_transport.includes("Automobile")) {
-      console.log("works");
       var depart = this.departTarget.value;
       var depart_time = this.depart_timeTarget.value;
       this.depart_carrierTarget.value = "";
       this.depart_route_numTarget.value = "";
       if (depart == "" || depart_time == "") {
-        console.log("empty");
         this.depart_messageTarget.classList.add("date-error--display")
         this.depart_messageTarget.classList.remove("date-error--hide")
         this.depart_messageTarget.innerText = "Fill out all depart information";
@@ -191,13 +169,6 @@ export default class extends Controller {
 
       }
     }
-    // if (no_submit) {
-    //   console.log("no submit");
-    //   event.preventDefault();
-    //   event.stopImmediatePropagation()
-    // }
-    // else {
-    console.log("all is ok");
-    // }
+
   }
 }
