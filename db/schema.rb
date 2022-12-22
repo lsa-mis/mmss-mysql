@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_12_16_223619) do
+ActiveRecord::Schema.define(version: 2022_12_22_022711) do
 
   create_table "active_admin_comments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "namespace"
@@ -410,4 +410,5 @@ ActiveRecord::Schema.define(version: 2022_12_16_223619) do
   add_foreign_key "session_activities", "enrollments"
   add_foreign_key "session_assignments", "camp_occurrences"
   add_foreign_key "session_assignments", "enrollments"
+  add_foreign_key "travels", "enrollments"
 end

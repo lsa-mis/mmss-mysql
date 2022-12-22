@@ -6,8 +6,11 @@ class AddFieldsToTravel < ActiveRecord::Migration[6.1]
     add_column :travels, :arrival_date, :date
     add_column :travels, :arrival_time, :time
     add_column :travels, :depart_transport, :string
-    add_column :travels, :depart_route_num, :time
+    add_column :travels, :depart_route_num, :string
     add_column :travels, :depart_date, :date
     add_column :travels, :depart_time, :time
+    add_column :travels, :depart_carrier, :string
+    add_column :travels, :arrival_session, :string
+    add_column :travels, :depart_session, :string
   end
 end
