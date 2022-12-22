@@ -7,7 +7,6 @@ export default class extends Controller {
   ]
 
   checkDates(event) {
-    console.log("nothing)")
 
     let arrival = this.arrivalTarget.value;
     let depart = this.departTarget.value;
@@ -77,9 +76,6 @@ export default class extends Controller {
     let arrival_transport = this.arrival_transportTarget.value;
     let depart_transport = this.depart_transportTarget.value;
 
-    console.log(arrival_transport)
-    console.log(depart_transport)
-
     if (arrival_transport.includes("commuter")) {
       this.arrival_carrierTarget.value = "";
       this.arrival_route_numTarget.value = "";
@@ -93,12 +89,11 @@ export default class extends Controller {
       let arrival = this.arrivalTarget.value;
       var arrival_time = this.arrival_timeTarget.value;
       if (arrival_carrier == "" || arrival_route_num == "" || arrival == "" || arrival_time == "") {
-        console.log("empty");
         this.arrival_messageTarget.classList.add("date-error--display")
         this.arrival_messageTarget.classList.remove("date-error--hide")
         this.arrival_messageTarget.innerText = "Fill out all arrival information";
         event.preventDefault();
-        event.stopImmediatePropagation()
+        event.stopImmediatePropagation();
       }
       else {
         this.arrival_messageTarget.innerText = "";
@@ -109,12 +104,14 @@ export default class extends Controller {
     if (arrival_transport.includes("Automobile")) {
       var arrival = this.arrivalTarget.value;
       var arrival_time = this.arrival_timeTarget.value;
+      this.arrival_carrierTarget.value = "";
+      this.arrival_route_numTarget.value = "";
       if (arrival == "" || arrival_time == "") {
         this.arrival_messageTarget.classList.add("date-error--display")
         this.arrival_messageTarget.classList.remove("date-error--hide")
         this.arrival_messageTarget.innerText = "Fill out all arrival information";
         event.preventDefault();
-        event.stopImmediatePropagation()
+        event.stopImmediatePropagation();
       }
       else {
         this.arrival_messageTarget.innerText = "";
@@ -136,15 +133,13 @@ export default class extends Controller {
       var depart = this.departTarget.value;
       var depart_time = this.depart_timeTarget.value;
       if (depart_carrier == "" || depart_route_num == "" || depart == "" || depart_time == "") {
-        console.log("depart empty");
         this.depart_messageTarget.classList.add("date-error--display")
         this.depart_messageTarget.classList.remove("date-error--hide")
         this.depart_messageTarget.innerText = "Fill out all depart information";
         event.preventDefault();
-        event.stopImmediatePropagation()
+        event.stopImmediatePropagation();
       }
       else {
-        console.log("depart remove");
         this.depart_messageTarget.innerText = "";
         this.depart_messageTarget.classList.remove("date-error--display")
         this.depart_messageTarget.classList.add("date-error--hide")
@@ -160,7 +155,7 @@ export default class extends Controller {
         this.depart_messageTarget.classList.remove("date-error--hide")
         this.depart_messageTarget.innerText = "Fill out all depart information";
         event.preventDefault();
-        event.stopImmediatePropagation()
+        event.stopImmediatePropagation();
       }
       else {
         this.depart_messageTarget.innerText = "";
@@ -169,6 +164,5 @@ export default class extends Controller {
 
       }
     }
-
   }
 }
