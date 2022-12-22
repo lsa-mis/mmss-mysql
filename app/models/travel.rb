@@ -22,7 +22,7 @@
 #
 class Travel < ApplicationRecord
   belongs_to :enrollment
-  before_save :check_transport 
+  before_update :check_transport
 
   validates :arrival_transport, :depart_transport, :arrival_session, :depart_session, presence: true
 
@@ -30,18 +30,22 @@ class Travel < ApplicationRecord
   validates_presence_of :depart_carrier, :depart_route_num, :depart_date, :depart_time,  if: :valid_depart_transport?
 
   def valid_arrival_transport?
-    if self.arrival_transport.include?("Automobile") || self.arrival_transport.include?("commuter")
-      false
-    else
-      true
+    if persisted?
+      if self.arrival_transport.include?("Automobile") || self.arrival_transport.include?("commuter")
+        false
+      else
+        true
+      end
     end
   end
 
   def valid_depart_transport?
-    if self.depart_transport.include?("Automobile") || self.depart_transport.include?("commuter")
-      false
-    else
-      true
+    if persisted?
+      if self.depart_transport.include?("Automobile") || self.depart_transport.include?("commuter")
+        false
+      else
+        true
+      end
     end
   end
 
