@@ -159,14 +159,4 @@ module ApplicationHelper
     field.strftime("%I:%M %p") unless field.blank?
   end
 
-  def radio_button_checked(object, key, value)
-    checked = ""
-    unless object.new_record?
-      if object.public_send(key) == value
-        checked = "checked" 
-      end
-    end
-    return checked
-  end
-
 end
