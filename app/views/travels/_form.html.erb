@@ -29,12 +29,12 @@
 
     <div>
       <%= form.label :arrival_session %>
-      <%= form.select :arrival_session, options_for_select(@sessions, @travel.arrival_session), prompt: "Select ...", required: true %>
+      <%= select_tag :arrival_session, options_for_select(@sessions, @travel.arrival_session), required: true, prompt: "Select ..." %>
     </div>
 
     <div>
       <%= form.label :depart_session %>
-      <%= form.select :depart_session, options_for_select(@sessions, @travel.depart_session), prompt: "Select ...", required: true %>
+      <%= select_tag :depart_session, options_for_select(@sessions, @travel.depart_session), prompt: "Select ...", required: true %>
     </div>
 
     <h2 class= "section-header">Arrival Information</h2>
