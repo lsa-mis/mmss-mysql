@@ -1,5 +1,12 @@
 <div>
-<%= form_with(model: [@current_enrollment, @travel], local: true) do |form| %>
+<%= form_with(model: [@current_enrollment, @travel], 
+                html: {local: true},
+                data: {
+                  controller: "travel",
+                  target: "travel.form",
+                  action: "submit->travel#submitForm"
+                }
+              ) do |form| %>
   <% if @travel.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(@travel.errors.count, "error") %> prohibited this travel from being saved:</h2>
@@ -10,7 +17,7 @@
       </ul>
     </div>
   <% end %>
-  <div class="text-sm" data-controller="travel">
+  <div class="text-sm">
     <span>
       PLEASE NOTE:  If you are no longer in need of the shuttle service you may have selected in your MMSS application, 
       or if you have any questions about shuttle service, please email mmss@umich.edu as soon as possible.
@@ -85,11 +92,11 @@
     <hr>
 
     <% if @travel.new_record? %>
-      <div class="travel-details--hide" data-target="travel.arrrival_details">
+      <div class="travel-details--hide" data-target="travel.arrival_details">
     <% elsif @travel.arrival_transport.include?("Automobile") || @travel.arrival_transport.include?("commuter") %>
-      <div class="travel-details--hide" data-target="travel.arrrival_details">
+      <div class="travel-details--hide" data-target="travel.arrival_details">
     <% else %>
-      <div class="travel-details--show" data-target="travel.arrrival_details">
+      <div class="travel-details--show" data-target="travel.arrival_details">
     <% end %>
       <span>
         Carrier Name. Airline: (Delta, United, Spirit, etc.), Bus (Greyhound), Train (Amtrak) *
@@ -108,7 +115,8 @@
         <%= form.text_field :arrival_route_num %>
       </div>
       <hr>
-
+    </div>
+    <div class="travel-details--hide" data-target="travel.arrival_date_time">
       <div class="field py-2 w-full md:w-1/3">
         <%= form.label :arrival_date, 'Date of arrival *' %>
         <%= form.date_field :arrival_date, class: "datepicker", "data-target": "travel.arrival", "data-action": "change->travel#checkDates" %>
@@ -170,7 +178,8 @@
         <%= form.text_field :depart_route_num %>
       </div>
       <hr>
-
+    </div>
+    <div class="travel-details--hide" data-target="travel.depart_date_time">
       <div class="field py-2 w-full md:w-1/3" >
         <%= form.label :depart_date, 'Date of departure *' %>
         <%= form.date_field :depart_date, class: "datepicker", "data-target": "travel.depart", "data-action": "change->travel#checkDates" %>
