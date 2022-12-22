@@ -27,13 +27,13 @@
       All fields are required unless marked <span class="text-gray-700">(optional)</span>
     </div>
 
-    <div>
-      <%= form.label 'travel[arrival_session]' %>
+    <div class="field">
+      <%= form.label 'travel[arrival_session]', 'Session of Arrival' %>
       <%= select_tag 'travel[arrival_session]', options_for_select(@sessions, @travel.arrival_session), required: true, prompt: "Select ..." %>
     </div>
 
-    <div>
-      <%= form.label 'travel[depart_session]' %>
+    <div class="field">
+      <%= form.label 'travel[depart_session]', 'Session of Departure' %>
       <%= select_tag 'travel[depart_session]', options_for_select(@sessions, @travel.depart_session), prompt: "Select ...", required: true %>
     </div>
 
@@ -41,7 +41,7 @@
     <span>
       Please indicate what type of transportation you will use to arrive to Michigan *
     </span>
-    <div>
+    <div class="field transport-select text-xm">
       <%= form.label 'travel[arrival_transport]', class: "hidden" %>
       <%= select_tag 'travel[arrival_transport]', options_for_select(transportation, @travel.arrival_transport), required: true, prompt: "Select ...", "data-target": "travel.arrival_transport", "data-action": "change->travel#checkArrivalTransport" %>
     </div>
@@ -62,7 +62,6 @@
         <%= form.label :arrival_carrier, class: "hidden" %>
         <%= form.text_field :arrival_carrier, "data-target": "travel.arrival_carrier" %>
       </div>
-      <hr>
 
       <span>
         Arrival Flight #/Bus #/Train # (Ex: Delta 0025) *
@@ -71,7 +70,6 @@
         <%= form.label :arrival_route_num, class: "hidden" %>
         <%= form.text_field :arrival_route_num, "data-target": "travel.arrival_route_num" %>
       </div>
-      <hr>
     </div>
     <% if @travel.new_record? %>
       <div class="travel-details--hide" data-target="travel.arrival_date_time">
@@ -84,7 +82,6 @@
         <%= form.label :arrival_date, 'Date of arrival *' %>
         <%= form.date_field :arrival_date, class: "datepicker", "data-target": "travel.arrival", "data-action": "change->travel#checkDates" %>
       </div>
-      <hr>
 
       <div class="field py-2 w-full md:w-1/3">
         <%= form.label :arrival_time, 'Time of arrival *' %>
@@ -96,13 +93,12 @@
     <span>
       Please indicate what type of transportation you will use to depart from Michigan *
     </span>
-    <div>
+    <div class="field transport-select">
       <%= form.label 'travel[depart_transport]', class: "hidden" %>
       <%= select_tag 'travel[depart_transport]', options_for_select(transportation, @travel.depart_transport), required: true, prompt: "Select ...", "data-target": "travel.depart_transport", "data-action": "change->travel#checkDepartTransport" %>
     </div>
     <div class="errors date-error--hide" data-target="travel.depart_message">
     </div>
-    <hr>
 
     <% if @travel.new_record? %>
       <div class="travel-details--hide" data-target="travel.depart_details">
@@ -118,7 +114,6 @@
         <%= form.label :depart_carrier, class: "hidden" %>
         <%= form.text_field :depart_carrier, "data-target": "travel.depart_carrier" %>
       </div>
-      <hr>
 
       <span>
         Departure Flight #/Bus #/Train # (Ex: Delta 0025) *
@@ -127,7 +122,6 @@
         <%= form.label :depart_route_num, class: "hidden" %>
         <%= form.text_field :depart_route_num, "data-target": "travel.depart_route_num" %>
       </div>
-      <hr>
     </div>
     <% if @travel.new_record? %>
       <div class="travel-details--hide" data-target="travel.depart_date_time">
@@ -142,15 +136,13 @@
       </div>
       <div class="errors date-error--hide" data-target="travel.message">
       </div>
-      <hr>
 
       <div class="field py-2 w-full md:w-1/3">
         <%= form.label :depart_time, 'Time of departure *' %>
         <%= form.time_field :depart_time, "data-target": "travel.depart_time" %>
       </div>
-      <hr>
     </div>
-
+    <hr>
     <div class="field">
       <%= form.label :note, 'Additional notes' %>
       <%= form.text_area :note %>
