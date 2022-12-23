@@ -24,6 +24,7 @@ ActiveAdmin.register_page "Reports" do
           li link_to "report - Course Assignments", admin_reports_course_assignments_path
           li link_to "report - Enrolled Students with Covid Verification", admin_reports_enrolled_with_covid_verification_path
           li link_to "report - Enrolled with Addresses, Birthdate, Gender, Graduation Year", admin_reports_enrolled_with_addresses_and_more_path
+          li link_to "report - Enrolled for More than One Session", admin_reports_enrolled_for_more_than_one_session_path
 
         end
       end
@@ -249,6 +250,29 @@ ActiveAdmin.register_page "Reports" do
       WHERE en.campyear = #{CampConfiguration.active.last.camp_year} AND en.application_status = 'enrolled'
       ORDER BY co.description, cor.title"
       title = "enrolled_students_with_sessions_and_courses"
+
+      data = data_to_csv_with_country(query, title)
+      respond_to do |format|
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv"}
+      end
+    end
+
+    def enrolled_for_more_than_one_session
+      hash_with_ids = SessionAssignment.accepted.group(:enrollment_id).having('count(*) > 1').size
+      enroll_ids = hash_with_ids.keys.join(", ")
+
+      query = "SELECT ad.country,  en.user_id, REPLACE(ad.lastname, ',', ' ') AS lastname, REPLACE(ad.firstname, ',', ' ') AS firstname, u.email, co.description AS session, cor.title AS course,
+      en.year_in_school, ad.state
+      FROM course_assignments ca 
+      JOIN enrollments en ON ca.enrollment_id = en.id 
+      JOIN applicant_details AS ad ON ad.user_id = en.user_id 
+      JOIN courses AS cor ON ca.course_id = cor.id 
+      JOIN camp_occurrences AS co ON cor.camp_occurrence_id = co.id
+      LEFT JOIN users AS u ON en.user_id = u.id
+      WHERE en.campyear = #{CampConfiguration.active.last.camp_year} AND en.application_status = 'enrolled' and en.id IN (#{enroll_ids})
+      ORDER BY u.email, co.description"
+
+      title = "enrolled_for_more_than_one_session"
 
       data = data_to_csv_with_country(query, title)
       respond_to do |format|
