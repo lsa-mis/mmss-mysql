@@ -66,7 +66,7 @@ ActiveAdmin.register_page "Reports" do
     end
 
     def all_complete_apps
-      query = "SELECT DATE_FORMAT(e.updated_at, '%Y-%m-%d') AS 'Last Update', CONCAT(REPLACE(ad.firstname, ',', ' '), ' ', REPLACE(ad.lastname, ',', ' ')) AS name, 
+      query = "SELECT DATE_FORMAT(e.updated_at, '%Y-%m-%d') AS 'Last Update', CONCAT(REPLACE(ad.firstname, ',', ' '), ' ', REPLACE(ad.lastname, ',', ' ')) AS name, u.email,
       (CASE WHEN ad.gender = '' THEN NULL ELSE 
       (SELECT genders.name FROM genders WHERE CAST(ad.gender AS UNSIGNED) = genders.id) END) as gender, 
       ad.us_citizen as us_citizen,
@@ -89,7 +89,8 @@ ActiveAdmin.register_page "Reports" do
       e.application_status as application_status, e.offer_status as offer_status,
       r.email AS recommender_email, CONCAT(REPLACE(r.lastname, ',', ' '), ' ', REPLACE(r.firstname, ',', ' ')) AS recommender_name, r.organization AS recommender_organization,
       (fa.amount_cents / 100) AS fin_aid_amount, fa.source AS fin_aid_source, fa.note AS fin_aid_note, fa.status AS fin_aid_status
-      FROM enrollments AS e 
+      FROM enrollments AS e
+      LEFT JOIN users AS u ON e.user_id = u.id
       LEFT JOIN applicant_details AS ad ON ad.user_id = e.user_id
       LEFT JOIN recommendations AS r ON r.enrollment_id = e.id
       LEFT JOIN financial_aids AS fa ON fa.enrollment_id = e.id
