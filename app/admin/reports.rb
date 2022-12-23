@@ -172,14 +172,14 @@ ActiveAdmin.register_page "Reports" do
       ORDER BY co.description, a.description, ad.lastname, e.id"
       title = "events_per_session_for_enrolled"
 
-      data = data_to_csv_demographic(query, title)
+      data = data_to_csv_with_country(query, title)
       respond_to do |format|
         format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv"}
       end
     end
 
     def dorm_by_state
-      query = "SELECT ad.country, co.description AS Session, ad.state, a.description AS 'Event Activity', ad.lastname, ad.firstname, u.email, ad.city
+      query = "SELECT ad.country, co.description AS Session, a.description AS 'Event Activity', ad.lastname, ad.firstname, u.email, ad.city, ad.state,
       FROM session_assignments AS sa
       JOIN enrollments AS e ON e.id = sa.enrollment_id
       JOIN enrollment_activities AS ea ON ea.enrollment_id = sa.enrollment_id
@@ -195,7 +195,7 @@ ActiveAdmin.register_page "Reports" do
       ORDER BY co.description, ad.state"
       title = "dorm_by_state"
 
-      data = data_to_csv_demographic(query, title)
+      data = data_to_csv_with_country(query, title)
       respond_to do |format|
         format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv"}
       end
@@ -238,8 +238,8 @@ ActiveAdmin.register_page "Reports" do
     end
 
     def enrolled_with_sessions_and_courses
-      query = "SELECT ad.country, ad.state, co.description AS session, cor.title AS course, en.user_id, REPLACE(ad.lastname, ',', ' ') AS lastname, REPLACE(ad.firstname, ',', ' ') AS firstname, u.email,
-      en.year_in_school
+      query = "SELECT ad.country, co.description AS session, cor.title AS course, en.user_id, REPLACE(ad.lastname, ',', ' ') AS lastname, REPLACE(ad.firstname, ',', ' ') AS firstname, u.email,
+      en.year_in_school, ad.state
       FROM course_assignments ca 
       JOIN enrollments en ON ca.enrollment_id = en.id 
       JOIN applicant_details AS ad ON ad.user_id = en.user_id 
@@ -250,7 +250,7 @@ ActiveAdmin.register_page "Reports" do
       ORDER BY co.description, cor.title"
       title = "enrolled_students_with_sessions_and_courses"
 
-      data = data_to_csv_demographic(query, title)
+      data = data_to_csv_with_country(query, title)
       respond_to do |format|
         format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv"}
       end
@@ -370,6 +370,32 @@ ActiveAdmin.register_page "Reports" do
             if c != 'country'
               row[0] = ISO3166::Country[c].name + " - " + c
             end
+            csv << row
+          end
+        end
+      end
+    end
+
+    def data_to_csv_with_country(query, title)
+      records_array = ActiveRecord::Base.connection.exec_query(query)
+      result = []
+      result.push({"empty" => "", "total" => records_array.count, "header" => records_array.columns, "rows" => records_array.rows})
+
+      CSV.generate(headers: false) do |csv|
+        csv << Array(title.titleize)
+        result.each do |res|
+          line =[]
+          line << res['empty'].to_s + "Total number of records: " + res['total'].to_s
+          csv << line
+          header = res['header'].map! { |e| e.titleize.upcase }
+          header = header.rotate(1)
+          csv << header
+          res['rows'].each do |row|
+            c = row[0]
+            if c != 'country'
+              row[0] = ISO3166::Country[c].name + " - " + c
+            end
+            row = row.rotate(1)
             csv << row
           end
         end
