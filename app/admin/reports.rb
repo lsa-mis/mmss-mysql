@@ -18,7 +18,6 @@ ActiveAdmin.register_page "Reports" do
         ul do
           li link_to "report - Enrolled with Addresses", admin_reports_enrolled_with_addresses_path
           li link_to "report - Events per Session", admin_reports_enrolled_events_per_session_path
-          li link_to "report - Dorm by State", admin_reports_enrolled_dorm_by_state_path
           li link_to "report - Enrolled Students with Sessions and Courses", admin_reports_enrolled_with_sessions_and_courses_path
           li link_to "report - Enrolled Students with Sessions and T-Shirt size", admin_reports_enrolled_with_sessions_and_tshirt_path
           li link_to "report - Course Assignments", admin_reports_course_assignments_path
@@ -195,29 +194,6 @@ ActiveAdmin.register_page "Reports" do
       WHERE sa.enrollment_id IN (#{enroll_ids}) AND sa.offer_status = 'accepted' AND a.description LIKE ('Dormitory%')
       ORDER BY co.description, a.description, ad.lastname, e.id"
       title = "events_per_session_for_enrolled"
-
-      data = data_to_csv_with_country(query, title)
-      respond_to do |format|
-        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv"}
-      end
-    end
-
-    def dorm_by_state
-      query = "SELECT ad.country, co.description AS Session, a.description AS 'Event Activity', ad.lastname, ad.firstname, u.email, ad.city, ad.state,
-      FROM session_assignments AS sa
-      JOIN enrollments AS e ON e.id = sa.enrollment_id
-      JOIN enrollment_activities AS ea ON ea.enrollment_id = sa.enrollment_id
-      JOIN activities as a ON a.id = ea.activity_id AND a.camp_occurrence_id = sa.camp_occurrence_id
-      JOIN camp_occurrences AS co ON co.id = a.camp_occurrence_id
-      JOIN applicant_details AS ad ON ad.user_id = e.user_id
-      JOIN users AS u ON u.id = ad.user_id
-      WHERE sa.enrollment_id IN (
-        SELECT id
-        FROM enrollments
-        WHERE application_status = 'enrolled' AND campyear = #{CampConfiguration.active.last.camp_year}
-      ) AND sa.offer_status = 'accepted' AND a.description LIKE ('Dormitory%')
-      ORDER BY co.description, ad.state"
-      title = "dorm_by_state"
 
       data = data_to_csv_with_country(query, title)
       respond_to do |format|
