@@ -25,6 +25,7 @@ ActiveAdmin.register_page "Reports" do
           li link_to "report - Enrolled Students with Covid Verification", admin_reports_enrolled_with_covid_verification_path
           li link_to "report - Enrolled with Addresses, Birthdate, Gender, Graduation Year", admin_reports_enrolled_with_addresses_and_more_path
           li link_to "report - Enrolled for More than One Session", admin_reports_enrolled_for_more_than_one_session_path
+          li link_to "report - Enrolled with Dormitories", admin_reports_dorm_by_gender_by_session_path
 
         end
       end
@@ -170,6 +171,28 @@ ActiveAdmin.register_page "Reports" do
         FROM enrollments
         WHERE application_status = 'enrolled' AND campyear = #{CampConfiguration.active.last.camp_year}
       ) AND sa.offer_status = 'accepted'
+      ORDER BY co.description, a.description, ad.lastname, e.id"
+      title = "events_per_session_for_enrolled"
+
+      data = data_to_csv_with_country(query, title)
+      respond_to do |format|
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv"}
+      end
+    end
+
+    def dorm_by_gender_by_session
+      enroll_ids = Enrollment.enrolled.pluck(:id).join(", ")
+      query = "SELECT ad.country, a.description AS 'Event Activity', co.description AS Session, ad.lastname, ad.firstname, u.email,
+      (CASE WHEN ad.gender = '' THEN NULL ELSE (SELECT genders.name FROM genders WHERE CAST(ad.gender AS UNSIGNED) = genders.id) END) as gender,
+      e.room_mate_request, ad.city, ad.state
+      FROM session_assignments AS sa
+      JOIN enrollments AS e ON e.id = sa.enrollment_id
+      JOIN enrollment_activities AS ea ON ea.enrollment_id = sa.enrollment_id
+      JOIN activities as a ON a.id = ea.activity_id AND a.camp_occurrence_id = sa.camp_occurrence_id
+      JOIN camp_occurrences AS co ON co.id = a.camp_occurrence_id
+      JOIN applicant_details AS ad ON ad.user_id = e.user_id
+      JOIN users AS u ON u.id = ad.user_id
+      WHERE sa.enrollment_id IN (#{enroll_ids}) AND sa.offer_status = 'accepted' AND a.description LIKE ('Dormitory%')
       ORDER BY co.description, a.description, ad.lastname, e.id"
       title = "events_per_session_for_enrolled"
 
@@ -354,7 +377,6 @@ ActiveAdmin.register_page "Reports" do
         format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv"}
       end
     end
-
 
     def data_to_csv(query, title)
       records_array = ActiveRecord::Base.connection.exec_query(query)
