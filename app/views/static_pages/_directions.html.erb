@@ -123,6 +123,11 @@
         <p class="direction_notes">
           We look forward to seeing you at the <%= @current_camp_year %> University of Michigan MMSS High School Summer Program.
         </p>
+        <% if @current_enrollment.uniqname.present? %>
+              <p class="m-2">
+                Your University of Michigan uniqname is <strong><%= @current_enrollment.uniqname %></strong>
+              </p>
+        <% end %>
       </div>
     <% else %>
       <div class="m-2">
