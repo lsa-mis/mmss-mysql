@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_12_15_154325) do
+ActiveRecord::Schema.define(version: 2022_12_26_143012) do
 
   create_table "active_admin_comments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "namespace"
@@ -158,6 +158,7 @@ ActiveRecord::Schema.define(version: 2022_12_15_154325) do
     t.bigint "course_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.boolean "waiting_list", default: false
     t.index ["course_id"], name: "index_course_assignments_on_course_id"
     t.index ["enrollment_id"], name: "index_course_assignments_on_enrollment_id"
   end
@@ -224,6 +225,7 @@ ActiveRecord::Schema.define(version: 2022_12_15_154325) do
     t.integer "campyear"
     t.date "application_deadline"
     t.date "application_status_updated_on"
+    t.string "uniqname"
     t.index ["user_id"], name: "index_enrollments_on_user_id"
   end
 
@@ -353,21 +355,15 @@ ActiveRecord::Schema.define(version: 2022_12_15_154325) do
 
   create_table "travels", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "enrollment_id", null: false
-    t.string "arrival_transport"
-    t.string "arrival_carrier"
-    t.string "arrival_route_num"
+    t.string "direction"
+    t.string "transport_needed"
+    t.datetime "date"
+    t.string "mode"
+    t.string "carrier"
+    t.string "route_num"
     t.text "note"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.date "arrival_date"
-    t.time "arrival_time"
-    t.string "depart_transport"
-    t.time "depart_route_num"
-    t.date "depart_date"
-    t.time "depart_time"
-    t.string "depart_carrier"
-    t.string "arrival_session"
-    t.string "depart_session"
     t.index ["enrollment_id"], name: "index_travels_on_enrollment_id"
   end
 
@@ -410,4 +406,5 @@ ActiveRecord::Schema.define(version: 2022_12_15_154325) do
   add_foreign_key "session_activities", "enrollments"
   add_foreign_key "session_assignments", "camp_occurrences"
   add_foreign_key "session_assignments", "enrollments"
+  add_foreign_key "travels", "enrollments"
 end
