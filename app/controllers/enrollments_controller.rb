@@ -95,15 +95,7 @@ class EnrollmentsController < ApplicationController
 
   def remove_from_waitlist
     @enrollment = Enrollment.find(params[:id])
-    if @enrollment.user.payments.current_camp_payments.where(transaction_status: 1).count > 0 && @enrollment.recommendation.present?
-      if @enrollment.recommendation.recupload.present?
-        @enrollment.update(application_status: 'application complete', application_status_updated_on: Date.today)
-      else
-        @enrollment.update(application_status: 'submitted', application_status_updated_on: Date.today)
-      end
-    else
-      @enrollment.update(application_status: 'submitted', application_status_updated_on: Date.today)
-    end
+    @enrollment.update(application_status: 'application complete', application_status_updated_on: Date.today)
     respond_to do |format|
       format.html { redirect_to admin_applications_path, notice: 'Application was removed from waitlist. Send an email to an applicant with further instructions.' }
       format.json { head :no_content }
