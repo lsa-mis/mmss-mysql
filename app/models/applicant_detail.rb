@@ -4,34 +4,34 @@
 #
 #  id                 :bigint           not null, primary key
 #  user_id            :bigint           not null
-#  firstname          :string           not null
-#  middlename         :string
-#  lastname           :string           not null
-#  gender             :string
+#  firstname          :string(255)      not null
+#  middlename         :string(255)
+#  lastname           :string(255)      not null
+#  gender             :string(255)
 #  us_citizen         :boolean          default(FALSE), not null
-#  demographic        :string
+#  demographic        :string(255)
 #  birthdate          :date             not null
-#  diet_restrictions  :string
-#  shirt_size         :string
-#  address1           :string           not null
-#  address2           :string
-#  city               :string           not null
-#  state              :string           not null
-#  state_non_us       :string
-#  postalcode         :string           not null
-#  country            :string           not null
-#  phone              :string           not null
-#  parentname         :string           not null
-#  parentaddress1     :string
-#  parentaddress2     :string
-#  parentcity         :string
-#  parentstate        :string
-#  parentstate_non_us :string
-#  parentzip          :string
-#  parentcountry      :string
-#  parentphone        :string           not null
-#  parentworkphone    :string
-#  parentemail        :string
+#  diet_restrictions  :text(65535)
+#  shirt_size         :string(255)
+#  address1           :string(255)      not null
+#  address2           :string(255)
+#  city               :string(255)      not null
+#  state              :string(255)      not null
+#  state_non_us       :string(255)
+#  postalcode         :string(255)      not null
+#  country            :string(255)      not null
+#  phone              :string(255)      not null
+#  parentname         :string(255)      not null
+#  parentaddress1     :string(255)
+#  parentaddress2     :string(255)
+#  parentcity         :string(255)
+#  parentstate        :string(255)
+#  parentstate_non_us :string(255)
+#  parentzip          :string(255)
+#  parentcountry      :string(255)
+#  parentphone        :string(255)      not null
+#  parentworkphone    :string(255)
+#  parentemail        :string(255)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #
@@ -45,6 +45,7 @@ class ApplicantDetail < ApplicationRecord
   # validates :us_citizen, presence: true
   validates :gender, presence: true
   validates :birthdate, presence: true
+  validates :shirt_size, presence: true
   validates :address1, presence: true
   validates :city, presence: true
   validates :state, presence: { message: "needs to be selected or if you are

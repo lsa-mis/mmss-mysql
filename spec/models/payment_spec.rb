@@ -3,18 +3,18 @@
 # Table name: payments
 #
 #  id                 :bigint           not null, primary key
-#  transaction_type   :string
-#  transaction_status :string
-#  transaction_id     :string
-#  total_amount       :string
-#  transaction_date   :string
-#  account_type       :string
-#  result_code        :string
-#  result_message     :string
-#  user_account       :string
-#  payer_identity     :string
-#  timestamp          :string
-#  transaction_hash   :string
+#  transaction_type   :string(255)
+#  transaction_status :string(255)
+#  transaction_id     :string(255)
+#  total_amount       :string(255)
+#  transaction_date   :string(255)
+#  account_type       :string(255)
+#  result_code        :string(255)
+#  result_message     :string(255)
+#  user_account       :string(255)
+#  payer_identity     :string(255)
+#  timestamp          :string(255)
+#  transaction_hash   :string(255)
 #  user_id            :bigint           not null
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null

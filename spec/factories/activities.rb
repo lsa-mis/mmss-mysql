@@ -3,11 +3,11 @@
 # Table name: activities
 #
 #  id                 :bigint           not null, primary key
-#  camp_occurrence_id :bigint           not null
-#  description        :string           not null
-#  cost_cents         :integer          not null
-#  date_occurs        :date             not null
-#  active             :boolean          default(FALSE), not null
+#  camp_occurrence_id :bigint
+#  description        :string(255)
+#  cost_cents         :integer
+#  date_occurs        :date
+#  active             :boolean          default(FALSE)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #

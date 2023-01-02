@@ -5,9 +5,9 @@
 #  id                :bigint           not null, primary key
 #  enrollment_id     :bigint           not null
 #  amount_cents      :integer          default(0)
-#  source            :string
-#  note              :text
-#  status            :string           default("pending")
+#  source            :string(255)
+#  note              :text(65535)
+#  status            :string(255)      default("pending")
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  payments_deadline :date
@@ -32,8 +32,8 @@ class FinancialAid < ApplicationRecord
   def acceptable_taxform
     return unless taxform.attached?
 
-    unless taxform.blob.byte_size <= 5.megabyte
-      errors.add(:taxform, "is too big - file size cannot exceed 5Mbyte")
+    unless taxform.blob.byte_size <= 20.megabyte
+      errors.add(:taxform, "is too big - file size cannot exceed 20Mbyte")
     end
 
     acceptable_types = ["image/png", "image/jpeg", "application/pdf"]

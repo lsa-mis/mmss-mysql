@@ -6,7 +6,7 @@ ActiveAdmin.register Course do
   #
   # Uncomment all parameters which should be permitted for assignment
   #
-   permit_params :camp_occurrence_id, :title, :available_spaces, :status
+   permit_params :camp_occurrence_id, :title, :available_spaces, :status, :faculty_uniqname, :faculty_name
   #
   # or
   #
@@ -30,6 +30,8 @@ ActiveAdmin.register Course do
       f.input :camp_occurrence, label: "Session", as: :select, collection: CampOccurrence.active.order(begin_date: :desc).no_any_session
       f.input :title
       f.input :available_spaces
+      f.input :faculty_uniqname
+      f.input :faculty_name
       f.input :status, as: :select, collection: course_status
     end
     f.actions         # adds the 'Submit' and 'Cancel' button
@@ -46,6 +48,8 @@ ActiveAdmin.register Course do
     column "Open Spaces" do |op|
       op.available_spaces - CourseAssignment.number_of_assignments(op.id)
     end
+    column :faculty_uniqname
+    column :faculty_name
     column :status
     column :created_at
     column :updated_at
@@ -62,6 +66,8 @@ ActiveAdmin.register Course do
       row "Open Spaces" do |op|
         op.available_spaces - CourseAssignment.number_of_assignments(op.id)
       end
+      row :faculty_uniqname
+      row :faculty_name
       row :status
       row :created_at
       row :updated_at

@@ -1,0 +1,12 @@
+<h1 class="text-yellow-um_yellow bg-blue-um_blue p-2">Michigan Math and Science Scholars Faculty Site </h1>
+<% unless faculty_signed_in? %>
+<div class= "my-4">
+  <p>
+    Please Sign up to create an account - use your UofM email;
+    or Sign in, if you have an account.
+  </p>
+</div>
+<% end %>
+<%= link_to "Sign up", new_faculty_registration_path, class: "btn btn-blue"  %>
+<%= link_to "Returning User - Sign In", new_faculty_session_path, class: "btn btn-blue" %>
+

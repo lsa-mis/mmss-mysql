@@ -1,0 +1,62 @@
+<div class="hover:underline">
+  <%= link_to 'Back to student list', :back, class: "btn btn-sm btn-blue mr-1" %>
+</div>
+
+<h1><%= @student.applicant_detail.full_name %></h1>
+
+<table class="student-page-table">
+  <tr>
+    <th>Email</th>
+    <td><%= @student.user.email %></td>
+  </tr>
+  <tr>
+    <th>Gender</th>
+    <td><%= gender_description(@student.applicant_detail.gender) %></td>
+  </tr>
+  <tr>
+    <th>Year in School<me</th>
+    <td><%= @student.year_in_school%></td>
+  </tr>
+  <tr>
+    <th>Country</th>
+    <td><%= ISO3166::Country[@student.applicant_detail.country].name %></td>
+  </tr>
+  <tr>
+    <th>City - State</th>
+    <td><%= @student.applicant_detail.city %> - <%= @student.applicant_detail.state %></td>
+  </tr>
+  <tr>
+    <th>Personal Statement</th>
+    <td><%= @student.personal_statement %></td>
+  </tr>
+  <tr>
+    <th>Transcript</th>
+    <td>
+      <% if @student.transcript.attached? %>
+        <%= link_to @student.transcript.filename, url_for(@student.transcript), :target => "_blank", class: "hover:underline" %>
+      <% else %>
+        Not avalable
+      <% end %>
+    </td>
+  </tr>
+  <tr>
+    <th>Recommendation</th>
+    <% if @student.recommendation.present? %>
+      <% if @student.recommendation.recupload.present? %>
+        <td>
+          <% if @student.recommendation.recupload.recletter.attached? %>
+            <%= link_to @student.recommendation.recupload.recletter.filename, url_for(@student.recommendation.recupload.recletter), :target => "_blank", class: "hover:underline" %>
+          <% end %>
+        </td>
+        <% unless @student.recommendation.recupload.letter.empty? %>
+          </tr><tr><th> </th>
+          <td><%= @student.recommendation.recupload.letter %></td>
+        <% end %>
+      <% end %>
+    <% else %>
+     <td>Not available</td>
+    <% end %>
+
+  </tr>
+  
+</table>

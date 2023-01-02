@@ -1,5 +1,5 @@
 class FeedbacksController < ApplicationController
-  devise_group :logged_in, contains: [:user, :admin]
+  devise_group :logged_in, contains: [:user, :admin, :faculty]
   before_action :authenticate_logged_in!
   before_action :authenticate_admin!, only: [:index, :destroy]
   # InheritedResources::Base

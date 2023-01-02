@@ -3,9 +3,9 @@
 # Table name: recuploads
 #
 #  id                :bigint           not null, primary key
-#  letter            :text
-#  authorname        :string           not null
-#  studentname       :string           not null
+#  letter            :text(65535)
+#  authorname        :string(255)      not null
+#  studentname       :string(255)      not null
 #  recommendation_id :bigint           not null
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
@@ -26,8 +26,8 @@ class Recupload < ApplicationRecord
   def acceptable_recletter
     return unless recletter.attached?
 
-    unless recletter.blob.byte_size <= 5.megabyte
-      errors.add(:recletter, "is too big - file size cannot exceed 5Mbyte")
+    unless recletter.blob.byte_size <= 20.megabyte
+      errors.add(:recletter, "is too big - file size cannot exceed 20Mbyte")
     end
 
     acceptable_types = ["image/png", "image/jpeg", "application/pdf"]

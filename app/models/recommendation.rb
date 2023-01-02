@@ -4,20 +4,20 @@
 #
 #  id                       :bigint           not null, primary key
 #  enrollment_id            :bigint           not null
-#  email                    :string           not null
-#  lastname                 :string           not null
-#  firstname                :string           not null
-#  organization             :string
-#  address1                 :string
-#  address2                 :string
-#  city                     :string
-#  state                    :string
-#  state_non_us             :string
-#  postalcode               :string
-#  country                  :string
-#  phone_number             :string
-#  best_contact_time        :string
-#  submitted_recommendation :string
+#  email                    :string(255)      not null
+#  lastname                 :string(255)      not null
+#  firstname                :string(255)      not null
+#  organization             :string(255)
+#  address1                 :string(255)
+#  address2                 :string(255)
+#  city                     :string(255)
+#  state                    :string(255)
+#  state_non_us             :string(255)
+#  postalcode               :string(255)
+#  country                  :string(255)
+#  phone_number             :string(255)
+#  best_contact_time        :string(255)
+#  submitted_recommendation :string(255)
 #  date_submitted           :datetime
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
