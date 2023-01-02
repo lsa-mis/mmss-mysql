@@ -104,7 +104,6 @@ class EnrollmentsController < ApplicationController
     else
       @enrollment.update(application_status: 'submitted', application_status_updated_on: Date.today)
     end
-    send_remove_from_waitlist_email(@enrollment)
     respond_to do |format|
       format.html { redirect_to admin_applications_path, notice: 'Application was removed from waitlist. Send an email to an applicant with further instructions.' }
       format.json { head :no_content }
@@ -117,11 +116,6 @@ class EnrollmentsController < ApplicationController
     respond_to do |format|
       format.html { redirect_to admin_application_path(@enrollment), notice: 'Request was sent!' }
     end
-  end
-
-  def send_remove_from_waitlist_email(id)
-    enrollment = Enrollment.find_by(id: params[:id])
-    RemoveFromWaitlistMailer.with(enrollment: enrollment).app_remove_from_waitlist_email.deliver_now
   end
 
   private
