@@ -72,20 +72,6 @@ ActiveAdmin.register Course do
       row :created_at
       row :updated_at
     end
-    panel "List of students" do
-      enrollment_ids = CourseAssignment.where(course_id: course).order(:waiting_list).pluck(:enrollment_id)
-        students = enrollment_ids.collect { |id| Enrollment.find(id) }
-        if students.present?
-          table_for students do
-            column "Name" do |student| 
-              link_to("#{student.applicant_detail.full_name}", admin_application_path(student))
-            end
-            column "Name" do |student|
-              student.user.email
-            end
-          end
-        end
-      end
     active_admin_comments
   end
 
