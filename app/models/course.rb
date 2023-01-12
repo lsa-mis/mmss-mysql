@@ -18,6 +18,8 @@ class Course < ApplicationRecord
   has_many :course_assignments
   has_many :enrolled_users, through: :course_preferences, source: :enrollment
 
+  validates :faculty_uniqname, format: { with: /\A[\w.-]+\z/,
+    message: "usernames or uniqnames only - do not include domain" }
 
   scope :is_open, -> { where(status: "open") }
   scope :current_camp, -> { where(camp_occurrence_id: CampOccurrence.active) }
@@ -25,4 +27,5 @@ class Course < ApplicationRecord
   def display_name
     "#{self.title} - #{self.camp_occurrence.description}" # or whatever column you want
   end
+
 end
