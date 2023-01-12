@@ -364,6 +364,15 @@ ActiveRecord::Schema.define(version: 2022_12_26_143012) do
     t.text "note"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.date "arrival_date"
+    t.time "arrival_time"
+    t.string "depart_transport"
+    t.string "depart_route_num"
+    t.date "depart_date"
+    t.time "depart_time"
+    t.string "depart_carrier"
+    t.string "arrival_session"
+    t.string "depart_session"
     t.index ["enrollment_id"], name: "index_travels_on_enrollment_id"
   end
 
