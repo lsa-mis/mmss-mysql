@@ -16,6 +16,11 @@ ActiveAdmin.register SessionAssignment do
   #   permitted
   # end
 
+  scope :current_year_session_assignments, :default => true, label: "Current years Session Assignments"
+  scope :all
+
+  scope :accepted, group: :offer_status
+
   form do |f|
     f.inputs do
       f.input :enrollment_id, as: :select, collection: Enrollment.current_camp_year_applications.map { |enrol| [enrol.display_name.downcase, enrol.id]}.sort

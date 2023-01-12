@@ -13,7 +13,9 @@ class SessionAssignment < ApplicationRecord
   belongs_to :enrollment
   belongs_to :camp_occurrence
 
-  scope :accepted, -> {where("offer_status = 'accepted'")}
+  scope :current_year_session_assignments, -> { where(enrollment_id: Enrollment.current_camp_year_applications) }
+  scope :accepted, -> { current_year_session_assignments.where(offer_status: 'accepted') }
+
 
   # def description_name
   #   self.camp_occurrence.description
