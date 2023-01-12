@@ -29,6 +29,7 @@ class CampConfiguration < ApplicationRecord
   validates :application_materials_due, presence: true
   validates :camper_acceptance_due, presence: true
   validate :only_one_active_camp
+  validates :offer_letter, :reject_letter, :waitlist_letter, presence: true
 
   monetize :application_fee_cents
 
