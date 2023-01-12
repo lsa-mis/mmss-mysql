@@ -15,6 +15,9 @@ class ApplicantDetailsController < ApplicationController
   # GET /applicant_details/1.json
   def show
     @us_citizen = citizen_status
+    if current_user.enrollments.current_camp_year_applications.present?
+      @current_enrollment = current_user.enrollments.current_camp_year_applications.last
+    end
   end
 
   # GET /applicant_details/new
@@ -24,6 +27,9 @@ class ApplicantDetailsController < ApplicationController
 
   # GET /applicant_details/1/edit
   def edit
+    if current_user.enrollments.current_camp_year_applications.present?
+      @current_enrollment = current_user.enrollments.current_camp_year_applications.last
+    end
   end
 
   # POST /applicant_details
