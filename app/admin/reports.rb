@@ -259,7 +259,11 @@ ActiveAdmin.register_page "Reports" do
 
     def enrolled_for_more_than_one_session
       hash_with_ids = SessionAssignment.accepted.group(:enrollment_id).having('count(*) > 1').size
-      enroll_ids = hash_with_ids.keys.join(", ")
+      if hash_with_ids.present?
+        enroll_ids = hash_with_ids.keys.join(", ")
+      else
+        enroll_ids = 0
+      end
 
       query = "SELECT ad.country,  en.user_id, REPLACE(ad.lastname, ',', ' ') AS lastname, REPLACE(ad.firstname, ',', ' ') AS firstname, u.email, co.description AS session, cor.title AS course,
       en.year_in_school, ad.state
