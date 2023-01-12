@@ -93,6 +93,15 @@ class EnrollmentsController < ApplicationController
     end
   end
 
+  def remove_from_waitlist
+    @enrollment = Enrollment.find(params[:id])
+    @enrollment.update(application_status: 'application complete', application_status_updated_on: Date.today)
+    respond_to do |format|
+      format.html { redirect_to admin_applications_path, notice: 'Application was removed from waitlist. Send an email to an applicant with further instructions.' }
+      format.json { head :no_content }
+    end
+  end
+
   def send_finaid_request_email
     @enrollment = Enrollment.find_by(id: params[:enrollment_id])
     FinaidMailer.with(enrollment: @enrollment).fin_aid_request_email.deliver_now

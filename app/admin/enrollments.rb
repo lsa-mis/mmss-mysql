@@ -38,11 +38,13 @@ ActiveAdmin.register Enrollment, as: "Application" do
   scope :no_covid_test_record, group: :vaccine
 
   action_item :set_waitlisted, only: :show do
-    text_node link_to("Place on Wait List", waitlisted_path(application), data: { confirm: 'Are you sure you want to wait list this application?'}, method: :post ) if ["", "submitted", "application complete"].include? application.application_status
+    text_node link_to("Place on Wait List", waitlisted_path(application), data: { confirm: 'Are you sure you want to wait list this application?'}, method: :post ) if ["application complete"].include? application.application_status
   end
-
+  action_item :remove_from_waitlist, only: :show do
+    text_node link_to("Remove from Wait List", remove_from_waitlist_path(application), data: { confirm: 'Are you sure you want to remove this application from wait list?'}, method: :post ) if ["waitlisted"].include? application.application_status
+  end
   action_item :set_rejected, only: :show do
-    text_node link_to("Reject Applicant", new_admin_rejection_path(:enrollment_id => application)) if ["", "submitted", "application complete"].include? application.application_status
+    text_node link_to("Reject Applicant", new_admin_rejection_path(:enrollment_id => application)) if ["application complete"].include? application.application_status
   end
 
   form do |f| # This is a formtastic form builder
