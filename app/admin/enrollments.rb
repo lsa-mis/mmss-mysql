@@ -15,7 +15,7 @@ ActiveAdmin.register Enrollment, as: "Application" do
                   :room_mate_request, :personal_statement, 
                   :shirt_size, :notes, :application_status, :application_status_updated_on, :campyear,
                   :offer_status, :partner_program, :transcript, :student_packet, 
-                  :application_deadline, :vaccine_record, :covid_test_record,
+                  :application_deadline, :vaccine_record, :covid_test_record, :uniqname,
                   session_assignments_attributes: [:id, :camp_occurrence_id, :_destroy ],
                   course_assignments_attributes: [:id, :course_id, :_destroy ]
 
@@ -49,6 +49,9 @@ ActiveAdmin.register Enrollment, as: "Application" do
     f.semantic_errors *f.object.errors.keys # shows errors on :base
     f.inputs do
      f.input :user_id, as: :select, collection: User.all.order(:email)
+     if application.application_status == 'enrolled'
+      f.input :uniqname
+    end
      f.input :international
      f.input :campyear
      f.input :high_school_name
@@ -186,6 +189,9 @@ ActiveAdmin.register Enrollment, as: "Application" do
   show do
     attributes_table do
       row :user_id do |user| link_to(user.applicant_detail.full_name.titleize, admin_applicant_detail_path(user.applicant_detail)) end
+      if application.application_status == 'enrolled'
+        row :uniqname
+      end
       row :personal_statement
       row :notes
       row :offer_status
