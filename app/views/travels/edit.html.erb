@@ -1,6 +1,10 @@
-<h1>Editing Travel</h1>
+<div class="max-w rounded overflow-hidden shadow-lg">
+  <h1 class="text-yellow-um_yellow bg-blue-um_blue p-2 mt-2">Editing Travel Information</h1>
+  <div class="m-2">
+    <%= render 'form', travel: @travel %>
+  </div>
+</div>
 
-<%= render 'form', travel: @travel %>
-
-<%= link_to 'Show', @travel %> |
-<%= link_to 'Back', travels_path %>
+<div class="m-2">
+  <%= link_to 'Back', root_path, class: "btn btn-blue" %>
+</div>

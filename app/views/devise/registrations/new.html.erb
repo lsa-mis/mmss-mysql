@@ -6,7 +6,9 @@
       <%= render "devise/shared/error_messages", resource: resource %>
 
       <div class="field">
-        <%= f.label "Email (please use the applicant's email address here, not a parent's email)"%>
+        <p>Email (please use the applicant's email address here, not a parent's email)
+        </p>
+        <%= f.label :email, class: "hidden"%>
         <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
       </div>
 

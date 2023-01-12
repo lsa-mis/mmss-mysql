@@ -12,7 +12,7 @@ ActiveAdmin.register Recupload do
   form do |f|
     f.semantic_errors
     f.inputs do
-      f.input :recommendation_id, as: :select, collection: Recommendation.all.map { |reccup| [reccup.display_name.downcase, reccup.id]}.sort
+      f.input :recommendation_id, label: "Applicant Name", as: :select, collection: Recommendation.all.map { |reccup| [reccup.applicant_name, reccup.id]}.sort
       f.input :letter
       f.input :recletter, as: :file
       f.input :authorname

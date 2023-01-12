@@ -2,17 +2,23 @@
 #
 # Table name: travels
 #
-#  id               :bigint           not null, primary key
-#  enrollment_id    :bigint           not null
-#  direction        :string(255)
-#  transport_needed :string(255)
-#  date             :datetime
-#  mode             :string(255)
-#  carrier          :string(255)
-#  route_num        :string(255)
-#  note             :text(65535)
-#  created_at       :datetime         not null
-#  updated_at       :datetime         not null
+#  id                :bigint           not null, primary key
+#  enrollment_id     :bigint           not null
+#  arrival_transport :string(255)
+#  arrival_carrier   :string(255)
+#  arrival_route_num :string(255)
+#  note              :text(65535)
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#  arrival_date      :date
+#  arrival_time      :time
+#  depart_transport  :string(255)
+#  depart_route_num  :string(255)
+#  depart_date       :date
+#  depart_time       :time
+#  depart_carrier    :string(255)
+#  arrival_session   :string(255)
+#  depart_session    :string(255)
 #
 FactoryBot.define do
   factory :travel do

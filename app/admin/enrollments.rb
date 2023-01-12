@@ -15,7 +15,7 @@ ActiveAdmin.register Enrollment, as: "Application" do
                   :room_mate_request, :personal_statement, 
                   :shirt_size, :notes, :application_status, :application_status_updated_on, :campyear,
                   :offer_status, :partner_program, :transcript, :student_packet, 
-                  :application_deadline, :vaccine_record, :covid_test_record,
+                  :application_deadline, :vaccine_record, :covid_test_record, :uniqname,
                   session_assignments_attributes: [:id, :camp_occurrence_id, :_destroy ],
                   course_assignments_attributes: [:id, :course_id, :_destroy ]
 
@@ -49,6 +49,9 @@ ActiveAdmin.register Enrollment, as: "Application" do
     f.semantic_errors *f.object.errors.keys # shows errors on :base
     f.inputs do
      f.input :user_id, as: :select, collection: User.all.order(:email)
+     if application.application_status == 'enrolled'
+      f.input :uniqname
+    end
      f.input :international
      f.input :campyear
      f.input :high_school_name
@@ -186,6 +189,9 @@ ActiveAdmin.register Enrollment, as: "Application" do
   show do
     attributes_table do
       row :user_id do |user| link_to(user.applicant_detail.full_name.titleize, admin_applicant_detail_path(user.applicant_detail)) end
+      if application.application_status == 'enrolled'
+        row :uniqname
+      end
       row :personal_statement
       row :notes
       row :offer_status
@@ -314,6 +320,25 @@ ActiveAdmin.register Enrollment, as: "Application" do
         end
       end
     end
+
+    panel "Travel Information" do
+      if application.travels.present?
+        table_for application.travels do
+          column "Session of Arrival" do |item|
+            item.arrival_session
+          end
+          column "Session of Departure" do |item|
+            item.depart_session
+          end
+          column "Travel Forms" do |item|
+            link_to("view", admin_travel_path(item))
+          end
+        end
+      else
+        text_node "There is no travel information"
+      end
+    end
+
     active_admin_comments
   end
 
