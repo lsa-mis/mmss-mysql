@@ -144,4 +144,19 @@ module ApplicationHelper
     end
   end
 
+  def transportation
+    ['Airplane', 'Bus', 'Train', 
+      'Automobile - parent or permitted designee is driving me to the University of Michigan campus', 
+      'I am a daily MMSS commuter'
+    ]
+  end
+
+  def show_date(field)
+    field.strftime("%A, %d %b %Y") unless field.blank?
+  end
+
+  def show_time(field)
+    field.strftime("%I:%M %p") unless field.blank?
+  end
+
 end

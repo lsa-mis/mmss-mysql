@@ -12,5 +12,8 @@ require("stylesheets/_footer.sass")
 
 import 'controllers'
 
+import flatpickr from "flatpickr"
+import "flatpickr/dist/flatpickr.min.css"
+flatpickr(".datepicker", {})
 
 const images = require.context('../images', true)
