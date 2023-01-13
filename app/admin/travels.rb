@@ -20,8 +20,8 @@ ActiveAdmin.register Travel do
 
   filter :enrollment_applicant_detail_lastname_start, label: "Last Name (Starts with)"
   filter :enrollment_applicant_detail_firstname_start, label: "First Name (Starts with)"
-  filter :arrival_session, as: :select, collection: CampOccurrence.no_any_session.map { |s| s.description_with_month_and_day }
-  filter :depart_session, label: "Departure Session", as: :select, collection: CampOccurrence.no_any_session.map { |s| s.description_with_month_and_day }
+  filter :arrival_session, label: "Session of Arrival", as: :select, collection: CampOccurrence.no_any_session.map { |s| s.description_with_month_and_day }
+  filter :depart_session, label: "Session of Departure", as: :select, collection: CampOccurrence.no_any_session.map { |s| s.description_with_month_and_day }
   filter :arrival_date
   filter :depart_date, label: "Departure Date"
 
