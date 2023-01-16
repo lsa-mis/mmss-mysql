@@ -1,7 +1,6 @@
 ActiveAdmin.register Travel do
   menu parent: 'Applicant Info', priority: 3
 
-  config.filters = false
   # See permitted parameters documentation:
   # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
   #
@@ -18,6 +17,15 @@ ActiveAdmin.register Travel do
   #   permitted << :other if params[:action] == 'create' && current_user.admin?
   #   permitted
   # end
+
+  filter :enrollment_applicant_detail_lastname_start, label: "Last Name (Starts with)"
+  filter :enrollment_applicant_detail_firstname_start, label: "First Name (Starts with)"
+  filter :arrival_session, label: "Session of Arrival", as: :select, collection: CampOccurrence.no_any_session.map { |s| s.description_with_month_and_day }
+  filter :depart_session, label: "Session of Departure", as: :select, collection: CampOccurrence.no_any_session.map { |s| s.description_with_month_and_day }
+  filter :arrival_date
+  filter :depart_date, label: "Departure Date"
+  filter :arrival_transport, as: :select
+  filter :depart_transport, label: "Departure Transport", as: :select
 
   index do
     selectable_column
