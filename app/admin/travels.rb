@@ -24,13 +24,8 @@ ActiveAdmin.register Travel do
   filter :depart_session, label: "Session of Departure", as: :select, collection: CampOccurrence.no_any_session.map { |s| s.description_with_month_and_day }
   filter :arrival_date
   filter :depart_date, label: "Departure Date"
-  filter :arrival_transport, as: :select, collection: ['Airplane', 'Bus', 'Train', 
-                                          'Automobile - parent or permitted designee is driving me to the University of Michigan campus', 
-                                          'I am a daily MMSS commuter']
-  filter :depart_transport, label: "Departure Transport", as: :select, collection: ['Airplane', 'Bus', 'Train', 
-                                          'Automobile - parent or permitted designee is driving me to the University of Michigan campus', 
-                                          'I am a daily MMSS commuter']
-
+  filter :arrival_transport, as: :select
+  filter :depart_transport, label: "Departure Transport", as: :select
 
   index do
     selectable_column
