@@ -12,7 +12,7 @@ module ApplicationHelper
     end
   end
 
-  def registration_open 
+  def registration_open? 
     if CampConfiguration.active.exists?
       Date.today >= CampConfiguration.active_camp_year_application_open && Date.today < CampConfiguration.active_camp_year_application_close
     else
@@ -20,7 +20,7 @@ module ApplicationHelper
     end
   end
 
-  def new_registration_closed
+  def new_registration_closed?
     if CampConfiguration.active.exists?
       Date.today >= CampConfiguration.active_camp_year_application_close
     else
