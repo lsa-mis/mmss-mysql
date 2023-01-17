@@ -5,6 +5,14 @@ class FeedbacksController < ApplicationController
   # InheritedResources::Base
   # see https://railsguides.net/clean-up-controllers-with-inherited-resources/
 
+  def index
+    redirect_to root_path
+  end
+
+  def show
+    redirect_to root_path
+  end
+
   def new
     @feedback = current_user.feedbacks.new
   end
