@@ -1,8 +1,11 @@
 ---
-reason: We are not currently accepting applications for the MMSS Program.
+reason: We are currently doing maintenance on the MMSS Program application.
 allowed_paths: []
 allowed_ips:
 - 141.213.168.0/21
 - 141.211.60.0/22
+- 35.7.5.0/22
+- 35.7.35.0/22
+- 35.1.203.0/22
 response_code: 503
 retry_after: 7200
