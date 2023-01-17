@@ -71,10 +71,11 @@ Rails.application.configure do
   # https://stackoverflow.com/questions/24443920/how-to-setup-postfix-for-ruby-on-rails-to-send-email
   config.action_mailer.delivery_method = :sendmail
   # Defaults to:
-  # config.action_mailer.sendmail_settings = {
-  #   location: '/usr/sbin/sendmail',
-  #   arguments: '-i -t'
-  # }
+  config.action_mailer.sendmail_settings = {
+    location: '/usr/sbin/sendmail',
+    arguments: ['-i']
+    # arguments: '-i -t'
+  }
   config.action_mailer.perform_deliveries = true
   config.action_mailer.default_options = {from: 'mmss-support@umich.edu'}
 
