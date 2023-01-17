@@ -1,4 +1,4 @@
-<% if user_signed_in? %>
+<% if user_signed_in? && registration_open? %>
   <% if current_user.applicant_detail.blank? %>
     <div class="m-2">
         <%= link_to 'Registration', new_applicant_detail_path,
@@ -176,14 +176,14 @@
 
 <% else %>
   <% if @active_camp_exists %>
-    <% if registration_open %>
+    <% if registration_open? %>
       <div class="mt-2">
         <%= link_to 'Sign up', new_user_registration_path,
                   class: "btn btn-blue"  %>
         <%= link_to 'Returning User - Sign In', new_user_session_path,
                     class: "btn btn-blue" %>
       </div>
-    <% elsif new_registration_closed %>
+    <% elsif new_registration_closed? %>
       <div class="mt-2">
         <p class='direction_notes mb-2' >We have closed the registration for new applications.</p>
         <%= link_to 'Returning User - Sign In', new_user_session_path,
