@@ -37,7 +37,9 @@
   </div>
   <div class="w-full flex justify-center">
     <div class="mr-5">
-      <%= link_to 'Feedback', new_feedback_path, class: "btn btn-sm btn-blue" %>
+      <% if current_user %>
+        <%= link_to 'Feedback', new_feedback_path, class: "btn btn-sm btn-blue" %>
+      <% end %>
     </div>
     <div class="copyright">
       Copyright <%= Time.now.year %> | <%= link_to 'The Regents of the University of Michigan', 'https://regents.umich.edu' %>
