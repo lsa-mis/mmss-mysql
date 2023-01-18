@@ -10,7 +10,7 @@ class FacultiesController < ApplicationController
 
   def student_list
     @course = Course.find(params[:id])
-    enrollment_ids = CourseAssignment.where(course_id: params[:id]).pluck(:enrollment_id)
+    enrollment_ids = CourseAssignment.where(course_id: params[:id], wait_list: false).pluck(:enrollment_id)
     @students = Enrollment.where(id: enrollment_ids)
   end
 
