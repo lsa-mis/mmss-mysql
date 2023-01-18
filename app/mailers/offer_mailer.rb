@@ -6,7 +6,7 @@ class OfferMailer < ApplicationMailer
     @offer_letter_text = CampConfiguration.active.last.offer_letter
     @application = ApplicantDetail.find_by(user_id: user)
     @enrollment = Enrollment.current_camp_year_applications.find_by(user_id: user)
-    @assigned_courses = @enrollment.course_assignments
+    @assigned_courses = @enrollment.course_assignments.where(wait_list: false)
     @assigned_sessions = @enrollment.session_assignments
     @url = ConstantData::HOST_URL
     @camp_config = CampConfiguration.find_by(active: true)
