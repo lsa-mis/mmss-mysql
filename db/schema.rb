@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_12_26_143012) do
+ActiveRecord::Schema.define(version: 2023_01_18_135603) do
 
   create_table "active_admin_comments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "namespace"
@@ -158,7 +158,7 @@ ActiveRecord::Schema.define(version: 2022_12_26_143012) do
     t.bigint "course_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.boolean "waiting_list", default: false
+    t.boolean "wait_list", default: false
     t.index ["course_id"], name: "index_course_assignments_on_course_id"
     t.index ["enrollment_id"], name: "index_course_assignments_on_enrollment_id"
   end
@@ -355,12 +355,9 @@ ActiveRecord::Schema.define(version: 2022_12_26_143012) do
 
   create_table "travels", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "enrollment_id", null: false
-    t.string "direction"
-    t.string "transport_needed"
-    t.datetime "date"
-    t.string "mode"
-    t.string "carrier"
-    t.string "route_num"
+    t.string "arrival_transport"
+    t.string "arrival_carrier"
+    t.string "arrival_route_num"
     t.text "note"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
