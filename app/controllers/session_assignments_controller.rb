@@ -32,6 +32,11 @@ class SessionAssignmentsController < ApplicationController
         if @course_assignment.present?
           @course_assignment.destroy
         end
+        # destroy wait_list assignments too (if they exist)
+        waiting_list = CourseAssignment.find_by(enrollment_id: @session_assignment.enrollment_id, course_id: CampOccurrence.find(@session_assignment.camp_occurrence_id).courses.ids, wait_list: true)
+        if waiting_list.present?
+          waiting_list.destroy
+        end
         status_array = SessionAssignment.where(enrollment_id: @current_enrollment).pluck(:offer_status)
         if status_array.count("declined") == status_array.size
           enroll_id = @session_assignment.enrollment_id
@@ -61,7 +66,7 @@ class SessionAssignmentsController < ApplicationController
     end
 
     def set_course_assignment
-       @course_assignment = CourseAssignment.find_by(enrollment_id: @session_assignment.enrollment_id, course_id: CampOccurrence.find(@session_assignment.camp_occurrence_id).courses.ids)
+      @course_assignment = CourseAssignment.find_by(enrollment_id: @session_assignment.enrollment_id, course_id: CampOccurrence.find(@session_assignment.camp_occurrence_id).courses.ids, wait_list: false)
     end
 
     def session_assignment_params
