@@ -119,7 +119,7 @@
               <div>
                 <%= sa.camp_occurrence.display_name %>
                 <div>
-                  <% course_ids = CourseAssignment.where(enrollment_id: current_enrollment).pluck(:course_id) %>
+                  <% course_ids = CourseAssignment.where(enrollment_id: current_enrollment, wait_list: false).pluck(:course_id) %>
                   Course:
                   <% if Course.find_by(id: course_ids, camp_occurrence_id: sa.camp_occurrence_id) %>
                     <%= Course.find_by(id: course_ids, camp_occurrence_id: sa.camp_occurrence_id).title %>
@@ -130,6 +130,15 @@
               </div>
               <% end %>
             <% end %>
+            <div>
+              <% course_ids = CourseAssignment.where(enrollment_id: current_enrollment, wait_list: true).pluck(:course_id) %>
+              <% if course_ids.present? %>
+                <div class="text-xs font-semibold">Wait list courses:</div>
+                <% Course.where(id: course_ids).each do |course| %>
+                  <%= course.display_name %>
+                <% end %>
+              <% end %>
+            </div>
             <hr>
             <h4>Download and return the <br>
               <div class="my-2">
