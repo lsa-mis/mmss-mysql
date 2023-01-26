@@ -6,7 +6,7 @@ ActiveAdmin.register CourseAssignment do
   #
   # Uncomment all parameters which should be permitted for assignment
   #
-   permit_params :enrollment_id, :course_id
+   permit_params :enrollment_id, :course_id, :wait_list
 
    filter :enrollment_id, as: :select, collection: -> { Enrollment.current_camp_year_applications.map { |enrol| [enrol.display_name.downcase, enrol.id]}.sort}
    filter :course_id, as: :select, collection: Course.where(camp_occurrence_id: CampOccurrence.active).order(camp_occurrence_id: :asc, title: :asc)
@@ -16,6 +16,7 @@ ActiveAdmin.register CourseAssignment do
       f.input :enrollment_id, as: :select, collection: Enrollment.current_camp_year_applications.map { |enrol| [enrol.display_name.downcase, enrol.id]}.sort
       f.input :course_id, label: "Course", as: :select, collection: Course.where(camp_occurrence_id: CampOccurrence.active)
     end
+    f.inputs :wait_list
     f.actions
   end
 
@@ -26,6 +27,7 @@ ActiveAdmin.register CourseAssignment do
     column "Course" do |ca|
       ca.course
     end
+    column :wait_list
     column :created_at
     column :updated_at
   end
@@ -36,6 +38,7 @@ ActiveAdmin.register CourseAssignment do
     row "Course" do |ca|
       ca.course
     end
+    row :wait_list
     row :created_at
     row :updated_at
     end

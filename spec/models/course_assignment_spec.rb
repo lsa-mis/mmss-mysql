@@ -7,6 +7,7 @@
 #  course_id     :bigint           not null
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
+#  wait_list     :boolean          default(FALSE)
 #
 require 'rails_helper'
 

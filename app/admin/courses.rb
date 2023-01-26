@@ -48,6 +48,9 @@ ActiveAdmin.register Course do
     column "Open Spaces" do |op|
       op.available_spaces - CourseAssignment.number_of_assignments(op.id)
     end
+    column "Wait List" do |op|
+      CourseAssignment.wait_list_number(op.id)
+    end
     column :faculty_uniqname
     column :faculty_name
     column :status
@@ -66,12 +69,32 @@ ActiveAdmin.register Course do
       row "Open Spaces" do |op|
         op.available_spaces - CourseAssignment.number_of_assignments(op.id)
       end
+      row "Wait List" do |op|
+        CourseAssignment.wait_list_number(op.id)
+      end
       row :faculty_uniqname
       row :faculty_name
       row :status
       row :created_at
       row :updated_at
     end
+    panel "List of students" do
+      enrollment_ids = CourseAssignment.where(course_id: course).order(:wait_list).pluck(:enrollment_id)
+        students = enrollment_ids.collect { |id| Enrollment.find(id) }
+        if students.present?
+          table_for students do
+            column "Name" do |student| 
+              link_to("#{student.applicant_detail.full_name}", admin_application_path(student))
+            end
+            column "Name" do |student|
+              student.user.email
+            end
+            column :waiting_list do |student|
+              CourseAssignment.find_by(course_id: course, enrollment_id: student).wait_list
+            end
+          end
+        end
+      end
     active_admin_comments
   end
 

@@ -17,7 +17,7 @@ ActiveAdmin.register Enrollment, as: "Application" do
                   :offer_status, :partner_program, :transcript, :student_packet, 
                   :application_deadline, :vaccine_record, :covid_test_record, :uniqname,
                   session_assignments_attributes: [:id, :camp_occurrence_id, :_destroy ],
-                  course_assignments_attributes: [:id, :course_id, :_destroy ]
+                  course_assignments_attributes: [:id, :course_id, :wait_list, :_destroy ]
 
   scope :current_camp_year_applications, :default => true, label: "Current years Applications"
   scope :all
@@ -118,8 +118,9 @@ ActiveAdmin.register Enrollment, as: "Application" do
                   allow_destroy: true,
                   new_record: true do |a|
                     a.input :course_id, as: :select, collection:
-                    application.course_registrations.order(:camp_occurrence_id).map{|u| ["#{u.title}, #{u.camp_occurrence.description}, 
-                    rank - #{application.course_preferences.find_by(course_id: u.id).ranking}, available - #{u.available_spaces - CourseAssignment.number_of_assignments(u.id)}", u.id]}
+                      application.course_registrations.order(:camp_occurrence_id).map{|u| ["#{u.title}, #{u.camp_occurrence.description}, 
+                      rank - #{application.course_preferences.find_by(course_id: u.id).ranking}, available - #{u.available_spaces - CourseAssignment.number_of_assignments(u.id)}", u.id]}
+                    a.input :wait_list
                   end
     end
     if application.session_assignments.any? and application.course_assignments.any?
@@ -225,6 +226,7 @@ ActiveAdmin.register Enrollment, as: "Application" do
           column "Session" do |item| 
             item.course.camp_occurrence.description 
           end
+          column :wait_list
         end
 
         table_for application.course_preferences do
