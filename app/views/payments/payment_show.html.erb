@@ -205,6 +205,9 @@
                   <p>
                     <%= "Message: #{payment.result_message}" %>
                   </p>
+                  <p class="text-xs ml-2">
+                    <%= "Status: #{transaction_status_message(payment.transaction_status)}" %>
+                  </p>
                   <p>
                     <%= "Amount: #{humanized_money_with_symbol(payment.total_amount.to_f / 100 )}" %>
                   </p>
