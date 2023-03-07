@@ -159,4 +159,19 @@ module ApplicationHelper
     field.strftime("%I:%M %p") unless field.blank?
   end
 
+  def transaction_status_message(transaction_status)
+    case transaction_status
+      when "1"
+        "Accepted credit card (successful)"
+      when "2"
+        "Rejected credit card (declined)"
+      when "3"
+        "Error credit card (error)"
+      when "4"
+        "Unknown credit card error (unknown)"
+      else
+        "Transaction Status not returned"
+      end
+    end
+
 end
