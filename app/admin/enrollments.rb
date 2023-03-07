@@ -273,6 +273,7 @@ ActiveAdmin.register Enrollment, as: "Application" do
           column(:id) { |aid| link_to(aid.id, admin_payment_path(aid.id)) }
           column(:account_type) { |atype| atype.account_type.titleize }
           column(:transaction_date) {|td| Date.parse(td.transaction_date) }
+          column(:transaction_status) {|ts| transaction_status_message(ts.transaction_status) }
           column(:total_amount) { |ta|  humanized_money_with_symbol(ta.total_amount.to_f / 100) }
         end
       end
