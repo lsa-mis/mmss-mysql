@@ -12,6 +12,7 @@ ActiveAdmin.register_page "Reports" do
           li link_to "report - Accepted Course Assignments with Students", admin_reports_accepted_course_assignments_with_students_path
           li link_to "report - Complete Application with Course Preferences", admin_reports_complete_applications_with_course_preferences_path
           li link_to "report - Waitlisted Application with Course Preferences", admin_reports_waitlisted_applications_with_course_preferences_path
+          li link_to "report - Finaid with App and Offer Status", admin_reports_finaid_with_app_and_offer_status_path
         end
         text_node "----- ENROLLED USERS -----".html_safe
         ul do
@@ -231,6 +232,22 @@ ActiveAdmin.register_page "Reports" do
       WHERE campyear = #{CampConfiguration.active.last.camp_year} AND application_status = 'waitlisted'
       ORDER BY e.id, co.description, cp.ranking"
       title = "waitlisted_applications_with_course_preferences"
+
+      data = data_to_csv(query, title)
+      respond_to do |format|
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv"}
+      end
+    end
+
+    def finaid_with_app_and_offer_status
+      query = "SELECT ad.firstname, ad.lastname, u.email, enroll.application_status, enroll.offer_status
+      FROM financial_aids AS fa
+      JOIN enrollments AS enroll ON fa.enrollment_id = enroll.id
+      JOIN applicant_details AS ad ON enroll.user_id = ad.user_id
+      JOIN users AS u ON enroll.user_id = u.id
+      WHERE enroll.campyear = #{CampConfiguration.active.last.camp_year}
+      ORDER BY enroll.application_status, enroll.offer_status"
+      title = "finaid_with_app_and_offer_status"
 
       data = data_to_csv(query, title)
       respond_to do |format|
