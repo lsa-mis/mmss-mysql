@@ -27,6 +27,9 @@ class FinancialAid < ApplicationRecord
   validate :acceptable_taxform
   validate :set_deadline
 
+  scope :current_camp_requests, -> { where(enrollment_id: Enrollment.current_camp_year_applications) }
+
+
   private
 
   def acceptable_taxform

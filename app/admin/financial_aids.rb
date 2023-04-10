@@ -19,6 +19,9 @@ ActiveAdmin.register FinancialAid, as: "Financial Aid Request" do
   filter :status, as: :select 
   filter :source, as: :select
 
+  scope :current_camp_requests
+  scope :all
+
   form do |f| # This is a formtastic form builder
     f.semantic_errors # shows errors on :base
     f.inputs do
