@@ -132,4 +132,42 @@ ActiveAdmin.register Travel do
     f.actions
   end
 
+  csv do
+    column "Name" do |travel|
+      travel.enrollment.applicant_detail.full_name
+    end
+    column "email" do |travel|
+      travel.enrollment.user.email
+    end
+    column :arrival_session
+    column :depart_session
+    column :arrival_transport
+    column :arrival_carrier
+    column :arrival_route_num
+    column :arrival_date do |travel|
+      if travel.arrival_date.present?
+        travel.arrival_date.strftime("%A, %d %b %Y")
+      end
+    end
+    column :arrival_time do |travel|
+      if travel.arrival_time.present?
+        travel.arrival_time.strftime("%I:%M %p")
+      end
+    end
+    column :depart_transport
+    column :depart_carrier
+    column :depart_route_num
+    column :depart_date do |travel|
+      if travel.depart_date.present?
+        travel.depart_date.strftime("%A, %d %b %Y")
+      end
+    end
+    column :depart_time do |travel|
+      if travel.depart_time.present?
+        travel.depart_time.strftime("%A, %d %b %Y")
+      end
+    end
+    column :note
+  end
+
 end
