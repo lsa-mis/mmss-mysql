@@ -58,7 +58,7 @@ ActiveAdmin.register Travel do
     end
     column :depart_time do |travel|
       if travel.depart_time.present?
-        travel.depart_time.strftime("%A, %d %b %Y")
+        travel.depart_time.strftime("%I:%M %p")
       end
     end
     column :note
@@ -89,7 +89,7 @@ ActiveAdmin.register Travel do
       row :depart_route_num
       row :depart_date do |travel|
         if travel.depart_date.present?
-          travel.depart_date.strftime("%I:%M %p")
+          travel.depart_date.strftime("%A, %d %b %Y")
         end
       end
       row :depart_time do |travel|
@@ -164,7 +164,7 @@ ActiveAdmin.register Travel do
     end
     column :depart_time do |travel|
       if travel.depart_time.present?
-        travel.depart_time.strftime("%A, %d %b %Y")
+        travel.depart_time.strftime("%I:%M %p")
       end
     end
     column :note
