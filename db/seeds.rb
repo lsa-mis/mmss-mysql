@@ -38,8 +38,8 @@ gender = Gender.create([
   {name: "Male", description: "dude"}
 ])
 
-camp_configuration = CampConfiguration.create([
-  {camp_year: 2021, application_open: "2021-01-01", application_close: "2021-05-01", priority: "2021-04-01", application_materials_due: "2021-05-20", camper_acceptance_due: "2021-06-01", application_fee_cents: 10000, active: true}
+camp_configuration = CampConfiguration.create!([
+  {camp_year: 2021, application_open: "2021-01-01", application_close: "2021-05-01", priority: "2021-04-01", application_materials_due: "2021-05-20", camper_acceptance_due: "2021-06-01", application_fee_cents: 10000, active: true, offer_letter: "offer", waitlist_letter: "wait", reject_letter: "reject"}
 ])
 
 camp_config = CampConfiguration.active.first
