@@ -3,17 +3,15 @@ default: &default
   encoding: utf8mb4
   collation: utf8mb4_unicode_ci
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  username: root
+  password: <%= ENV['LOCAL_MYSQL_DATABASE_PASSWORD'] %>
 
 development:
   <<: *default
-  username: root
-  password: <%= Rails.application.credentials.mysql[:local_password] %>
   database: mmss-mysql_development
 
 test:
   <<: *default
-  username: root
-  password: <%= Rails.application.credentials.mysql[:local_password] %>
   database: mmss-mysql_test
 
 production:
