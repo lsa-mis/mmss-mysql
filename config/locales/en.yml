@@ -43,6 +43,11 @@ en:
       delimiter: ","
       separator: "."
 
+  activerecord:
+    attributes:
+      applicant_detail:
+        demographic: "Race/Ethnicity"
+
   helpers:
     label:
       applicant_detail:
@@ -67,6 +72,7 @@ en:
         birthdate: "Birthdate*"
         gender: "Gender*"
         shirt_size: "Shirt size*"
+        demographic: "Race/Ethnicity*"
       
       enrollment:
         high_school_state: "High school state (Select Non-US if international)*"
