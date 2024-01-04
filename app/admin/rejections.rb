@@ -16,7 +16,7 @@ ActiveAdmin.register Rejection do
   #   permitted
   # end
 
-  filter :enrollment_id, as: :select, collection: Enrollment.current_camp_year_applications.map { |enrol| [enrol.display_name.downcase, enrol.id]}.sort
+  filter :enrollment_id, as: :select, collection: Proc.new { Enrollment.current_camp_year_applications.map { |enrol| [enrol.display_name.downcase, enrol.id]}.sort }
 
   form do |f| # This is a formtastic form builder
     f.semantic_errors # shows errors on :base

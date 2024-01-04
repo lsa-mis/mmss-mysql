@@ -15,7 +15,7 @@ ActiveAdmin.register FinancialAid, as: "Financial Aid Request" do
   #   permitted << :other if params[:action] == 'create' && current_user.admin?
   #   permitted
   # end
-  filter :enrollment_id, as: :select, collection: Enrollment.current_camp_year_applications.map { |enrol| [enrol.display_name.downcase, enrol.id]}.sort
+  filter :enrollment_id, as: :select, collection: Proc.new { Enrollment.current_camp_year_applications.map { |enrol| [enrol.display_name.downcase, enrol.id]}.sort }
   filter :status, as: :select 
   filter :source, as: :select
 
