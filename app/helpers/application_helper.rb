@@ -140,7 +140,8 @@ module ApplicationHelper
     [
       ['9', '9'],
       ['10', '10'],
-      ['11', '11']
+      ['11', '11'],
+      ['Other', 'Other']
     ]
   end
 
