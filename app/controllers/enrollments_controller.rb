@@ -64,7 +64,7 @@ class EnrollmentsController < ApplicationController
         format.html { redirect_to root_path, notice: 'Application was successfully updated.' }
         format.json { render :show, status: :ok, location: @current_enrollment }
       else
-        if @current_enrollment.errors.include?(:student_packet) || @current_enrollment.errors.include?(:vaccine_record) || @current_enrollment.errors.include?(:covid_test_record)
+        if @current_enrollment.errors.include?(:student_packet)
           format.html { redirect_to root_path, alert: @current_enrollment.errors.full_messages.to_sentence }
         else
           format.html { render :edit }
@@ -165,7 +165,6 @@ class EnrollmentsController < ApplicationController
                           :application_status, :offer_status,
                           :partner_program, :transcript,
                           :student_packet, :campyear,
-                          :vaccine_record, :covid_test_record,
                           registration_activity_ids: [],
                           session_registration_ids: [],
                           course_registration_ids: [])
