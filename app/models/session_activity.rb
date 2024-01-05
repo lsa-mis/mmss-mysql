@@ -12,5 +12,11 @@ class SessionActivity < ApplicationRecord
   belongs_to :enrollment
   belongs_to :camp_occurrence
 
+  def self.ransackable_associations(auth_object = nil)
+    ["camp_occurrence", "enrollment"]
+  end
 
+  def self.ransackable_attributes(auth_object = nil)
+    ["camp_occurrence_id", "created_at", "enrollment_id", "id", "updated_at"]
+  end
 end

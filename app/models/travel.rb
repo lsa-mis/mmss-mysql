@@ -25,4 +25,11 @@ class Travel < ApplicationRecord
 
   validates :arrival_transport, :depart_transport, :arrival_session, :depart_session, presence: true
 
+  def self.ransackable_attributes(auth_object = nil)
+    ["arrival_carrier", "arrival_date", "arrival_route_num", "arrival_session", "arrival_time", "arrival_transport", "created_at", "depart_carrier", "depart_date", "depart_route_num", "depart_session", "depart_time", "depart_transport", "enrollment_id", "id", "note", "updated_at"]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    ["enrollment"]
+  end
 end

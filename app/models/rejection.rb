@@ -31,4 +31,12 @@ class Rejection < ApplicationRecord
     Enrollment.find(enrollment_id).update!(application_status: "rejected", application_status_updated_on: Date.today, offer_status: "")
   end
 
+  def self.ransackable_associations(auth_object = nil)
+    ["enrollment"]
+  end
+
+  def self.ransackable_attributes(auth_object = nil)
+    ["created_at", "enrollment_id", "id", "reason", "updated_at"]
+  end
+
 end
