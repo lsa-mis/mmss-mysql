@@ -165,7 +165,7 @@
 
   <div class="field">
     <%= form.label :year_in_school, "What grade year are you in at school?" %>
-    <%= form.text_field :year_in_school, required: true %>
+    <%= form.select :year_in_school, year_in_school, include_blank: "*Select*", required: true %>
   </div>
 
   <div class="field">

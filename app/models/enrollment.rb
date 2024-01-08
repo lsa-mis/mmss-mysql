@@ -187,4 +187,11 @@ class Enrollment < ApplicationRecord
     end
   end
 
+  def self.ransackable_attributes(auth_object = nil)
+    ["anticipated_graduation_year", "application_deadline", "application_status", "application_status_updated_on", "campyear", "created_at", "high_school_address1", "high_school_address2", "high_school_city", "high_school_country", "high_school_name", "high_school_non_us", "high_school_postalcode", "high_school_state", "id", "international", "notes", "offer_status", "partner_program", "personal_statement", "room_mate_request", "uniqname", "updated_at", "user_id", "year_in_school"]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    ["applicant_detail", "course_assignments", "course_preferences", "course_registrations", "covid_test_record_attachment", "covid_test_record_blob", "enrollment_activities", "financial_aids", "recommendation", "registration_activities", "rejection", "session_activities", "session_assignments", "session_registrations", "student_packet_attachment", "student_packet_blob", "transcript_attachment", "transcript_blob", "travels", "user", "vaccine_record_attachment", "vaccine_record_blob"]
+  end
 end

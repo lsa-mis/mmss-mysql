@@ -24,6 +24,10 @@ class Campnote < ApplicationRecord
     if closedate < opendate
       errors.add(:closedate, "must be after the start date")
     end
- end
+  end
+
+  def self.ransackable_attributes(auth_object = nil)
+    ["closedate", "created_at", "id", "note", "notetype", "opendate", "updated_at"]
+  end
 
 end
