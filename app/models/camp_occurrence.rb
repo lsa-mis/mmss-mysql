@@ -59,4 +59,12 @@ class CampOccurrence < ApplicationRecord
     "#{self.description}: #{self.begin_date.strftime('%B %d')} to #{self.end_date.strftime('%B %d')}"
   end
 
+  def self.ransackable_associations(auth_object = nil)
+    ["activities", "camp_configuration", "courses", "enrollments", "session_activities", "session_assignments"]
+  end
+
+  def self.ransackable_attributes(auth_object = nil)
+    ["active", "begin_date", "camp_configuration_id", "cost_cents", "created_at", "description", "end_date", "id", "updated_at"]
+  end
+
 end

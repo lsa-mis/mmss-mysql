@@ -28,4 +28,11 @@ class Course < ApplicationRecord
     "#{self.title} - #{self.camp_occurrence.description}" # or whatever column you want
   end
 
+  def self.ransackable_associations(auth_object = nil)
+    ["camp_occurrence", "course_assignments", "course_preferences", "enrolled_users"]
+  end
+
+  def self.ransackable_attributes(auth_object = nil)
+    ["available_spaces", "camp_occurrence_id", "created_at", "faculty_name", "faculty_uniqname", "id", "status", "title", "updated_at"]
+  end
 end

@@ -39,13 +39,13 @@ class ApplicantDetail < ApplicationRecord
   belongs_to :user, required: true, inverse_of: :applicant_detail
 
   validates :user_id, uniqueness: true
-
   validates :firstname, presence: true
   validates :lastname, presence: true
   # validates :us_citizen, presence: true
   validates :gender, presence: true
   validates :birthdate, presence: true
   validates :shirt_size, presence: true
+  validates :demographic, presence: true
   validates :address1, presence: true
   validates :city, presence: true
   validates :state, presence: { message: "needs to be selected or if you are
@@ -53,7 +53,6 @@ class ApplicantDetail < ApplicationRecord
   validates :postalcode, presence: true
   validates :country, presence: true
   validates :phone, presence: true, format: { with: /\A(\+|00)?[0-9][0-9 \-?\(\)\.]{7,}\z/, message: "number format is incorrect"}
-
   validates :parentname, presence: true
   validates :parentphone, presence: true, format: { with: /\A(\+|00)?[0-9][0-9 \-?\(\)\.]{7,}\z/, message: "number format is incorrect"}
   validates :parentemail, presence: true, length: {maximum: 255},
@@ -94,4 +93,11 @@ class ApplicantDetail < ApplicationRecord
     end
   end
 
+  def self.ransackable_associations(auth_object = nil)
+    ["user"]
+  end
+
+  def self.ransackable_attributes(auth_object = nil)
+    ["address1", "address2", "birthdate", "city", "country", "created_at", "demographic", "diet_restrictions", "firstname", "gender", "id", "lastname", "middlename", "parentaddress1", "parentaddress2", "parentcity", "parentcountry", "parentemail", "parentname", "parentphone", "parentstate", "parentstate_non_us", "parentworkphone", "parentzip", "phone", "postalcode", "shirt_size", "state", "state_non_us", "updated_at", "us_citizen", "user_id"]
+  end
 end

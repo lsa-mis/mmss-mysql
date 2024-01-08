@@ -14,4 +14,12 @@ class Feedback < ApplicationRecord
 
   validates :genre, presence: true
   validates :message, presence: true
+
+  def self.ransackable_associations(auth_object = nil)
+    ["user"]
+  end
+
+  def self.ransackable_attributes(auth_object = nil)
+    ["created_at", "genre", "id", "message", "updated_at", "user_id"]
+  end
 end

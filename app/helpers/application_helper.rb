@@ -136,6 +136,15 @@ module ApplicationHelper
     ]
   end
 
+  def year_in_school
+    [
+      ['9', '9'],
+      ['10', '10'],
+      ['11', '11'],
+      ['Other', 'Other']
+    ]
+  end
+
   def show_international(international)
     if international
       "yes"

@@ -15,4 +15,11 @@ class EnrollmentActivity < ApplicationRecord
   validates_presence_of :enrollment
   validates_presence_of :activity
 
+  def self.ransackable_associations(auth_object = nil)
+    ["activity", "enrollment"]
+  end
+
+  def self.ransackable_attributes(auth_object = nil)
+    ["activity_id", "created_at", "enrollment_id", "id", "updated_at"]
+  end
 end
