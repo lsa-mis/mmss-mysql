@@ -93,4 +93,11 @@ class ApplicantDetail < ApplicationRecord
     end
   end
 
+  def self.ransackable_associations(auth_object = nil)
+    ["user"]
+  end
+
+  def self.ransackable_attributes(auth_object = nil)
+    ["address1", "address2", "birthdate", "city", "country", "created_at", "demographic", "diet_restrictions", "firstname", "gender", "id", "lastname", "middlename", "parentaddress1", "parentaddress2", "parentcity", "parentcountry", "parentemail", "parentname", "parentphone", "parentstate", "parentstate_non_us", "parentworkphone", "parentzip", "phone", "postalcode", "shirt_size", "state", "state_non_us", "updated_at", "us_citizen", "user_id"]
+  end
 end

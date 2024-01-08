@@ -72,5 +72,12 @@ class FinancialAid < ApplicationRecord
     end
   end
     
+  def self.ransackable_associations(auth_object = nil)
+    ["enrollment", "taxform_attachment", "taxform_blob"]
+  end
+
+  def self.ransackable_attributes(auth_object = nil)
+    ["amount_cents", "created_at", "enrollment_id", "id", "note", "payments_deadline", "source", "status", "updated_at"]
+  end
 
 end

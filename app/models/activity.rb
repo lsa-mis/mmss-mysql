@@ -32,4 +32,12 @@ class Activity < ApplicationRecord
   def display_name
     "#{self.description} - #{self.camp_occurrence.description}" # or whatever column you want
   end
+
+  def self.ransackable_associations(auth_object = nil)
+    ["camp_occurrence", "enrolled_users", "enrollment_activities"]
+  end
+
+  def self.ransackable_attributes(auth_object = nil)
+    ["active", "camp_occurrence_id", "cost_cents", "created_at", "date_occurs", "description", "id", "updated_at"]
+  end
 end

@@ -53,4 +53,12 @@ class Payment < ApplicationRecord
       end
     end
   end
+
+  def self.ransackable_associations(auth_object = nil)
+    ["user"]
+  end
+
+  def self.ransackable_attributes(auth_object = nil)
+    ["account_type", "camp_year", "created_at", "id", "payer_identity", "result_code", "result_message", "timestamp", "total_amount", "transaction_date", "transaction_hash", "transaction_id", "transaction_status", "transaction_type", "updated_at", "user_account", "user_id"]
+  end
 end
