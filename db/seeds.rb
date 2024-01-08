@@ -76,9 +76,9 @@ camp_configuration = CampConfiguration.first
 date1 = DateTime.new(Time.now.year, 6, 23)
 
 camp_configuration.camp_occurrences.create!([
-  {description: "Session 1", begin_date: date1, end_date: date1 + 12.days, cost_cents: 20000, active: true},
-  {description: "Session 2", begin_date: date1 + 14.days, end_date: date1 + 26.days, cost_cents: 20000, active: true},
-  {description: "Session 3", begin_date: date1 + 28.days, end_date: date1 + 40.days, cost_cents: 20000, active: true},
+  {description: "Session 1", begin_date: date1, end_date: date1 + 12.days, cost_cents: 10000, active: true},
+  {description: "Session 2", begin_date: date1 + 14.days, end_date: date1 + 26.days, cost_cents: 10000, active: true},
+  {description: "Session 3", begin_date: date1 + 28.days, end_date: date1 + 40.days, cost_cents: 10000, active: true},
   {description: "Any Session", begin_date: date1, end_date: date1 + 40.days, cost_cents: 0, active: true}
 ])
 
@@ -116,7 +116,6 @@ camp2.courses.create!([
   {title: "Forensic Physics", available_spaces: 16, status: "open", faculty_uniqname: "teach"},
   {title: "Mathematics and Music Theory", available_spaces: 16, status: "open", faculty_uniqname: "markum"},
   {title: "Mathematical Modeling in Biology", available_spaces: 16, status: "open", faculty_uniqname: "bohr"},
-  {title: "Forensic Physics", available_spaces: 16, status: "open", faculty_uniqname: "lawrence"},
   {title: "Catalysis, Solar Energy and Green Chemical Synthesis", available_spaces: 16, status: "open", faculty_uniqname: "lawrence"}
 ])
 
