@@ -15,7 +15,7 @@ ActiveAdmin.register Enrollment, as: "Application" do
                   :room_mate_request, :personal_statement, 
                   :shirt_size, :notes, :application_status, :application_status_updated_on, :campyear,
                   :offer_status, :partner_program, :transcript, :student_packet, 
-                  :application_deadline, :uniqname,
+                  :application_deadline, :vaccine_record, :covid_test_record, :uniqname,
                   session_assignments_attributes: [:id, :camp_occurrence_id, :_destroy ],
                   course_assignments_attributes: [:id, :course_id, :wait_list, :_destroy ]
 
@@ -33,6 +33,9 @@ ActiveAdmin.register Enrollment, as: "Application" do
   scope :no_letter, group: :missing
   scope :no_payments, group: :missing
   scope :no_student_packet, group: :missing
+
+  # scope :no_vaccine_record, group: :vaccine
+  # scope :no_covid_test_record, group: :vaccine
 
   action_item :set_waitlisted, only: :show do
     text_node link_to("Place on Wait List", waitlisted_path(application), data: { confirm: 'Are you sure you want to wait list this application?'}, method: :post ) if ["application complete"].include? application.application_status
@@ -77,9 +80,22 @@ ActiveAdmin.register Enrollment, as: "Application" do
             link_to item.student_packet.filename, url_for(item.student_packet)
           end
         end
+        # column "Vaccine Record" do |item| 
+        #   if item.vaccine_record.attached?
+        #     link_to item.vaccine_record.filename, url_for(item.vaccine_record)
+        #   end
+        # end
+        # column "COVID Test" do |item| 
+        #   if item.covid_test_record.attached?
+        #     link_to item.covid_test_record.filename, url_for(item.covid_test_record)
+        #   end
+        # end
+
       end
      f.input :transcript, as: :file, label: "Update transcript"
      f.input :student_packet, as: :file, label: "Update student_packet"
+    #  f.input :vaccine_record, as: :file, label: "Update vaccine_record"
+    #  f.input :covid_test_record, as: :file, label: "Update covid_test_record"
       hr
      f.input :notes
      f.input :partner_program
@@ -120,7 +136,7 @@ ActiveAdmin.register Enrollment, as: "Application" do
   filter :applicant_detail_lastname_start, label: "Last Name (Starts with)"
   filter :applicant_detail_firstname_start, label: "First Name (Starts with)"
   filter :international
-  filter :year_in_school, as: :select, collection: Proc.new { Enrollment.current_camp_year_applications.pluck(:year_in_school) }
+  filter :year_in_school, as: :select, collection: Enrollment.current_camp_year_applications.pluck(:year_in_school)
   filter :anticipated_graduation_year, as: :select
   filter :application_status, as: :select
   filter :offer_status, as: :select
@@ -144,6 +160,16 @@ ActiveAdmin.register Enrollment, as: "Application" do
         link_to sp.student_packet.filename, url_for(sp.student_packet)
       end
     end
+    # column "Vaccination Record" do |enroll|
+    #   if enroll.vaccine_record.attached?
+    #     link_to enroll.vaccine_record.filename, url_for(enroll.vaccine_record)
+    #   end
+    # end
+    # column "COVID Test" do |sp|
+    #   if sp.covid_test_record.attached?
+    #     link_to sp.covid_test_record.filename, url_for(sp.covid_test_record)
+    #   end
+    # end
     column :offer_status
     column :application_deadline
     column :application_status
@@ -334,6 +360,16 @@ ActiveAdmin.register Enrollment, as: "Application" do
           link_to sp.student_packet.filename, url_for(sp.student_packet)
         end
       end
+      # row :vaccine_record do |tr|
+      #   if tr.vaccine_record.attached?
+      #     link_to tr.vaccine_record.filename, url_for(tr.vaccine_record)
+      #   end
+      # end
+      # row :covid_test_record do |sp|
+      #   if sp.covid_test_record.attached?
+      #     link_to sp.covid_test_record.filename, url_for(sp.covid_test_record)
+      #   end
+      # end
       row :international
       row :high_school_name
       row :high_school_address1
