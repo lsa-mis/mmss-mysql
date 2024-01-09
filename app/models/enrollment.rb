@@ -55,7 +55,7 @@ class Enrollment < ApplicationRecord
   accepts_nested_attributes_for :course_assignments, allow_destroy: true
 
   has_many :financial_aids, dependent: :destroy
-  # has_many :travels, dependent: :destroy
+  has_many :travels, dependent: :destroy
   has_one :recommendation, dependent: :destroy
 
   has_one :rejection, dependent: :destroy
