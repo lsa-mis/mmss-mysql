@@ -326,24 +326,6 @@ ActiveAdmin.register Enrollment, as: "Application" do
       end
     end
 
-    panel "Travel Information" do
-      if application.travels.present?
-        table_for application.travels do
-          column "Session of Arrival" do |item|
-            item.arrival_session
-          end
-          column "Session of Departure" do |item|
-            item.depart_session
-          end
-          column "Travel Forms" do |item|
-            link_to("view", admin_travel_path(item))
-          end
-        end
-      else
-        text_node "There is no travel information"
-      end
-    end
-
     active_admin_comments
   end
 

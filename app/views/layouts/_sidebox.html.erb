@@ -72,19 +72,6 @@
           </div>
         <% end %>
 
-        <% if @current_enrollment.travels.present? %>
-          <% @current_enrollment.travels.each_with_index do |travel, index| %>
-            <% if travel.id.present? %>
-              <div class="sidebox_element">
-                <%= link_to enrollment_travel_path(@current_enrollment, travel) do %> 
-                  Travel Information <%= index+1 %>
-                <% end %>
-                - submitted
-              </div>
-            <% end %>
-          <% end %>
-        <% end %>
-
         <% if current_enrollment.offer_status == "offered" %>
           <hr>
           <% current_enrollment.session_assignments.each do |as| %>
