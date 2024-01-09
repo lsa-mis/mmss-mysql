@@ -34,8 +34,8 @@ ActiveAdmin.register Enrollment, as: "Application" do
   scope :no_payments, group: :missing
   scope :no_student_packet, group: :missing
 
-  scope :no_vaccine_record, group: :vaccine
-  scope :no_covid_test_record, group: :vaccine
+  # scope :no_vaccine_record, group: :vaccine
+  # scope :no_covid_test_record, group: :vaccine
 
   action_item :set_waitlisted, only: :show do
     text_node link_to("Place on Wait List", waitlisted_path(application), data: { confirm: 'Are you sure you want to wait list this application?'}, method: :post ) if ["application complete"].include? application.application_status
@@ -80,22 +80,22 @@ ActiveAdmin.register Enrollment, as: "Application" do
             link_to item.student_packet.filename, url_for(item.student_packet)
           end
         end
-        column "Vaccine Record" do |item| 
-          if item.vaccine_record.attached?
-            link_to item.vaccine_record.filename, url_for(item.vaccine_record)
-          end
-        end
-        column "COVID Test" do |item| 
-          if item.covid_test_record.attached?
-            link_to item.covid_test_record.filename, url_for(item.covid_test_record)
-          end
-        end
+        # column "Vaccine Record" do |item| 
+        #   if item.vaccine_record.attached?
+        #     link_to item.vaccine_record.filename, url_for(item.vaccine_record)
+        #   end
+        # end
+        # column "COVID Test" do |item| 
+        #   if item.covid_test_record.attached?
+        #     link_to item.covid_test_record.filename, url_for(item.covid_test_record)
+        #   end
+        # end
 
       end
      f.input :transcript, as: :file, label: "Update transcript"
      f.input :student_packet, as: :file, label: "Update student_packet"
-     f.input :vaccine_record, as: :file, label: "Update vaccine_record"
-     f.input :covid_test_record, as: :file, label: "Update covid_test_record"
+    #  f.input :vaccine_record, as: :file, label: "Update vaccine_record"
+    #  f.input :covid_test_record, as: :file, label: "Update covid_test_record"
       hr
      f.input :notes
      f.input :partner_program
@@ -160,16 +160,16 @@ ActiveAdmin.register Enrollment, as: "Application" do
         link_to sp.student_packet.filename, url_for(sp.student_packet)
       end
     end
-        column "Vaccination Record" do |enroll|
-      if enroll.vaccine_record.attached?
-        link_to enroll.vaccine_record.filename, url_for(enroll.vaccine_record)
-      end
-    end
-    column "COVID Test" do |sp|
-      if sp.covid_test_record.attached?
-        link_to sp.covid_test_record.filename, url_for(sp.covid_test_record)
-      end
-    end
+    # column "Vaccination Record" do |enroll|
+    #   if enroll.vaccine_record.attached?
+    #     link_to enroll.vaccine_record.filename, url_for(enroll.vaccine_record)
+    #   end
+    # end
+    # column "COVID Test" do |sp|
+    #   if sp.covid_test_record.attached?
+    #     link_to sp.covid_test_record.filename, url_for(sp.covid_test_record)
+    #   end
+    # end
     column :offer_status
     column :application_deadline
     column :application_status
@@ -205,45 +205,45 @@ ActiveAdmin.register Enrollment, as: "Application" do
       row :campyear
     end
 
-      panel "Session Assignment" do
-        table_for application.session_assignments do
-          column(:id) { |item| link_to(item.id, admin_session_assignment_path(item)) }
-          column ("Session") { |item| item.camp_occurrence.description }
-          column(:offer_status)
-        end
-
-        table_for application.session_registrations do
-          column "User Selected Sessions" do |item| 
-            item.description 
-          end
-        end
+    panel "Session Assignment" do
+      table_for application.session_assignments do
+        column(:id) { |item| link_to(item.id, admin_session_assignment_path(item)) }
+        column ("Session") { |item| item.camp_occurrence.description }
+        column(:offer_status)
       end
 
-      panel "Course Assignment" do
-        table_for application.course_assignments do
-          column(:id) { |item| link_to(item.id, admin_course_assignment_path(item)) }
-          column(:course_id) { |item| item.course.title }
-          column "Session" do |item| 
-            item.course.camp_occurrence.description 
-          end
-          column :wait_list
-        end
-
-        table_for application.course_preferences do
-          column "User Course Preference" do |item| 
-            item.course.title 
-          end
-          column "Rank" do |item| 
-            item.ranking 
-          end
-          column "Session" do |item| 
-            item.course.camp_occurrence.description 
-          end
-          column "Available" do |item| 
-            item.course.available_spaces - CourseAssignment.number_of_assignments(item.course_id)
-          end
+      table_for application.session_registrations do
+        column "User Selected Sessions" do |item| 
+          item.description 
         end
       end
+    end
+
+    panel "Course Assignment" do
+      table_for application.course_assignments do
+        column(:id) { |item| link_to(item.id, admin_course_assignment_path(item)) }
+        column(:course_id) { |item| item.course.title }
+        column "Session" do |item| 
+          item.course.camp_occurrence.description 
+        end
+        column :wait_list
+      end
+
+      table_for application.course_preferences do
+        column "User Course Preference" do |item| 
+          item.course.title 
+        end
+        column "Rank" do |item| 
+          item.ranking 
+        end
+        column "Session" do |item| 
+          item.course.camp_occurrence.description 
+        end
+        column "Available" do |item| 
+          item.course.available_spaces - CourseAssignment.number_of_assignments(item.course_id)
+        end
+      end
+    end
 
     panel "Activities/Services" do
       table_for Activity.where(camp_occurrence_id: application.session_assignments.accepted.pluck(:camp_occurrence_id)).order(:camp_occurrence_id).where(id: application.enrollment_activities.pluck(:activity_id)) do
@@ -342,16 +342,16 @@ ActiveAdmin.register Enrollment, as: "Application" do
           link_to sp.student_packet.filename, url_for(sp.student_packet)
         end
       end
-      row :vaccine_record do |tr|
-        if tr.vaccine_record.attached?
-          link_to tr.vaccine_record.filename, url_for(tr.vaccine_record)
-        end
-      end
-      row :covid_test_record do |sp|
-        if sp.covid_test_record.attached?
-          link_to sp.covid_test_record.filename, url_for(sp.covid_test_record)
-        end
-      end
+      # row :vaccine_record do |tr|
+      #   if tr.vaccine_record.attached?
+      #     link_to tr.vaccine_record.filename, url_for(tr.vaccine_record)
+      #   end
+      # end
+      # row :covid_test_record do |sp|
+      #   if sp.covid_test_record.attached?
+      #     link_to sp.covid_test_record.filename, url_for(sp.covid_test_record)
+      #   end
+      # end
       row :international
       row :high_school_name
       row :high_school_address1
