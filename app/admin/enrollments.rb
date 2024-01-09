@@ -136,7 +136,7 @@ ActiveAdmin.register Enrollment, as: "Application" do
   filter :applicant_detail_lastname_start, label: "Last Name (Starts with)"
   filter :applicant_detail_firstname_start, label: "First Name (Starts with)"
   filter :international
-  filter :year_in_school, as: :select, collection: Enrollment.current_camp_year_applications.pluck(:year_in_school)
+  filter :year_in_school, as: :select, collection: Proc.new { Enrollment.current_camp_year_applications.pluck(:year_in_school) }
   filter :anticipated_graduation_year, as: :select
   filter :application_status, as: :select
   filter :offer_status, as: :select
