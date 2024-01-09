@@ -62,6 +62,8 @@ class Enrollment < ApplicationRecord
 
   has_one_attached :transcript
   has_one_attached :student_packet
+  has_one_attached :vaccine_record
+  has_one_attached :covid_test_record
 
   validates :high_school_name, presence: true
   validates :high_school_address1, presence: true
@@ -77,7 +79,10 @@ class Enrollment < ApplicationRecord
 
   validate :validate_transcript_presence
   validate :acceptable_transcript
+
   validate :acceptable_student_packet
+  validate :acceptable_image
+
   validates :user_id, uniqueness: { scope: :campyear }
 
   scope :current_camp_year_applications, -> { where('campyear = ? ', CampConfiguration.active_camp_year) }
@@ -90,7 +95,9 @@ class Enrollment < ApplicationRecord
   scope :no_letter, -> { current_camp_year_applications.where(id: Recommendation.where.missing(:recupload).pluck(:enrollment_id)) }
   scope :no_payments, -> { current_camp_year_applications.where.not(user_id: Payment.where(camp_year: CampConfiguration.active.last.camp_year).pluck(:user_id)) }
   scope :no_student_packet, -> { current_camp_year_applications.where.not(id: Enrollment.current_camp_year_applications.joins(:student_packet_attachment).pluck(:id)) }
-  
+  scope :no_vaccine_record, -> { enrolled.where.not(id: Enrollment.current_camp_year_applications.joins(:vaccine_record_attachment).pluck(:id)) }
+  scope :no_covid_test_record, -> { enrolled.where.not(id: Enrollment.current_camp_year_applications.joins(:covid_test_record_attachment).pluck(:id)) }
+
   def display_name
     "#{self.applicant_detail.full_name} - #{self.user.email}"
   end
@@ -140,6 +147,24 @@ class Enrollment < ApplicationRecord
     acceptable_types = ["image/png", "image/jpeg", "application/pdf"]
     unless acceptable_types.include?(student_packet.content_type)
       errors.add(:student_packet, "must be file type PDF, JPEG or PNG")
+    end
+  end
+
+  def acceptable_image
+    return unless covid_test_record.attached? || vaccine_record.attached?
+
+    [covid_test_record, vaccine_record].compact.each do |image|
+
+      if image.attached?
+        unless image.blob.byte_size <= 10.megabyte
+          errors.add(image.name, "is too big")
+        end
+
+        acceptable_types = ["image/png", "image/jpeg", "application/pdf"]
+        unless acceptable_types.include?(image.content_type)
+          errors.add(image.name, "incorrect file type")
+        end
+      end
     end
   end
 
