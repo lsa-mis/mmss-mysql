@@ -84,9 +84,9 @@ class CoursePreferencesController < ApplicationController
       ids = @current_enrollment.course_registrations.where(camp_occurrence: camp_occurrence).pluck(:id)
       selections_used =  @current_enrollment.course_preferences.where(course_id: ids).pluck(:ranking).compact
       if selections_used.empty?
-        (1..10).to_a
+        (1..12).to_a
       else
-        (1..10).to_a - selections_used
+        (1..12).to_a - selections_used
       end
     end
 
