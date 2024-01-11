@@ -67,27 +67,31 @@ Rails.application.configure do
   # config.active_job.queue_adapter     = :resque
   # config.active_job.queue_name_prefix = "mmss_production"
 
- # configure mailer to user Postfix
-  # https://stackoverflow.com/questions/24443920/how-to-setup-postfix-for-ruby-on-rails-to-send-email
-  config.action_mailer.delivery_method = :sendmail
-  # Defaults to:
-  config.action_mailer.sendmail_settings = {
-    location: '/usr/sbin/sendmail',
-    arguments: ['-i']
-    # arguments: '-i -t'
-  }
-  config.action_mailer.perform_deliveries = true
-  config.action_mailer.default_options = {from: 'mmss-support@umich.edu'}
-
-
-  # Devise setting - Ensure you have defined default url options
-  config.action_mailer.default_url_options = { host: 'mmss-registration.math.lsa.umich.edu' }
-
-  config.action_mailer.perform_caching = false
-
-  # Ignore bad email addresses and do not raise email delivery errors.
-  # Set this to true and configure the email server for immediate delivery to raise delivery errors.
-  config.action_mailer.raise_delivery_errors = true
+# The `perform_caching` option determines whether or not Action Mailer will 
+# cache emails. When set to `true`, Action Mailer will cache emails to improve 
+# performance. This can be useful if your application sends out a lot of emails 
+# that are identical or very similar, as it can reduce the amount of work the 
+# server has to do.
+# When set to `false`, which means that Action Mailer will not cache emails. 
+# This might be because the emails your application sends are unique, so caching 
+# wouldn't provide a performance benefit. Or it might be to avoid potential issues 
+# with stale or incorrect emails being sent out due to caching.
+config.action_mailer.perform_caching = false
+config.action_mailer.perform_deliveries = true
+config.action_mailer.default_options = {from: 'mmss-support@umich.edu'}
+config.action_mailer.raise_delivery_errors = true
+config.action_mailer.delivery_method = :smtp
+host = 'https://mmss-registration.math.lsa.umich.edu/'
+config.action_mailer.default_url_options = { host: host }
+ActionMailer::Base.smtp_settings = {
+  :address        => 'smtp.sendgrid.net',
+  :port           => '587',
+  :authentication => :plain,
+  :user_name      => 'apikey',
+  :password       => Rails.application.credentials.SENDGRID_API_KEY,
+  :domain         => 'umich.edu',
+  :enable_starttls_auto => true
+}
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

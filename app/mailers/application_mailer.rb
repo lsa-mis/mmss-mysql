@@ -1,5 +1,5 @@
 class ApplicationMailer < ActionMailer::Base
-  default bcc: 'MMSS Office <mmss@umich.edu>', from: 'MMSS Admin <mmss-support@umich.edu>'
+  default from: 'MMSS Admin <mmss-support@umich.edu>'
+  default bcc: 'MMSS Office <mmss@umich.edu>'
   layout 'mailer'
-
 end
