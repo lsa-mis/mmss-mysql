@@ -32,6 +32,7 @@ class Payment < ApplicationRecord
   belongs_to :user
 
   scope :current_camp_payments, -> { where('camp_year = ? ', CampConfiguration.active_camp_year) }
+  scope :status1_current_camp_payments, -> { current_camp_payments.where('transaction_status = ?', "1") }
 
   private
 

@@ -62,7 +62,7 @@
       them directions on how to submit a recommendation for you, so please
       be certain that you enter their correct email address.
     </div>
-  <% elsif current_user.payments.current_camp_payments.empty? %>
+  <% elsif current_user.payments.status1_current_camp_payments.empty? %>
     <div class="m-2">Now that you've submitted your application, the next step is to make
       sure you pay the <%= humanized_money_with_symbol(current_camp_fee / 100) %> non-refundable application fee
       <%= button_to "pay #{humanized_money_with_symbol(current_camp_fee / 100)} application fee",
