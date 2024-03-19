@@ -4,7 +4,7 @@ lock "~> 3.17"
 # set ruby version, '3.1.0'
 set :rbenv_ruby, '3.1.0'
 
-server 'mathmmssapp2.miserver.it.umich.edu/', roles: %w{app db web}, primary: true
+server 'mathmmssapp2.miserver.it.umich.edu', roles: %w{app db web}, primary: true
 
 set :application, "mmss-mysql"
 set :repo_url, "git@github.com:lsa-mis/mmss-mysql.git"
