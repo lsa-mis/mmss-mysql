@@ -390,6 +390,7 @@ GEM
       sprockets (> 3.0)
       sprockets-rails
       tilt
+    sd_notify (0.1.1)
     selenium-webdriver (4.7.1)
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
@@ -504,6 +505,7 @@ DEPENDENCIES
   rails (~> 6.1)
   rspec-rails (~> 5.0, >= 5.0.2)
   sass-rails (~> 6.0)
+  sd_notify
   skylight
   spring (~> 3.0)
   standard
