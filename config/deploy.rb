@@ -4,7 +4,7 @@ lock "~> 3.17"
 # set ruby version, '3.1.0'
 set :rbenv_ruby, '3.1.0'
 
-server 'lsa-math-mmss-app.miserver.it.umich.edu', roles: %w{app db web}, primary: true
+server 'mathmmssapp2.miserver.it.umich.edu/', roles: %w{app db web}, primary: true
 
 set :application, "mmss-mysql"
 set :repo_url, "git@github.com:lsa-mis/mmss-mysql.git"
@@ -19,7 +19,7 @@ set :stage,           :production
 set :deploy_via,      :remote_cache     
 set :deploy_to,       "/home/#{fetch(:user)}/apps/#{fetch(:application)}"
 set :shared_path,     "#{fetch(:deploy_to)}/shared"
-set :ssh_options,     { forward_agent: true, user: fetch(:user), keys: %w(~/.ssh/id_rsa.pub) }
+set :ssh_options,     { forward_agent: true, user: fetch(:user), keys: %w(~/.ssh/id_ed25519.pub) }
 # Avoid permissions issues with using /tmp
 set :tmp_dir, '/home/deployer/tmp'
 
@@ -78,15 +78,15 @@ namespace :deploy do
     end
   end
 
-  desc "reload the database with seed data"
-  task :seed do
-    puts "Seeding db with seed file located at db/seeds.rb"
-    run "cd #{current_path}; bin/rails db:seed RAILS_ENV=production"
-  end
+#   desc "reload the database with seed data"
+#   task :seed do
+#     puts "Seeding db with seed file located at db/seeds.rb"
+#     run "cd #{current_path}; bin/rails db:seed RAILS_ENV=production"
+#   end
 
-  before :starting,     :check_revision
-  after  :finishing,    'puma:restart'
-end
+#   before :starting,     :check_revision
+#   after  :finishing,    'puma:restart'
+# end
 
 namespace :maintenance do
   desc "Maintenance start (edit config/maintenance_template.yml to provide parameters)"
