@@ -84,9 +84,9 @@ namespace :deploy do
 #     run "cd #{current_path}; bin/rails db:seed RAILS_ENV=production"
 #   end
 
-#   before :starting,     :check_revision
-#   after  :finishing,    'puma:restart'
-# end
+  before :starting,     :check_revision
+  after  :finishing,    'puma:restart'
+end
 
 namespace :maintenance do
   desc "Maintenance start (edit config/maintenance_template.yml to provide parameters)"
