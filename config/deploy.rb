@@ -1,7 +1,7 @@
 # config valid for current version and patch releases of Capistrano
 lock "~> 3.17"
 
-set ruby version, '3.1.0'
+# set ruby version, '3.1.0'
 # set :rbenv_ruby, '3.1.0'
 # SSHKit.config.command_map.prefix[:bundle].push("source ~/.bashrc &&")
 

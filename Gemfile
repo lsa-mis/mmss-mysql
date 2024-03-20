@@ -45,6 +45,7 @@ group :development do
   gem "better_errors", "~> 2.9", ">= 2.9.1"
   gem "capistrano", "~> 3.16", require: false
   gem "capistrano-rails", "~> 1.6", ">= 1.6.1", require: false
+  gem 'capistrano-asdf', require: false
   gem "letter_opener_web", "~> 1.4"
   gem "listen", "~> 3.7"
   gem "spring", "~> 3.0"
