@@ -4,6 +4,12 @@ lock "~> 3.17"
 # set ruby version, '3.1.0'
 # set :rbenv_ruby, '3.1.0'
 # SSHKit.config.command_map.prefix[:bundle].push("source ~/.bashrc &&")
+
+
+set :default_environment, {
+  'PATH' => "$HOME/.asdf/shims:$HOME/.asdf/bin:$PATH"
+}
+
 SSHKit.config.command_map[:bundle] = "/home/deployer/.asdf/shims/bundle"
 SSHKit.config.command_map[:ruby] = "/home/deployer/.asdf/shims/ruby"
 
