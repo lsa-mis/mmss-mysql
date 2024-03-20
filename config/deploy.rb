@@ -4,7 +4,7 @@ lock "~> 3.17"
 # set ruby version, '3.1.0'
 # set :rbenv_ruby, '3.1.0'
 # SSHKit.config.command_map.prefix[:bundle].push("source ~/.bashrc &&")
-# SSHKit.config.command_map[:bundle] = "/home/deployer/.asdf/shims/bundle"
+SSHKit.config.command_map[:bundle] = "/home/deployer/.asdf/shims/bundle"
 
 
 server 'mathmmssapp2.miserver.it.umich.edu', roles: %w{app db web}, primary: true
