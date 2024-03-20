@@ -7,6 +7,7 @@ lock "~> 3.17"
 
 
 set :default_env, {
+  'NODE_OPTIONS' => '--openssl-legacy-provider',
   'PATH' => "$HOME/.asdf/shims:$HOME/.asdf/bin:$PATH"
 }
 
