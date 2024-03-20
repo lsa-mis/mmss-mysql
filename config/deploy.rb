@@ -92,9 +92,19 @@ namespace :deploy do
 #     puts "Seeding db with seed file located at db/seeds.rb"
 #     run "cd #{current_path}; bin/rails db:seed RAILS_ENV=production"
 #   end
-
+  before "bundler:install", "debug:print_ruby_version"
   before :starting,     :check_revision
   after  :finishing,    'puma:restart'
+end
+
+namespace :debug do
+  desc "Print Ruby version and which ruby"
+  task :print_ruby_version do
+    on roles(:app) do
+      execute "ruby -v"
+      execute "which ruby"
+    end
+  end
 end
 
 namespace :maintenance do
