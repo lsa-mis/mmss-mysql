@@ -6,7 +6,7 @@ lock "~> 3.17"
 # SSHKit.config.command_map.prefix[:bundle].push("source ~/.bashrc &&")
 
 
-set :default_environment, {
+set :default_env, {
   'PATH' => "$HOME/.asdf/shims:$HOME/.asdf/bin:$PATH"
 }
 
