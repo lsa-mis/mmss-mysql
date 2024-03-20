@@ -12,16 +12,16 @@ server 'mathmmssapp2.miserver.it.umich.edu', roles: %w{app db web}, primary: tru
 set :application, "mmss-mysql"
 set :repo_url, "git@github.com:lsa-mis/mmss-mysql.git"
 set :user, "deployer"
-set :puma_threads,    [4, 16]
-set :puma_workers,    0
+# set :puma_threads,    [4, 16]
+# set :puma_workers,    0
 set :branch, "main"
 
 # Don't change these unless you know what you're doing
 set :pty,             true
 set :stage,           :production
-set :deploy_via,      :remote_cache     
+# set :deploy_via,      :remote_cache     
 set :deploy_to,       "/home/#{fetch(:user)}/apps/#{fetch(:application)}"
-set :shared_path,     "#{fetch(:deploy_to)}/shared"
+# set :shared_path,     "#{fetch(:deploy_to)}/shared"
 set :ssh_options,     { forward_agent: true, user: fetch(:user), keys: %w(~/.ssh/id_ed25519.pub) }
 # Avoid permissions issues with using /tmp
 set :tmp_dir, '/home/deployer/tmp'
@@ -72,12 +72,12 @@ namespace :deploy do
   desc 'Upload to shared/config'
   task :upload do
     on roles (:app) do
-     upload! "config/master.key",  "#{shared_path}/config/master.key"
-     upload! "config/puma_prod.rb",  "#{shared_path}/config/puma.rb"
-     upload! "config/nginx_prod.conf",  "#{shared_path}/config/nginx.conf"
-     upload! "config/puma_prod.service",  "#{fetch(:shared_path)}/config/puma.service"
-     upload! "config/lsa-was-base-c096c776ead3.json",  "#{shared_path}/config/lsa-was-base-c096c776ead3.json"
-     upload! "config/InCommon.CA.crt",  "#{shared_path}/mysql/InCommon.CA.crt"
+     upload! "config/master.key",  "#{fetch(:deploy_to)}/shared/config/master.key"
+     upload! "config/puma_prod.rb",  "#{fetch(:deploy_to)}/shared/config/puma.rb"
+     upload! "config/nginx_prod.conf",  "#{fetch(:deploy_to)}/shared/config/nginx.conf"
+     upload! "config/puma_prod.service",  "#{fetch(:deploy_to)}/shared/config/puma.service"
+     upload! "config/lsa-was-base-c096c776ead3.json",  "#{fetch(:deploy_to)}/shared/config/lsa-was-base-c096c776ead3.json"
+     upload! "config/InCommon.CA.crt",  "#{fetch(:deploy_to)}/shared/mysql/InCommon.CA.crt"
     end
   end
 
