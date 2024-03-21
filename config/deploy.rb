@@ -1,10 +1,4 @@
-# config valid for current version and patch releases of Capistrano
 lock "~> 3.17"
-
-# set ruby version, '3.1.0'
-# set :rbenv_ruby, '3.1.0'
-# SSHKit.config.command_map.prefix[:bundle].push("source ~/.bashrc &&")
-
 
 set :default_env, {
   'NODE_OPTIONS' => '--openssl-legacy-provider',
@@ -19,21 +13,14 @@ server 'mathmmssapp2.miserver.it.umich.edu', roles: %w{app db web}, primary: tru
 set :application, "mmss-mysql"
 set :repo_url, "git@github.com:lsa-mis/mmss-mysql.git"
 set :user, "deployer"
-# set :puma_threads,    [4, 16]
-# set :puma_workers,    0
 set :branch, "main"
 
 # Don't change these unless you know what you're doing
 set :pty,             true
 set :stage,           :production
-# set :deploy_via,      :remote_cache     
 set :deploy_to,       "/home/#{fetch(:user)}/apps/#{fetch(:application)}"
-# set :shared_path,     "#{fetch(:deploy_to)}/shared"
 set :ssh_options,     { forward_agent: true, user: fetch(:user), keys: %w(~/.ssh/id_ed25519.pub) }
-# Avoid permissions issues with using /tmp
 set :tmp_dir, '/home/deployer/tmp'
-
-# Default value for keep_releases is 5
 set :keep_releases, 3
 
 # Default value for :linked_files and linked_dirs is []
