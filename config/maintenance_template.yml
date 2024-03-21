@@ -1,11 +1,8 @@
 ---
-reason: We are currently doing maintenance on the MMSS Program application.
+reason: We are currently doing maintenance on the MMSS Registration application. (code: 240321)
 allowed_paths: []
 allowed_ips:
-- 141.213.168.0/21
-- 141.211.60.0/22
-- 35.7.5.0/22
-- 35.7.35.0/22
-- 35.1.203.0/22
+# UMVPN - All Traffic or UMVPN - Only U-M Traffic range
+- 35.7.0.0/18
 response_code: 503
 retry_after: 7200
