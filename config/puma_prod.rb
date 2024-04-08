@@ -4,7 +4,7 @@ directory "/home/deployer/apps/mmss-mysql/current"
 rackup "/home/deployer/apps/mmss-mysql/current/config.ru"
 environment "production"
 
-# tag ""
+tag "mmss-mysql-production"
 
 pidfile "/home/deployer/apps/mmss-mysql/shared/tmp/pids/puma.pid"
 state_path "/home/deployer/apps/mmss-mysql/shared/tmp/pids/puma.state"
