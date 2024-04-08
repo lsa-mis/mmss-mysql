@@ -24,7 +24,7 @@ set :tmp_dir, '/home/deployer/tmp'
 set :keep_releases, 3
 
 # Default value for :linked_files and linked_dirs is []
-set :linked_files, %w{config/puma.rb config/nginx.conf config/master.key config/puma.service config/lsa-was-base-c096c776ead3.json mysql/InCommon.CA.crt}
+set :linked_files, %w{config/puma.rb config/nginx.conf config/master.key config/lsa-was-base-c096c776ead3.json mysql/InCommon.CA.crt}
 set :linked_dirs,  %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system}
 set :linked_dirs, fetch(:linked_dirs, []).push('public/packs', 'node_modules')
 
@@ -39,7 +39,7 @@ namespace :puma do
   desc 'Restart the PUMA service'
   task :restart do
     on roles(:app) do
-      execute "cd #{fetch(:deploy_to)}/current; bin/bundle exec pumactl -P ~/apps/#{fetch(:application)}/current/tmp/pids/puma.pid phased-restart"
+      execute "cd #{fetch(:deploy_to)}/current; bin/bundle exec pumactl -P ~/apps/#{fetch(:application)}/current/tmp/pids/puma.pid restart"
     end
   end
 
@@ -69,7 +69,6 @@ namespace :deploy do
      upload! "config/master.key",  "#{fetch(:deploy_to)}/shared/config/master.key"
      upload! "config/puma_prod.rb",  "#{fetch(:deploy_to)}/shared/config/puma.rb"
      upload! "config/nginx_prod.conf",  "#{fetch(:deploy_to)}/shared/config/nginx.conf"
-     upload! "config/puma_prod.service",  "#{fetch(:deploy_to)}/shared/config/puma.service"
      upload! "config/lsa-was-base-c096c776ead3.json",  "#{fetch(:deploy_to)}/shared/config/lsa-was-base-c096c776ead3.json"
      upload! "config/InCommon.CA.crt",  "#{fetch(:deploy_to)}/shared/mysql/InCommon.CA.crt"
     end
