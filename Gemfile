@@ -13,7 +13,7 @@ gem "money-rails", "~> 1.14"
 # gem install mysql2 -v '0.5.4' -- --with-ldflags=-L/usr/local/opt/openssl/lib --with-cppflags=-I/usr/local/opt/openssl/include
 # gem install mysql2 -v '0.5.6' -- --with-mysql-dir=/opt/homebrew/bin/mysql --with-mysql-lib=/opt/homebrew/Cellar/mysql/8.3.0/lib --with-mysql-include=/opt/homebrew/Cellar/mysql/8.3.0/include/mysql
 gem "mysql2", "~> 0.5.6"
-gem "puma", "5.6.8"
+gem "puma", "5.6.9"
 # gem 'puma', '5.6.4'
 gem "rails", "~> 6.1"
 gem "sass-rails", "~> 6.0"
