@@ -36,9 +36,9 @@ module ApplicationHelper
     @current_enrollment = current_user.enrollments.current_camp_year_applications.last
   end
   
-  def student_packet_url 
-    CampConfiguration.active.pick(:student_packet_url)
-  end
+  # def student_packet_url 
+  #   CampConfiguration.active.pick(:student_packet_url)
+  # end
 
   def current_camp_fee
     CampConfiguration.active_camp_fee_cents

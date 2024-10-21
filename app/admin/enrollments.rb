@@ -32,7 +32,7 @@ ActiveAdmin.register Enrollment, as: "Application" do
   scope :no_recomendation, group: :missing
   scope :no_letter, group: :missing
   scope :no_payments, group: :missing
-  scope :no_student_packet, group: :missing
+  # scope :no_student_packet, group: :missing
 
   # scope :no_vaccine_record, group: :vaccine
   # scope :no_covid_test_record, group: :vaccine
@@ -75,11 +75,11 @@ ActiveAdmin.register Enrollment, as: "Application" do
             link_to item.transcript.filename, url_for(item.transcript)
           end
         end
-        column "Current Student Packet" do |item| 
-          if item.student_packet.attached?
-            link_to item.student_packet.filename, url_for(item.student_packet)
-          end
-        end
+        # column "Current Student Packet" do |item| 
+        #   if item.student_packet.attached?
+        #     link_to item.student_packet.filename, url_for(item.student_packet)
+        #   end
+        # end
         # column "Vaccine Record" do |item| 
         #   if item.vaccine_record.attached?
         #     link_to item.vaccine_record.filename, url_for(item.vaccine_record)
@@ -93,7 +93,7 @@ ActiveAdmin.register Enrollment, as: "Application" do
 
       end
      f.input :transcript, as: :file, label: "Update transcript"
-     f.input :student_packet, as: :file, label: "Update student_packet"
+    #  f.input :student_packet, as: :file, label: "Update student_packet"
     #  f.input :vaccine_record, as: :file, label: "Update vaccine_record"
     #  f.input :covid_test_record, as: :file, label: "Update covid_test_record"
       hr
@@ -155,11 +155,11 @@ ActiveAdmin.register Enrollment, as: "Application" do
         link_to enroll.transcript.filename, url_for(enroll.transcript)
       end
     end
-    column "Student Packet" do |sp|
-      if sp.student_packet.attached?
-        link_to sp.student_packet.filename, url_for(sp.student_packet)
-      end
-    end
+    # column "Student Packet" do |sp|
+    #   if sp.student_packet.attached?
+    #     link_to sp.student_packet.filename, url_for(sp.student_packet)
+    #   end
+    # end
     # column "Vaccination Record" do |enroll|
     #   if enroll.vaccine_record.attached?
     #     link_to enroll.vaccine_record.filename, url_for(enroll.vaccine_record)
@@ -337,11 +337,11 @@ ActiveAdmin.register Enrollment, as: "Application" do
           link_to tr.transcript.filename, url_for(tr.transcript)
         end
       end
-      row :student_packet do |sp|
-        if sp.student_packet.attached?
-          link_to sp.student_packet.filename, url_for(sp.student_packet)
-        end
-      end
+      # row :student_packet do |sp|
+      #   if sp.student_packet.attached?
+      #     link_to sp.student_packet.filename, url_for(sp.student_packet)
+      #   end
+      # end
       # row :vaccine_record do |tr|
       #   if tr.vaccine_record.attached?
       #     link_to tr.vaccine_record.filename, url_for(tr.vaccine_record)
@@ -381,11 +381,11 @@ ActiveAdmin.register Enrollment, as: "Application" do
         "uploaded"
       end
     end
-    column "Student Packet" do |sp|
-      if sp.student_packet.attached?
-        "uploaded"
-      end
-    end
+    # column "Student Packet" do |sp|
+    #   if sp.student_packet.attached?
+    #     "uploaded"
+    #   end
+    # end
     column :offer_status
     column :application_deadline
     column :application_status

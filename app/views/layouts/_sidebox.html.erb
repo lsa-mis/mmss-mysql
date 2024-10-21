@@ -127,38 +127,40 @@
               <% end %>
             </div>
             <hr>
-            <h4>Download and return the <br>
-              <div class="my-2">
-                <%= link_to student_packet_url, class: "btn btn-blue", target: "_blank" do %>
-                  Student Information Packet
+            <div class="hidden">
+              <h4>Download and return the <br>
+                <div class="my-2">
+                  <%= link_to student_packet_url, class: "btn btn-blue", target: "_blank" do %>
+                    Student Information Packet
+                  <% end %>
+                </div>
+              </h4>
+              <%= form_with(model: current_enrollment, local: true) do |form| %>
+                <p class="text-xs">The Student Packet upload is limited to files smaller than 20Mbytes. You can use an 
+                <a class="hover:underline text-blue-800" href="https://www.ilovepdf.com/compress_pdf" target="_blank">online pdf compression tool</a>
+                if your file size is larger than 20MBytes.</p>
+                <% if current_enrollment.student_packet.attached? %>
+                  <div class='current-uploaded-docs'>
+                    <p>
+                      <strong>Student Packet currently uploaded:</strong>
+                      <%= link_to current_enrollment.student_packet.filename, url_for(current_enrollment.student_packet) %>
+                    </p>
+                  </div>
+                  <div class="field">
+                    <%= form.label :student_packet, 'Update Student Packet' %>
+                    <%= form.file_field :student_packet %>
+                  </div>
+                <% else %>
+                  <div class="field">
+                    <%= form.label :student_packet, 'Upload Student Packet' %>
+                    <%= form.file_field :student_packet, required: true %>
+                  </div>
                 <% end %>
-              </div>
-            </h4>
-            <%= form_with(model: current_enrollment, local: true) do |form| %>
-              <p class="text-xs">The Student Packet upload is limited to files smaller than 20Mbytes. You can use an 
-              <a class="hover:underline text-blue-800" href="https://www.ilovepdf.com/compress_pdf" target="_blank">online pdf compression tool</a>
-              if your file size is larger than 20MBytes.</p>
-              <% if current_enrollment.student_packet.attached? %>
-                <div class='current-uploaded-docs'>
-                  <p>
-                    <strong>Student Packet currently uploaded:</strong>
-                    <%= link_to current_enrollment.student_packet.filename, url_for(current_enrollment.student_packet) %>
-                  </p>
-                </div>
-                <div class="field">
-                  <%= form.label :student_packet, 'Update Student Packet' %>
-                  <%= form.file_field :student_packet %>
-                </div>
-              <% else %>
-                <div class="field">
-                  <%= form.label :student_packet, 'Upload Student Packet' %>
-                  <%= form.file_field :student_packet, required: true %>
+                <div class="actions">
+                  <%= form.submit "Upload Student Packet", id: 'student_packet_submit' %>
                 </div>
               <% end %>
-              <div class="actions">
-                <%= form.submit "Upload Student Packet", id: 'student_packet_submit' %>
-              </div>
-            <% end %>
+            </div>
             <div class="hidden covid-panel">
               <hr>
               <hr>
