@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_10_21_230137) do
+ActiveRecord::Schema.define(version: 2024_10_24_193249) do
 
   create_table "active_admin_comments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "namespace"
@@ -227,6 +227,7 @@ ActiveRecord::Schema.define(version: 2024_10_21_230137) do
     t.date "application_status_updated_on"
     t.string "uniqname"
     t.boolean "camp_doc_form_completed", default: false
+    t.integer "balance_due_cents"
     t.index ["user_id"], name: "index_enrollments_on_user_id"
   end
 

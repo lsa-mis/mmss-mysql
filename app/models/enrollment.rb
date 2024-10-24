@@ -27,6 +27,7 @@
 #  application_deadline          :date
 #  application_status_updated_on :date
 #  camp_doc_form_completed       :boolean          default(FALSE)
+#  balance_due_cents             :integer
 #
 class Enrollment < ApplicationRecord
   after_update :send_offer_letter
