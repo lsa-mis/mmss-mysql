@@ -26,6 +26,7 @@
 #  campyear                      :integer
 #  application_deadline          :date
 #  application_status_updated_on :date
+#  camp_doc_form_completed       :boolean          default(FALSE)
 #
 class Enrollment < ApplicationRecord
   after_update :send_offer_letter
