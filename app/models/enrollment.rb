@@ -30,9 +30,11 @@
 #  balance_due_cents             :integer
 #
 class Enrollment < ApplicationRecord
-  after_update :send_offer_letter
+  
+  before_update :if_camp_doc_form_completed
   before_update :if_application_status_changed
   before_update :set_application_deadline
+  after_update :send_offer_letter
   after_commit :send_enroll_letter, if: :persisted?
   after_commit :send_rejected_letter, if: :persisted?
   after_commit :send_waitlisted_letter, if: :persisted?
@@ -205,6 +207,12 @@ class Enrollment < ApplicationRecord
   def set_application_deadline
     if self.session_assignments.present? && self.course_assignments.present?
       self.application_deadline = 30.days.from_now unless self.application_deadline.present?
+    end
+  end
+
+  def if_camp_doc_form_completed
+    if self.camp_doc_form_completed && self.balance_due_cents == 0
+      self.application_status = "enrolled"
     end
   end
 

@@ -40,6 +40,7 @@ class PaymentsController < ApplicationController
       if params['transactionStatus'] != '1'
         redirect_to all_payments_path, alert: "Your payment was not successfull"
       else
+        @current_enrollment.update!(balance_due_cents: balance_due)
         redirect_to all_payments_path, notice: "Your payment was successfully recorded"
       end
     end

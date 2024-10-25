@@ -1,4 +1,6 @@
 class SessionAssignmentsController < ApplicationController
+  include ApplicantState
+
   devise_group :logged_in, contains: [:user, :admin]
   before_action :authenticate_logged_in!
   before_action :authenticate_admin!, only: [:index, :destroy]
@@ -14,7 +16,7 @@ class SessionAssignmentsController < ApplicationController
         status_array = SessionAssignment.where(enrollment_id: @current_enrollment).pluck(:offer_status)
         if status_array.count("accepted") + status_array.count("declined") == status_array.size
           enroll_id = @session_assignment.enrollment_id
-          Enrollment.find(enroll_id).update(offer_status: "accepted", application_status: "offer accepted", application_status_updated_on: Date.today)
+          Enrollment.find(enroll_id).update(offer_status: "accepted", application_status: "offer accepted", application_status_updated_on: Date.today, balance_due_cents: balance_due)
         end
         format.html { redirect_to all_payments_path, notice: 'Session assignment was successfully accepted.' }
         format.json { render :show, status: :ok, location: @session_assignment }
@@ -45,7 +47,7 @@ class SessionAssignmentsController < ApplicationController
           format.json { render :show, status: :ok, location: @session_assignment }
         elsif status_array.count("accepted") + status_array.count("declined") == status_array.size
           enroll_id = @session_assignment.enrollment_id
-          Enrollment.find(enroll_id).update(offer_status: "accepted", application_status: "offer accepted", application_status_updated_on: Date.today)
+          Enrollment.find(enroll_id).update(offer_status: "accepted", application_status: "offer accepted", application_status_updated_on: Date.today, balance_due_cents: balance_due)
           format.html { redirect_to all_payments_path, notice: 'Session assignment was declined.' }
           format.json { render :show, status: :ok, location: @session_assignment }
         else
