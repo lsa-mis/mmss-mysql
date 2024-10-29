@@ -216,7 +216,7 @@ ActiveAdmin.register Enrollment, as: "Application" do
 
       table_for application.session_registrations do
         column "User Selected Sessions" do |item| 
-          item&.description 
+          item.description 
         end
       end
     end
