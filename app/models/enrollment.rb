@@ -101,6 +101,7 @@ class Enrollment < ApplicationRecord
   scope :no_student_packet, -> { current_camp_year_applications.where.not(id: Enrollment.current_camp_year_applications.joins(:student_packet_attachment).pluck(:id)) }
   scope :no_vaccine_record, -> { enrolled.where.not(id: Enrollment.current_camp_year_applications.joins(:vaccine_record_attachment).pluck(:id)) }
   scope :no_covid_test_record, -> { enrolled.where.not(id: Enrollment.current_camp_year_applications.joins(:covid_test_record_attachment).pluck(:id)) }
+  scope :no_camp_doc_form, -> { current_camp_year_applications.where(camp_doc_form_completed: false) }
 
   def display_name
     "#{self.applicant_detail.full_name} - #{self.user.email}"

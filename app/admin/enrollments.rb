@@ -32,6 +32,7 @@ ActiveAdmin.register Enrollment, as: "Application" do
   scope :no_recomendation, group: :missing
   scope :no_letter, group: :missing
   scope :no_payments, group: :missing
+  scope :no_camp_doc_form
   # scope :no_student_packet, group: :missing
 
   # scope :no_vaccine_record, group: :vaccine
