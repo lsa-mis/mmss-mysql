@@ -20,17 +20,17 @@ export default class extends Controller {
   otherDemographic(data){
     console.log(data)
     var demographic = data["name"].toLowerCase()    
+    var other_demographic = document.getElementById("applicant_detail_other_demographic");
 
     if (demographic == 'other') {
-      console.log("other")
+      other_demographic.required = true;
       this.other_demographicTarget.value = ""
       this.other_demographic_divTarget.classList.remove("fields--hide")
       this.other_demographic_divTarget.classList.add("fields--display")
     }
     else {
       console.log("hell")
-      var other_demographic = document.getElementById("applicant_detail_other_demographic");
-      other_demographic.removeAttribute('required');
+      other_demographic.required = false;
       this.other_demographicTarget.value = ""
       this.other_demographic_divTarget.classList.add("fields--hide")
       this.other_demographic_divTarget.classList.remove("fields--display")
