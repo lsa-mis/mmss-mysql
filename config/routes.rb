@@ -39,6 +39,8 @@ Rails.application.routes.draw do
   # authenticated :admin do
     resources :genders
     resources :demographics
+    get '/demographics/get_demographic_value/:id', to: 'demographics#get_demographic_value'
+
 
     resources :camp_configurations do
       resources :camp_occurrences

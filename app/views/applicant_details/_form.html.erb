@@ -144,7 +144,7 @@
   </div>
 
   <h2 class= "section-header">Applicant Demographics</h2>
-
+  
   <div class="field">
     <p class="direction_notes">
       Please contact 
@@ -164,11 +164,23 @@
     </div>
   </div>
 
-  <div class="field">
-    <%= form.label :demographic %>
-    <%= form.collection_select(:demographic, Demographic.all, :id, :name, include_blank: "Select") %>
+  <div data-controller: "demographic">
+    <% if @applicant_detail.persisted? && @applicant_detail.other_demographic.present? %>
+    <p>Current Race/Ethnicity: <%= demographic_description(@applicant_detail) %></p>
+    <% end %>
+    <div class="field">
+      <%= form.label :demographic %>
+      <%= form.collection_select :demographic, Demographic.all, :id, :name, { include_blank: "Select" }, { required: true, "data-target": "demographic.list", "data-action": "change->demographic#getDemographic" } %>
+    </div>
+    <% if @applicant_detail.persisted? && @applicant_detail.other_demographic.present? %>
+      <div data-target="demographic.other_demographic_div" class="my-5 fields--display">
+    <% else %>
+      <div data-target="demographic.other_demographic_div" class="my-5 fields--hide">
+    <% end %>
+        <%= form.label 'other_demographic', 'Other Demographic' %>
+        <%= form.text_field :other_demographic, required: true, "data-target": "demographic.other_demographic" %>
+      </div>
   </div>
-
 
   <div class="actions">
     <% if applicant_detail.new_record? %>

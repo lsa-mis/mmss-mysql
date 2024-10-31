@@ -62,6 +62,10 @@ class DemographicsController < ApplicationController
     end
   end
 
+  def get_demographic_value
+    render json: {"name": Demographic.find(params[:id]).name}.to_json
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_demographic
