@@ -164,10 +164,7 @@
     </div>
   </div>
 
-  <div data-controller: "demographic">
-    <% if @applicant_detail.persisted? && @applicant_detail.other_demographic.present? %>
-    <p>Current Race/Ethnicity: <%= demographic_description(@applicant_detail) %></p>
-    <% end %>
+  <div data-controller="demographic">
     <div class="field">
       <%= form.label :demographic %>
       <%= form.collection_select :demographic, Demographic.all, :id, :name, { include_blank: "Select" }, { required: true, "data-target": "demographic.list", "data-action": "change->demographic#getDemographic" } %>
