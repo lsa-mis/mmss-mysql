@@ -6,7 +6,7 @@ ActiveAdmin.register ApplicantDetail do
   #
   # Uncomment all parameters which should be permitted for assignment
   #
-   permit_params :user_id, :firstname, :middlename, :lastname, :gender, :us_citizen, :demographic, :birthdate, :diet_restrictions, :shirt_size, :address1, :address2, :city, :state, :state_non_us, :postalcode, :country, :phone, :parentname, :parentaddress1, :parentaddress2, :parentcity, :parentstate, :parentstate_non_us, :parentzip, :parentcountry, :parentphone, :parentworkphone, :parentemail
+   permit_params :user_id, :firstname, :middlename, :lastname, :gender, :us_citizen, :demographic, :other_demographic, :birthdate, :diet_restrictions, :shirt_size, :address1, :address2, :city, :state, :state_non_us, :postalcode, :country, :phone, :parentname, :parentaddress1, :parentaddress2, :parentcity, :parentstate, :parentstate_non_us, :parentzip, :parentcountry, :parentphone, :parentworkphone, :parentemail
   #
   actions :index, :show, :new, :create, :update, :edit
 
@@ -24,6 +24,7 @@ ActiveAdmin.register ApplicantDetail do
       f.input :gender, as: :select, collection: Gender.all
       f.input :us_citizen
       f.input :demographic, as: :select, collection: Demographic.all
+      f.input :other_demographic, label: "Description, if Race/Ethnicity is Other"
       f.input :birthdate
       f.input :diet_restrictions
       f.input :shirt_size
@@ -77,7 +78,7 @@ ActiveAdmin.register ApplicantDetail do
       g.gender_name
     end
     column :us_citizen
-    column :demographic do |d| 
+    column :demographic do |d|
         d.demographic_name
     end
     column :birthdate
