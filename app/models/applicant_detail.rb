@@ -34,6 +34,7 @@
 #  parentemail        :string(255)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
+#  other_demographic  :string
 #
 class ApplicantDetail < ApplicationRecord
   belongs_to :user, required: true, inverse_of: :applicant_detail
@@ -58,6 +59,7 @@ class ApplicantDetail < ApplicationRecord
   validates :parentemail, presence: true, length: {maximum: 255},
                     format: {with: URI::MailTo::EMAIL_REGEXP, message: "only allows valid emails"}
   validate :parentemail_not_user_email 
+  validate :other_demographic_requered_if_other
 
   scope :current_camp_enrolled, -> { where("user_id IN (?)", Enrollment.enrolled.pluck(:user_id)) }
 
@@ -78,10 +80,10 @@ class ApplicantDetail < ApplicationRecord
   end
 
   def demographic_name
-    if self.demographic.present?
-      Demographic.find(self.demographic).name
+    if self.other_demographic.present?
+      self.other_demographic + " (" + Demographic.find(self.demographic).name + ")"
     else
-      "None Selected"
+      Demographic.find(self.demographic).name
     end
   end
 
@@ -90,6 +92,15 @@ class ApplicantDetail < ApplicationRecord
       errors.add(:base, "Parent/Guardian email should be different than the applicant's email")
     else
       return true
+    end
+  end
+
+  def other_demographic_requered_if_other
+    if Demographic.find(self.demographic).name.downcase == 'other' && self.other_demographic.blank?
+      errors.add(:other_demographic, "Description is required if Race/Ethnicity is Other")
+    end
+    if !(Demographic.find(self.demographic).name.downcase == 'other') && self.other_demographic.present?
+      errors.add(:other_demographic, "Description shoild be blank if Race/Ethnicity is not Other")
     end
   end
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_01_18_135603) do
+ActiveRecord::Schema.define(version: 2024_10_30_212801) do
 
   create_table "active_admin_comments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "namespace"
@@ -111,6 +111,7 @@ ActiveRecord::Schema.define(version: 2023_01_18_135603) do
     t.string "parentemail"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "other_demographic"
     t.index ["user_id"], name: "index_applicant_details_on_user_id"
   end
 
@@ -226,6 +227,8 @@ ActiveRecord::Schema.define(version: 2023_01_18_135603) do
     t.date "application_deadline"
     t.date "application_status_updated_on"
     t.string "uniqname"
+    t.boolean "camp_doc_form_completed", default: false
+    t.integer "balance_due_cents"
     t.index ["user_id"], name: "index_enrollments_on_user_id"
   end
 
