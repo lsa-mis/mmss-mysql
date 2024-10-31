@@ -227,8 +227,6 @@ ActiveRecord::Schema.define(version: 2024_10_30_212801) do
     t.date "application_deadline"
     t.date "application_status_updated_on"
     t.string "uniqname"
-    t.boolean "camp_doc_form_completed", default: false
-    t.integer "balance_due_cents"
     t.index ["user_id"], name: "index_enrollments_on_user_id"
   end
 
