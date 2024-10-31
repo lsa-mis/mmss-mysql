@@ -11,7 +11,7 @@
       <ul>
         <li>Gender: <%= gender_description(@applicant_detail.gender) %></li>
         <li><%= @us_citizen %></li>
-        <li>Demographic: <%= demographic_description(@applicant_detail) %></li>
+        <li>Demographic: <%= @applicant_detail.demographic_name %></li>
       </ul>
     </div>
     <p class="text-gray-700 text-base">
