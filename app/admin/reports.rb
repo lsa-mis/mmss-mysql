@@ -35,12 +35,15 @@ ActiveAdmin.register_page "Reports" do
   controller do
     
     def demographic_report
+      demographic_other_id = Demographic.find_by('name LIKE ?', "other").id.to_s
       query = "SELECT ad.country,
       (CASE WHEN ad.gender = '' THEN NULL ELSE 
       (SELECT genders.name FROM genders WHERE CAST(ad.gender AS UNSIGNED) = genders.id) END) as gender,
       e.year_in_school,
-      (CASE WHEN ad.demographic = '' THEN NULL ELSE 
-      (SELECT demographics.name FROM demographics WHERE CAST(ad.demographic AS UNSIGNED) = demographics.id) END) AS demographic,
+      (CASE ad.demographic WHEN '' THEN NULL 
+            WHEN '" + demographic_other_id + "' THEN (SELECT CONCAT('Other: ', ad.other_demographic))
+            ELSE 
+            (SELECT demographics.name FROM demographics WHERE CAST(ad.demographic AS UNSIGNED) = demographics.id) END) AS demographic,
       e.international
       FROM enrollments AS e 
       LEFT JOIN users AS u ON e.user_id = u.id
