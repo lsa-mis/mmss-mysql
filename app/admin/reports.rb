@@ -13,11 +13,12 @@ ActiveAdmin.register_page "Reports" do
           li link_to "report - Complete Application with Course Preferences", admin_reports_complete_applications_with_course_preferences_path
           li link_to "report - Waitlisted Application with Course Preferences", admin_reports_waitlisted_applications_with_course_preferences_path
           li link_to "report - Finaid with App and Offer Status", admin_reports_finaid_with_app_and_offer_status_path
+          li link_to "report - Complete Applications Demographic Report", admin_reports_complete_apps_demographic_report_path
         end
         text_node "----- ENROLLED USERS -----".html_safe
         ul do
           li link_to "report - Enrolled with Addresses and Parents Information", admin_reports_enrolled_with_addresses_path
-          li link_to "report - Demographic Report", admin_reports_demographic_report_path
+          li link_to "report - Enrolled Students Demographic Report", admin_reports_enrolled_student_demographic_report_path
           li link_to "report - Events per Session", admin_reports_enrolled_events_per_session_path
           li link_to "report - Enrolled Students with Sessions and Courses", admin_reports_enrolled_with_sessions_and_courses_path
           li link_to "report - Enrolled Students with Sessions and T-Shirt size", admin_reports_enrolled_with_sessions_and_tshirt_path
@@ -34,7 +35,27 @@ ActiveAdmin.register_page "Reports" do
 
   controller do
     
-    def demographic_report
+    def complete_apps_demographic_report
+      query = "SELECT ad.country,
+      (CASE WHEN ad.gender = '' THEN NULL ELSE 
+      (SELECT genders.name FROM genders WHERE CAST(ad.gender AS UNSIGNED) = genders.id) END) as gender,
+      e.year_in_school,
+      (CASE WHEN ad.demographic = '' THEN NULL ELSE 
+      (SELECT demographics.name FROM demographics WHERE CAST(ad.demographic AS UNSIGNED) = demographics.id) END) AS demographic,
+      e.international
+      FROM enrollments AS e 
+      LEFT JOIN users AS u ON e.user_id = u.id
+      LEFT JOIN applicant_details AS ad ON ad.user_id = e.user_id
+      WHERE e.application_status = 'application complete' AND e.campyear = #{CampConfiguration.active.last.camp_year} ORDER BY country, gender, year_in_school"
+      title = "complete_apps_demographic_report"
+
+      data = data_to_csv_demographic(query, title)
+      respond_to do |format|
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv"}
+      end
+    end
+
+    def enrolled_student_demographic_report
       query = "SELECT ad.country,
       (CASE WHEN ad.gender = '' THEN NULL ELSE 
       (SELECT genders.name FROM genders WHERE CAST(ad.gender AS UNSIGNED) = genders.id) END) as gender,
@@ -46,7 +67,7 @@ ActiveAdmin.register_page "Reports" do
       LEFT JOIN users AS u ON e.user_id = u.id
       LEFT JOIN applicant_details AS ad ON ad.user_id = e.user_id
       WHERE e.application_status = 'enrolled' AND e.campyear = #{CampConfiguration.active.last.camp_year} ORDER BY country, gender, year_in_school"
-      title = "demographic"
+      title = "enrolled_student_demographic_report"
 
       data = data_to_csv_demographic(query, title)
       respond_to do |format|
