@@ -58,8 +58,11 @@ class ApplicantDetail < ApplicationRecord
   validates :parentemail, presence: true, length: {maximum: 255},
                     format: {with: URI::MailTo::EMAIL_REGEXP, message: "only allows valid emails"}
   validate :parentemail_not_user_email 
+  validate :demographic_other_if_other_selected
 
   scope :current_camp_enrolled, -> { where("user_id IN (?)", Enrollment.enrolled.pluck(:user_id)) }
+
+  before_save :clear_demographic_other_if_not_other
 
   def full_name
     "#{lastname}, #{firstname}"
@@ -99,5 +102,19 @@ class ApplicantDetail < ApplicationRecord
 
   def self.ransackable_attributes(auth_object = nil)
     ["address1", "address2", "birthdate", "city", "country", "created_at", "demographic", "diet_restrictions", "firstname", "gender", "id", "lastname", "middlename", "parentaddress1", "parentaddress2", "parentcity", "parentcountry", "parentemail", "parentname", "parentphone", "parentstate", "parentstate_non_us", "parentworkphone", "parentzip", "phone", "postalcode", "shirt_size", "state", "state_non_us", "updated_at", "us_citizen", "user_id"]
+  end
+
+  private
+
+  def demographic_other_if_other_selected
+    if demographic.present? && Demographic.find(demographic).name.downcase == 'other' && demographic_other.blank?
+      errors.add(:demographic_other, "must be specified when 'Other' is selected")
+    end
+  end
+
+  def clear_demographic_other_if_not_other
+    if demographic.present? && Demographic.find(demographic).name.downcase != 'other'
+      self.demographic_other = nil
+    end
   end
 end
