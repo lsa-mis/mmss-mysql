@@ -6,7 +6,7 @@ ActiveAdmin.register ApplicantDetail do
   #
   # Uncomment all parameters which should be permitted for assignment
   #
-   permit_params :user_id, :firstname, :middlename, :lastname, :gender, :us_citizen, :demographic, :birthdate, :diet_restrictions, :shirt_size, :address1, :address2, :city, :state, :state_non_us, :postalcode, :country, :phone, :parentname, :parentaddress1, :parentaddress2, :parentcity, :parentstate, :parentstate_non_us, :parentzip, :parentcountry, :parentphone, :parentworkphone, :parentemail
+   permit_params :user_id, :firstname, :middlename, :lastname, :gender, :us_citizen, :demographic, :demographic_other, :birthdate, :diet_restrictions, :shirt_size, :address1, :address2, :city, :state, :state_non_us, :postalcode, :country, :phone, :parentname, :parentaddress1, :parentaddress2, :parentcity, :parentstate, :parentstate_non_us, :parentzip, :parentcountry, :parentphone, :parentworkphone, :parentemail
   #
   actions :index, :show, :new, :create, :update, :edit
 
@@ -24,6 +24,7 @@ ActiveAdmin.register ApplicantDetail do
       f.input :gender, as: :select, collection: Gender.all
       f.input :us_citizen
       f.input :demographic, as: :select, collection: Demographic.all
+      f.input :demographic_other
       f.input :birthdate
       f.input :diet_restrictions
       f.input :shirt_size
@@ -78,7 +79,11 @@ ActiveAdmin.register ApplicantDetail do
     end
     column :us_citizen
     column :demographic do |d| 
+      if d.demographic_name == "Other" && d.demographic_other.present?
+        "#{d.demographic_name} - #{d.demographic_other}"
+      else
         d.demographic_name
+      end
     end
     column :birthdate
     column :diet_restrictions
@@ -123,6 +128,13 @@ ActiveAdmin.register ApplicantDetail do
       row :gender do |g|
         g.gender_name
       end
+      row :demographic do |d|
+        if d.demographic_name == "Other" && d.demographic_other.present?
+          "#{d.demographic_name} - #{d.demographic_other}"
+        else
+          d.demographic_name
+        end
+      end
       row :birthdate
       row :diet_restrictions
       row :shirt_size
@@ -147,6 +159,13 @@ ActiveAdmin.register ApplicantDetail do
     column :lastname
     column :firstname
     column('email') { |app| app.applicant_email }
+    column('demographic') do |d|
+      if d.demographic_name == "Other" && d.demographic_other.present?
+        "#{d.demographic_name} - #{d.demographic_other}"
+      else
+        d.demographic_name
+      end
+    end
     column :us_citizen
     column :birthdate
     column :diet_restrictions
