@@ -164,11 +164,25 @@
     </div>
   </div>
 
-  <div class="field">
-    <%= form.label :demographic %>
-    <%= form.collection_select(:demographic, Demographic.all, :id, :name, include_blank: "Select") %>
+  <div data-controller="demographic-other">
+    <div class="field">
+      <%= form.label :demographic %>
+      <%= form.collection_select :demographic, 
+                               Demographic.all, 
+                               :id, 
+                               :name, 
+                               { include_blank: "Select" },
+                               { 
+                                 data: { 
+                                   action: "change->demographic-other#toggleOtherField"
+                                 } 
+                               } %>
+    </div>
+    <div class="field" data-demographic-other-target="otherField">
+      <%= form.label :demographic_other, "Please specify your demographic" %>
+      <%= form.text_field :demographic_other %>
+    </div>
   </div>
-
 
   <div class="actions">
     <% if applicant_detail.new_record? %>
