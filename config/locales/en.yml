@@ -73,6 +73,7 @@ en:
         gender: "Gender*"
         shirt_size: "Shirt size*"
         demographic: "Race/Ethnicity*"
+        demographic_other: "Please specify your demographic"
       
       enrollment:
         high_school_state: "High school state (Select Non-US if international)*"

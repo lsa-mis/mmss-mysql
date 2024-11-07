@@ -93,6 +93,13 @@ class ApplicantDetailsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def applicant_detail_params
-      params.require(:applicant_detail).permit(:user_id, :firstname, :middlename, :lastname, :gender, :us_citizen, :demographic, :birthdate, :diet_restrictions, :shirt_size, :address1, :address2, :city, :state, :state_non_us, :postalcode, :country, :phone, :parentname, :parentaddress1, :parentaddress2, :parentcity, :parentstate, :parentstate_non_us, :parentzip, :parentcountry, :parentphone, :parentworkphone, :parentemail)
+      params.require(:applicant_detail).permit(
+              :user_id, :firstname, :middlename, :lastname, :gender, :us_citizen,
+              :demographic, :demographic_other, :birthdate, :diet_restrictions,
+              :shirt_size, :address1, :address2, :city, :state, :state_non_us,
+              :postalcode, :country, :phone, :parentname, :parentaddress1, :parentaddress2,
+              :parentcity, :parentstate, :parentstate_non_us, :parentzip, :parentcountry,
+              :parentphone, :parentworkphone, :parentemail
+      )
     end
 end
