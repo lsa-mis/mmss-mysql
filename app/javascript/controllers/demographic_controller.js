@@ -25,15 +25,15 @@ export default class extends Controller {
     if (demographic == 'other') {
       other_demographic.required = true;
       this.other_demographicTarget.value = ""
-      this.other_demographic_divTarget.classList.remove("fields--hide")
-      this.other_demographic_divTarget.classList.add("fields--display")
+      this.other_demographic_divTarget.classList.remove("hidden")
+      this.other_demographic_divTarget.classList.add("block")
     }
     else {
       console.log("hell")
       other_demographic.required = false;
       this.other_demographicTarget.value = ""
-      this.other_demographic_divTarget.classList.add("fields--hide")
-      this.other_demographic_divTarget.classList.remove("fields--display")
+      this.other_demographic_divTarget.classList.add("hidden")
+      this.other_demographic_divTarget.classList.remove("bloch")
     }
   }
 
