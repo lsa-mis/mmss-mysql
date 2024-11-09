@@ -23,8 +23,8 @@ ActiveAdmin.register ApplicantDetail do
       f.input :lastname
       f.input :gender, as: :select, collection: Gender.all
       f.input :us_citizen
-      f.input :demographic, as: :select, collection: Demographic.all
-      f.input :demographic_other
+      f.input :demographic, as: :select, collection: Demographic.all, input_html: { id: 'applicant_detail_demographic' }
+      f.input :demographic_other, wrapper_html: { style: 'margin-left: 20px;' }
       f.input :birthdate
       f.input :diet_restrictions
       f.input :shirt_size
