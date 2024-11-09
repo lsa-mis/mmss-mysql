@@ -3,7 +3,7 @@
     using English characters and standard punctuation.<p>
     <br>
 <p>All fields are required unless marked <span class="text-gray-700">(optional)</span></p>
-<%= form_with(model: enrollment, local: true) do |form| %>
+<%= form_with(model: enrollment, local: true, data: { controller: "required-stars" }) do |form| %>
   <% if enrollment.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(enrollment.errors.count, "error") %> prohibited this enrollment from being saved:</h2>
@@ -165,7 +165,7 @@
 
   <div class="field">
     <%= form.label :year_in_school, "What grade year are you in at school?" %>
-    <%= form.select :year_in_school, year_in_school, include_blank: "*Select*", required: true %>
+    <%= form.select :year_in_school, year_in_school, { include_blank: "Select" }, { required: true } %>
   </div>
 
   <div class="field">
@@ -195,7 +195,7 @@
 
   <div class="field">
     <%= form.label :high_school_state  %>
-    <%= form.select :high_school_state, us_states, include_blank: "*Select*", required: true %>
+    <%= form.select :high_school_state, us_states, { include_blank: "Select" }, { required: true } %>
   </div>
 
   <div class="field">
@@ -210,7 +210,10 @@
 
   <div class="field">
     <%= form.label :high_school_country %>
-    <%= form.country_select :high_school_country, priority_countries: ["US"], include_blank: "*Select*", required: true %>
+    <%= form.country_select :high_school_country, 
+                        { priority_countries: ["US"] }, 
+                        { include_blank: "Select" }, 
+                        { required: true } %>
   </div>
 
   <hr>
@@ -248,14 +251,26 @@
     </div>
     <div class="field">
       <%= form.label :transcript, 'Update Transcript' %>
-      <%= form.file_field :transcript %>
+      <%= form.file_field :transcript, 
+            data: { 
+              controller: "filesize-check", 
+              action: "filesize-check#validateFileSize", 
+              filesize_check_max_file_size_value: 20 * 1024 * 1024 
+            } %>
     </div>
   <% else %>
     <div class="field">
       <%= form.label :transcript %>
-      <%= form.file_field :transcript, required: true %>
+      <%= form.file_field :transcript, 
+            required: true, 
+            data: { 
+              controller: "filesize-check", 
+              action: "filesize-check#validateFileSize", 
+              filesize_check_max_file_size_value: 20 * 1024 * 1024 
+            } %>
     </div>
   <% end %>
+
   <p class="direction_notes">
     <span class="text-red-700">
       Upload a pdf copy of your high school transcript<br> (Maximum size is 20Mb and file format is PDF, JPG, PNG)
@@ -305,5 +320,3 @@
       <% end %>
     </div>
 <% end %>
-<%= javascript_pack_tag 'required_stars' %>
-<%= javascript_pack_tag 'filesize_check' %>

@@ -1,4 +1,4 @@
-<%= form_with(model: recupload, local: true) do |form| %>
+<%= form_with(model: recupload, local: true, data: { controller: "required-stars" }) do |form| %>
   <% if recupload.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(recupload.errors.count, "error") %> prohibited this recupload from being saved:</h2>
@@ -38,7 +38,12 @@
 
     <div class="field">
       <%= form.label :recletter, "Upload Recommendation Letter" %>
-      <%= form.file_field :recletter %>
+      <%= form.file_field :recletter, 
+          data: { 
+            controller: "filesize-check", 
+            action: "filesize-check#validateFileSize", 
+            filesize_check_max_file_size_value: 20 * 1024 * 1024 
+          } %>
     </div>
     <p class="direction_notes">Maximum size is 20Mb and valid file formats are PDF, JPG, PNG</p>
     <p class= "my-2">
@@ -56,5 +61,3 @@
 <% end %>
 
 <%= javascript_pack_tag 'rec_file_select' %>
-<%= javascript_pack_tag 'required_stars' %>
-<%= javascript_pack_tag 'filesize_check' %>
