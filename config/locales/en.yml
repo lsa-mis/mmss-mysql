@@ -67,17 +67,17 @@ en:
         parentphone: "Parent/Guardian Phone"
         parentworkphone: "Parent/Guardian Work Phone"
         parentemail: "Parent/Guardian email"
-        state: "State (Select Non-US if international)*"
-        country: "Country*"
-        birthdate: "Birthdate*"
-        gender: "Gender*"
-        shirt_size: "Shirt size*"
-        demographic: "Race/Ethnicity*"
-        demographic_other: "Please specify your demographic"
+        state: "State (Select Non-US if international)"
+        country: "Country"
+        birthdate: "Birthdate"
+        gender: "Gender"
+        shirt_size: "Shirt size"
+        demographic: "Race/Ethnicity"
+        demographic_other: "If OTHER, specify demographic"
       
       enrollment:
-        high_school_state: "High school state (Select Non-US if international)*"
-        high_school_country: "High school country*"
+        high_school_state: "High school state (Select Non-US if international)"
+        high_school_country: "High school country"
       
       recommendation:
         firstname: "First Name"
