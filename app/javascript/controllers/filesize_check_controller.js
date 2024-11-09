@@ -7,7 +7,6 @@ export default class extends Controller {
   }
 
   connect() {
-    console.log("FilesizeCheck controller connected")
     this.maxFileSize = this.maxFileSizeValue || 20 * 1024 * 1024 // Default to 20MB
   }
 
