@@ -78,12 +78,8 @@ ActiveAdmin.register ApplicantDetail do
       g.gender_name
     end
     column :us_citizen
-    column :demographic do |d| 
-      if d.demographic_name == "Other" && d.demographic_other.present?
-        "#{d.demographic_name} - #{d.demographic_other}"
-      else
-        d.demographic_name
-      end
+    column :demographic do |d|
+      d.formatted_demographic
     end
     column :birthdate
     column :diet_restrictions
@@ -129,11 +125,7 @@ ActiveAdmin.register ApplicantDetail do
         g.gender_name
       end
       row :demographic do |d|
-        if d.demographic_name == "Other" && d.demographic_other.present?
-          "#{d.demographic_name} - #{d.demographic_other}"
-        else
-          d.demographic_name
-        end
+        d.formatted_demographic
       end
       row :birthdate
       row :diet_restrictions
@@ -159,13 +151,7 @@ ActiveAdmin.register ApplicantDetail do
     column :lastname
     column :firstname
     column('email') { |app| app.applicant_email }
-    column('demographic') do |d|
-      if d.demographic_name == "Other" && d.demographic_other.present?
-        "#{d.demographic_name} - #{d.demographic_other}"
-      else
-        d.demographic_name
-      end
-    end
+    column('demographic') { |d| d.formatted_demographic }
     column :us_citizen
     column :birthdate
     column :diet_restrictions
