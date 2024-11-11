@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_11_06_202652) do
+ActiveRecord::Schema.define(version: 2024_11_11_193121) do
 
   create_table "active_admin_comments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "namespace"
@@ -86,7 +86,6 @@ ActiveRecord::Schema.define(version: 2024_11_06_202652) do
     t.string "lastname", null: false
     t.string "gender"
     t.boolean "us_citizen", default: false, null: false
-    t.string "demographic"
     t.date "birthdate", null: false
     t.text "diet_restrictions"
     t.string "shirt_size"
@@ -111,7 +110,9 @@ ActiveRecord::Schema.define(version: 2024_11_06_202652) do
     t.string "parentemail"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.bigint "demographic_id"
     t.string "demographic_other"
+    t.index ["demographic_id"], name: "index_applicant_details_on_demographic_id"
     t.index ["user_id"], name: "index_applicant_details_on_user_id"
   end
 
@@ -393,6 +394,7 @@ ActiveRecord::Schema.define(version: 2024_11_06_202652) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "activities", "camp_occurrences"
+  add_foreign_key "applicant_details", "demographics"
   add_foreign_key "applicant_details", "users"
   add_foreign_key "camp_occurrences", "camp_configurations"
   add_foreign_key "course_assignments", "courses"

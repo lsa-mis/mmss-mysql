@@ -175,15 +175,15 @@
 
   <div data-controller="demographic-other">
     <div class="field">
-      <%= form.label :demographic %>
-      <%= form.collection_select :demographic, 
-                                 Demographic.all, 
-                                 :id, 
-                                 :name, 
+      <%= form.label :demographic_id %>
+      <%= form.collection_select :demographic_id,
+                                 Demographic.all,
+                                 :id,
+                                 :name,
                                  { include_blank: "Select" },
                                  { 
                                    required: true,
-                                   data: { 
+                                   data: {
                                      action: "change->demographic-other#toggleOtherField"
                                    } 
                                  } %>

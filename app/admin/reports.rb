@@ -52,7 +52,7 @@ ActiveAdmin.register_page 'Reports' do
         FROM enrollments AS e
         LEFT JOIN users AS u ON e.user_id = u.id
         LEFT JOIN applicant_details AS ad ON ad.user_id = e.user_id
-        LEFT JOIN demographics AS d ON d.id = CAST(ad.demographic AS UNSIGNED)
+        LEFT JOIN demographics AS d ON d.id = ad.demographic_id
         WHERE e.application_status = 'application complete'
         AND e.campyear = #{CampConfiguration.active.last.camp_year}
         ORDER BY country, gender, year_in_school"
@@ -74,7 +74,7 @@ ActiveAdmin.register_page 'Reports' do
       FROM enrollments AS e
       LEFT JOIN users AS u ON e.user_id = u.id
       LEFT JOIN applicant_details AS ad ON ad.user_id = e.user_id
-      LEFT JOIN demographics AS d ON d.id = CAST(ad.demographic AS UNSIGNED)
+      LEFT JOIN demographics AS d ON d.id = ad.demographic_id
       WHERE e.application_status = 'enrolled'
       AND e.campyear = #{CampConfiguration.active.last.camp_year}
       ORDER BY country, gender, year_in_school"
@@ -130,7 +130,7 @@ ActiveAdmin.register_page 'Reports' do
         LEFT JOIN applicant_details AS ad ON ad.user_id = e.user_id
         LEFT JOIN recommendations AS r ON r.enrollment_id = e.id
         LEFT JOIN financial_aids AS fa ON fa.enrollment_id = e.id
-        LEFT JOIN demographics AS d ON d.id = CAST(ad.demographic AS UNSIGNED)
+        LEFT JOIN demographics AS d ON d.id = ad.demographic_id
         WHERE e.application_status = 'application complete' AND e.campyear = #{CampConfiguration.active.last.camp_year}
         ORDER BY name"
       title = 'all_complete_applications'
@@ -395,7 +395,7 @@ ActiveAdmin.register_page 'Reports' do
         FROM enrollments AS e
         LEFT JOIN users AS u ON e.user_id = u.id
         LEFT JOIN applicant_details AS ad ON ad.user_id = e.user_id
-        LEFT JOIN demographics AS d ON d.id = CAST(ad.demographic AS UNSIGNED)
+        LEFT JOIN demographics AS d ON d.id = ad.demographic_id
         WHERE e.application_status = 'enrolled'
         AND e.campyear = #{CampConfiguration.active.last.camp_year}
         ORDER BY name"

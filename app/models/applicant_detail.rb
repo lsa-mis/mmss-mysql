@@ -9,7 +9,6 @@
 #  lastname           :string(255)      not null
 #  gender             :string(255)
 #  us_citizen         :boolean          default(FALSE), not null
-#  demographic        :string(255)
 #  birthdate          :date             not null
 #  diet_restrictions  :text(65535)
 #  shirt_size         :string(255)
@@ -34,22 +33,20 @@
 #  parentemail        :string(255)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
+#  demographic_id     :bigint
 #  demographic_other  :string(255)
 #
 class ApplicantDetail < ApplicationRecord
   belongs_to :user, required: true, inverse_of: :applicant_detail
-  belongs_to :demographic_record, class_name: 'Demographic',
-                                  foreign_key: 'demographic',
-                                  optional: true
+  belongs_to :demographic, optional: true
 
   validates :user_id, uniqueness: true
   validates :firstname, presence: true
   validates :lastname, presence: true
-  # validates :us_citizen, presence: true
   validates :gender, presence: true
   validates :birthdate, presence: true
   validates :shirt_size, presence: true
-  validates :demographic, presence: true
+  validates :demographic_id, presence: true
   validates :address1, presence: true
   validates :city, presence: true
   validates :state, presence: { message: "needs to be selected or if you are
@@ -87,7 +84,7 @@ class ApplicantDetail < ApplicationRecord
   end
 
   def demographic_name
-    demographic_record&.name || 'None Selected'
+    demographic&.name || 'None Selected'
   end
 
   def parentemail_not_user_email
@@ -101,9 +98,9 @@ class ApplicantDetail < ApplicationRecord
   end
 
   def self.ransackable_attributes(auth_object = nil)
-    %w[address1 address2 birthdate city country created_at demographic diet_restrictions
-       firstname gender id lastname middlename parentaddress1 parentaddress2 parentcity
-       parentcountry parentemail parentname parentphone parentstate parentstate_non_us
+    %w[address1 address2 birthdate city country created_at demographic demographic_other
+       diet_restrictions firstname gender id lastname middlename parentaddress1 parentaddress2
+       parentcity parentcountry parentemail parentname parentphone parentstate parentstate_non_us
        parentworkphone parentzip phone postalcode shirt_size state state_non_us updated_at
        us_citizen user_id]
   end
@@ -119,13 +116,15 @@ class ApplicantDetail < ApplicationRecord
   private
 
   def demographic_other_if_other_selected
-    if demographic.present? && Demographic.find(demographic).name.downcase == 'other' && demographic_other.blank?
-      errors.add(:demographic_other, "must be specified when 'Other' is selected")
-    end
+    return unless demographic_id.present? &&
+                  demographic&.name&.downcase == 'other' &&
+                  demographic_other.blank?
+
+    errors.add(:demographic_other, "must be specified when 'Other' is selected")
   end
 
   def clear_demographic_other_if_not_other
-    return unless demographic.present? && Demographic.find(demographic).name.downcase != 'other'
+    return unless demographic_id.present? && demographic&.name&.downcase != 'other'
 
     self.demographic_other = nil
   end

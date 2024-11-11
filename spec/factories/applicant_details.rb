@@ -9,7 +9,6 @@
 #  lastname           :string(255)      not null
 #  gender             :string(255)
 #  us_citizen         :boolean          default(FALSE), not null
-#  demographic        :string(255)
 #  birthdate          :date             not null
 #  diet_restrictions  :text(65535)
 #  shirt_size         :string(255)
@@ -34,6 +33,7 @@
 #  parentemail        :string(255)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
+#  demographic_id     :bigint
 #  demographic_other  :string(255)
 #
 FactoryBot.define do
