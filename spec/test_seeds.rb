@@ -2,6 +2,10 @@ Gender.create!([
                  { name: 'Female', description: 'dudette' },
                  { name: 'Male', description: 'dude' }
                ])
+Demographic.create!([
+                      { name: 'Test Demographic', description: 'Test Description', protected: false },
+                      { name: 'Other', description: 'Other demographic option', protected: true }
+                    ])
 
 CampConfiguration.create([
                            { camp_year: 2022, application_open: '2022-01-01', application_close: '2022-11-01', priority: '2022-04-01',

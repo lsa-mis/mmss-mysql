@@ -43,7 +43,7 @@ FactoryBot.define do
     firstname { Faker::Name.first_name }
     middlename { Faker::Name.middle_name }
     lastname { Faker::Name.last_name }
-    gender { Faker::Gender.binary_type }
+    gender { Gender.first&.id || association(:gender) }
     birthdate { Faker::Date.birthday(min_age: 15, max_age: 18) }
     diet_restrictions { 'peanuts' }
     shirt_size { 'Large' }
@@ -64,5 +64,11 @@ FactoryBot.define do
     parentphone { '123-444-5555' }
     parentworkphone { '123-666-5555' }
     parentemail { Faker::Internet.email }
+
+    after(:build) do |applicant_detail|
+      if applicant_detail.demographic&.name&.downcase == 'other'
+        applicant_detail.demographic_other = 'Other Demographic Details'
+      end
+    end
   end
 end
