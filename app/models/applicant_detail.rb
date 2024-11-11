@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: applicant_details
@@ -93,11 +95,11 @@ class ApplicantDetail < ApplicationRecord
     errors.add(:base, "Parent/Guardian email should be different than the applicant's email")
   end
 
-  def self.ransackable_associations(auth_object = nil)
-    ["demographic", "user"]
+  def self.ransackable_associations(_auth_object = nil)
+    %w[demographic user]
   end
 
-  def self.ransackable_attributes(auth_object = nil)
+  def self.ransackable_attributes(_auth_object = nil)
     %w[address1 address2 birthdate city country created_at demographic_id diet_restrictions
        firstname gender id lastname middlename parentaddress1 parentaddress2 parentcity
        parentcountry parentemail parentname parentphone parentstate parentstate_non_us
