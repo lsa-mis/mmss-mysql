@@ -17,7 +17,6 @@
 #  application_fee_cents     :integer
 #  reject_letter             :text(65535)
 #  waitlist_letter           :text(65535)
-#  application_fee_required  :boolean
 #
 class CampConfiguration < ApplicationRecord
   has_many :camp_occurrences, dependent: :destroy

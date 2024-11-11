@@ -34,6 +34,7 @@
 #  parentemail        :string(255)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
+#  demographic_other  :string(255)
 #
 require 'rails_helper'
 
