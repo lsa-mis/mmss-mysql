@@ -38,9 +38,9 @@
 #
 class ApplicantDetail < ApplicationRecord
   belongs_to :user, required: true, inverse_of: :applicant_detail
-  belongs_to :demographic_record, class_name: 'Demographic', 
-                                 foreign_key: 'demographic', 
-                                 optional: true
+  belongs_to :demographic_record, class_name: 'Demographic',
+                                  foreign_key: 'demographic',
+                                  optional: true
 
   validates :user_id, uniqueness: true
   validates :firstname, presence: true
@@ -56,15 +56,17 @@ class ApplicantDetail < ApplicationRecord
                                           outside of the US select *Non-US*" }
   validates :postalcode, presence: true
   validates :country, presence: true
-  validates :phone, presence: true, format: { with: /\A(\+|00)?[0-9][0-9 \-?\(\)\.]{7,}\z/, message: "number format is incorrect"}
+  validates :phone, presence: true,
+                    format: { with: /\A(\+|00)?[0-9][0-9 \-?().]{7,}\z/, message: 'number format is incorrect' }
   validates :parentname, presence: true
-  validates :parentphone, presence: true, format: { with: /\A(\+|00)?[0-9][0-9 \-?\(\)\.]{7,}\z/, message: "number format is incorrect"}
-  validates :parentemail, presence: true, length: {maximum: 255},
-                    format: {with: URI::MailTo::EMAIL_REGEXP, message: "only allows valid emails"}
-  validate :parentemail_not_user_email 
+  validates :parentphone, presence: true,
+                          format: { with: /\A(\+|00)?[0-9][0-9 \-?().]{7,}\z/, message: 'number format is incorrect' }
+  validates :parentemail, presence: true, length: { maximum: 255 },
+                          format: { with: URI::MailTo::EMAIL_REGEXP, message: 'only allows valid emails' }
+  validate :parentemail_not_user_email
   validate :demographic_other_if_other_selected
 
-  scope :current_camp_enrolled, -> { where("user_id IN (?)", Enrollment.enrolled.pluck(:user_id)) }
+  scope :current_camp_enrolled, -> { where('user_id IN (?)', Enrollment.enrolled.pluck(:user_id)) }
 
   before_save :clear_demographic_other_if_not_other
 
@@ -73,39 +75,38 @@ class ApplicantDetail < ApplicationRecord
   end
 
   def applicant_email
-    User.find(self.user_id).email
-  end# or whatever column you wantend
+    User.find(user_id).email
+  end
 
   def full_name_and_email
     "#{full_name} - #{applicant_email}"
   end
 
   def gender_name
-    Gender.find(self.gender).name
+    Gender.find(gender).name
   end
 
   def demographic_name
-    demographic_record&.name || "None Selected"
+    demographic_record&.name || 'None Selected'
   end
 
   def parentemail_not_user_email
-    if self.user.email == self.parentemail
-      errors.add(:base, "Parent/Guardian email should be different than the applicant's email")
-    else
-      return true
-    end
+    return true unless user.email == parentemail
+
+    errors.add(:base, "Parent/Guardian email should be different than the applicant's email")
   end
 
   def self.ransackable_associations(auth_object = nil)
-    ["user"]
+    ['user']
   end
 
   def self.ransackable_attributes(auth_object = nil)
-    ["address1", "address2", "birthdate", "city", "country", "created_at", "demographic", "diet_restrictions", "firstname", "gender", "id", "lastname", "middlename", "parentaddress1", "parentaddress2", "parentcity", "parentcountry", "parentemail", "parentname", "parentphone", "parentstate", "parentstate_non_us", "parentworkphone", "parentzip", "phone", "postalcode", "shirt_size", "state", "state_non_us", "updated_at", "us_citizen", "user_id"]
+    %w[address1 address2 birthdate city country created_at demographic diet_restrictions
+       firstname gender id lastname middlename parentaddress1 parentaddress2 parentcity parentcountry parentemail parentname parentphone parentstate parentstate_non_us parentworkphone parentzip phone postalcode shirt_size state state_non_us updated_at us_citizen user_id]
   end
 
   def formatted_demographic
-    if demographic_name == "Other" && demographic_other.present?
+    if demographic_name == 'Other' && demographic_other.present?
       "#{demographic_name} - #{demographic_other}"
     else
       demographic_name
@@ -121,8 +122,8 @@ class ApplicantDetail < ApplicationRecord
   end
 
   def clear_demographic_other_if_not_other
-    if demographic.present? && Demographic.find(demographic).name.downcase != 'other'
-      self.demographic_other = nil
-    end
+    return unless demographic.present? && Demographic.find(demographic).name.downcase != 'other'
+
+    self.demographic_other = nil
   end
 end
