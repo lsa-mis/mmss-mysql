@@ -38,6 +38,9 @@
 #
 class ApplicantDetail < ApplicationRecord
   belongs_to :user, required: true, inverse_of: :applicant_detail
+  belongs_to :demographic_record, class_name: 'Demographic', 
+                                 foreign_key: 'demographic', 
+                                 optional: true
 
   validates :user_id, uniqueness: true
   validates :firstname, presence: true
@@ -82,11 +85,7 @@ class ApplicantDetail < ApplicationRecord
   end
 
   def demographic_name
-    if self.demographic.present?
-      Demographic.find(self.demographic).name
-    else
-      "None Selected"
-    end
+    demographic_record&.name || "None Selected"
   end
 
   def parentemail_not_user_email
@@ -103,6 +102,14 @@ class ApplicantDetail < ApplicationRecord
 
   def self.ransackable_attributes(auth_object = nil)
     ["address1", "address2", "birthdate", "city", "country", "created_at", "demographic", "diet_restrictions", "firstname", "gender", "id", "lastname", "middlename", "parentaddress1", "parentaddress2", "parentcity", "parentcountry", "parentemail", "parentname", "parentphone", "parentstate", "parentstate_non_us", "parentworkphone", "parentzip", "phone", "postalcode", "shirt_size", "state", "state_non_us", "updated_at", "us_citizen", "user_id"]
+  end
+
+  def formatted_demographic
+    if demographic_name == "Other" && demographic_other.present?
+      "#{demographic_name} - #{demographic_other}"
+    else
+      demographic_name
+    end
   end
 
   private
