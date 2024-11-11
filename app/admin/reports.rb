@@ -31,7 +31,6 @@ ActiveAdmin.register_page 'Reports' do
           li link_to 'report - Enrolled Students with Sessions and T-Shirt size',
                      admin_reports_enrolled_with_sessions_and_tshirt_path
           li link_to 'report - Course Assignments', admin_reports_course_assignments_path
-          # li link_to "report - Enrolled Students with Covid Verification", admin_reports_enrolled_with_covid_verification_path
           li link_to 'report - Enrolled with Addresses, Birthdate, Gender, Graduation Year',
                      admin_reports_enrolled_with_addresses_and_more_path
           li link_to 'report - Enrolled for More than One Session',
@@ -40,7 +39,7 @@ ActiveAdmin.register_page 'Reports' do
         end
       end
     end
-  end # content
+  end
 
   controller do
     def complete_apps_demographic_report
@@ -101,16 +100,16 @@ ActiveAdmin.register_page 'Reports' do
     end
 
     def all_complete_apps
-      query = "SELECT DATE_FORMAT(e.updated_at, '%Y-%m-%d') AS 'Last Update', 
-        CONCAT(REPLACE(ad.firstname, ',', ' '), ' ', REPLACE(ad.lastname, ',', ' ')) AS name, 
+      query = "SELECT DATE_FORMAT(e.updated_at, '%Y-%m-%d') AS 'Last Update',
+        CONCAT(REPLACE(ad.firstname, ',', ' '), ' ', REPLACE(ad.lastname, ',', ' ')) AS name,
         u.email,
-        (CASE WHEN ad.gender = '' THEN NULL ELSE 
-        (SELECT genders.name FROM genders WHERE CAST(ad.gender AS UNSIGNED) = genders.id) END) as gender, 
+        (CASE WHEN ad.gender = '' THEN NULL ELSE
+        (SELECT genders.name FROM genders WHERE CAST(ad.gender AS UNSIGNED) = genders.id) END) as gender,
         ad.us_citizen as us_citizen,
         d.name AS demographic,
         CASE WHEN d.name = 'Other' THEN ad.demographic_other ELSE NULL END as demographic_other,
         ad.birthdate as birthdate, ad.diet_restrictions as diet_restrictions,
-        ad.shirt_size as shirt_size, CONCAT(ad.address1, ' ', ad.address2, ' ', ad.city, ' ', 
+        ad.shirt_size as shirt_size, CONCAT(ad.address1, ' ', ad.address2, ' ', ad.city, ' ',
         ad.state, ' ', ad.state_non_us, ' ', ad.postalcode, ' ', ad.country) AS address,
         ad.phone as phone, ad.parentname as parentname,
         CONCAT(ad.parentaddress1, ' ', ad.parentaddress2, ' ', ad.parentcity, ' ', ad.parentstate, ' ',
@@ -134,11 +133,11 @@ ActiveAdmin.register_page 'Reports' do
         LEFT JOIN demographics AS d ON d.id = CAST(ad.demographic AS UNSIGNED)
         WHERE e.application_status = 'application complete' AND e.campyear = #{CampConfiguration.active.last.camp_year}
         ORDER BY name"
-      title = "all_complete_applications"
+      title = 'all_complete_applications'
 
       data = data_to_csv(query, title)
       respond_to do |format|
-        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv"}
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv" }
       end
     end
 
@@ -379,23 +378,6 @@ ActiveAdmin.register_page 'Reports' do
       end
     end
 
-    # def enrolled_with_covid_verification
-    #   query = "SELECT co.description AS session, REPLACE(ad.lastname, ',', ' ') AS lastname, REPLACE(ad.firstname, ',', ' ') AS firstname, u.email, en.id
-    #   FROM enrollments en
-    #   JOIN applicant_details AS ad ON ad.user_id = en.user_id
-    #   JOIN session_assignments AS sa ON sa.enrollment_id = en.id
-    #   JOIN camp_occurrences AS co ON sa.camp_occurrence_id = co.id
-    #   LEFT JOIN users AS u ON en.user_id = u.id
-    #   WHERE en.campyear = #{CampConfiguration.active.last.camp_year} AND en.application_status = 'enrolled'
-    #   ORDER BY co.description, lastname"
-    #   title = "enrolled_with_covid_verification"
-
-    #   data = data_to_csv_covid_verification(query, title)
-    #   respond_to do |format|
-    #     format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv"}
-    #   end
-    # end
-
     def enrolled_with_addresses_and_more
       query = "SELECT
         CONCAT(REPLACE(ad.firstname, ',', ' '), ' ', REPLACE(ad.lastname, ',', ' ')) AS name,
@@ -529,38 +511,5 @@ ActiveAdmin.register_page 'Reports' do
         end
       end
     end
-
-    # def data_to_csv_covid_verification(query, title)
-    #   records_array = ActiveRecord::Base.connection.exec_query(query)
-    #   result = []
-    #   result.push({"total" => records_array.count, "header" => records_array.columns, "rows" => records_array.rows})
-
-    #   CSV.generate(headers: false) do |csv|
-    #     csv << Array(title.titleize)
-    #     result.each do |res|
-    #       line =[]
-    #       line << "Total number of records: " + res['total'].to_s
-    #       csv << line
-    #       header = res['header'].map! { |e| e.titleize.upcase }
-    #       header [4] = "VACCINE RECORD"
-    #       header[5] = 'COVID TEST RECORD'
-    #       csv << header
-    #       res['rows'].each do |row|
-    #         en_id = row[4]
-    #         if Enrollment.find(en_id).vaccine_record.attached?
-    #           row[4] = "uploaded"
-    #         else
-    #           row[4] = "missing"
-    #         end
-    #         if Enrollment.find(en_id).covid_test_record.attached?
-    #           row[5] = "uploaded"
-    #         else
-    #           row[5] = "missing"
-    #         end
-    #         csv << row
-    #       end
-    #     end
-    #   end
-    # end
   end
 end
