@@ -1,20 +1,9 @@
 ActiveAdmin.register User do
   menu parent: 'Logins Info', priority: 1
   config.filters = false
-  # See permitted parameters documentation:
-  # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
-  #
-  # Uncomment all parameters which should be permitted for assignment
-  #
-   permit_params :email, :password, :password_confirmation
-  #
-  # or
-  #
-  # permit_params do
-  #   permitted = [:email, :encrypted_password, :reset_password_token, :reset_password_sent_at, :remember_created_at, :sign_in_count, :current_sign_in_at, :last_sign_in_at, :current_sign_in_ip, :last_sign_in_ip]
-  #   permitted << :other if params[:action] == 'create' && current_user.admin?
-  #   permitted
-  # end
+
+  # Allow email updates without requiring password
+  permit_params :email, :password, :password_confirmation
 
   index do
     selectable_column
@@ -29,10 +18,21 @@ ActiveAdmin.register User do
   form do |f|
     f.inputs do
       f.input :email
-      f.input :password
-      f.input :password_confirmation
+      f.input :password, required: false, 
+              hint: "Leave blank if you don't want to change the password"
+      f.input :password_confirmation, required: false
     end
     f.actions
   end
 
+  # Custom update action to handle password changes
+  controller do
+    def update
+      if params[:user][:password].blank? && params[:user][:password_confirmation].blank?
+        params[:user].delete(:password)
+        params[:user].delete(:password_confirmation)
+      end
+      super
+    end
+  end
 end
