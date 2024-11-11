@@ -55,7 +55,8 @@ ActiveAdmin.register ApplicantDetail do
   end
 
   filter :gender, as: :select, collection: Gender.all.map { |a| [a.name, a.id] }
-  filter :demographic, as: :select, collection: Demographic.all.map { |a| [a.name, a.id] }
+  filter :demographic, as: :select, 
+                      collection: proc { Demographic.all.map { |d| [d.name, d.id] } }
   filter :lastname, as: :select
   filter :us_citizen
   filter :birthdate
