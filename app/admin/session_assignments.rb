@@ -6,7 +6,7 @@ ActiveAdmin.register SessionAssignment do
   #
   # Uncomment all parameters which should be permitted for assignment
   #
- permit_params :enrollment_id, :camp_occurrence_id, :offer_status
+  permit_params :enrollment_id, :camp_occurrence_id, :offer_status
   #
   # or
   #
@@ -16,16 +16,22 @@ ActiveAdmin.register SessionAssignment do
   #   permitted
   # end
 
-  scope :current_year_session_assignments, :default => true, label: "Current years Session Assignments"
+  scope :current_year_session_assignments, default: true, label: 'Current years Session Assignments'
   scope :all
 
   scope :accepted, group: :offer_status
 
   form do |f|
     f.inputs do
-      f.input :enrollment_id, as: :select, collection: Enrollment.current_camp_year_applications.map { |enrol| [enrol.display_name.downcase, enrol.id]}.sort
-      f.input :camp_occurrence_id, label: "Session", as: :select, collection: CampOccurrence.active
-      f.input :offer_status, as: :select, collection: ['accepted','declined']
+      f.input :enrollment_id, as: :select, collection: lambda {
+        Enrollment.current_camp_year_applications.map do |enrol|
+          [enrol.display_name.downcase, enrol.id]
+        end.sort
+      }
+      f.input :camp_occurrence_id, label: 'Session', as: :select, collection: lambda {
+        CampOccurrence.active.no_any_session
+      }
+      f.input :offer_status, as: :select, collection: %w[accepted declined]
     end
     f.actions
   end
@@ -33,8 +39,8 @@ ActiveAdmin.register SessionAssignment do
   index do
     selectable_column
     actions
-    column ('Enrollment') { |sa| link_to sa.enrollment.display_name, admin_application_path(sa.enrollment_id) }
-    column "Session" do |sa|
+    column('Enrollment') { |sa| link_to sa.enrollment.display_name, admin_application_path(sa.enrollment_id) }
+    column 'Session' do |sa|
       sa.camp_occurrence
     end
     column :created_at
@@ -44,31 +50,34 @@ ActiveAdmin.register SessionAssignment do
 
   show do
     attributes_table do
-      row ('Enrollment') { |sa| link_to sa.enrollment.user.email, admin_application_path(sa.enrollment_id) }
-    row "Session" do |sa|
-      sa.camp_occurrence
-    end
-    row :created_at
-    row :updated_at
-    row :offer_status
+      row('Enrollment') { |sa| link_to sa.enrollment.user.email, admin_application_path(sa.enrollment_id) }
+      row 'Session' do |sa|
+        sa.camp_occurrence
+      end
+      row :created_at
+      row :updated_at
+      row :offer_status
     end
     active_admin_comments
   end
 
-  filter :enrollment_id, as: :select, collection: -> { Enrollment.current_camp_year_applications.map { |enrol| [enrol.display_name.downcase, enrol.id]}.sort }
-  filter :camp_occurrence_id, label: "Session", as: :select, collection: CampOccurrence.active.no_any_session
+  filter :enrollment_id, as: :select, collection: lambda {
+    Enrollment.current_camp_year_applications.map do |enrol|
+      [enrol.display_name.downcase, enrol.id]
+    end.sort
+  }
+  filter :camp_occurrence_id, label: 'Session', as: :select, collection: -> { CampOccurrence.active.no_any_session }
   filter :offer_status, as: :select
 
   csv do
-    column "Name" do |sa|
+    column 'Name' do |sa|
       sa.enrollment.applicant_detail.full_name
     end
-    column "email" do |sa|
+    column 'email' do |sa|
       sa.enrollment.user.email
     end
-    column "Session" do |sa|
+    column 'Session' do |sa|
       sa.camp_occurrence.display_name
     end
   end
 end
-

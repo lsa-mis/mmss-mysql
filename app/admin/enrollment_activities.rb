@@ -16,9 +16,20 @@ ActiveAdmin.register EnrollmentActivity, as: "Applicant Activities" do
   #   permitted
   # end
 
-  filter :enrollment_id, as: :select, collection: -> { Enrollment.current_camp_year_applications.map { |enrol| [enrol.display_name.downcase, enrol.id]}.sort}
-  filter :activity_id, as: :select, collection: Activity.where(camp_occurrence_id: CampOccurrence.active).order(camp_occurrence_id: :asc, description: :asc)
+  filter :enrollment_id, 
+    as: :select, 
+    collection: -> { 
+      Enrollment.current_camp_year_applications.map { |enrol| 
+        [enrol.display_name.downcase, enrol.id]
+      }.sort
+    }
 
+  filter :activity_id, 
+    as: :select, 
+    collection: -> { 
+      Activity.where(camp_occurrence_id: CampOccurrence.active)
+              .order(camp_occurrence_id: :asc, description: :asc)
+    }
 
   form do |f|
     f.inputs do

@@ -15,7 +15,7 @@ ActiveAdmin.register Course do
   #   permitted << :other if params[:action] == 'create' && current_user.admin?
   #   permitted
   # end
-  filter :camp_occurrence_id, label: "Session", as: :select, collection: CampOccurrence.order(begin_date: :desc).no_any_session
+  filter :camp_occurrence_id, label: "Session", as: :select, collection: -> { CampOccurrence.order(begin_date: :desc).no_any_session }
   filter :title
   filter :available_spaces, as: :select
   filter :status, as: :select
