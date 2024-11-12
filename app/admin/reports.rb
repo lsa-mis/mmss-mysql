@@ -47,7 +47,10 @@ ActiveAdmin.register_page 'Reports' do
         (CASE WHEN ad.gender = '' THEN NULL ELSE
         (SELECT genders.name FROM genders WHERE CAST(ad.gender AS UNSIGNED) = genders.id) END) as gender,
         e.year_in_school,
-        d.name AS demographic,
+        CASE
+          WHEN d.name = 'Other' AND ad.demographic_other IS NOT NULL THEN CONCAT(d.name, ' - ', ad.demographic_other)
+          ELSE d.name
+        END AS demographic,
         e.international
         FROM enrollments AS e
         LEFT JOIN users AS u ON e.user_id = u.id
@@ -69,7 +72,10 @@ ActiveAdmin.register_page 'Reports' do
       (CASE WHEN ad.gender = '' THEN NULL ELSE
       (SELECT genders.name FROM genders WHERE CAST(ad.gender AS UNSIGNED) = genders.id) END) as gender,
       e.year_in_school,
-      d.name AS demographic,
+      CASE
+        WHEN d.name = 'Other' AND ad.demographic_other IS NOT NULL THEN CONCAT(d.name, ' - ', ad.demographic_other)
+        ELSE d.name
+      END AS demographic,
       e.international
       FROM enrollments AS e
       LEFT JOIN users AS u ON e.user_id = u.id
@@ -106,8 +112,10 @@ ActiveAdmin.register_page 'Reports' do
         (CASE WHEN ad.gender = '' THEN NULL ELSE
         (SELECT genders.name FROM genders WHERE CAST(ad.gender AS UNSIGNED) = genders.id) END) as gender,
         ad.us_citizen as us_citizen,
-        d.name AS demographic,
-        CASE WHEN d.name = 'Other' THEN ad.demographic_other ELSE NULL END as demographic_other,
+        CASE
+          WHEN d.name = 'Other' AND ad.demographic_other IS NOT NULL THEN CONCAT(d.name, ' - ', ad.demographic_other)
+          ELSE d.name
+        END AS demographic,
         ad.birthdate as birthdate, ad.diet_restrictions as diet_restrictions,
         ad.shirt_size as shirt_size, CONCAT(ad.address1, ' ', ad.address2, ' ', ad.city, ' ',
         ad.state, ' ', ad.state_non_us, ' ', ad.postalcode, ' ', ad.country) AS address,
