@@ -42,6 +42,8 @@ class ApplicantDetail < ApplicationRecord
   belongs_to :user, required: true, inverse_of: :applicant_detail
   belongs_to :demographic, optional: true
 
+  before_validation :clear_demographic_other_if_not_other
+
   validates :user_id, uniqueness: true
   validates :firstname, presence: true
   validates :lastname, presence: true
@@ -66,8 +68,6 @@ class ApplicantDetail < ApplicationRecord
   validate :demographic_other_if_other_selected
 
   scope :current_camp_enrolled, -> { where('user_id IN (?)', Enrollment.enrolled.pluck(:user_id)) }
-
-  before_save :clear_demographic_other_if_not_other
 
   def full_name
     "#{lastname}, #{firstname}"
