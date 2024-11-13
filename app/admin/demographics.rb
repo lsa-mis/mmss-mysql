@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ActiveAdmin.register Demographic do
   menu parent: 'Camp Setup'
 

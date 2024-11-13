@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ActiveAdmin.register_page 'Reports' do
   menu parent: 'Dashboard', priority: 1
 
@@ -424,7 +426,7 @@ ActiveAdmin.register_page 'Reports' do
         csv << Array(title.titleize)
         result.each do |res|
           line = []
-          line << 'Total number of records: ' + res['total'].to_s
+          line << "Total number of records: #{res['total']}"
           csv << line
           header = res['header'].map! { |e| e.titleize.upcase }
           csv << header
@@ -444,13 +446,13 @@ ActiveAdmin.register_page 'Reports' do
         csv << Array(title.titleize)
         result.each do |res|
           line = []
-          line << 'Total number of records: ' + res['total'].to_s
+          line << "Total number of records: #{res['total']}"
           csv << line
           header = res['header'].map! { |e| e.titleize.upcase }
           csv << header
           res['rows'].each do |row|
             c = row[0]
-            row[0] = ISO3166::Country[c].name + ' - ' + c if c != 'country'
+            row[0] = "#{ISO3166::Country[c].name} - #{c}" if c != 'country'
             csv << row
           end
         end
@@ -467,14 +469,14 @@ ActiveAdmin.register_page 'Reports' do
         csv << Array(title.titleize)
         result.each do |res|
           line = []
-          line << res['empty'].to_s + 'Total number of records: ' + res['total'].to_s
+          line << res['empty'].to_s + "Total number of records: #{res['total']}"
           csv << line
           header = res['header'].map! { |e| e.titleize.upcase }
           header = header.rotate(1)
           csv << header
           res['rows'].each do |row|
             c = row[0]
-            row[0] = ISO3166::Country[c].name + ' - ' + c if c != 'country'
+            row[0] = "#{ISO3166::Country[c].name} - #{c}" if c != 'country'
             row = row.rotate(1)
             csv << row
           end
@@ -491,7 +493,7 @@ ActiveAdmin.register_page 'Reports' do
         csv << Array(title.titleize)
         result.each do |res|
           line = []
-          line << 'Total number of records: ' + res['total'].to_s
+          line << "Total number of records: #{res['total']}"
           csv << line
           header = res['header'].map! { |e| e.titleize.upcase }
           csv << header
@@ -511,7 +513,7 @@ ActiveAdmin.register_page 'Reports' do
                        c1
                      end
             country = row[5]
-            row[5] = ISO3166::Country[country].name + ' - ' + country if country != 'country'
+            row[5] = "#{ISO3166::Country[country].name} - #{country}" if country != 'country'
             csv << row
             s2 = s1
             c2 = c1
