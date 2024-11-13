@@ -6,7 +6,7 @@ ActiveAdmin.register CoursePreference do
   #
   # Uncomment all parameters which should be permitted for assignment
   #
-   permit_params :enrollment_id, :course_id, :ranking
+  permit_params :enrollment_id, :course_id, :ranking
   #
   # or
   #
@@ -15,24 +15,30 @@ ActiveAdmin.register CoursePreference do
   #   permitted << :other if params[:action] == 'create' && current_user.admin?
   #   permitted
   # end
-  filter :enrollment_id, as: :select, collection: -> { Enrollment.current_camp_year_applications.map { |enrol| [enrol.display_name.downcase, enrol.id]}.sort}
-  filter :course_id, as: :select, collection: -> { Course.where(camp_occurrence_id: CampOccurrence.active).order(camp_occurrence_id: :asc, title: :asc) }
+  filter :enrollment_id, as: :select, collection: Enrollment.current_camp_year_applications.map { |enrol|
+    [enrol.display_name.downcase, enrol.id]
+  }.sort
+  filter :course_id, as: :select,
+                     collection: Course.where(camp_occurrence_id: CampOccurrence.active).order(camp_occurrence_id: :asc, title: :asc)
 
   form do |f|
     f.inputs do
-      f.input :enrollment_id, as: :select, collection: -> { Enrollment.current_camp_year_applications.map { |enrol| [enrol.display_name.downcase, enrol.id]}.sort }
-      f.input :course_id, label: "Course", as: :select, collection: -> { Course.where(camp_occurrence_id: CampOccurrence.active) }
+      f.input :enrollment_id, as: :select, collection: Enrollment.current_camp_year_applications.map { |enrol|
+        [enrol.display_name.downcase, enrol.id]
+      }.sort
+      f.input :course_id, label: 'Course', as: :select,
+                          collection: Course.where(camp_occurrence_id: CampOccurrence.active)
       f.input :ranking, as: :select, collection: (1..12).to_a
     end
     f.actions
   end
-  
-  index do 
+
+  index do
     selectable_column
     actions
     column :id
     column :enrollment
-    column "Session" do |cp|
+    column 'Session' do |cp|
       cp.course.camp_occurrence.description
     end
     column :course
@@ -40,5 +46,4 @@ ActiveAdmin.register CoursePreference do
     column :created_at
     column :updated_at
   end
-
 end
