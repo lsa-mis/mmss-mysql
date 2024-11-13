@@ -30,9 +30,10 @@
 #  camp_doc_form_completed       :boolean          default(FALSE)
 #
 class Enrollment < ApplicationRecord
-  after_update :send_offer_letter
+  before_update :if_camp_doc_form_completed
   before_update :if_application_status_changed
   before_update :set_application_deadline
+  after_update :send_offer_letter
   after_commit :send_enroll_letter, if: :persisted?
   after_commit :send_rejected_letter, if: :persisted?
   after_commit :send_waitlisted_letter, if: :persisted?
@@ -167,6 +168,13 @@ class Enrollment < ApplicationRecord
           errors.add(image.name, "incorrect file type")
         end
       end
+    end
+  end
+
+  def if_camp_doc_form_completed
+    payment = PaymentState.new(self)
+    if self.camp_doc_form_completed && payment.balance_due == 0
+      self.application_status = "enrolled"
     end
   end
 

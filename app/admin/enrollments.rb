@@ -12,7 +12,7 @@ ActiveAdmin.register Enrollment, as: "Application" do
                   :high_school_state, :high_school_non_us, 
                   :high_school_postalcode, :high_school_country, 
                   :year_in_school, :anticipated_graduation_year, 
-                  :room_mate_request, :personal_statement, 
+                  :room_mate_request, :personal_statement, :camp_doc_form_completed,
                   :shirt_size, :notes, :application_status, :application_status_updated_on, :campyear,
                   :offer_status, :partner_program, :transcript, :student_packet, 
                   :application_deadline, :vaccine_record, :covid_test_record, :uniqname,
@@ -93,6 +93,7 @@ ActiveAdmin.register Enrollment, as: "Application" do
 
       end
      f.input :transcript, as: :file, label: "Update transcript"
+     f.input :camp_doc_form_completed
     #  f.input :student_packet, as: :file, label: "Update student_packet"
     #  f.input :vaccine_record, as: :file, label: "Update vaccine_record"
     #  f.input :covid_test_record, as: :file, label: "Update covid_test_record"
@@ -170,6 +171,7 @@ ActiveAdmin.register Enrollment, as: "Application" do
     #     link_to sp.covid_test_record.filename, url_for(sp.covid_test_record)
     #   end
     # end
+    column :camp_doc_form_completed
     column :offer_status
     column :application_deadline
     column :application_status
@@ -337,6 +339,7 @@ ActiveAdmin.register Enrollment, as: "Application" do
           link_to tr.transcript.filename, url_for(tr.transcript)
         end
       end
+      row :camp_doc_form_completed
       # row :student_packet do |sp|
       #   if sp.student_packet.attached?
       #     link_to sp.student_packet.filename, url_for(sp.student_packet)
@@ -396,6 +399,7 @@ ActiveAdmin.register Enrollment, as: "Application" do
     column :room_mate_request
     column :notes
     column :partner_program
+    column :camp_doc_form_completed
     column "Balance Due" do |app|
       humanized_money_with_symbol(PaymentState.new(app).balance_due / 100)
     end
