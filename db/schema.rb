@@ -10,9 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_11_11_223015) do
+ActiveRecord::Schema.define(version: 2024_11_13_195535) do
 
-  create_table "active_admin_comments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "active_admin_comments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "namespace"
     t.text "body"
     t.string "resource_type"
@@ -26,7 +26,7 @@ ActiveRecord::Schema.define(version: 2024_11_11_223015) do
     t.index ["resource_type", "resource_id"], name: "index_active_admin_comments_on_resource_type_and_resource_id"
   end
 
-  create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
     t.bigint "record_id", null: false
@@ -36,7 +36,7 @@ ActiveRecord::Schema.define(version: 2024_11_11_223015) do
     t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
   end
 
-  create_table "active_storage_blobs", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "active_storage_blobs", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "key", null: false
     t.string "filename", null: false
     t.string "content_type"
@@ -48,7 +48,7 @@ ActiveRecord::Schema.define(version: 2024_11_11_223015) do
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
 
-  create_table "activities", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "activities", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "camp_occurrence_id"
     t.string "description"
     t.integer "cost_cents"
@@ -59,7 +59,7 @@ ActiveRecord::Schema.define(version: 2024_11_11_223015) do
     t.index ["camp_occurrence_id"], name: "index_activities_on_camp_occurrence_id"
   end
 
-  create_table "admins", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "admins", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.integer "sign_in_count", default: 0, null: false
@@ -79,7 +79,7 @@ ActiveRecord::Schema.define(version: 2024_11_11_223015) do
     t.index ["reset_password_token"], name: "index_admins_on_reset_password_token", unique: true
   end
 
-  create_table "applicant_details", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "applicant_details", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "firstname", null: false
     t.string "middlename"
@@ -110,13 +110,14 @@ ActiveRecord::Schema.define(version: 2024_11_11_223015) do
     t.string "parentemail"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "other_demographic"
     t.string "demographic_other"
     t.bigint "demographic_id"
     t.index ["demographic_id"], name: "index_applicant_details_on_demographic_id"
     t.index ["user_id"], name: "index_applicant_details_on_user_id"
   end
 
-  create_table "camp_configurations", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "camp_configurations", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.integer "camp_year", null: false
     t.date "application_open", null: false
     t.date "application_close", null: false
@@ -134,7 +135,7 @@ ActiveRecord::Schema.define(version: 2024_11_11_223015) do
     t.index ["camp_year"], name: "index_camp_configurations_on_camp_year", unique: true
   end
 
-  create_table "camp_occurrences", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "camp_occurrences", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "camp_configuration_id", null: false
     t.string "description", null: false
     t.date "begin_date", null: false
@@ -146,7 +147,7 @@ ActiveRecord::Schema.define(version: 2024_11_11_223015) do
     t.index ["camp_configuration_id"], name: "index_camp_occurrences_on_camp_configuration_id"
   end
 
-  create_table "campnotes", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "campnotes", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "note"
     t.datetime "opendate"
     t.datetime "closedate"
@@ -155,7 +156,7 @@ ActiveRecord::Schema.define(version: 2024_11_11_223015) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  create_table "course_assignments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "course_assignments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "enrollment_id", null: false
     t.bigint "course_id", null: false
     t.datetime "created_at", precision: 6, null: false
@@ -165,7 +166,7 @@ ActiveRecord::Schema.define(version: 2024_11_11_223015) do
     t.index ["enrollment_id"], name: "index_course_assignments_on_enrollment_id"
   end
 
-  create_table "course_preferences", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "course_preferences", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "enrollment_id", null: false
     t.bigint "course_id", null: false
     t.integer "ranking"
@@ -175,7 +176,7 @@ ActiveRecord::Schema.define(version: 2024_11_11_223015) do
     t.index ["enrollment_id"], name: "index_course_preferences_on_enrollment_id"
   end
 
-  create_table "courses", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "courses", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "camp_occurrence_id", null: false
     t.string "title"
     t.integer "available_spaces"
@@ -187,7 +188,7 @@ ActiveRecord::Schema.define(version: 2024_11_11_223015) do
     t.index ["camp_occurrence_id"], name: "index_courses_on_camp_occurrence_id"
   end
 
-  create_table "demographics", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "demographics", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "description", null: false
     t.datetime "created_at", precision: 6, null: false
@@ -195,7 +196,7 @@ ActiveRecord::Schema.define(version: 2024_11_11_223015) do
     t.boolean "protected", default: false
   end
 
-  create_table "enrollment_activities", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "enrollment_activities", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "enrollment_id", null: false
     t.bigint "activity_id", null: false
     t.datetime "created_at", precision: 6, null: false
@@ -204,7 +205,7 @@ ActiveRecord::Schema.define(version: 2024_11_11_223015) do
     t.index ["enrollment_id"], name: "index_enrollment_activities_on_enrollment_id"
   end
 
-  create_table "enrollments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "enrollments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.boolean "international", default: false, null: false
     t.string "high_school_name", null: false
@@ -229,10 +230,11 @@ ActiveRecord::Schema.define(version: 2024_11_11_223015) do
     t.date "application_deadline"
     t.date "application_status_updated_on"
     t.string "uniqname"
+    t.boolean "camp_doc_form_completed", default: false
     t.index ["user_id"], name: "index_enrollments_on_user_id"
   end
 
-  create_table "faculties", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "faculties", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "reset_password_token"
@@ -249,7 +251,7 @@ ActiveRecord::Schema.define(version: 2024_11_11_223015) do
     t.index ["reset_password_token"], name: "index_faculties_on_reset_password_token", unique: true
   end
 
-  create_table "feedbacks", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "feedbacks", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "genre"
     t.string "message"
     t.bigint "user_id"
@@ -258,7 +260,7 @@ ActiveRecord::Schema.define(version: 2024_11_11_223015) do
     t.index ["user_id"], name: "index_feedbacks_on_user_id"
   end
 
-  create_table "financial_aids", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "financial_aids", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "enrollment_id", null: false
     t.integer "amount_cents", default: 0
     t.string "source"
@@ -270,14 +272,14 @@ ActiveRecord::Schema.define(version: 2024_11_11_223015) do
     t.index ["enrollment_id"], name: "index_financial_aids_on_enrollment_id"
   end
 
-  create_table "genders", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "genders", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "description"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  create_table "payments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "payments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "transaction_type"
     t.string "transaction_status"
     t.string "transaction_id"
@@ -297,7 +299,7 @@ ActiveRecord::Schema.define(version: 2024_11_11_223015) do
     t.index ["user_id"], name: "index_payments_on_user_id"
   end
 
-  create_table "recommendations", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "recommendations", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "enrollment_id", null: false
     t.string "email", null: false
     t.string "lastname", null: false
@@ -319,7 +321,7 @@ ActiveRecord::Schema.define(version: 2024_11_11_223015) do
     t.index ["enrollment_id"], name: "index_recommendations_on_enrollment_id"
   end
 
-  create_table "recuploads", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "recuploads", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.text "letter"
     t.string "authorname", null: false
     t.string "studentname", null: false
@@ -329,7 +331,7 @@ ActiveRecord::Schema.define(version: 2024_11_11_223015) do
     t.index ["recommendation_id"], name: "index_recuploads_on_recommendation_id"
   end
 
-  create_table "rejections", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "rejections", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "enrollment_id", null: false
     t.text "reason"
     t.datetime "created_at", precision: 6, null: false
@@ -337,7 +339,7 @@ ActiveRecord::Schema.define(version: 2024_11_11_223015) do
     t.index ["enrollment_id"], name: "index_rejections_on_enrollment_id"
   end
 
-  create_table "session_activities", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "session_activities", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "enrollment_id", null: false
     t.bigint "camp_occurrence_id", null: false
     t.datetime "created_at", precision: 6, null: false
@@ -346,7 +348,7 @@ ActiveRecord::Schema.define(version: 2024_11_11_223015) do
     t.index ["enrollment_id"], name: "index_session_activities_on_enrollment_id"
   end
 
-  create_table "session_assignments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "session_assignments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "enrollment_id", null: false
     t.bigint "camp_occurrence_id", null: false
     t.datetime "created_at", precision: 6, null: false
@@ -356,7 +358,7 @@ ActiveRecord::Schema.define(version: 2024_11_11_223015) do
     t.index ["enrollment_id"], name: "index_session_assignments_on_enrollment_id"
   end
 
-  create_table "travels", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "travels", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "enrollment_id", null: false
     t.string "arrival_transport"
     t.string "arrival_carrier"
@@ -376,7 +378,7 @@ ActiveRecord::Schema.define(version: 2024_11_11_223015) do
     t.index ["enrollment_id"], name: "index_travels_on_enrollment_id"
   end
 
-  create_table "users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "users", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "reset_password_token"
