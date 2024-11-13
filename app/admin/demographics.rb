@@ -20,8 +20,8 @@ ActiveAdmin.register Demographic do
       else
         item 'View', admin_demographic_path(demographic), class: 'member_link'
         item 'Edit', edit_admin_demographic_path(demographic), class: 'member_link'
-        item 'Delete', admin_demographic_path(demographic), 
-             method: :delete, 
+        item 'Delete', admin_demographic_path(demographic),
+             method: :delete,
              class: 'member_link',
              data: { confirm: 'Are you sure?' }
       end
@@ -30,8 +30,8 @@ ActiveAdmin.register Demographic do
 
   form do |f|
     if f.object.protected?
-      panel "Protected Record" do
-        para "This demographic record is protected and cannot be modified."
+      panel 'Protected Record' do
+        para 'This demographic record is protected and cannot be modified.'
       end
       # Display read-only information
       attributes_table_for f.object do
@@ -43,7 +43,6 @@ ActiveAdmin.register Demographic do
       f.inputs do
         f.input :name
         f.input :description
-        f.input :protected
       end
       f.actions
     end
@@ -58,7 +57,7 @@ ActiveAdmin.register Demographic do
     def update
       # Prevent updates to protected records
       if resource.protected?
-        flash[:error] = "Cannot modify protected demographic records"
+        flash[:error] = 'Cannot modify protected demographic records'
         redirect_to admin_demographic_path(resource)
       else
         super
@@ -68,7 +67,7 @@ ActiveAdmin.register Demographic do
     def destroy
       # Prevent deletion of protected records
       if resource.protected?
-        flash[:error] = "Cannot delete protected demographic records"
+        flash[:error] = 'Cannot delete protected demographic records'
         redirect_to admin_demographic_path(resource)
       else
         super
