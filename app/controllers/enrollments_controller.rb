@@ -58,7 +58,7 @@ class EnrollmentsController < ApplicationController
   def update
     respond_to do |format|
       if @current_enrollment.update(enrollment_params)
-        if @current_enrollment.student_packet.attached? && balance_due == 0
+        if @current_enrollment.camp_doc_form_completed && balance_due == 0
           @current_enrollment.update!(application_status: "enrolled", application_status_updated_on: Date.today)
         end
         format.html { redirect_to root_path, notice: 'Application was successfully updated.' }
@@ -164,7 +164,7 @@ class EnrollmentsController < ApplicationController
                           :personal_statement, :shirt_size, :notes,
                           :application_status, :offer_status,
                           :partner_program, :transcript,
-                          :student_packet, :campyear,
+                          :student_packet, :campyear, :camp_doc_form_completed,
                           :vaccine_record, :covid_test_record,
                           registration_activity_ids: [],
                           session_registration_ids: [],

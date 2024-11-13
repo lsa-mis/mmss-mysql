@@ -49,7 +49,7 @@ class Payment < ApplicationRecord
         end
       end
     else 
-      if balance_due == 0 && @current_enrollment.student_packet.attached?
+      if balance_due == 0 && @current_enrollment.camp_doc_form_completed
         @current_enrollment.update!(application_status: "enrolled", application_status_updated_on: Date.today)
       end
     end
