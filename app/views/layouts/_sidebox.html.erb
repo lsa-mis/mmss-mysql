@@ -147,12 +147,22 @@
                 </div>
                 <div class="field">
                   <%= form.label :student_packet, 'Update Student Packet' %>
-                  <%= form.file_field :student_packet %>
+                  <%= form.file_field :student_packet, 
+                          data: { 
+                            controller: "filesize-check", 
+                            action: "filesize-check#validateFileSize", 
+                            filesize_check_max_file_size_value: 20 * 1024 * 1024 
+                          } %>
                 </div>
               <% else %>
                 <div class="field">
                   <%= form.label :student_packet, 'Upload Student Packet' %>
-                  <%= form.file_field :student_packet, required: true %>
+                  <%= form.file_field :student_packet, 
+                          data: { 
+                            controller: "filesize-check", 
+                            action: "filesize-check#validateFileSize", 
+                            filesize_check_max_file_size_value: 20 * 1024 * 1024 
+                          } %>
                 </div>
               <% end %>
               <div class="actions">
@@ -177,12 +187,22 @@
                   </div>
                   <div class="field">
                     <%= form.label :vaccine_record, 'Update Vaccine Record' %>
-                    <%= form.file_field :vaccine_record %>
+                    <%= form.file_field :vaccine_record, 
+                            data: { 
+                              controller: "filesize-check", 
+                              action: "filesize-check#validateFileSize", 
+                              filesize_check_max_file_size_value: 20 * 1024 * 1024 
+                            } %>
                   </div>
                 <% else %>
                   <div class="field">
                     <%= form.label :vaccine_record, 'Upload Vaccine Record' %>
-                    <%= form.file_field :vaccine_record, required: true %>
+                    <%= form.file_field :vaccine_record, 
+                            data: { 
+                              controller: "filesize-check", 
+                              action: "filesize-check#validateFileSize", 
+                              filesize_check_max_file_size_value: 20 * 1024 * 1024 
+                            } %>
                   </div>
                 <% end %>
                 <div class="actions">
@@ -203,12 +223,22 @@
                     </div>
                     <div class="field">
                       <%= form.label :covid_test_record, 'Update Covid Test Report' %>
-                      <%= form.file_field :covid_test_record %>
+                      <%= form.file_field :covid_test_record, 
+                              data: { 
+                                controller: "filesize-check", 
+                                action: "filesize-check#validateFileSize", 
+                                filesize_check_max_file_size_value: 20 * 1024 * 1024 
+                              } %>
                     </div>
                   <% else %>
                     <div class="field">
                       <%= form.label :covid_test_record, 'Upload Covid Test Report' %>
-                      <%= form.file_field :covid_test_record, required: true %>
+                      <%= form.file_field :covid_test_record, 
+                              data: { 
+                                controller: "filesize-check", 
+                                action: "filesize-check#validateFileSize", 
+                                filesize_check_max_file_size_value: 20 * 1024 * 1024 
+                              } %>
                     </div>
                   <% end %>
                   <div class="actions">
@@ -238,4 +268,3 @@
 <% end %>
 
 <%= javascript_pack_tag 'student_packet_upload' %>
-<%= javascript_pack_tag 'filesize_check' %>

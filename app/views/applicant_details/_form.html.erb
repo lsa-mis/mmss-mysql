@@ -1,9 +1,8 @@
 <p>All fields are required unless marked <span class="text-gray-700">(optional)</span></p>
-<%= form_with(model: applicant_detail, local: true) do |form| %>
+<%= form_with(model: applicant_detail, local: true, data: { controller: "required-stars" }) do |form| %>
   <% if applicant_detail.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(applicant_detail.errors.count, "error") %> prohibited this applicant_detail from being saved:</h2>
-
       <ul>
         <% applicant_detail.errors.full_messages.each do |message| %>
           <li><%= message %></li>
@@ -11,7 +10,8 @@
       </ul>
     </div>
   <% end %>
-<h2 class="section-header">Applicant Information</h2>
+  
+  <h2 class="section-header">Applicant Information</h2>
 
   <div class="field">
     <%= form.label :firstname %>
@@ -45,7 +45,7 @@
 
   <div class="field state-select">
     <%= form.label :state%>
-    <%= form.select :state, us_states, include_blank: "Select", required: true %>
+    <%= form.select :state, us_states, { include_blank: "Select" }, { required: true } %>
   </div>
 
   <div class="field">
@@ -55,7 +55,10 @@
 
   <div class="field country-select">
     <%= form.label :country%>
-    <%= form.country_select :country, priority_countries: ["US"], include_blank: "Select", required: true %>
+    <%= form.country_select :country, 
+                        { priority_countries: ["US"] }, 
+                        { include_blank: "Select" }, 
+                        { required: true } %>
   </div>
 
   <div class="field">
@@ -69,15 +72,19 @@
   </div>
 
   <div class="field">
-    <%= form.label :birthdate%>
+    <%= form.label :birthdate %>
     <div class="date_select">
-      <%= form.date_select :birthdate, default: applicant_detail.birthdate, start_year: Date.today.year - 19, end_year: Date.today.year - 12, prompt: "Select",required: true %>
+      <%= form.text_field :birthdate, required: true, data: { 
+        controller: "flatpickr", 
+        flatpickr_min_date_value: (Date.today - 19.years).strftime('%Y-%m-%d'), 
+        flatpickr_max_date_value: (Date.today - 12.years).strftime('%Y-%m-%d') 
+      }, placeholder: "Select your birthdate" %>
     </div>
   </div>
 
   <div class="field">
     <%= form.label :shirt_size%>
-    <%= form.select :shirt_size, ["small","medium","large","xlarge","2xlarge","No Shirt"], include_blank: "Select", required: true %>
+    <%= form.select :shirt_size, ["small","medium","large","xlarge","2xlarge","No Shirt"], { include_blank: "Select" }, { required: true } %>
   </div>
 
   <div class="field">
@@ -153,8 +160,10 @@
       <% end %> if you need special rooming arrangements
       based on your gender identity.
     </p>
-      <%= form.label :gender%>
-      <%= form.collection_select(:gender, Gender.all, :id, :name, {include_blank: "Select"}) %>
+    <%= form.label :gender %>
+    <%= form.collection_select :gender, Gender.all, :id, :name, 
+                               { include_blank: "Select" }, 
+                               { required: true } %>
   </div>
 
   <div class="field">
@@ -164,11 +173,26 @@
     </div>
   </div>
 
-  <div class="field">
-    <%= form.label :demographic %>
-    <%= form.collection_select(:demographic, Demographic.all, :id, :name, include_blank: "Select") %>
+  <div data-controller="demographic-other">
+    <div class="field">
+      <%= form.label :demographic_id %>
+      <%= form.collection_select :demographic_id,
+                                 Demographic.all,
+                                 :id,
+                                 :name,
+                                 { include_blank: "Select" },
+                                 { 
+                                   required: true,
+                                   data: {
+                                     action: "change->demographic-other#toggleOtherField"
+                                   } 
+                                 } %>
+    </div>
+    <div class="field" data-demographic-other-target="otherfield">
+      <%= form.label :demographic_other, "If OTHER, specify your demographic" %>
+      <%= form.text_field :demographic_other %>
+    </div>
   </div>
-
 
   <div class="actions">
     <% if applicant_detail.new_record? %>
@@ -178,4 +202,3 @@
     <% end %>
   </div>
 <% end %>
-<%= javascript_pack_tag 'required_stars' %>

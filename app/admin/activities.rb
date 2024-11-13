@@ -16,7 +16,7 @@ ActiveAdmin.register Activity do
   #   permitted
   # end
 
-  filter :camp_occurrence_id, label: "Session", as: :select, collection: CampOccurrence.order(begin_date: :desc).no_any_session
+  filter :camp_occurrence_id, label: "Session", as: :select, collection: -> { CampOccurrence.order(begin_date: :desc).no_any_session }
   filter :description, as: :select
   filter :cost_cents
   filter :date_occurs
@@ -25,7 +25,7 @@ ActiveAdmin.register Activity do
   form do |f|
     f.semantic_errors
     f.inputs do
-      f.input :camp_occurrence, label: "Session", as: :select, collection: CampOccurrence.order(begin_date: :desc).no_any_session
+      f.input :camp_occurrence, label: "Session", as: :select, collection: -> { CampOccurrence.order(begin_date: :desc).no_any_session }
       f.input :description
       f.input :cost
       f.input :date_occurs

@@ -1,9 +1,13 @@
-class ApplicantDetailsController < ApplicationController
-  devise_group :logged_in, contains: [:user, :admin]
-  before_action :authenticate_logged_in!
-  before_action :authenticate_admin!, only: [:index, :destroy]
-  before_action :set_applicant_detail, only: [:show, :edit, :update, :destroy]
+# frozen_string_literal: true
 
+##
+# Controller handling applicant details management.
+# Provides CRUD operations for applicant information and requires authentication.
+class ApplicantDetailsController < ApplicationController
+  devise_group :logged_in, contains: %i[user admin]
+  before_action :authenticate_logged_in!
+  before_action :authenticate_admin!, only: %i[index destroy]
+  before_action :set_applicant_detail, only: %i[show edit update destroy]
 
   # GET /applicant_details
   # GET /applicant_details.json
@@ -15,9 +19,9 @@ class ApplicantDetailsController < ApplicationController
   # GET /applicant_details/1.json
   def show
     @us_citizen = citizen_status
-    if current_user.enrollments.current_camp_year_applications.present?
-      @current_enrollment = current_user.enrollments.current_camp_year_applications.last
-    end
+    return unless current_user.enrollments.current_camp_year_applications.present?
+
+    @current_enrollment = current_user.enrollments.current_camp_year_applications.last
   end
 
   # GET /applicant_details/new
@@ -27,16 +31,16 @@ class ApplicantDetailsController < ApplicationController
 
   # GET /applicant_details/1/edit
   def edit
-    if current_user.enrollments.current_camp_year_applications.present?
-      @current_enrollment = current_user.enrollments.current_camp_year_applications.last
-    end
+    return unless current_user.enrollments.current_camp_year_applications.present?
+
+    @current_enrollment = current_user.enrollments.current_camp_year_applications.last
   end
 
   # POST /applicant_details
   # POST /applicant_details.json
   def create
     if current_user.applicant_detail.present?
-      flash[:notice] = "Applicant Details exist. Click Edit, if you want to change something."
+      flash[:notice] = 'Applicant Details exist. Click Edit, if you want to change something.'
       redirect_to(applicant_detail_path(current_user))
     else
       @applicant_detail = current_user.create_applicant_detail(applicant_detail_params)
@@ -78,21 +82,25 @@ class ApplicantDetailsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_applicant_detail
-      @applicant_detail = current_user.applicant_detail
-    end
 
-    def citizen_status
-      if @applicant_detail.us_citizen
-        "You are a US citizen"
-      else
-        nil 
-      end
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_applicant_detail
+    @applicant_detail = current_user.applicant_detail
+  end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def applicant_detail_params
-      params.require(:applicant_detail).permit(:user_id, :firstname, :middlename, :lastname, :gender, :us_citizen, :demographic, :birthdate, :diet_restrictions, :shirt_size, :address1, :address2, :city, :state, :state_non_us, :postalcode, :country, :phone, :parentname, :parentaddress1, :parentaddress2, :parentcity, :parentstate, :parentstate_non_us, :parentzip, :parentcountry, :parentphone, :parentworkphone, :parentemail)
-    end
+  def citizen_status
+    'You are a US citizen' if @applicant_detail.us_citizen
+  end
+
+  # Never trust parameters from the scary internet, only allow the white list through.
+  def applicant_detail_params
+    params.require(:applicant_detail).permit(
+      :user_id, :firstname, :middlename, :lastname, :gender, :us_citizen,
+      :demographic_id, :demographic_other, :birthdate, :diet_restrictions,
+      :shirt_size, :address1, :address2, :city, :state, :state_non_us,
+      :postalcode, :country, :phone, :parentname, :parentaddress1, :parentaddress2,
+      :parentcity, :parentstate, :parentstate_non_us, :parentzip, :parentcountry,
+      :parentphone, :parentworkphone, :parentemail
+    )
+  end
 end

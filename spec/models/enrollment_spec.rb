@@ -26,6 +26,7 @@
 #  campyear                      :integer
 #  application_deadline          :date
 #  application_status_updated_on :date
+#  uniqname                      :string(255)
 #
 require 'rails_helper'
 

@@ -7,10 +7,11 @@
 #  description :string(255)      not null
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
+#  protected   :boolean          default(FALSE)
 #
 FactoryBot.define do
   factory :demographic do
-    name { "MyString" }
-    description { "MyString" }
+    sequence(:name) { |n| "Demographic #{n}" }
+    sequence(:description) { |n| "Description for demographic #{n}" }
   end
 end

@@ -9,7 +9,6 @@
 #  lastname           :string(255)      not null
 #  gender             :string(255)
 #  us_citizen         :boolean          default(FALSE), not null
-#  demographic        :string(255)
 #  birthdate          :date             not null
 #  diet_restrictions  :text(65535)
 #  shirt_size         :string(255)
@@ -34,41 +33,49 @@
 #  parentemail        :string(255)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
+#  demographic_id     :bigint
+#  demographic_other  :string(255)
 #
 require 'rails_helper'
 
 RSpec.describe ApplicantDetail, type: :model do
-
-  context "the Factory" do
+  context 'the Factory' do
     it 'is valid' do
       expect(build(:applicant_detail)).to be_valid
     end
   end
 
-  context "all required fields are present" do
-    subject { 
+  context 'all required fields are present' do
+    subject do
       FactoryBot.create(:user)
-      FactoryBot.create(:applicant_detail) } 
+      FactoryBot.create(:applicant_detail)
+    end
 
     it 'is valid' do
       expect(subject).to be_valid
     end
   end
 
-  context "without first name" do
+  context 'without first name' do
     let!(:user) { FactoryBot.create(:user) }
 
     it 'is not valid' do
-      expect { (FactoryBot.create(:applicant_detail, firstname: "", user: user)) }.to raise_error(ActiveRecord::RecordInvalid, "Validation failed: Firstname can't be blank")
+      expect do
+        FactoryBot.create(:applicant_detail, firstname: '',
+                                             user:)
+      end.to raise_error(ActiveRecord::RecordInvalid, "Validation failed: Firstname can't be blank")
     end
   end
 
-  context "prevent to create two ApplicantDetail records for a user (test user uniqueness)" do
+  context 'prevent to create two ApplicantDetail records for a user (test user uniqueness)' do
     let!(:user) { FactoryBot.create(:user) }
     it 'is valid' do
-      appdet1 = FactoryBot.create(:applicant_detail, user: user)
+      appdet1 = FactoryBot.create(:applicant_detail, user:)
       expect(appdet1).to be_valid
-      expect { (FactoryBot.create(:applicant_detail, user: user)) }.to raise_error(ActiveRecord::RecordInvalid, "Validation failed: User has already been taken")
+      expect do
+        FactoryBot.create(:applicant_detail,
+                          user:)
+      end.to raise_error(ActiveRecord::RecordInvalid, 'Validation failed: User has already been taken')
     end
   end
 end

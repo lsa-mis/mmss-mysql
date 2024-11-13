@@ -6,8 +6,11 @@ ActiveAdmin.register ApplicantDetail do
   #
   # Uncomment all parameters which should be permitted for assignment
   #
-   permit_params :user_id, :firstname, :middlename, :lastname, :gender, :us_citizen, :demographic, :birthdate, :diet_restrictions, :shirt_size, :address1, :address2, :city, :state, :state_non_us, :postalcode, :country, :phone, :parentname, :parentaddress1, :parentaddress2, :parentcity, :parentstate, :parentstate_non_us, :parentzip, :parentcountry, :parentphone, :parentworkphone, :parentemail
-  #
+  permit_params :user_id, :firstname, :middlename, :lastname, :gender, :us_citizen, :demographic_id, :demographic_other,
+                :birthdate, :diet_restrictions, :shirt_size, :address1, :address2, :city, :state, :state_non_us,
+                :postalcode, :country, :phone, :parentname, :parentaddress1, :parentaddress2, :parentcity, :parentstate,
+                :parentstate_non_us, :parentzip, :parentcountry, :parentphone, :parentworkphone, :parentemail
+
   actions :index, :show, :new, :create, :update, :edit
 
   scope :all, group: :application_status
@@ -23,7 +26,8 @@ ActiveAdmin.register ApplicantDetail do
       f.input :lastname
       f.input :gender, as: :select, collection: Gender.all
       f.input :us_citizen
-      f.input :demographic, as: :select, collection: Demographic.all
+      f.input :demographic, as: :select, collection: Demographic.all, input_html: { id: 'applicant_detail_demographic' }
+      f.input :demographic_other, wrapper_html: { style: 'margin-left: 20px;' }
       f.input :birthdate
       f.input :diet_restrictions
       f.input :shirt_size
@@ -47,29 +51,30 @@ ActiveAdmin.register ApplicantDetail do
       f.input :parentworkphone
       f.input :parentemail
     end
-    f.actions 
+    f.actions
   end
 
-  filter :gender, as: :select, collection: Gender.all.map{|a| [a.name, a.id]}
-  filter :demographic, as: :select, collection: Demographic.all.map{|a| [a.name, a.id]}
+  filter :gender, as: :select, collection: -> { Gender.all.map { |a| [a.name, a.id] } }
+  filter :demographic, as: :select,
+                       collection: proc { Demographic.all.map { |d| [d.name, d.id] } }
   filter :lastname, as: :select
   filter :us_citizen
   filter :birthdate
   filter :diet_restrictions
   filter :parentname
 
-  index do 
+  index do
     selectable_column
     actions
-    column "Fullname", sortable: :lastname do |appdetail|
+    column 'Fullname', sortable: :lastname do |appdetail|
       appdetail.full_name
     end
     column('email') do |app|
       if app.user.enrollments.exists?
         div(title: 'Link to Latest Application') do
-          link_to app.applicant_email, admin_application_path(app.user.enrollments.last) 
+          link_to app.applicant_email, admin_application_path(app.user.enrollments.last)
         end
-      else 
+      else
         app.applicant_email
       end
     end
@@ -77,8 +82,8 @@ ActiveAdmin.register ApplicantDetail do
       g.gender_name
     end
     column :us_citizen
-    column :demographic do |d| 
-        d.demographic_name
+    column :demographic do |d|
+      d.formatted_demographic
     end
     column :birthdate
     column :diet_restrictions
@@ -96,17 +101,17 @@ ActiveAdmin.register ApplicantDetail do
   end
 
   show do
-    panel "Applications" do
+    panel 'Applications' do
       table_for applicant_detail do
         column :firstname
         column :lastname
         column :gender do |g|
           g.gender_name
         end
-        column('email') do |app| 
+        column('email') do |app|
           if app.user.enrollments.exists?
             div(title: 'Link to Application') do
-              link_to app.applicant_email, admin_application_path(app.user.enrollments.last) 
+              link_to app.applicant_email, admin_application_path(app.user.enrollments.last)
             end
           else
             app.applicant_email
@@ -117,11 +122,14 @@ ActiveAdmin.register ApplicantDetail do
     active_admin_comments
   end
 
-  sidebar "Details", only: :show do
+  sidebar 'Details', only: :show do
     attributes_table_for applicant_detail do
       row :id
       row :gender do |g|
         g.gender_name
+      end
+      row :demographic do |d|
+        d.formatted_demographic
       end
       row :birthdate
       row :diet_restrictions
@@ -147,6 +155,7 @@ ActiveAdmin.register ApplicantDetail do
     column :lastname
     column :firstname
     column('email') { |app| app.applicant_email }
+    column('demographic') { |d| d.formatted_demographic }
     column :us_citizen
     column :birthdate
     column :diet_restrictions

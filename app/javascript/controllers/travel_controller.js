@@ -1,4 +1,4 @@
-import { Controller } from 'stimulus';
+import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = ["form", "depart", "arrival", "message", "arrival_transport", "arrival_details", "depart_transport", "depart_details",
     "arrival_date_time", "depart_date_time", "arrival_message",

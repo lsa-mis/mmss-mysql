@@ -26,6 +26,7 @@
 #  campyear                      :integer
 #  application_deadline          :date
 #  application_status_updated_on :date
+#  uniqname                      :string(255)
 #
 class Enrollment < ApplicationRecord
   after_update :send_offer_letter

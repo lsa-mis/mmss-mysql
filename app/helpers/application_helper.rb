@@ -1,18 +1,17 @@
 module ApplicationHelper
-
   def current_camp_year
-      CampConfiguration.active_camp_year
+    CampConfiguration.active_camp_year
   end
 
   def current_camp_year_app_opens
     if CampConfiguration.active.exists?
       CampConfiguration.active_camp_year_application_open
     else
-      "soon"
+      'soon'
     end
   end
 
-  def registration_open? 
+  def registration_open?
     if CampConfiguration.active.exists?
       Date.today >= CampConfiguration.active_camp_year_application_open && Date.today < CampConfiguration.active_camp_year_application_close
     else
@@ -29,14 +28,14 @@ module ApplicationHelper
   end
 
   def current_enrolled_applicants
-      Enrollment.enrolled
+    Enrollment.enrolled
   end
 
   def current_enrollment
     @current_enrollment = current_user.enrollments.current_camp_year_applications.last
   end
-  
-  def student_packet_url 
+
+  def student_packet_url
     CampConfiguration.active.pick(:student_packet_url)
   end
 
@@ -57,8 +56,8 @@ module ApplicationHelper
 
   def course_status
     [
-      ['open','open'],
-      ['closed','closed']
+      %w[open open],
+      %w[closed closed]
     ]
   end
 
@@ -131,56 +130,54 @@ module ApplicationHelper
 
   def campnote_types
     [
-      ['Alert','alert'],
-      ['Notice','notice']
+      %w[Alert alert],
+      %w[Notice notice]
     ]
   end
 
   def year_in_school
     [
-      ['9', '9'],
-      ['10', '10'],
-      ['11', '11'],
-      ['Other', 'Other']
+      %w[9 9],
+      %w[10 10],
+      %w[11 11],
+      %w[Other Other]
     ]
   end
 
   def show_international(international)
     if international
-      "yes"
+      'yes'
     else
-      "no"
+      'no'
     end
   end
 
   def transportation
-    ['Airplane', 'Bus', 'Train', 
-      'Automobile - parent or permitted designee is driving me to the University of Michigan campus', 
-      'I am a daily MMSS commuter'
-    ]
+    ['Airplane', 'Bus', 'Train',
+     'Automobile - parent or permitted designee is driving me to the University of Michigan campus',
+     'I am a daily MMSS commuter']
   end
 
   def show_date(field)
-    field.strftime("%A, %d %b %Y") unless field.blank?
+    field.strftime('%A, %d %b %Y') unless field.blank?
   end
 
   def show_time(field)
-    field.strftime("%I:%M %p") unless field.blank?
+    field.strftime('%I:%M %p') unless field.blank?
   end
 
   def transaction_status_message(transaction_status)
     case transaction_status
-      when "1"
-        "Accepted credit card (successful)"
-      when "2"
-        "Rejected credit card (declined)"
-      when "3"
-        "Error credit card (error)"
-      when "4"
-        "Unknown credit card error (unknown)"
-      else
-        "Transaction Status not returned"
-      end
+    when '1'
+      'Accepted credit card (successful)'
+    when '2'
+      'Rejected credit card (declined)'
+    when '3'
+      'Error credit card (error)'
+    when '4'
+      'Unknown credit card error (unknown)'
+    else
+      'Transaction Status not returned'
     end
-
+  end
 end
