@@ -62,10 +62,9 @@ ActiveAdmin.register_page 'Reports' do
         AND e.campyear = #{CampConfiguration.active.last.camp_year}
         ORDER BY country, gender, year_in_school"
       title = 'complete_apps_demographic_report'
-
       data = data_to_csv_demographic(query, title)
       respond_to do |format|
-        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv" }
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-b-%-d-%Y')}.csv" }
       end
     end
 
@@ -87,23 +86,34 @@ ActiveAdmin.register_page 'Reports' do
       AND e.campyear = #{CampConfiguration.active.last.camp_year}
       ORDER BY country, gender, year_in_school"
       title = 'enrolled_student_demographic_report'
-
       data = data_to_csv_demographic(query, title)
       respond_to do |format|
-        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv" }
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-b-%-d-%Y')}.csv" }
       end
     end
 
     def registered_but_not_applied
-      query = "SELECT u.id, u.email, CONCAT(REPLACE(ad.firstname, ',', ' '), ' ', REPLACE(ad.lastname, ',', ' ')) AS name, DATE_FORMAT(u.current_sign_in_at, '%Y-%m-%d') AS 'Last user login', DATE_FORMAT(ad.created_at, '%Y-%m-%d') AS 'Applicant Details created'
+      query = "SELECT u.id, u.email,
+              CONCAT(REPLACE(ad.firstname, ',', ' '), ' ',
+                    REPLACE(ad.lastname, ',', ' ')) AS name,
+              DATE_FORMAT(u.current_sign_in_at, '%Y-%m-%d') AS 'Last user login',
+              DATE_FORMAT(ad.created_at, '%Y-%m-%d') AS 'Applicant Details created'
       FROM users AS u
       JOIN applicant_details AS ad on u.id = ad.user_id
-      WHERE ad.user_id NOT IN (SELECT e.user_id FROM enrollments AS e WHERE e.campyear = (SELECT cc.camp_year FROM camp_configurations AS cc WHERE cc.active = true)) ORDER BY ad.created_at DESC, u.current_sign_in_at DESC"
+      WHERE ad.user_id NOT IN (
+        SELECT e.user_id
+        FROM enrollments AS e
+        WHERE e.campyear = (
+          SELECT cc.camp_year
+          FROM camp_configurations AS cc
+          WHERE cc.active = true
+        )
+      )
+      ORDER BY ad.created_at DESC, u.current_sign_in_at DESC"
       title = 'registered_but_not_applied'
-
       data = data_to_csv(query, title)
       respond_to do |format|
-        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv" }
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-b-%-d-%Y')}.csv" }
       end
     end
 
@@ -133,8 +143,11 @@ ActiveAdmin.register_page 'Reports' do
         e.anticipated_graduation_year as anticipated_graduation_year, e.room_mate_request as room_mate_request,
         e.personal_statement as personal_statement, e.notes as notes,
         e.application_status as application_status, e.offer_status as offer_status,
-        r.email AS recommender_email, CONCAT(REPLACE(r.lastname, ',', ' '), ' ', REPLACE(r.firstname, ',', ' ')) AS recommender_name, r.organization AS recommender_organization,
-        (fa.amount_cents / 100) AS fin_aid_amount, fa.source AS fin_aid_source, fa.note AS fin_aid_note, fa.status AS fin_aid_status
+        r.email AS recommender_email,
+        CONCAT(REPLACE(r.lastname, ',', ' '), ' ', REPLACE(r.firstname, ',', ' ')) AS recommender_name,
+        r.organization AS recommender_organization,
+        (fa.amount_cents / 100) AS fin_aid_amount, fa.source AS fin_aid_source, fa.note AS fin_aid_note,
+        fa.status AS fin_aid_status
         FROM enrollments AS e
         LEFT JOIN users AS u ON e.user_id = u.id
         LEFT JOIN applicant_details AS ad ON ad.user_id = e.user_id
@@ -144,222 +157,227 @@ ActiveAdmin.register_page 'Reports' do
         WHERE e.application_status = 'application complete' AND e.campyear = #{CampConfiguration.active.last.camp_year}
         ORDER BY name"
       title = 'all_complete_applications'
-
       data = data_to_csv(query, title)
       respond_to do |format|
-        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv" }
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-b-%-d-%Y')}.csv" }
       end
     end
 
     def enrolled_with_addresses
-      query = "Select ad.country, CONCAT(REPLACE(ad.firstname, ',', ' '), ' ', REPLACE(ad.lastname, ',', ' ')) AS name, REPLACE(ad.lastname, ',', ' ') AS lastname, REPLACE(ad.firstname, ',', ' ') AS firstname, u.email,
-              ad.parentname, ad.parentphone, ad.parentemail,
-              ad.address1, ad.address2, ad.city, ad.state, ad.state_non_us, ad.postalcode
-              FROM enrollments AS e
-              LEFT JOIN users AS u ON e.user_id = u.id
-              JOIN applicant_details AS ad ON ad.user_id = e.user_id
-              WHERE e.application_status = 'enrolled' AND e.campyear = #{CampConfiguration.active.last.camp_year} ORDER BY name"
+      query = "Select ad.country, CONCAT(REPLACE(ad.firstname, ',', ' '), ' ', REPLACE(ad.lastname, ',', ' ')) AS name,
+        REPLACE(ad.lastname, ',', ' ') AS lastname, REPLACE(ad.firstname, ',', ' ') AS firstname, u.email,
+        ad.parentname, ad.parentphone, ad.parentemail,
+        ad.address1, ad.address2, ad.city, ad.state, ad.state_non_us, ad.postalcode
+        FROM enrollments AS e
+        LEFT JOIN users AS u ON e.user_id = u.id
+        JOIN applicant_details AS ad ON ad.user_id = e.user_id
+        WHERE e.application_status = 'enrolled' AND e.campyear = #{CampConfiguration.active.last.camp_year}
+        ORDER BY name"
       title = 'enrolled_with_addresses_and_parents_information'
-
       data = data_to_csv_with_country(query, title)
       respond_to do |format|
-        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv" }
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-b-%-d-%Y')}.csv" }
       end
     end
 
     def pending_course_assignments_with_students
-      query = "SELECT co.description, cor.title, en.user_id, REPLACE(ad.lastname, ',', ' ') AS lastname, REPLACE(ad.firstname, ',', ' ') AS firstname, u.email
-      FROM course_assignments ca
-      JOIN enrollments en ON ca.enrollment_id = en.id
-      JOIN applicant_details AS ad ON ad.user_id = en.user_id
-      JOIN courses AS cor ON ca.course_id = cor.id
-      JOIN camp_occurrences AS co ON cor.camp_occurrence_id = co.id
-      LEFT JOIN users AS u ON en.user_id = u.id
-      WHERE en.campyear = #{CampConfiguration.active.last.camp_year}
-      ORDER BY co.description, cor.title"
+      query = "SELECT co.description, cor.title, en.user_id, REPLACE(ad.lastname, ',', ' ') AS lastname,
+        REPLACE(ad.firstname, ',', ' ') AS firstname, u.email
+        FROM course_assignments ca
+        JOIN enrollments en ON ca.enrollment_id = en.id
+        JOIN applicant_details AS ad ON ad.user_id = en.user_id
+        JOIN courses AS cor ON ca.course_id = cor.id
+        JOIN camp_occurrences AS co ON cor.camp_occurrence_id = co.id
+        LEFT JOIN users AS u ON en.user_id = u.id
+        WHERE en.campyear = #{CampConfiguration.active.last.camp_year}
+        ORDER BY co.description, cor.title"
       title = 'pending_course_assignments_with_students'
-
       data = data_to_csv(query, title)
       respond_to do |format|
-        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv" }
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-b-%-d-%Y')}.csv" }
       end
     end
 
     def accepted_course_assignments_with_students
-      query = "SELECT co.description, cor.title, en.user_id, REPLACE(ad.lastname, ',', ' ') AS lastname, REPLACE(ad.firstname, ',', ' ') AS firstname, u.email
-      FROM course_assignments ca
-      JOIN enrollments en ON ca.enrollment_id = en.id
-      JOIN applicant_details AS ad ON ad.user_id = en.user_id
-      JOIN courses AS cor ON ca.course_id = cor.id
-      JOIN camp_occurrences AS co ON cor.camp_occurrence_id = co.id
-      LEFT JOIN users AS u ON en.user_id = u.id
-      WHERE en.campyear = #{CampConfiguration.active.last.camp_year} AND en.offer_status = 'accepted'
-      ORDER BY co.description, cor.title"
+      query = "SELECT co.description, cor.title, en.user_id, REPLACE(ad.lastname, ',', ' ') AS lastname,
+        REPLACE(ad.firstname, ',', ' ') AS firstname, u.email
+        FROM course_assignments ca
+        JOIN enrollments en ON ca.enrollment_id = en.id
+        JOIN applicant_details AS ad ON ad.user_id = en.user_id
+        JOIN courses AS cor ON ca.course_id = cor.id
+        JOIN camp_occurrences AS co ON cor.camp_occurrence_id = co.id
+        LEFT JOIN users AS u ON en.user_id = u.id
+        WHERE en.campyear = #{CampConfiguration.active.last.camp_year} AND en.offer_status = 'accepted'
+        ORDER BY co.description, cor.title"
       title = 'accepted_course_assignments_with_students'
-
       data = data_to_csv(query, title)
       respond_to do |format|
-        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv" }
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-b-%-d-%Y')}.csv" }
       end
     end
 
     def events_per_session_for_enrolled
-      query = "SELECT ad.country, a.description AS 'Event Activity', co.description AS Session, ad.lastname, ad.firstname, u.email, e.room_mate_request, ad.city, ad.state, e.id
-      FROM session_assignments AS sa
-      JOIN enrollments AS e ON e.id = sa.enrollment_id
-      JOIN enrollment_activities AS ea ON ea.enrollment_id = sa.enrollment_id
-      JOIN activities as a ON a.id = ea.activity_id AND a.camp_occurrence_id = sa.camp_occurrence_id
-      JOIN camp_occurrences AS co ON co.id = a.camp_occurrence_id
-      JOIN applicant_details AS ad ON ad.user_id = e.user_id
-      JOIN users AS u ON u.id = ad.user_id
-      WHERE sa.enrollment_id IN (
-        SELECT id
-        FROM enrollments
-        WHERE application_status = 'enrolled' AND campyear = #{CampConfiguration.active.last.camp_year}
-      ) AND sa.offer_status = 'accepted'
-      ORDER BY co.description, a.description, ad.lastname, e.id"
+      query = "SELECT ad.country, a.description AS 'Event Activity',
+        co.description AS Session,
+        ad.lastname,
+        ad.firstname,
+        u.email,
+        e.room_mate_request,
+        ad.city,
+        ad.state,
+        e.id
+        FROM session_assignments AS sa
+        JOIN enrollments AS e ON e.id = sa.enrollment_id
+        JOIN enrollment_activities AS ea ON ea.enrollment_id = sa.enrollment_id
+        JOIN activities as a ON a.id = ea.activity_id AND a.camp_occurrence_id = sa.camp_occurrence_id
+        JOIN camp_occurrences AS co ON co.id = a.camp_occurrence_id
+        JOIN applicant_details AS ad ON ad.user_id = e.user_id
+        JOIN users AS u ON u.id = ad.user_id
+        WHERE sa.enrollment_id IN (
+          SELECT id
+          FROM enrollments
+          WHERE application_status = 'enrolled' AND campyear = #{CampConfiguration.active.last.camp_year}
+        ) AND sa.offer_status = 'accepted'
+        ORDER BY co.description, a.description, ad.lastname, e.id"
       title = 'events_per_session_for_enrolled'
-
       data = data_to_csv_with_country(query, title)
       respond_to do |format|
-        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv" }
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-b-%-d-%Y')}.csv" }
       end
     end
 
     def dorm_by_gender_by_session
       enroll_ids = Enrollment.enrolled.pluck(:id).join(', ')
-      query = "SELECT ad.country, a.description AS 'Event Activity', co.description AS Session, ad.lastname, ad.firstname, u.email,
-      (CASE WHEN ad.gender = '' THEN NULL ELSE (SELECT genders.name FROM genders WHERE CAST(ad.gender AS UNSIGNED) = genders.id) END) as gender,
-      e.room_mate_request, ad.city, ad.state
-      FROM session_assignments AS sa
-      JOIN enrollments AS e ON e.id = sa.enrollment_id
-      JOIN enrollment_activities AS ea ON ea.enrollment_id = sa.enrollment_id
-      JOIN activities as a ON a.id = ea.activity_id AND a.camp_occurrence_id = sa.camp_occurrence_id
-      JOIN camp_occurrences AS co ON co.id = a.camp_occurrence_id
-      JOIN applicant_details AS ad ON ad.user_id = e.user_id
-      JOIN users AS u ON u.id = ad.user_id
-      WHERE sa.enrollment_id IN (#{enroll_ids}) AND sa.offer_status = 'accepted' AND a.description LIKE ('Dormitory%')
-      ORDER BY co.description, a.description, ad.lastname, e.id"
+      query = "SELECT ad.country, a.description AS 'Event Activity', co.description AS Session, ad.lastname,
+        ad.firstname, u.email,
+        (CASE WHEN ad.gender = '' THEN NULL
+         ELSE (SELECT genders.name FROM genders WHERE CAST(ad.gender AS UNSIGNED) = genders.id) END) as gender,
+        e.room_mate_request, ad.city, ad.state
+        FROM session_assignments AS sa
+        JOIN enrollments AS e ON e.id = sa.enrollment_id
+        JOIN enrollment_activities AS ea ON ea.enrollment_id = sa.enrollment_id
+        JOIN activities as a ON a.id = ea.activity_id AND a.camp_occurrence_id = sa.camp_occurrence_id
+        JOIN camp_occurrences AS co ON co.id = a.camp_occurrence_id
+        JOIN applicant_details AS ad ON ad.user_id = e.user_id
+        JOIN users AS u ON u.id = ad.user_id
+        WHERE sa.enrollment_id IN (#{enroll_ids}) AND sa.offer_status = 'accepted' AND a.description LIKE ('Dormitory%')
+        ORDER BY co.description, a.description, ad.lastname, e.id"
       title = 'events_per_session_for_enrolled'
-
       data = data_to_csv_with_country(query, title)
       respond_to do |format|
-        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv" }
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-b-%-d-%Y')}.csv" }
       end
     end
 
     def complete_applications_with_course_preferences
       query = "SELECT u.email, ad.lastname, ad.firstname, cp.ranking, c.title, co.description
-      FROM enrollments AS e
-      JOIN course_preferences AS cp ON cp.enrollment_id = e.id
-      JOIN courses AS c ON cp.course_id = c.id
-      JOIN camp_occurrences AS co ON c.camp_occurrence_id = co.id
-      JOIN applicant_details AS ad ON e.user_id = ad.user_id
-      JOIN users AS u ON u.id = e.user_id
-      WHERE campyear = #{CampConfiguration.active.last.camp_year} AND application_status = 'application complete' AND (offer_status = '' OR offer_status IS NULL)
-      ORDER BY e.id, co.description, cp.ranking"
+        FROM enrollments AS e
+        JOIN course_preferences AS cp ON cp.enrollment_id = e.id
+        JOIN courses AS c ON cp.course_id = c.id
+        JOIN camp_occurrences AS co ON c.camp_occurrence_id = co.id
+        JOIN applicant_details AS ad ON e.user_id = ad.user_id
+        JOIN users AS u ON u.id = e.user_id
+        WHERE campyear = #{CampConfiguration.active.last.camp_year}
+          AND application_status = 'application complete'
+          AND (offer_status = '' OR offer_status IS NULL)
+        ORDER BY e.id, co.description, cp.ranking"
       title = 'complete_applications_with_course_preferences'
-
       data = data_to_csv(query, title)
       respond_to do |format|
-        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv" }
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-b-%-d-%Y')}.csv" }
       end
     end
 
     def waitlisted_applications_with_course_preferences
       query = "SELECT u.email, ad.lastname, ad.firstname, cp.ranking, c.title, co.description
-      FROM enrollments AS e
-      JOIN course_preferences AS cp ON cp.enrollment_id = e.id
-      JOIN courses AS c ON cp.course_id = c.id
-      JOIN camp_occurrences AS co ON c.camp_occurrence_id = co.id
-      JOIN applicant_details AS ad ON e.user_id = ad.user_id
-      JOIN users AS u ON u.id = e.user_id
-      WHERE campyear = #{CampConfiguration.active.last.camp_year} AND application_status = 'waitlisted'
-      ORDER BY e.id, co.description, cp.ranking"
+        FROM enrollments AS e
+        JOIN course_preferences AS cp ON cp.enrollment_id = e.id
+        JOIN courses AS c ON cp.course_id = c.id
+        JOIN camp_occurrences AS co ON c.camp_occurrence_id = co.id
+        JOIN applicant_details AS ad ON e.user_id = ad.user_id
+        JOIN users AS u ON u.id = e.user_id
+        WHERE campyear = #{CampConfiguration.active.last.camp_year} AND application_status = 'waitlisted'
+        ORDER BY e.id, co.description, cp.ranking"
       title = 'waitlisted_applications_with_course_preferences'
-
       data = data_to_csv(query, title)
       respond_to do |format|
-        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv" }
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-b-%-d-%Y')}.csv" }
       end
     end
 
     def finaid_with_app_and_offer_status
       query = "SELECT ad.firstname, ad.lastname, u.email, enroll.application_status, enroll.offer_status
-      FROM financial_aids AS fa
-      JOIN enrollments AS enroll ON fa.enrollment_id = enroll.id
-      JOIN applicant_details AS ad ON enroll.user_id = ad.user_id
-      JOIN users AS u ON enroll.user_id = u.id
-      WHERE enroll.campyear = #{CampConfiguration.active.last.camp_year}
-      ORDER BY enroll.application_status, enroll.offer_status"
+        FROM financial_aids AS fa
+        JOIN enrollments AS enroll ON fa.enrollment_id = enroll.id
+        JOIN applicant_details AS ad ON enroll.user_id = ad.user_id
+        JOIN users AS u ON enroll.user_id = u.id
+        WHERE enroll.campyear = #{CampConfiguration.active.last.camp_year}
+        ORDER BY enroll.application_status, enroll.offer_status"
       title = 'finaid_with_app_and_offer_status'
-
       data = data_to_csv(query, title)
       respond_to do |format|
-        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv" }
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-b-%-d-%Y')}.csv" }
       end
     end
 
     def enrolled_with_sessions_and_courses
-      query = "SELECT ad.country, co.description AS session, cor.title AS course, en.user_id, REPLACE(ad.lastname, ',', ' ') AS lastname, REPLACE(ad.firstname, ',', ' ') AS firstname, u.email,
-      en.year_in_school, ad.state
-      FROM course_assignments ca
-      JOIN enrollments en ON ca.enrollment_id = en.id
-      JOIN applicant_details AS ad ON ad.user_id = en.user_id
-      JOIN courses AS cor ON ca.course_id = cor.id
-      JOIN camp_occurrences AS co ON cor.camp_occurrence_id = co.id
-      LEFT JOIN users AS u ON en.user_id = u.id
-      WHERE en.campyear = #{CampConfiguration.active.last.camp_year} AND en.application_status = 'enrolled'
-      ORDER BY co.description, cor.title"
+      query = "SELECT ad.country, co.description AS session, cor.title AS course, en.user_id,
+        REPLACE(ad.lastname, ',', ' ') AS lastname,
+        REPLACE(ad.firstname, ',', ' ') AS firstname, u.email,
+        en.year_in_school, ad.state
+        FROM course_assignments ca
+        JOIN enrollments en ON ca.enrollment_id = en.id
+        JOIN applicant_details AS ad ON ad.user_id = en.user_id
+        JOIN courses AS cor ON ca.course_id = cor.id
+        JOIN camp_occurrences AS co ON cor.camp_occurrence_id = co.id
+        LEFT JOIN users AS u ON en.user_id = u.id
+        WHERE en.campyear = #{CampConfiguration.active.last.camp_year} AND en.application_status = 'enrolled'
+        ORDER BY co.description, cor.title"
       title = 'enrolled_students_with_sessions_and_courses'
-
       data = data_to_csv_with_country(query, title)
       respond_to do |format|
-        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv" }
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-b-%-d-%Y')}.csv" }
       end
     end
 
     def enrolled_for_more_than_one_session
       hash_with_ids = SessionAssignment.accepted.group(:enrollment_id).having('count(*) > 1').size
-      enroll_ids = if hash_with_ids.present?
-                     hash_with_ids.keys.join(', ')
-                   else
-                     0
-                   end
-
-      query = "SELECT ad.country,  en.user_id, REPLACE(ad.lastname, ',', ' ') AS lastname, REPLACE(ad.firstname, ',', ' ') AS firstname, u.email, co.description AS session, cor.title AS course,
-      en.year_in_school, ad.state
-      FROM course_assignments ca
-      JOIN enrollments en ON ca.enrollment_id = en.id
-      JOIN applicant_details AS ad ON ad.user_id = en.user_id
-      JOIN courses AS cor ON ca.course_id = cor.id
-      JOIN camp_occurrences AS co ON cor.camp_occurrence_id = co.id
-      LEFT JOIN users AS u ON en.user_id = u.id
-      WHERE en.campyear = #{CampConfiguration.active.last.camp_year} AND en.application_status = 'enrolled' and en.id IN (#{enroll_ids})
-      ORDER BY u.email, co.description"
-
+      enroll_ids = hash_with_ids.keys.join(', ').presence || 0
+      query = "SELECT ad.country,  en.user_id,
+        REPLACE(ad.lastname, ',', ' ') AS lastname, REPLACE(ad.firstname, ',', ' ') AS firstname,
+        u.email, co.description AS session, cor.title AS course,
+        en.year_in_school, ad.state
+        FROM course_assignments ca
+        JOIN enrollments en ON ca.enrollment_id = en.id
+        JOIN applicant_details AS ad ON ad.user_id = en.user_id
+        JOIN courses AS cor ON ca.course_id = cor.id
+        JOIN camp_occurrences AS co ON cor.camp_occurrence_id = co.id
+        LEFT JOIN users AS u ON en.user_id = u.id
+        WHERE en.campyear = #{CampConfiguration.active.last.camp_year}
+          AND en.application_status = 'enrolled'
+          AND en.id IN (#{enroll_ids})
+        ORDER BY u.email, co.description"
       title = 'enrolled_for_more_than_one_session'
-
       data = data_to_csv_with_country(query, title)
       respond_to do |format|
-        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv" }
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-b-%-d-%Y')}.csv" }
       end
     end
 
     def enrolled_with_sessions_and_tshirt
-      query = "SELECT co.description AS session, en.user_id, REPLACE(ad.lastname, ',', ' ') AS lastname, REPLACE(ad.firstname, ',', ' ') AS firstname, u.email, ad.shirt_size
-      FROM enrollments en
-      JOIN applicant_details AS ad ON ad.user_id = en.user_id
-      JOIN session_assignments AS sa ON sa.enrollment_id = en.id
-      JOIN camp_occurrences AS co ON sa.camp_occurrence_id = co.id
-      LEFT JOIN users AS u ON en.user_id = u.id
-      WHERE en.campyear = #{CampConfiguration.active.last.camp_year} AND en.application_status = 'enrolled'
-      ORDER BY co.description, ad.shirt_size"
+      query = "SELECT co.description AS session, en.user_id, REPLACE(ad.lastname, ',', ' ') AS lastname,
+        REPLACE(ad.firstname, ',', ' ') AS firstname, u.email, ad.shirt_size
+        FROM enrollments en
+        JOIN applicant_details AS ad ON ad.user_id = en.user_id
+        JOIN session_assignments AS sa ON sa.enrollment_id = en.id
+        JOIN camp_occurrences AS co ON sa.camp_occurrence_id = co.id
+        LEFT JOIN users AS u ON en.user_id = u.id
+        WHERE en.campyear = #{CampConfiguration.active.last.camp_year} AND en.application_status = 'enrolled'
+        ORDER BY co.description, ad.shirt_size"
       title = 'enrolled_with_sessions_and_tshirt'
-
       data = data_to_csv(query, title)
       respond_to do |format|
-        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv" }
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-b-%-d-%Y')}.csv" }
       end
     end
 
@@ -380,11 +398,9 @@ ActiveAdmin.register_page 'Reports' do
       WHERE en.campyear = #{CampConfiguration.active.last.camp_year} AND en.application_status = 'enrolled'
       ORDER BY co.description ASC, cor.title, lastname"
       title = 'course_assignments'
-
       data = data_to_csv_list(query, title)
-
       respond_to do |format|
-        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv" }
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-b-%-d-%Y')}.csv" }
       end
     end
 
@@ -410,115 +426,106 @@ ActiveAdmin.register_page 'Reports' do
         AND e.campyear = #{CampConfiguration.active.last.camp_year}
         ORDER BY name"
       title = 'enrolled_with_addresses_and_more'
-
       data = data_to_csv(query, title)
       respond_to do |format|
-        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-d-%-m-%Y')}.csv" }
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-b-%-d-%Y')}.csv" }
       end
     end
 
     def data_to_csv(query, title)
-      records_array = ActiveRecord::Base.connection.exec_query(query)
-      result = []
-      result.push({ 'total' => records_array.count, 'header' => records_array.columns, 'rows' => records_array.rows })
-
-      CSV.generate(headers: false) do |csv|
-        csv << Array(title.titleize)
-        result.each do |res|
-          line = []
-          line << "Total number of records: #{res['total']}"
-          csv << line
-          header = res['header'].map! { |e| e.titleize.upcase }
-          csv << header
-          res['rows'].each do |h|
-            csv << h
-          end
-        end
-      end
+      records_array = fetch_records(query)
+      format_basic_csv(records_array, title)
     end
 
     def data_to_csv_demographic(query, title)
-      records_array = ActiveRecord::Base.connection.exec_query(query)
-      result = []
-      result.push({ 'total' => records_array.count, 'header' => records_array.columns, 'rows' => records_array.rows })
-
-      CSV.generate(headers: false) do |csv|
-        csv << Array(title.titleize)
-        result.each do |res|
-          line = []
-          line << "Total number of records: #{res['total']}"
-          csv << line
-          header = res['header'].map! { |e| e.titleize.upcase }
-          csv << header
-          res['rows'].each do |row|
-            c = row[0]
-            row[0] = "#{ISO3166::Country[c].name} - #{c}" if c != 'country'
-            csv << row
-          end
-        end
-      end
+      records_array = fetch_records(query)
+      format_demographic_csv(records_array, title)
     end
 
     def data_to_csv_with_country(query, title)
-      records_array = ActiveRecord::Base.connection.exec_query(query)
-      result = []
-      result.push({ 'empty' => '', 'total' => records_array.count, 'header' => records_array.columns,
-                    'rows' => records_array.rows })
-
-      CSV.generate(headers: false) do |csv|
-        csv << Array(title.titleize)
-        result.each do |res|
-          line = []
-          line << res['empty'].to_s + "Total number of records: #{res['total']}"
-          csv << line
-          header = res['header'].map! { |e| e.titleize.upcase }
-          header = header.rotate(1)
-          csv << header
-          res['rows'].each do |row|
-            c = row[0]
-            row[0] = "#{ISO3166::Country[c].name} - #{c}" if c != 'country'
-            row = row.rotate(1)
-            csv << row
-          end
-        end
-      end
+      records_array = fetch_records(query)
+      format_country_csv(records_array, title)
     end
 
     def data_to_csv_list(query, title)
-      records_array = ActiveRecord::Base.connection.exec_query(query)
-      result = []
-      result.push({ 'total' => records_array.count, 'header' => records_array.columns, 'rows' => records_array.rows })
+      records_array = fetch_records(query)
+      format_records_to_csv(records_array, title)
+    end
 
+    private
+
+    def fetch_records(query)
+      ActiveRecord::Base.connection.exec_query(query)
+    end
+
+    def format_basic_csv(records, title)
       CSV.generate(headers: false) do |csv|
         csv << Array(title.titleize)
-        result.each do |res|
-          line = []
-          line << "Total number of records: #{res['total']}"
-          csv << line
-          header = res['header'].map! { |e| e.titleize.upcase }
-          csv << header
-          s2 = ''
-          c2 = ''
-          res['rows'].each do |row|
-            s1 = row[0]
-            row[0] = if s1 == s2
-                       ''
-                     else
-                       s1
-                     end
-            c1 = row[1]
-            row[1] = if c1 == c2
-                       ''
-                     else
-                       c1
-                     end
-            country = row[5]
-            row[5] = "#{ISO3166::Country[country].name} - #{country}" if country != 'country'
-            csv << row
-            s2 = s1
-            c2 = c1
-          end
-        end
+        csv << ["Total number of records: #{records.count}"]
+        csv << records.columns.map { |e| e.titleize.upcase }
+        records.rows.each { |row| csv << row }
+      end
+    end
+
+    def format_demographic_csv(records, title)
+      CSV.generate(headers: false) do |csv|
+        add_header_rows(csv, records, title)
+        add_demographic_data_rows(csv, records)
+      end
+    end
+
+    def add_header_rows(csv, records, title)
+      csv << Array(title.titleize)
+      csv << ["Total number of records: #{records.count}"]
+      csv << records.columns.map { |e| e.titleize.upcase }
+    end
+
+    def add_demographic_data_rows(csv, records)
+      records.rows.each do |row|
+        c = row[0]
+        row[0] = "#{ISO3166::Country[c].name} - #{c}" if c != 'country'
+        csv << row
+      end
+    end
+
+    def format_country_csv(records, title)
+      CSV.generate(headers: false) do |csv|
+        add_header_rows(csv, records, title)
+        add_country_data_rows(csv, records)
+      end
+    end
+
+    def add_country_data_rows(csv, records)
+      records.rows.each do |row|
+        c = row[0]
+        row[0] = "#{ISO3166::Country[c].name} - #{c}" if c != 'country'
+        csv << row.rotate(1)
+      end
+    end
+
+    def format_records_to_csv(records, title)
+      CSV.generate(headers: false) do |csv|
+        add_header_rows(csv, records, title)
+        add_formatted_data_rows(csv, records)
+      end
+    end
+
+    def add_formatted_data_rows(csv)
+      track_previous_values do |prev_session, prev_course, row|
+        session = row[0]
+        course = row[1]
+        row[0] = session == prev_session ? '' : session
+        row[1] = course == prev_course ? '' : course
+        csv << row
+        [session, course] # Return new previous values
+      end
+    end
+
+    def track_previous_values(&block)
+      prev_session = nil
+      prev_course = nil
+      records.rows.each do |row|
+        prev_session, prev_course = block.call(prev_session, prev_course, row)
       end
     end
   end
