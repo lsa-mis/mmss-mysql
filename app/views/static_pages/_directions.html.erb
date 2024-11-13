@@ -99,12 +99,8 @@
       </div>
     <% elsif @current_enrollment.application_status == "offer accepted" %>
       <div class="m-2">
-        <% unless current_enrollment.student_packet.attached? %>
-          <p>You need to download, fill out and upload the Student Information Packet using
-          the button in the progress window to the right.</p>
-          <p class="direction_notes">The Student Packet upload is limited to files smaller than 20Mbytes. You can use an 
-            <a class="hover:underline text-blue-800" href="https://www.ilovepdf.com/compress_pdf" target="_blank">online pdf compression tool</a>
-            if your file size is larger than 20MBytes.</p> 
+        <% unless current_enrollment.camp_doc_form_completed %>
+          <p>You need to fill out the form on Camp Doc.</p>
         <% end %>
         <p>Please refer to your offer email for the payment deadline. To 
         check your account balance click the button below.</p>
