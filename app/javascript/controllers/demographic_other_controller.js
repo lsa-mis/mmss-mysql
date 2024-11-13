@@ -28,7 +28,7 @@ export default class extends Controller {
 
     const isOther = selectedOption && selectedOption.text.trim().toLowerCase() === 'other'
     const input = this.otherfieldTarget.querySelector('input')
-    
+
     if (isOther) {
       this.otherfieldTarget.classList.remove('hidden')
       input.required = true
