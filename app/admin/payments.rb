@@ -30,11 +30,9 @@ ActiveAdmin.register Payment do
         li "<strong>Application: #{Enrollment.find(params[:enrollment_id]).display_name}</strong>".html_safe
         f.input :user_id, input_html: { value: Enrollment.find(params[:enrollment_id]).user_id }, as: :hidden
       else
-        f.input :user_id, as: :select, collection: lambda {
-          Enrollment.current_camp_year_applications.map do |enrol|
-            [enrol.display_name.downcase, enrol.user_id]
-          end.sort
-        }
+        f.input :user_id, as: :select, collection: Enrollment.current_camp_year_applications.map { |enrol|
+          [enrol.display_name.downcase, enrol.user_id]
+        }.sort
       end
       f.input :total_amount, label: 'Total amount in cents'
       li "Transaction Type #{f.object.transaction_type}" unless f.object.new_record?
