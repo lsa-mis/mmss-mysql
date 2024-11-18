@@ -100,7 +100,7 @@
         <% elsif current_enrollment.offer_status == "accepted" %>
           <hr>
           <div>
-            <span class="text-green-700 font-semibold">You have accepted admission</span>
+            <span class="text-green-umgreen font-semibold">You have accepted admission</span>
             <% current_enrollment.session_assignments.each do |sa| %>
               <% if sa.offer_status == "accepted" %>
               <div>
@@ -127,24 +127,25 @@
               <% end %>
             </div>
             <hr>
-            <h4>Camp Doc form<br>
+            <span><strong>Health Forms</strong></span>
             <% if current_enrollment.camp_doc_form_completed %>
               <p>
-                <strong>The form has been filled out</strong>
+                The forms has been filled out
               </p>
             <% else %>
               <p>
-                Please fill the forem on Camp Doc             
+                The parent email address on file will be sent an invitation to complete health forms on Camp Doc 
+                after the balance has been paid in full. Please complete the forms as soon as possible. 
+                Enrollment will not be finalized until the health forms are completed.          
               </p>
             <% end %>
             <div class="hidden">
-              <h4>Download and return the <br>
+              <span>Download and return the <span>
                 <div class="my-2">
                   <%= link_to student_packet_url, class: "btn btn-blue", target: "_blank" do %>
                     Student Information Packet
                   <% end %>
                 </div>
-              </h4>
               <%= form_with(model: current_enrollment, local: true) do |form| %>
                 <p class="text-xs">The Student Packet upload is limited to files smaller than 20Mbytes. You can use an 
                 <a class="hover:underline text-blue-800" href="https://www.ilovepdf.com/compress_pdf" target="_blank">online pdf compression tool</a>
@@ -185,7 +186,7 @@
               <hr>
               <hr>
               <h2 class="text-red-700"> !! COVID Information !! </h2>
-              <h4>* Upload a copy of your Vaccine Record</h4>
+              <span>* Upload a copy of your Vaccine Record</span>
               <%= form_with(model: current_enrollment, local: true) do |form| %>
                 <p class="text-xs">File uploads are limited to files smaller than 20Mbytes. You can use an 
                 <a class="hover:underline text-blue-800" href="https://www.ilovepdf.com/compress_pdf" target="_blank">online pdf compression tool</a>
@@ -224,7 +225,7 @@
 
               <div class="hidden covid-test-panel" >
                 <hr>
-                <h4>* Upload a copy of your Covid Test Report</h4>
+                <span>* Upload a copy of your Covid Test Report</span>
                 <%= form_with(model: current_enrollment, local: true) do |form| %>
                   <% if current_enrollment.covid_test_record.attached? %>
                     <div class='current-uploaded-docs'>
@@ -263,7 +264,7 @@
         <% elsif @current_enrollment.offer_status == "declined" %>
           <hr>
           <div>
-            <span class="text-red-700 font-semibold">You have declined admission</span>
+            <span class="text-red-umred font-semibold">You have declined admission</span>
           </div>
         <% else %>
           <hr>

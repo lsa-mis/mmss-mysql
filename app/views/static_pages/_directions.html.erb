@@ -100,7 +100,11 @@
     <% elsif @current_enrollment.application_status == "offer accepted" %>
       <div class="m-2">
         <% unless current_enrollment.camp_doc_form_completed %>
-          <p>You need to fill out the form on Camp Doc.</p>
+          <p class="direction_notes">
+            The parent email address on file will be sent an invitation to complete health forms on Camp Doc 
+            after the balance has been paid in full. Please complete the forms as soon as possible. 
+            Enrollment will not be finalized until the health forms are completed.
+          </p>
         <% end %>
         <p>Please refer to your offer email for the payment deadline. To 
         check your account balance click the button below.</p>
