@@ -130,7 +130,7 @@
             <span><strong>Health Forms</strong></span>
             <% if current_enrollment.camp_doc_form_completed %>
               <p>
-                The forms has been filled out
+                Completed
               </p>
             <% else %>
               <p>
@@ -139,127 +139,6 @@
                 Enrollment will not be finalized until the health forms are completed.          
               </p>
             <% end %>
-            <div class="hidden">
-              <span>Download and return the <span>
-                <div class="my-2">
-                  <%= link_to student_packet_url, class: "btn btn-blue", target: "_blank" do %>
-                    Student Information Packet
-                  <% end %>
-                </div>
-              <%= form_with(model: current_enrollment, local: true) do |form| %>
-                <p class="text-xs">The Student Packet upload is limited to files smaller than 20Mbytes. You can use an 
-                <a class="hover:underline text-blue-800" href="https://www.ilovepdf.com/compress_pdf" target="_blank">online pdf compression tool</a>
-                if your file size is larger than 20MBytes.</p>
-                <% if current_enrollment.student_packet.attached? %>
-                  <div class='current-uploaded-docs'>
-                    <p>
-                      <strong>Student Packet currently uploaded:</strong>
-                      <%= link_to current_enrollment.student_packet.filename, url_for(current_enrollment.student_packet) %>
-                    </p>
-                  </div>
-                  <div class="field">
-                    <%= form.label :student_packet, 'Update Student Packet' %>
-                    <%= form.file_field :student_packet, 
-                            data: { 
-                              controller: "filesize-check", 
-                              action: "filesize-check#validateFileSize", 
-                              filesize_check_max_file_size_value: 20 * 1024 * 1024 
-                            } %>
-                  </div>
-                <% else %>
-                  <div class="field">
-                    <%= form.label :student_packet, 'Upload Student Packet' %>
-                    <%= form.file_field :student_packet, 
-                            data: { 
-                              controller: "filesize-check", 
-                              action: "filesize-check#validateFileSize", 
-                              filesize_check_max_file_size_value: 20 * 1024 * 1024 
-                            } %>
-                  </div>
-                <% end %>
-                <div class="actions">
-                  <%= form.submit "Upload Student Packet", id: 'student_packet_submit' %>
-                </div>
-              <% end %>
-            </div>
-            <div class="hidden covid-panel">
-              <hr>
-              <hr>
-              <h2 class="text-red-700"> !! COVID Information !! </h2>
-              <span>* Upload a copy of your Vaccine Record</span>
-              <%= form_with(model: current_enrollment, local: true) do |form| %>
-                <p class="text-xs">File uploads are limited to files smaller than 20Mbytes. You can use an 
-                <a class="hover:underline text-blue-800" href="https://www.ilovepdf.com/compress_pdf" target="_blank">online pdf compression tool</a>
-                if your file size is larger than 20MBytes.</p>
-                <% if current_enrollment.vaccine_record.attached? %>
-                  <div class='current-uploaded-docs'>
-                    <p>
-                      <strong>Vaccine Record currently uploaded:</strong>
-                      <%= link_to current_enrollment.vaccine_record.filename, url_for(current_enrollment.vaccine_record) %>
-                    </p>
-                  </div>
-                  <div class="field">
-                    <%= form.label :vaccine_record, 'Update Vaccine Record' %>
-                    <%= form.file_field :vaccine_record, 
-                            data: { 
-                              controller: "filesize-check", 
-                              action: "filesize-check#validateFileSize", 
-                              filesize_check_max_file_size_value: 20 * 1024 * 1024 
-                            } %>
-                  </div>
-                <% else %>
-                  <div class="field">
-                    <%= form.label :vaccine_record, 'Upload Vaccine Record' %>
-                    <%= form.file_field :vaccine_record, 
-                            data: { 
-                              controller: "filesize-check", 
-                              action: "filesize-check#validateFileSize", 
-                              filesize_check_max_file_size_value: 20 * 1024 * 1024 
-                            } %>
-                  </div>
-                <% end %>
-                <div class="actions">
-                  <%= form.submit "Upload Vaccine Record", id: 'vaccine_record_submit' %>
-                </div>
-              <% end %>
-
-              <div class="hidden covid-test-panel" >
-                <hr>
-                <span>* Upload a copy of your Covid Test Report</span>
-                <%= form_with(model: current_enrollment, local: true) do |form| %>
-                  <% if current_enrollment.covid_test_record.attached? %>
-                    <div class='current-uploaded-docs'>
-                      <p>
-                        <strong>Covid Test Report currently uploaded:</strong>
-                        <%= link_to current_enrollment.covid_test_record.filename, url_for(current_enrollment.covid_test_record) %>
-                      </p>
-                    </div>
-                    <div class="field">
-                      <%= form.label :covid_test_record, 'Update Covid Test Report' %>
-                      <%= form.file_field :covid_test_record, 
-                              data: { 
-                                controller: "filesize-check", 
-                                action: "filesize-check#validateFileSize", 
-                                filesize_check_max_file_size_value: 20 * 1024 * 1024 
-                              } %>
-                    </div>
-                  <% else %>
-                    <div class="field">
-                      <%= form.label :covid_test_record, 'Upload Covid Test Report' %>
-                      <%= form.file_field :covid_test_record, 
-                              data: { 
-                                controller: "filesize-check", 
-                                action: "filesize-check#validateFileSize", 
-                                filesize_check_max_file_size_value: 20 * 1024 * 1024 
-                              } %>
-                    </div>
-                  <% end %>
-                  <div class="actions">
-                    <%= form.submit "Upload Covid Test Report", id: 'covid_test_record_submit' %>
-                  </div>
-                <% end %>
-              </div>
-            </div>
           </div>
         <% elsif @current_enrollment.offer_status == "declined" %>
           <hr>
