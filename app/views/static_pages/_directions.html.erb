@@ -99,12 +99,12 @@
       </div>
     <% elsif @current_enrollment.application_status == "offer accepted" %>
       <div class="m-2">
-        <% unless current_enrollment.student_packet.attached? %>
-          <p>You need to download, fill out and upload the Student Information Packet using
-          the button in the progress window to the right.</p>
-          <p class="direction_notes">The Student Packet upload is limited to files smaller than 20Mbytes. You can use an 
-            <a class="hover:underline text-blue-800" href="https://www.ilovepdf.com/compress_pdf" target="_blank">online pdf compression tool</a>
-            if your file size is larger than 20MBytes.</p> 
+        <% unless current_enrollment.camp_doc_form_completed %>
+          <p class="direction_notes">
+            The parent email address on file will be sent an invitation to complete health forms on Camp Doc 
+            after the balance has been paid in full. Please complete the forms as soon as possible. 
+            Enrollment will not be finalized until the health forms are completed.
+          </p>
         <% end %>
         <p>Please refer to your offer email for the payment deadline. To 
         check your account balance click the button below.</p>
@@ -155,11 +155,12 @@
                 class: "btn btn-blue" %>
         </div>
     <% end %>
-
-    <p class="direction_notes"> Watch the progress window at the right
-      to track the status of your application materials. You will receive an
-      email with instructions for any additional steps that are required.
-    </p>
+    <div class="m-2">
+      <p class="direction_notes"> Watch the progress window at the right
+        to track the status of your application materials. You will receive an
+        email with instructions for any additional steps that are required.
+      </p>
+    </div>
   <% end %>
 
 <% else %>

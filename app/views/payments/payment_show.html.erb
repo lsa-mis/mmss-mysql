@@ -18,50 +18,50 @@
                       make_payment_path(amount: current_camp_fee / 100), class: 'btn btn-green' %>
       </p>
     <% else %>
-        <% if @current_application_status == "offer accepted" %>
-          <p class=my-2>
-            Your application materials have been received and processed, and we are
-            pleased to offer you a spot for MMSS <%= current_camp_year %>.
-            Your official notification and course assignment are found in your
-            notification email.
-            <br>
-            Paying the tuition and service fees is a requirement of participation.
-            Please continue paying your camp fees at this time.
-          </p>
-          <hr class="w-75" />
-        <% elsif  @current_application_status == "offer declined" %>
-          <p class="my-2"> Thanks for your interest.</p>
-        <% elsif  @current_application_status == "enrolled" %>
-          <p> Thank you for paying all your fees. We look forward to seeing you at MMSS <%= current_camp_year %>.</p>
-        <% else %>
-          <p class="my-2">
-            Thank you for your Michigan Math and Science Scholars Application. When we
-            have received all your application components your file will be reviewed.
-            <br>
-            The process may take up to 6 weeks as we conduct our admissions on a
-            rolling basis.
-            <br>
-            Please continue to check your email, and the Progress Window, for
-            updates on your application.
-          </p>
-        <% end %>
+      <% if @current_application_status == "offer accepted" %>
+        <p class=my-2>
+          Your application materials have been received and processed, and we are
+          pleased to offer you a spot for MMSS <%= current_camp_year %>.
+          Your official notification and course assignment are found in your
+          notification email.
+          <br>
+          Paying the tuition and service fees is a requirement of participation.
+          Please continue paying your camp fees at this time.
+        </p>
+        <hr class="w-75" />
+      <% elsif  @current_application_status == "offer declined" %>
+        <p class="my-2"> Thanks for your interest.</p>
+      <% elsif  @current_application_status == "enrolled" %>
+        <p> Thank you for paying all your fees. We look forward to seeing you at MMSS <%= current_camp_year %>.</p>
+      <% else %>
+        <p class="my-2">
+          Thank you for your Michigan Math and Science Scholars Application. When we
+          have received all your application components your file will be reviewed.
+          <br>
+          The process may take up to 6 weeks as we conduct our admissions on a
+          rolling basis.
+          <br>
+          Please continue to check your email, and the Progress Window, for
+          updates on your application.
+        </p>
+      <% end %>
 
-        <% if @current_enrollment.financial_aids.blank? && (@current_application_status == nil || @current_application_status == "" || @current_application_status == "submitted" || @current_application_status == "application complete") %>
-          <p class="mb-2">If you are applying for need-based financial support, please fill out the
-            <br>
-            <div class="my-2">
-              <%= link_to "Financial Aid Application", new_enrollment_financial_aid_path(@current_enrollment),
-                      class: "btn btn-green pt-8" %>
-            </div>
-          </p>
+      <% if @current_enrollment.financial_aids.blank? && (@current_application_status == nil || @current_application_status == "" || @current_application_status == "submitted" || @current_application_status == "application complete") %>
+        <p class="mb-2">If you are applying for need-based financial support, please fill out the
+          <br>
+          <div class="my-2">
+            <%= link_to "Financial Aid Application", new_enrollment_financial_aid_path(@current_enrollment),
+                    class: "btn btn-green pt-8" %>
+          </div>
+        </p>
+      <% end %>
+      <div class="direction_notes">You may email any questions to 
+        <%= mail_to "mmss@umich.edu", subject: "Question about MMSS"  do %>
+          <strong>mmss@umich.edu</strong>
         <% end %>
-        <div class="direction_notes">You may email any questions to 
-          <%= mail_to "mmss@umich.edu", subject: "Question about MMSS"  do %>
-            <strong>mmss@umich.edu</strong>
-          <% end %>
-        </div>
+      </div>
 
-        <hr class="w-75"/>
+      <hr class="w-75"/>
 
       <div class="max-w-sm rounded overflow-hidden shadow-lg">
         <h5 class="bg-green-700 px-4 text-white">

@@ -27,11 +27,13 @@
 #  application_deadline          :date
 #  application_status_updated_on :date
 #  uniqname                      :string(255)
+#  camp_doc_form_completed       :boolean          default(FALSE)
 #
 class Enrollment < ApplicationRecord
-  after_update :send_offer_letter
+  before_update :if_camp_doc_form_completed
   before_update :if_application_status_changed
   before_update :set_application_deadline
+  after_update :send_offer_letter
   after_commit :send_enroll_letter, if: :persisted?
   after_commit :send_rejected_letter, if: :persisted?
   after_commit :send_waitlisted_letter, if: :persisted?
@@ -98,6 +100,7 @@ class Enrollment < ApplicationRecord
   scope :no_student_packet, -> { current_camp_year_applications.where.not(id: Enrollment.current_camp_year_applications.joins(:student_packet_attachment).pluck(:id)) }
   scope :no_vaccine_record, -> { enrolled.where.not(id: Enrollment.current_camp_year_applications.joins(:vaccine_record_attachment).pluck(:id)) }
   scope :no_covid_test_record, -> { enrolled.where.not(id: Enrollment.current_camp_year_applications.joins(:covid_test_record_attachment).pluck(:id)) }
+  scope :no_camp_doc_form, -> { current_camp_year_applications.where(camp_doc_form_completed: false) }
 
   def display_name
     "#{self.applicant_detail.full_name} - #{self.user.email}"
@@ -166,6 +169,13 @@ class Enrollment < ApplicationRecord
           errors.add(image.name, "incorrect file type")
         end
       end
+    end
+  end
+
+  def if_camp_doc_form_completed
+    payment = PaymentState.new(self)
+    if self.camp_doc_form_completed && payment.balance_due == 0
+      self.application_status = "enrolled"
     end
   end
 

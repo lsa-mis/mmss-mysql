@@ -12,7 +12,7 @@ ActiveAdmin.register Enrollment, as: "Application" do
                   :high_school_state, :high_school_non_us, 
                   :high_school_postalcode, :high_school_country, 
                   :year_in_school, :anticipated_graduation_year, 
-                  :room_mate_request, :personal_statement, 
+                  :room_mate_request, :personal_statement, :camp_doc_form_completed,
                   :shirt_size, :notes, :application_status, :application_status_updated_on, :campyear,
                   :offer_status, :partner_program, :transcript, :student_packet, 
                   :application_deadline, :vaccine_record, :covid_test_record, :uniqname,
@@ -32,10 +32,7 @@ ActiveAdmin.register Enrollment, as: "Application" do
   scope :no_recomendation, group: :missing
   scope :no_letter, group: :missing
   scope :no_payments, group: :missing
-  scope :no_student_packet, group: :missing
-
-  # scope :no_vaccine_record, group: :vaccine
-  # scope :no_covid_test_record, group: :vaccine
+  scope :no_camp_doc_form, group: :missing
 
   action_item :set_waitlisted, only: :show do
     text_node link_to("Place on Wait List", waitlisted_path(application), data: { confirm: 'Are you sure you want to wait list this application?'}, method: :post ) if ["application complete"].include? application.application_status
@@ -75,27 +72,9 @@ ActiveAdmin.register Enrollment, as: "Application" do
             link_to item.transcript.filename, url_for(item.transcript)
           end
         end
-        column "Current Student Packet" do |item| 
-          if item.student_packet.attached?
-            link_to item.student_packet.filename, url_for(item.student_packet)
-          end
-        end
-        # column "Vaccine Record" do |item| 
-        #   if item.vaccine_record.attached?
-        #     link_to item.vaccine_record.filename, url_for(item.vaccine_record)
-        #   end
-        # end
-        # column "COVID Test" do |item| 
-        #   if item.covid_test_record.attached?
-        #     link_to item.covid_test_record.filename, url_for(item.covid_test_record)
-        #   end
-        # end
-
       end
      f.input :transcript, as: :file, label: "Update transcript"
-     f.input :student_packet, as: :file, label: "Update student_packet"
-    #  f.input :vaccine_record, as: :file, label: "Update vaccine_record"
-    #  f.input :covid_test_record, as: :file, label: "Update covid_test_record"
+     f.input :camp_doc_form_completed
       hr
      f.input :notes
      f.input :partner_program
@@ -155,21 +134,7 @@ ActiveAdmin.register Enrollment, as: "Application" do
         link_to enroll.transcript.filename, url_for(enroll.transcript)
       end
     end
-    column "Student Packet" do |sp|
-      if sp.student_packet.attached?
-        link_to sp.student_packet.filename, url_for(sp.student_packet)
-      end
-    end
-    # column "Vaccination Record" do |enroll|
-    #   if enroll.vaccine_record.attached?
-    #     link_to enroll.vaccine_record.filename, url_for(enroll.vaccine_record)
-    #   end
-    # end
-    # column "COVID Test" do |sp|
-    #   if sp.covid_test_record.attached?
-    #     link_to sp.covid_test_record.filename, url_for(sp.covid_test_record)
-    #   end
-    # end
+    column :camp_doc_form_completed
     column :offer_status
     column :application_deadline
     column :application_status
@@ -337,21 +302,7 @@ ActiveAdmin.register Enrollment, as: "Application" do
           link_to tr.transcript.filename, url_for(tr.transcript)
         end
       end
-      row :student_packet do |sp|
-        if sp.student_packet.attached?
-          link_to sp.student_packet.filename, url_for(sp.student_packet)
-        end
-      end
-      # row :vaccine_record do |tr|
-      #   if tr.vaccine_record.attached?
-      #     link_to tr.vaccine_record.filename, url_for(tr.vaccine_record)
-      #   end
-      # end
-      # row :covid_test_record do |sp|
-      #   if sp.covid_test_record.attached?
-      #     link_to sp.covid_test_record.filename, url_for(sp.covid_test_record)
-      #   end
-      # end
+      row :camp_doc_form_completed
       row :international
       row :high_school_name
       row :high_school_address1
@@ -381,11 +332,6 @@ ActiveAdmin.register Enrollment, as: "Application" do
         "uploaded"
       end
     end
-    column "Student Packet" do |sp|
-      if sp.student_packet.attached?
-        "uploaded"
-      end
-    end
     column :offer_status
     column :application_deadline
     column :application_status
@@ -396,6 +342,7 @@ ActiveAdmin.register Enrollment, as: "Application" do
     column :room_mate_request
     column :notes
     column :partner_program
+    column :camp_doc_form_completed
     column "Balance Due" do |app|
       humanized_money_with_symbol(PaymentState.new(app).balance_due / 100)
     end

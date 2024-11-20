@@ -11,14 +11,6 @@ ActiveAdmin.register CampConfiguration do
                   :camper_acceptance_due, :active, :offer_letter, 
                   :student_packet_url, :application_fee,
                   :reject_letter, :waitlist_letter
-  #
-  # or
-  #
-  # permit_params do
-  #   permitted = [:camp_year, :application_open, :application_close, :priority, :application_materials_due, :camper_acceptance_due, :active]
-  #   permitted << :other if params[:action] == 'create' && current_user.admin?
-  #   permitted
-  # end
 
   controller do
     # Custom new method
@@ -48,7 +40,6 @@ ActiveAdmin.register CampConfiguration do
      f.input :camper_acceptance_due
      f.input :active
      f.input :offer_letter
-     f.input :student_packet_url
      f.input :application_fee
      f.input :reject_letter
      f.input :waitlist_letter
@@ -66,7 +57,6 @@ ActiveAdmin.register CampConfiguration do
     column :application_materials_due
     column :camper_acceptance_due
     column :active
-    column :student_packet_url
     column "Application Fee" do |af|
       humanized_money_with_symbol(af.application_fee)
     end
@@ -90,7 +80,6 @@ ActiveAdmin.register CampConfiguration do
     row "Wait list Letter Text" do |item|
       item.waitlist_letter
     end
-    row :student_packet_url
     row "Application fee" do |cc|
       humanized_money_with_symbol(cc.application_fee)
     end
