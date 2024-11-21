@@ -1,4 +1,4 @@
-<%= form_with(model: financial_aid, local: true) do |form| %>
+<%= form_with(model: financial_aid, local: true, data: { controller: "required-stars" }) do |form| %>
   <% if financial_aid.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(financial_aid.errors.count, "error") %> prohibited this financial_aid from being saved:</h2>
@@ -24,12 +24,17 @@
     </div>
     <div class="field">
       <%= form.label :taxform, 'Update Tax Form' %>
-      <%= form.file_field :taxform %>
+      <%= form.file_field :taxform,
+       data: { controller: "filesize-check", 
+       action: "filesize-check#validateFileSize", 
+       filesize_check_max_file_size_value: 20 * 1024 * 1024 } %>
     </div>
   <% else %>
     <div class="field">
-      <%= form.label :taxform%>
-      <%= form.file_field :taxform %>
+      <%= form.label :taxform %>
+      <%= form.file_field :taxform, required: true, data: { controller: "filesize-check", 
+       action: "filesize-check#validateFileSize", 
+       filesize_check_max_file_size_value: 20 * 1024 * 1024 } %>
     </div>
   <% end %>
 <div class="direction_notes">
@@ -81,5 +86,3 @@
     <% end %>
   </div>
 <% end %>
-<%= javascript_pack_tag 'required_stars' %>
-<%= javascript_pack_tag 'filesize_check' %>
