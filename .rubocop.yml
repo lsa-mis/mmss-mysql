@@ -1,0 +1,3 @@
+Style/SymbolProc:
+  Exclude:
+    - 'app/admin/camp_configurations.rb'
