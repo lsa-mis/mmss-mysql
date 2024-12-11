@@ -9,16 +9,14 @@
       <p>====================================</p>
     <% end %>
 
-    <% if @users_current_payments.count < 1 %>
+    <% active_camp = CampConfiguration.active.last %>
+    <% if @users_current_payments.count < 1 && active_camp&.application_fee_required %>
       <p class="my-2">You have not made a payment yet. Payment can be made via check or money
         order from a U.S. based bank, or via credit card. International students may
         pay via wire transfer (contact our office for more information regarding wire
         transfers for international students.)
-        <% active_camp = CampConfiguration.active.last %>
-        <% if active_camp&.application_fee_required %>
-          <%= button_to "pay the #{humanized_money_with_symbol(current_camp_fee / 100)} non-refundable application fee",
-                        make_payment_path(amount: current_camp_fee / 100), class: 'btn btn-green' %>
-        <% end %>
+        <%= button_to "pay the #{humanized_money_with_symbol(current_camp_fee / 100)} non-refundable application fee",
+                      make_payment_path(amount: current_camp_fee / 100), class: 'btn btn-green' %>
       </p>
     <% else %>
       <% if @current_application_status == "offer accepted" %>
@@ -110,7 +108,7 @@
                   <% else %>
                     <% @session_registrations.each do |s| %>
                       <li class="text-right">
-                        <%= s.description_with_date %> -- <%= humanized_money_with_symbol(s.cost) %>
+                        <%= s.description_with_date %> -- <%= active_camp&.application_fee_required ? humanized_money_with_symbol(s.cost) : '--' %> Thanks
                       </li>
                     <% end %>
                   <% end %>
