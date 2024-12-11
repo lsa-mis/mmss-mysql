@@ -14,8 +14,11 @@
         order from a U.S. based bank, or via credit card. International students may
         pay via wire transfer (contact our office for more information regarding wire
         transfers for international students.)
-        <%= button_to "pay the #{humanized_money_with_symbol(current_camp_fee / 100)} non-refundable application fee",
-                      make_payment_path(amount: current_camp_fee / 100), class: 'btn btn-green' %>
+        <% active_camp = CampConfiguration.active.last %>
+        <% if active_camp&.application_fee_required %>
+          <%= button_to "pay the #{humanized_money_with_symbol(current_camp_fee / 100)} non-refundable application fee",
+                        make_payment_path(amount: current_camp_fee / 100), class: 'btn btn-green' %>
+        <% end %>
       </p>
     <% else %>
       <% if @current_application_status == "offer accepted" %>
@@ -55,7 +58,7 @@
           </div>
         </p>
       <% end %>
-      <div class="direction_notes">You may email any questions to 
+      <div class="direction_notes">You may email any questions to
         <%= mail_to "mmss@umich.edu", subject: "Question about MMSS"  do %>
           <strong>mmss@umich.edu</strong>
         <% end %>
@@ -68,9 +71,12 @@
           Account Summary
         </h5>
         <div class="p-4">
-          <div class="font-bold text-xs mb-2">
-            <%= "#{'application_fee_(non-refundable)'.humanize.ljust(24, '.')} #{humanized_money_with_symbol(CampConfiguration.active.last.application_fee).rjust(12,'.')}" %>
-          </div>
+          <% active_camp = CampConfiguration.active.last %>
+          <% if active_camp&.application_fee_required %>
+            <div class="font-bold text-xs mb-2">
+              <%= "#{'application_fee_(non-refundable)'.humanize.ljust(24, '.')} #{humanized_money_with_symbol(active_camp.application_fee).rjust(12,'.')}" %>
+            </div>
+          <% end %>
           <div class="font-bold text-base mb-2">
             <% if @current_application_status == "enrolled" %>
               <%= "#{'total_cost'.humanize.ljust(24, '.')} #{humanized_money_with_symbol(@total_cost / 100).rjust(12,'.')}" %>
