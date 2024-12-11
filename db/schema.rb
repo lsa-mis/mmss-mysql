@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_11_13_195535) do
+ActiveRecord::Schema.define(version: 2024_12_11_195358) do
 
   create_table "active_admin_comments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "namespace"
@@ -131,6 +131,7 @@ ActiveRecord::Schema.define(version: 2024_11_13_195535) do
     t.integer "application_fee_cents"
     t.text "reject_letter"
     t.text "waitlist_letter"
+    t.boolean "application_fee_required", default: true, null: false
     t.index ["camp_year"], name: "index_camp_configurations_on_camp_year", unique: true
   end
 
