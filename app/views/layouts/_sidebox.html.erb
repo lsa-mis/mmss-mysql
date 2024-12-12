@@ -64,8 +64,7 @@
           </div>
         <% end %>
 
-        <% active_camp = CampConfiguration.active.last %>
-        <% if active_camp&.application_fee_required %>
+        <% if @curr_enrollment&.application_fee_required %>
           <% if current_user.payments.current_camp_payments.present? %>
             <div class="sidebox_element">
               <%= link_to "Application Fee",
@@ -159,7 +158,4 @@
       <% end %>
     </div>
   <% end %>
-
 <% end %>
-
-<%= javascript_pack_tag 'student_packet_upload' %>
