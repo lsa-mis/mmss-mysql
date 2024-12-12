@@ -70,7 +70,7 @@
         </h5>
         <div class="p-4">
           <% active_camp = CampConfiguration.active.last %>
-          <% if active_camp&.application_fee_required %>
+          <% if @curr_enrollment&.application_fee_required %>
             <div class="font-bold text-xs mb-2">
               <%= "#{'application_fee_(non-refundable)'.humanize.ljust(24, '.')} #{humanized_money_with_symbol(active_camp.application_fee).rjust(12,'.')}" %>
             </div>
