@@ -42,7 +42,9 @@ class PaymentState
   def total_cost
     base_cost = cost_sessions_ttl + cost_activities_ttl
     active_camp = CampConfiguration.active.first
-    if active_camp&.application_fee_required
+
+    # Include application fee only if it was required for this enrollment
+    if @curr_enrollment.application_fee_required
       base_cost + active_camp.application_fee_cents
     else
       base_cost
