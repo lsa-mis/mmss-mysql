@@ -69,7 +69,7 @@
         Your application is complete and is being reviewed. You will receive an email
         notification of your admission decision.
       </div>
-    <% elsif current_user.payments.status1_current_camp_payments.empty? && @current_enrollment&.application_fee_required %>
+    <% elsif current_user.payments.status1_current_camp_payments.empty? &&  @current_enrollment&.application_fee_required %>
       <div class="m-2">Now that you've submitted your application, the next step is to make
         sure you pay the <%= humanized_money_with_symbol(current_camp_fee / 100) %> non-refundable application fee
         <%= button_to "pay #{humanized_money_with_symbol(current_camp_fee / 100)} application fee",
