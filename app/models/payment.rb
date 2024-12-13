@@ -41,13 +41,14 @@ class Payment < ApplicationRecord
 
     @current_enrollment = user.enrollments.current_camp_year_applications.last
 
-    # Check if this is the first payment (when required) or if no payment was required
-    if !@current_enrollment.application_fee_required || user.payments.current_camp_payments.where(transaction_status: 1).count == 1
+    # Check if this is the first payment (when required)
+    if @current_enrollment.application_fee_required && user.payments.current_camp_payments.where(transaction_status: 1).count == 1
       RegistrationMailer.app_complete_email(user).deliver_now
-      @current_enrollment.update!(application_status: 'submitted', application_status_updated_on: Date.today)
       if @current_enrollment.recommendation.present? && @current_enrollment.recommendation.recupload.present?
         @current_enrollment.update!(application_status: 'application complete',
                                     application_status_updated_on: Date.today)
+      else
+        @current_enrollment.update!(application_status: 'submitted', application_status_updated_on: Date.today)
       end
     elsif balance_due == 0 && @current_enrollment.camp_doc_form_completed
       @current_enrollment.update!(application_status: 'enrolled', application_status_updated_on: Date.today)
