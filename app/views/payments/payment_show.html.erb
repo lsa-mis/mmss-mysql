@@ -9,8 +9,7 @@
       <p>====================================</p>
     <% end %>
 
-    <% active_camp = CampConfiguration.active.last %>
-    <% if @users_current_payments.count < 1 && active_camp&.application_fee_required %>
+    <% if @users_current_payments.count < 1 && @current_enrollment&.application_fee_required %>
       <p class="my-2">You have not made a payment yet. Payment can be made via check or money
         order from a U.S. based bank, or via credit card. International students may
         pay via wire transfer (contact our office for more information regarding wire
@@ -70,7 +69,7 @@
         </h5>
         <div class="p-4">
           <% active_camp = CampConfiguration.active.last %>
-          <% if @curr_enrollment&.application_fee_required %>
+          <% if @current_enrollment&.application_fee_required %>
             <div class="font-bold text-xs mb-2">
               <%= "#{'application_fee_(non-refundable)'.humanize.ljust(24, '.')} #{humanized_money_with_symbol(active_camp.application_fee).rjust(12,'.')}" %>
             </div>
@@ -83,7 +82,7 @@
           <% if ["offer accepted","enrolled"].include? @current_application_status %>
             <% @current_enrollment.session_assignments.each do |sa| %>
               <% if sa.offer_status == "accepted" %>
-                <div>
+                <div class="text-sm">
                   <%= sa.camp_occurrence.display_name %>
                     -- <%= humanized_money_with_symbol(Enrollment.find(sa.enrollment_id).session_registrations.find(sa.camp_occurrence_id).cost) %>
                   <div class="flex justify-start bg-gray-200 text-xs">
@@ -108,7 +107,7 @@
                   <% else %>
                     <% @session_registrations.each do |s| %>
                       <li class="text-right">
-                        <%= s.description_with_date %> -- <%= active_camp&.application_fee_required ? humanized_money_with_symbol(s.cost) : '--' %> Thanks
+                        <%= s.description_with_date %> -- <%= humanized_money_with_symbol(s.cost) %>
                       </li>
                     <% end %>
                   <% end %>
