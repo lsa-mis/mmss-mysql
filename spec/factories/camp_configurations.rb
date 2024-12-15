@@ -17,6 +17,7 @@
 #  application_fee_cents     :integer
 #  reject_letter             :text(65535)
 #  waitlist_letter           :text(65535)
+#  application_fee_required  :boolean          default(TRUE), not null
 #
 FactoryBot.define do
   factory :camp_configuration do
