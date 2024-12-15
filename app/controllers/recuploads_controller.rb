@@ -6,7 +6,6 @@ class RecuploadsController < InheritedResources::Base
   before_action :authenticate_admin!, except: %i[success error new create]
   before_action :set_recupload, only: %i[show edit update destroy]
   before_action :get_recommendation, only: [:new]
-  before_action :get_student, only: [:create]
 
   def index
     redirect_to root_path unless admin_signed_in?
@@ -41,14 +40,6 @@ class RecuploadsController < InheritedResources::Base
         format.json { render :show, status: :created, location: @recupload }
         RecuploadMailer.with(recupload: @recupload).received_email.deliver_now
         RecuploadMailer.with(recupload: @recupload).applicant_received_email.deliver_now
-        recom_id = @recupload.recommendation_id
-        enroll_id = Recommendation.find(recom_id).enrollment_id
-        enrollment = Enrollment.find(enroll_id)
-
-        # Mark as complete if either payment exists (when required) or no payment was required
-        if !enrollment.application_fee_required || Payment.where(user_id: enrollment.user_id).current_camp_payments.exists?
-          enrollment.update!(application_status: 'application complete', application_status_updated_on: Date.today)
-        end
       else
         format.html { render :new }
         format.json { render json: @recupload.errors, status: :unprocessable_entity }
@@ -78,10 +69,6 @@ class RecuploadsController < InheritedResources::Base
     rec_id = hash_val.split('nGklDoc2egIkzFxr0U').last.to_i
     @recommendation = Recommendation.find(rec_id)
     @student = ApplicantDetail.find(params[:id]).full_name
-  end
-
-  def get_student
-    @student = params[:recupload]['studentname']
   end
 
   def recupload_params
