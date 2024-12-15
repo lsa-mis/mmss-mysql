@@ -12,6 +12,7 @@
 #
 class Recupload < ApplicationRecord
   belongs_to :recommendation
+  after_create :update_enrollment_status
 
   # validates :letter, length: { minimum: 50 }
   validates :authorname, presence: true
@@ -27,13 +28,19 @@ class Recupload < ApplicationRecord
     return unless recletter.attached?
 
     unless recletter.blob.byte_size <= 20.megabyte
-      errors.add(:recletter, "is too big - file size cannot exceed 20Mbyte")
+      errors.add(:recletter, 'is too big - file size cannot exceed 20Mbyte')
     end
 
-    acceptable_types = ["image/png", "image/jpeg", "application/pdf"]
-    unless acceptable_types.include?(recletter.content_type)
-      errors.add(:recletter, "must be file type PDF, JPEG or PNG")
-    end
+    acceptable_types = ['image/png', 'image/jpeg', 'application/pdf']
+    return if acceptable_types.include?(recletter.content_type)
+
+    errors.add(:recletter, 'must be file type PDF, JPEG or PNG')
   end
 
+  def update_enrollment_status
+    enrollment = Recommendation.find(recommendation_id).enrollment
+    if !enrollment.application_fee_required || Payment.where(user_id: enrollment.user_id).current_camp_payments.exists?
+      enrollment.update!(application_status: 'application complete', application_status_updated_on: Date.today)
+    end
+  end
 end
