@@ -10,7 +10,7 @@ ActiveAdmin.register CampConfiguration do
                  :priority, :application_materials_due,
                  :camper_acceptance_due, :active, :offer_letter,
                  :student_packet_url, :application_fee,
-                 :reject_letter, :waitlist_letter
+                 :reject_letter, :waitlist_letter, :application_fee_required
 
   controller do
     # Custom new method
@@ -40,6 +40,7 @@ ActiveAdmin.register CampConfiguration do
       f.input :active
       f.input :offer_letter
       f.input :application_fee
+      f.input :application_fee_required, label: 'Require Application Fee'
       f.input :reject_letter
       f.input :waitlist_letter
       f.actions # adds the 'Submit' and 'Cancel' button
@@ -59,6 +60,7 @@ ActiveAdmin.register CampConfiguration do
     column 'Application Fee' do |af|
       humanized_money_with_symbol(af.application_fee)
     end
+    column 'Fee Required', :application_fee_required
   end
 
   show do
@@ -82,6 +84,7 @@ ActiveAdmin.register CampConfiguration do
       row 'Application fee' do |cc|
         humanized_money_with_symbol(cc.application_fee)
       end
+      row :application_fee_required
       row :created_at
       row :updated_at
     end

@@ -32,34 +32,35 @@ class Payment < ApplicationRecord
   belongs_to :user
 
   scope :current_camp_payments, -> { where('camp_year = ? ', CampConfiguration.active_camp_year) }
-  scope :status1_current_camp_payments, -> { current_camp_payments.where('transaction_status = ?', "1") }
+  scope :status1_current_camp_payments, -> { current_camp_payments.where('transaction_status = ?', '1') }
 
   private
 
   def set_status
-    return unless self.transaction_status == '1'
+    return unless transaction_status == '1'
 
-    @current_enrollment = self.user.enrollments.current_camp_year_applications.last
-    if self.user.payments.current_camp_payments.where(transaction_status: 1).count == 1
-      RegistrationMailer.app_complete_email(self.user).deliver_now
-      @current_enrollment.update!(application_status: "submitted", application_status_updated_on: Date.today)
-      if @current_enrollment.recommendation.present?
-        if @current_enrollment.recommendation.recupload.present? 
-          @current_enrollment.update!(application_status: "application complete", application_status_updated_on: Date.today)
-        end
+    @current_enrollment = user.enrollments.current_camp_year_applications.last
+
+    # Check if this is the first payment (when required)
+    if @current_enrollment.application_fee_required && user.payments.status1_current_camp_payments.count == 1
+      RegistrationMailer.app_complete_email(user).deliver_now
+      if @current_enrollment.recommendation.present? && @current_enrollment.recommendation.recupload.present?
+        @current_enrollment.update!(application_status: 'application complete',
+                                    application_status_updated_on: Date.today)
+      else
+        @current_enrollment.update!(application_status: 'submitted', application_status_updated_on: Date.today)
       end
-    else 
-      if balance_due == 0 && @current_enrollment.camp_doc_form_completed
-        @current_enrollment.update!(application_status: "enrolled", application_status_updated_on: Date.today)
-      end
+    elsif balance_due == 0 && @current_enrollment.camp_doc_form_completed
+      @current_enrollment.update!(application_status: 'enrolled', application_status_updated_on: Date.today)
     end
   end
 
   def self.ransackable_associations(auth_object = nil)
-    ["user"]
+    ['user']
   end
 
   def self.ransackable_attributes(auth_object = nil)
-    ["account_type", "camp_year", "created_at", "id", "payer_identity", "result_code", "result_message", "timestamp", "total_amount", "transaction_date", "transaction_hash", "transaction_id", "transaction_status", "transaction_type", "updated_at", "user_account", "user_id"]
+    %w[account_type camp_year created_at id payer_identity result_code result_message timestamp
+       total_amount transaction_date transaction_hash transaction_id transaction_status transaction_type updated_at user_account user_id]
   end
 end

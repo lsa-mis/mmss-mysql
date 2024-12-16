@@ -4,7 +4,7 @@
         <%= link_to 'Registration', new_applicant_detail_path,
                     class: 'btn btn-blue' %>
       <p class ="mt-2">
-        As you advance through the application process, these directions will be updated. 
+        As you advance through the application process, these directions will be updated.
         For many items you submit, you will receive an event update on the right side of the screen.
       </p>
     </div>
@@ -16,14 +16,14 @@
     <div class="m-2">
       <%= link_to 'Camp Application', new_enrollment_path,
                   class: 'btn btn-blue' %>
-      
+
       <p class ="mt-2">The next step is to submit your application.</p>
       <p>Check your work before submitting. Once review of your application begins, you will not be able to make changes.</p>
     </div>
       <p class='direction_notes'>Make sure that you have gathered all the
         required information, then work your way through the sections.
       </p>
-     
+
       <div class='direction_notes'>
         <ul class="dirdot">
           <li class="dirdot">High School Address</li>
@@ -32,22 +32,22 @@
         </ul>
       </div>
         <p class='direction_notes'>
-          You will be selecting the activities and courses you wish to participate in. 
-          After this stage is complete, your next step will be to rank the courses 
+          You will be selecting the activities and courses you wish to participate in.
+          After this stage is complete, your next step will be to rank the courses
           related to your interest.
         </p>
-        
+
   <% elsif @current_enrollment.course_preferences.pluck(:ranking).any?{ |e| e.nil? } %>
     <div class="m-2">
       <%= link_to 'Course-Rankings',
                         enrollment_course_preferences_path(@current_enrollment.id),
                         class: 'btn btn-blue' %>
         <p class="mt-2">
-          The next step is to rank the courses you selected in priority of interest. You should give a 
+          The next step is to rank the courses you selected in priority of interest. You should give a
           rank of "1" for the first or highest preferred course.
         </p>
     </div>
-    <div class='m-2 direction_notes'>Make sure that you give each course you selected a ranking. </div>   
+    <div class='m-2 direction_notes'>Make sure that you give each course you selected a ranking. </div>
   <% elsif @current_enrollment.recommendation.blank? %>
     <div class="m-2">
       <%= link_to "Request Letter of Recommendation",
@@ -62,105 +62,113 @@
       them directions on how to submit a recommendation for you, so please
       be certain that you enter their correct email address.
     </div>
-  <% elsif current_user.payments.status1_current_camp_payments.empty? %>
-    <div class="m-2">Now that you've submitted your application, the next step is to make
-      sure you pay the <%= humanized_money_with_symbol(current_camp_fee / 100) %> non-refundable application fee
-      <%= button_to "pay #{humanized_money_with_symbol(current_camp_fee / 100)} application fee",
-                  make_payment_path(amount: current_camp_fee / 100), class: 'bg-blue-700 hover:bg-blue-900 text-gray-100 font-normal py-1 px-2 rounded' %>
-    </div>
-    <p class="text-red-700 m-2">
-      Payment of your application fee must be completed before you will be
-      considered for admission.
-    </p>
-    <p class="direction_notes">
-      International students may pay via wire transfer
-      (<a href="mailto:mmss@umich.edu">contact our office</a> for more
-      information regarding wire transfers for international students.)
-    </p>
-    <p class="direction_notes">You will receive an email from UM
-      MerchantServices confirming your credit card transactions.
-    </p>
   <% else %>
-    <% if @current_enrollment.application_status == "waitlisted" %>
+    <% active_camp = CampConfiguration.active.last %>
+    <% if @current_enrollment.application_status == "application complete" %>
       <div class="m-2">
-        <p class="direction_notes">
-          Your application was placed onto the wait list.</p>
+        Your application is complete and is being reviewed. You will receive an email
+        notification of your admission decision.
       </div>
-    <% elsif @current_enrollment.application_status == "rejected" %>
-      <div class="m-2">
-        <p class="direction_notes">
-          Your application was rejected.</p>
+    <% elsif current_user.payments.status1_current_camp_payments.empty? &&  @current_enrollment&.application_fee_required %>
+      <div class="m-2">Now that you've submitted your application, the next step is to make
+        sure you pay the <%= humanized_money_with_symbol(current_camp_fee / 100) %> non-refundable application fee
+        <%= button_to "pay #{humanized_money_with_symbol(current_camp_fee / 100)} application fee",
+                    make_payment_path(amount: current_camp_fee / 100), class: 'bg-blue-700 hover:bg-blue-900 text-gray-100 font-normal py-1 px-2 rounded' %>
       </div>
-    <% elsif @current_enrollment.offer_status == "offered" %>
-      <div class="m-2">
-        <p class="direction_notes">
-          Please respond to our acceptance offer by making the appropriate
-          selection in the Progress Window.</p>
-      </div>
-    <% elsif @current_enrollment.application_status == "offer accepted" %>
-      <div class="m-2">
-        <% unless current_enrollment.camp_doc_form_completed %>
-          <p class="direction_notes">
-            The parent email address on file will be sent an invitation to complete health forms on Camp Doc 
-            after the balance has been paid in full. Please complete the forms as soon as possible. 
-            Enrollment will not be finalized until the health forms are completed.
-          </p>
-        <% end %>
-        <p>Please refer to your offer email for the payment deadline. To 
-        check your account balance click the button below.</p>
-        <div class="my-2">
-          <%= link_to "Account Summary", all_payments_path, class: "btn btn-blue pt-8"%>
-        </div>
-      </div>
-    <% elsif @current_enrollment.application_status == "offer declined" %>
-      <div class="m-2">
-        <p class="direction_notes">
-          Thanks for your interest.
-        </p>
-      </div>
-    <% elsif @current_enrollment.application_status == "enrolled" %>
-      <div class="m-2">
-        <p class="direction_notes">
-          We look forward to seeing you at the <%= @current_camp_year %> University of Michigan MMSS High School Summer Program.
-          <br><br>
-        </p>
-        <% if @current_enrollment.uniqname.present? %>
-              <p class="m-2">
-                Your University of Michigan uniqname is <strong><%= @current_enrollment.uniqname %></strong>
-              </p>
-        <% end %>
-      </div>
-    <% else %>
-      <div class="m-2">
-        <p class="direction_notes">
-          At this point, you have submitted all of the information needed from
-          YOU. 
-          <% if @current_enrollment.recommendation.recupload.blank? %>
-            However, <strong>please note that your application will not be
-            considered "complete", and will not be reviewed until we receive the
-            letter of recommendation from your teacher. Please check with your
-            teacher to make sure they know you have applied, and they have
-            received an email from us!</strong>
-          <% end %>
-        </p>
-      </div>
-    <% end %>
-
-    <% if @current_enrollment.financial_aids.blank? &&
-    (@current_enrollment.application_status == nil || @current_enrollment.application_status == "" ||
-    @current_enrollment.application_status == "submitted" || @current_enrollment.application_status == "application complete") %>
-        <div class="m-2">
-          <p class="mb-2">If you are applying for need-based financial support, please fill out a request.</p>
-          <%= link_to "Financial Aid Request", new_enrollment_financial_aid_path(@current_enrollment),
-                class: "btn btn-blue" %>
-        </div>
-    <% end %>
-    <div class="m-2">
-      <p class="direction_notes"> Watch the progress window at the right
-        to track the status of your application materials. You will receive an
-        email with instructions for any additional steps that are required.
+      <p class="text-red-700 m-2">
+        Payment of your application fee must be completed before you will be
+        considered for admission.
       </p>
-    </div>
+      <p class="direction_notes">
+        International students may pay via wire transfer
+        (<a href="mailto:mmss@umich.edu">contact our office</a> for more
+        information regarding wire transfers for international students.)
+      </p>
+      <p class="direction_notes">You will receive an email from UM
+        MerchantServices confirming your credit card transactions.
+      </p>
+    <% else %>
+      <% if @current_enrollment.application_status == "waitlisted" %>
+        <div class="m-2">
+          <p class="direction_notes">
+            Your application was placed onto the wait list.</p>
+        </div>
+      <% elsif @current_enrollment.application_status == "rejected" %>
+        <div class="m-2">
+          <p class="direction_notes">
+            Your application was rejected.</p>
+        </div>
+      <% elsif @current_enrollment.offer_status == "offered" %>
+        <div class="m-2">
+          <p class="direction_notes">
+            Please respond to our acceptance offer by making the appropriate
+            selection in the Progress Window.</p>
+        </div>
+      <% elsif @current_enrollment.application_status == "offer accepted" %>
+        <div class="m-2">
+          <% unless current_enrollment.camp_doc_form_completed %>
+            <p class="direction_notes">
+              The parent email address on file will be sent an invitation to complete health forms on Camp Doc
+              after the balance has been paid in full. Please complete the forms as soon as possible.
+              Enrollment will not be finalized until the health forms are completed.
+            </p>
+          <% end %>
+          <p>Please refer to your offer email for the payment deadline. To
+          check your account balance click the button below.</p>
+          <div class="my-2">
+            <%= link_to "Account Summary", all_payments_path, class: "btn btn-blue pt-8"%>
+          </div>
+        </div>
+      <% elsif @current_enrollment.application_status == "offer declined" %>
+        <div class="m-2">
+          <p class="direction_notes">
+            Thanks for your interest.
+          </p>
+        </div>
+      <% elsif @current_enrollment.application_status == "enrolled" %>
+        <div class="m-2">
+          <p class="direction_notes">
+            We look forward to seeing you at the <%= @current_camp_year %> University of Michigan MMSS High School Summer Program.
+            <br><br>
+          </p>
+          <% if @current_enrollment.uniqname.present? %>
+                <p class="m-2">
+                  Your University of Michigan uniqname is <strong><%= @current_enrollment.uniqname %></strong>
+                </p>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="m-2">
+          <p class="direction_notes">
+            At this point, you have submitted all of the information needed from
+            YOU.
+            <% if @current_enrollment.recommendation.recupload.blank? %>
+              However, <strong>please note that your application will not be
+              considered "complete", and will not be reviewed until we receive the
+              letter of recommendation from your teacher. Please check with your
+              teacher to make sure they know you have applied, and they have
+              received an email from us!</strong>
+            <% end %>
+          </p>
+        </div>
+      <% end %>
+
+      <% if @current_enrollment.financial_aids.blank? &&
+      (@current_enrollment.application_status == nil || @current_enrollment.application_status == "" ||
+      @current_enrollment.application_status == "submitted" || @current_enrollment.application_status == "application complete") %>
+          <div class="m-2">
+            <p class="mb-2">If you are applying for need-based financial support, please fill out a request.</p>
+            <%= link_to "Financial Aid Request", new_enrollment_financial_aid_path(@current_enrollment),
+                  class: "btn btn-blue" %>
+          </div>
+      <% end %>
+      <div class="m-2">
+        <p class="direction_notes"> Watch the progress window at the right
+          to track the status of your application materials. You will receive an
+          email with instructions for any additional steps that are required.
+        </p>
+      </div>
+    <% end %>
   <% end %>
 
 <% else %>

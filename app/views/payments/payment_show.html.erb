@@ -9,7 +9,7 @@
       <p>====================================</p>
     <% end %>
 
-    <% if @users_current_payments.count < 1 %>
+    <% if @users_current_payments.count < 1 && @current_enrollment&.application_fee_required %>
       <p class="my-2">You have not made a payment yet. Payment can be made via check or money
         order from a U.S. based bank, or via credit card. International students may
         pay via wire transfer (contact our office for more information regarding wire
@@ -55,7 +55,7 @@
           </div>
         </p>
       <% end %>
-      <div class="direction_notes">You may email any questions to 
+      <div class="direction_notes">You may email any questions to
         <%= mail_to "mmss@umich.edu", subject: "Question about MMSS"  do %>
           <strong>mmss@umich.edu</strong>
         <% end %>
@@ -68,9 +68,12 @@
           Account Summary
         </h5>
         <div class="p-4">
-          <div class="font-bold text-xs mb-2">
-            <%= "#{'application_fee_(non-refundable)'.humanize.ljust(24, '.')} #{humanized_money_with_symbol(CampConfiguration.active.last.application_fee).rjust(12,'.')}" %>
-          </div>
+          <% active_camp = CampConfiguration.active.last %>
+          <% if @current_enrollment&.application_fee_required %>
+            <div class="font-bold text-xs mb-2">
+              <%= "#{'application_fee_(non-refundable)'.humanize.ljust(24, '.')} #{humanized_money_with_symbol(active_camp.application_fee).rjust(12,'.')}" %>
+            </div>
+          <% end %>
           <div class="font-bold text-base mb-2">
             <% if @current_application_status == "enrolled" %>
               <%= "#{'total_cost'.humanize.ljust(24, '.')} #{humanized_money_with_symbol(@total_cost / 100).rjust(12,'.')}" %>
@@ -79,7 +82,7 @@
           <% if ["offer accepted","enrolled"].include? @current_application_status %>
             <% @current_enrollment.session_assignments.each do |sa| %>
               <% if sa.offer_status == "accepted" %>
-                <div>
+                <div class="text-sm">
                   <%= sa.camp_occurrence.display_name %>
                     -- <%= humanized_money_with_symbol(Enrollment.find(sa.enrollment_id).session_registrations.find(sa.camp_occurrence_id).cost) %>
                   <div class="flex justify-start bg-gray-200 text-xs">

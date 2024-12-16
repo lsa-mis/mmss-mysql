@@ -28,6 +28,7 @@
 #  application_status_updated_on :date
 #  uniqname                      :string(255)
 #  camp_doc_form_completed       :boolean          default(FALSE)
+#  application_fee_required      :boolean          default(TRUE), not null
 #
 require 'rails_helper'
 

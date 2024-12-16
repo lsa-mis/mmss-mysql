@@ -4,7 +4,7 @@
   <% if current_user.applicant_detail.present? && current_user.applicant_detail.persisted? %>
     <div id="sidebox">
       <p><strong>Progress Window</strong><p>
-      <div class="text-xs">(You may email any questions to 
+      <div class="text-xs">(You may email any questions to
       <%= mail_to "mmss@umich.edu", subject: "Question about MMSS"  do %>
         <strong>mmss@umich.edu</strong>)
       <% end %>
@@ -64,12 +64,14 @@
           </div>
         <% end %>
 
-        <% if current_user.payments.current_camp_payments.present? %>
-          <div class="sidebox_element">
-            <%= link_to "Application Fee",
-                        all_payments_path %>
-               - paid
-          </div>
+        <% if @curr_enrollment&.application_fee_required %>
+          <% if current_user.payments.status1_current_camp_payments.present? %>
+            <div class="sidebox_element">
+              <%= link_to "Application Fee",
+                          all_payments_path %>
+                 - paid
+            </div>
+          <% end %>
         <% end %>
 
         <% if current_enrollment.offer_status == "offered" %>
@@ -134,9 +136,9 @@
               </p>
             <% else %>
               <p>
-                The parent email address on file will be sent an invitation to complete health forms on Camp Doc 
-                after the balance has been paid in full. Please complete the forms as soon as possible. 
-                Enrollment will not be finalized until the health forms are completed.          
+                The parent email address on file will be sent an invitation to complete health forms on Camp Doc
+                after the balance has been paid in full. Please complete the forms as soon as possible.
+                Enrollment will not be finalized until the health forms are completed.
               </p>
             <% end %>
           </div>
@@ -156,7 +158,4 @@
       <% end %>
     </div>
   <% end %>
-
 <% end %>
-
-<%= javascript_pack_tag 'student_packet_upload' %>
