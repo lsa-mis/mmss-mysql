@@ -65,7 +65,7 @@
         <% end %>
 
         <% if @curr_enrollment&.application_fee_required %>
-          <% if current_user.payments.current_camp_payments.present? %>
+          <% if current_user.payments.status1_current_camp_payments.present? %>
             <div class="sidebox_element">
               <%= link_to "Application Fee",
                           all_payments_path %>
