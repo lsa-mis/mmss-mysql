@@ -36,7 +36,7 @@ class PaymentState
   end
 
   def ttl_paid
-    @curr_enrollment.user.payments.current_camp_payments.where(transaction_status: '1').pluck(:total_amount).map(&:to_i).sum
+    @curr_enrollment.user.payments.status1_current_camp_payments.pluck(:total_amount).map(&:to_i).sum
   end
 
   def total_cost
