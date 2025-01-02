@@ -1,5 +1,5 @@
-<p><strong>Note: This form will only except characters found in the English alphabet.</strong>
-    If you are having troubles submitting your application, check that you are only 
+<p><strong>Note: This form will only accept characters found in the English alphabet.</strong>
+    If you are having troubles submitting your application, check that you are only
     using English characters and standard punctuation.<p>
     <br>
 <p>All fields are required unless marked <span class="text-gray-700">(optional)</span></p>
@@ -210,9 +210,9 @@
 
   <div class="field">
     <%= form.label :high_school_country %>
-    <%= form.country_select :high_school_country, 
-                        { priority_countries: ["US"] }, 
-                        { include_blank: "Select" }, 
+    <%= form.country_select :high_school_country,
+                        { priority_countries: ["US"] },
+                        { include_blank: "Select" },
                         { required: true } %>
   </div>
 
@@ -251,22 +251,22 @@
     </div>
     <div class="field">
       <%= form.label :transcript, 'Update Transcript' %>
-      <%= form.file_field :transcript, 
-            data: { 
-              controller: "filesize-check", 
-              action: "filesize-check#validateFileSize", 
-              filesize_check_max_file_size_value: 20 * 1024 * 1024 
+      <%= form.file_field :transcript,
+            data: {
+              controller: "filesize-check",
+              action: "filesize-check#validateFileSize",
+              filesize_check_max_file_size_value: 20 * 1024 * 1024
             } %>
     </div>
   <% else %>
     <div class="field">
       <%= form.label :transcript %>
-      <%= form.file_field :transcript, 
-            required: true, 
-            data: { 
-              controller: "filesize-check", 
-              action: "filesize-check#validateFileSize", 
-              filesize_check_max_file_size_value: 20 * 1024 * 1024 
+      <%= form.file_field :transcript,
+            required: true,
+            data: {
+              controller: "filesize-check",
+              action: "filesize-check#validateFileSize",
+              filesize_check_max_file_size_value: 20 * 1024 * 1024
             } %>
     </div>
   <% end %>
