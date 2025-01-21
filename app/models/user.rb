@@ -27,12 +27,11 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable,
          :trackable, :timeoutable
 
-
-  # def total_paid
-  #   payments.pluck(:total_amount).map{ |v| v.to_f }.sum / 100
-  # end
-
   def display_name
-    self.email # or whatever column you want
+    email # or whatever column you want
+  end
+
+  def self.ransackable_attributes(auth_object = nil)
+    %w[email]
   end
 end
