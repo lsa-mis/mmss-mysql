@@ -12,9 +12,19 @@
 #
 FactoryBot.define do
   factory :recupload do
-    letter { "MyText" }
-    authorname { "MyString" }
-    studentname { "MyString" }
-    recommendation { nil }
+    letter { 'Sample recommendation letter' }
+    authorname { 'John Smith' }
+    studentname { 'Jane Doe' }
+    recommendation
+
+    trait :with_pdf_letter do
+      after(:build) do |recupload|
+        recupload.recletter.attach(
+          io: File.open(Rails.root.join('spec', 'fixtures', 'files', 'samplerecletter.pdf')),
+          filename: 'samplerecletter.pdf',
+          content_type: 'application/pdf'
+        )
+      end
+    end
   end
 end
