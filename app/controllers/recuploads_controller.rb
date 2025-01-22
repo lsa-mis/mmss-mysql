@@ -5,7 +5,7 @@ class RecuploadsController < InheritedResources::Base
 
   before_action :authenticate_admin!, except: %i[success error new create]
   before_action :set_recupload, only: %i[show edit update destroy]
-  before_action :get_recommendation, only: [:new]
+  before_action :get_recommendation, only: %i[new create]
 
   def index
     redirect_to root_path unless admin_signed_in?
@@ -41,6 +41,8 @@ class RecuploadsController < InheritedResources::Base
         RecuploadMailer.with(recupload: @recupload).received_email.deliver_now
         RecuploadMailer.with(recupload: @recupload).applicant_received_email.deliver_now
       else
+        @student = ApplicantDetail.find(params[:id]).full_name if params[:id]
+        @recommendation = Recommendation.find(@recupload.recommendation_id) if @recupload.recommendation_id
         format.html { render :new }
         format.json { render json: @recupload.errors, status: :unprocessable_entity }
       end

@@ -10,6 +10,14 @@
         <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
       </div>
 
+      <div class="mt-2">
+        It is recommended to add <strong>mmss-support@umich.edu</strong> to your contacts/safe senders list.<br>
+        <ul class="list-disc ml-4">
+          <li><strong>Add to Contacts</strong>: Add mmss-support@umich.edu to your Gmail contacts list. This can improve deliverability.</li>
+          <li><strong>"Never Send It To Spam"</strong>  (If Found): If you find the email in any of the other folders (including spam, trash, or promotions), there should be an option that reads "Report not spam", "Looks Safe" or "Never Send It To Spam", click it after confirming it is not spam.</li>
+        </ul>
+      </div>
+
       <div class="actions">
         <%= f.submit "Send me reset password instructions" %>
       </div>

@@ -20,21 +20,21 @@ class Recupload < ApplicationRecord
 
   has_one_attached :recletter
 
-  validate :acceptable_recletter
+  validate :validate_recletter
 
   private
 
-  def acceptable_recletter
-    return unless recletter.attached?
+  def validate_recletter
+    if recletter.attached?
+      errors.add(:recletter, 'is too big - file size cannot exceed 20Mbyte') if recletter.blob.byte_size > 20.megabytes
 
-    unless recletter.blob.byte_size <= 20.megabyte
-      errors.add(:recletter, 'is too big - file size cannot exceed 20Mbyte')
+      acceptable_types = ['image/png', 'image/jpeg', 'application/pdf']
+      unless acceptable_types.include?(recletter.content_type)
+        errors.add(:recletter, 'must be file type PDF, JPEG or PNG')
+      end
+    elsif letter.blank?
+      errors.add(:recletter, 'must be attached or letter text must be provided')
     end
-
-    acceptable_types = ['image/png', 'image/jpeg', 'application/pdf']
-    return if acceptable_types.include?(recletter.content_type)
-
-    errors.add(:recletter, 'must be file type PDF, JPEG or PNG')
   end
 
   def update_enrollment_status

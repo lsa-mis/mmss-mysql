@@ -1,9 +1,11 @@
 ActiveAdmin.register User do
   menu parent: 'Logins Info', priority: 1
-  config.filters = false
+  config.filters = true
 
   # Allow email updates without requiring password
   permit_params :email, :password, :password_confirmation
+
+  filter :email
 
   index do
     selectable_column
@@ -18,8 +20,8 @@ ActiveAdmin.register User do
   form do |f|
     f.inputs do
       f.input :email
-      f.input :password, required: false, 
-              hint: "Leave blank if you don't want to change the password"
+      f.input :password, required: false,
+                         hint: "Leave blank if you don't want to change the password"
       f.input :password_confirmation, required: false
     end
     f.actions
