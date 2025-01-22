@@ -32,8 +32,8 @@ class Recupload < ApplicationRecord
       unless acceptable_types.include?(recletter.content_type)
         errors.add(:recletter, 'must be file type PDF, JPEG or PNG')
       end
-    else
-      errors.add(:recletter, 'must be attached')
+    elsif letter.blank?
+      errors.add(:recletter, 'must be attached or letter text must be provided')
     end
   end
 
