@@ -64,7 +64,6 @@ class CampConfiguration < ApplicationRecord
       new_camp_configuration.priority = ''
       new_camp_configuration.camper_acceptance_due = ''
       new_camp_configuration.active = ''
-      new_camp_configuration.student_packet_url = ''
     end
   end
 

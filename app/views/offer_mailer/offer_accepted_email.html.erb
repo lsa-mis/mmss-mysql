@@ -12,5 +12,9 @@
 <p>
   Retain the login id: <%= @user.email %> and password that you created
   during the application process. You will need it to refer back to the
-  application web site to review the events associated with your application.    
+  application web site to review the events associated with your application.
+</p>
+<p>
+  Please review the
+  <%= link_to "MMSS #{@camp_config.camp_year} Student Information Packet", @camp_config.student_packet_url %> for more information regarding program policies and procedures.
 </p>
