@@ -115,6 +115,10 @@
                   <% else %>
                     <%= "Contact MMSS admin"%>
                   <% end %>
+                  <p class="my-2">
+                    Please review the
+                    <%= link_to "MMSS #{current_camp_year} Student Information Packet", student_packet_url, class: "text-blue-700 font-bold", target: "_blank" %> for more information regarding program policies and procedures.
+                  </p>
                 </div>
               </div>
               <% end %>
