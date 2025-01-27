@@ -39,6 +39,7 @@ ActiveAdmin.register CampConfiguration do
       f.input :camper_acceptance_due
       f.input :active
       f.input :offer_letter
+      f.input :student_packet_url
       f.input :application_fee
       f.input :application_fee_required, label: 'Require Application Fee'
       f.input :reject_letter
@@ -74,6 +75,9 @@ ActiveAdmin.register CampConfiguration do
       row :active
       row 'Offer Letter Text' do |item|
         item.offer_letter
+      end
+      row 'Student Packet URL for campers who accept their offer' do |item|
+        item.student_packet_url
       end
       row 'Rejection Letter Text' do |item|
         item.reject_letter
