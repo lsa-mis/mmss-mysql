@@ -28,7 +28,7 @@ gem 'net-imap', require: false
 gem 'net-pop', require: false
 gem 'net-smtp', require: false
 
-gem 'nokogiri', '~> 1.15.0'
+gem 'nokogiri', '~> 1.18.3'
 
 group :development, :test do
   gem 'capybara', '~> 3.35', '>= 3.35.3'
