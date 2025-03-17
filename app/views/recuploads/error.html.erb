@@ -1,7 +1,25 @@
 <p class="text-lg">
   <span class="text-red-700">ERROR:</span>
   <br>
+  <% if flash[:alert] %>
+    <%= flash[:alert] %>
+  <% else %>
+    There was an issue processing your recommendation request.
+  <% end %>
+  <br><br>
+  If you received this link via email, please try:
+  <ul class="list-disc ml-8 mt-2">
+    <li>Copying the entire link from your email and pasting it directly into your browser's address bar</li>
+    <li>Using a different web browser</li>
+    <li>Disabling any browser extensions that might interfere with links</li>
+  </ul>
+  <br>
   If you believe that this is an error and the recommendation has not been
-  submitted yet please contact the Michigan Math & Science Scholars at:
-    <%= mail_to "mmss@umich.edu" %>
+  submitted yet, please contact the Michigan Math & Science Scholars at:
+  <%= mail_to "mmss@umich.edu" %> and include the following information:
+  <ul class="list-disc ml-8 mt-2">
+    <li>The student's name</li>
+    <li>Your name and email address</li>
+    <li>A brief description of the issue you're experiencing</li>
+  </ul>
 </p>
