@@ -68,9 +68,35 @@ class RecuploadsController < InheritedResources::Base
 
   def get_recommendation
     hash_val = params['hash']
-    rec_id = hash_val.split('nGklDoc2egIkzFxr0U').last.to_i
+
+    # More robust parsing - look for the pattern anywhere in the hash
+    if hash_val && hash_val.include?('nGklDoc2egIkzFxr0U')
+      rec_id = hash_val.split('nGklDoc2egIkzFxr0U').last.to_i
+    elsif hash_val
+      # Try to extract just the numeric part at the end if the pattern isn't found
+      rec_id = hash_val.gsub(/[^0-9]/, '').to_i
+    else
+      raise 'Missing hash parameter'
+    end
+
     @recommendation = Recommendation.find(rec_id)
-    @student = ApplicantDetail.find(params[:id]).full_name
+
+    # Find the student's name
+    if params[:id].present?
+      begin
+        @student = ApplicantDetail.find(params[:id]).full_name
+      rescue ActiveRecord::RecordNotFound
+        # If we can't find the ApplicantDetail, try to get the name from the recommendation
+        @student = @recommendation.applicant_name
+      end
+    else
+      @student = @recommendation.applicant_name
+    end
+  rescue StandardError => e
+    # Log the error
+    Rails.logger.error("Error in get_recommendation: #{e.message}, params: #{params.inspect}")
+    redirect_to recupload_error_path,
+                alert: 'We could not find the recommendation request. Please contact MMSS admin for assistance.'
   end
 
   def recupload_params
