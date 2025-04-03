@@ -1,5 +1,4 @@
 class FinaidMailer < ApplicationMailer
-  
   default from: 'University of Michigan MMSS High School Summer Program <mmss@umich.edu>'
 
   def fin_aid_awarded_email(finaid, balance_due)
@@ -24,8 +23,9 @@ class FinaidMailer < ApplicationMailer
   def fin_aid_request_email
     @enrollment = Enrollment.find_by(id: params[:enrollment])
     @student = ApplicantDetail.find_by(user_id: @enrollment.user_id)
-    @url  = "#{ ConstantData::HOST_URL }/financial_aids/new"
-    mail(to: @enrollment.user.email, subject: "Financial Aid Request Form for #{ @student.firstname } #{ @student.lastname }")
+    @url = "#{ConstantData::HOST_URL}" \
+           "/financial_aids/new"
+    mail(to: @enrollment.user.email,
+         subject: "Financial Aid Request Form for #{@student.firstname} #{@student.lastname}")
   end
-
 end
