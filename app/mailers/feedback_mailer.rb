@@ -1,5 +1,4 @@
 class FeedbackMailer < ApplicationMailer
-  default from: 'MMSS Registration Server - Feedback <mmss-support@umich.edu>'
 
   def feedback_email
     @url = ConstantData::HOST_URL
