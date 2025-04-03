@@ -3,26 +3,63 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <style>
-      /* Email styles need to be inline */
+      body {
+        font-family: Arial, sans-serif;
+        color: #333;
+        line-height: 1.5;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .header {
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eee;
+        margin-bottom: 20px;
+      }
+
+      h1, h2, h3 {
+        color: #1a5a96;
+        margin-top: 20px;
+      }
+
+      .footer {
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+        font-size: 0.8em;
+        color: #666;
+      }
     </style>
   </head>
-
   <body>
-    <%= yield %>
-    <p>
-      email: MMSS Office Staff - mmss@umich.edu<br>
-      URL:  <%= link_to "MMSS Website", "https://sites.lsa.umich.edu/mmss/" %>
-    </p>
+    <div class="container">
+      <div class="header">
+        <h1>University of Michigan MMSS High School Summer Program</h1>
+      </div>
 
-    <div>
-    Address:
-      <address class="text-xs">
-        Michigan Math and Science Scholars
-      <br>  Department of Mathematics
-      <br>   530 Church Street
-      <br>   2074 East Hall
-      <br>   Ann Arbor, MI 48109-1043
-      </address>
+      <%= yield %>
+
+      <p>
+        <%= mailto 'mmss@umich.edu', ' MMSS Office Staff' %>
+        <%= link_to 'MMSS Website', 'https://sites.lsa.umich.edu/mmss/' %>
+      </p>
+
+      <div>
+        Address:
+        <address class="text-xs">
+          Michigan Math and Science Scholars
+          <br>  Department of Mathematics
+          <br>   530 Church Street
+          <br>   2074 East Hall
+          <br>   Ann Arbor, MI 48109-1043
+        </address>
+      </div>
+      <div class="footer">
+        <p>This is an automated email. Please do not reply to this message.</p>
+        <p>&copy; <%= Time.now.year %> | <%= link_to 'The Regents of the University of Michigan', 'https://regents.umich.edu' %></p>
+      </div>
     </div>
   </body>
 </html>
