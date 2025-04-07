@@ -2,60 +2,116 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
       body {
         font-family: Arial, sans-serif;
         color: #333;
-        line-height: 1.5;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5f5;
       }
       .container {
         max-width: 600px;
-        margin: 0 auto;
-        padding: 20px;
+        margin: 20px auto;
+        padding: 30px;
+        background-color: #ffffff;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       }
       .header {
-        padding-bottom: 20px;
-        border-bottom: 1px solid #eee;
-        margin-bottom: 20px;
+        padding-bottom: 25px;
+        border-bottom: 2px solid #1a5a96;
+        margin-bottom: 30px;
+        text-align: center;
       }
-
+      .header img {
+        width: 150px;
+        height: auto;
+        margin-bottom: 15px;
+      }
       h1, h2, h3 {
         color: #1a5a96;
-        margin-top: 20px;
+        margin-top: 25px;
+        margin-bottom: 15px;
+        font-weight: 600;
       }
-
+      p {
+        margin-bottom: 15px;
+      }
+      .content {
+        margin: 25px 0;
+      }
+      .contact-info {
+        margin: 25px 0;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+      }
+      .contact-info a {
+        color: #1a5a96;
+        text-decoration: none;
+      }
+      .contact-info a:hover {
+        text-decoration: underline;
+      }
+      address {
+        font-style: normal;
+        line-height: 1.6;
+        margin: 10px 0;
+      }
       .footer {
-        margin-top: 30px;
+        margin-top: 40px;
         padding-top: 20px;
         border-top: 1px solid #eee;
-        font-size: 0.8em;
+        font-size: 0.85em;
         color: #666;
+        text-align: center;
+      }
+      .footer a {
+        color: #1a5a96;
+        text-decoration: none;
+      }
+      .footer a:hover {
+        text-decoration: underline;
+      }
+      .footer p {
+        margin: 5px 0;
+      }
+      @media only screen and (max-width: 600px) {
+        .container {
+          margin: 10px;
+          padding: 20px;
+        }
       }
     </style>
   </head>
   <body>
     <div class="container">
       <div class="header">
-        <h1>University of Michigan MMSS High School Summer Program</h1>
+        <%= image_tag "U-M_Logo.svg" %>
+        <h1>MMSS High School Summer Program</h1>
       </div>
 
-      <%= yield %>
+      <div class="content">
+        <%= yield %>
+      </div>
 
-      <p>
-        <%= mailto 'mmss@umich.edu', ' MMSS Office Staff' %>
-        <%= link_to 'MMSS Website', 'https://sites.lsa.umich.edu/mmss/' %>
-      </p>
-
-      <div>
-        Address:
-        <address class="text-xs">
-          Michigan Math and Science Scholars
-          <br>  Department of Mathematics
-          <br>   530 Church Street
-          <br>   2074 East Hall
-          <br>   Ann Arbor, MI 48109-1043
+      <div class="contact-info">
+        <p>
+          <%= mail_to 'mmss@umich.edu', 'MMSS Office Staff', class: 'contact-link' %> |
+          <%= link_to 'MMSS Website', 'https://sites.lsa.umich.edu/mmss/', class: 'contact-link' %>
+        </p>
+        <address>
+          Michigan Math and Science Scholars<br>
+          Department of Mathematics<br>
+          530 Church Street<br>
+          2074 East Hall<br>
+          Ann Arbor, MI 48109-1043
         </address>
       </div>
+
       <div class="footer">
         <p>This is an automated email. Please do not reply to this message.</p>
         <p>&copy; <%= Time.now.year %> | <%= link_to 'The Regents of the University of Michigan', 'https://regents.umich.edu' %></p>
