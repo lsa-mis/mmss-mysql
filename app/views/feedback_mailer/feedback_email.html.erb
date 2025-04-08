@@ -1,10 +1,16 @@
-<h4><%= "#{@sender.email} has feedback" %></h4>
-<p class="font-medium">
-  <%= "Feedback Type: #{@feedback.genre}" %>
-</p>
-<p>
-  <%= "Feedback Message: #{@feedback.message}" %>
-</p>
-<p>
-  Your friendly MMSS Registration server<br>
-</p>
+<div class="header">
+  <h2>New Feedback Received</h2>
+</div>
+
+<div class="content">
+  <p><strong>From:</strong> <%= @sender.email %></p>
+  <p><strong>Feedback Type:</strong> <%= @feedback.genre %></p>
+  <p><strong>Message:</strong></p>
+  <blockquote style="background-color: #ffffff; padding: 15px; border-left: 4px solid #3498db; margin: 10px 0;">
+    <%= @feedback.message %>
+  </blockquote>
+</div>
+
+<div class="footer">
+  <p>Your friendly MMSS Registration server</p>
+</div>
