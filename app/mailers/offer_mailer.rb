@@ -4,8 +4,8 @@ class OfferMailer < ApplicationMailer
   def offer_email(user_id)
     raise ArgumentError, 'user_id cannot be nil' if user_id.nil?
     setup_common_variables(user_id)
-    @assigned_courses = @enrollment.course_assignments.where(wait_list: false)
-    @assigned_sessions = @enrollment.session_assignments
+    @assigned_courses = @enrollment.course_assignments.where(wait_list: false).reverse
+    @assigned_sessions = @enrollment.session_assignments.reverse
 
     result = mail(to: @user.email,
                  subject: 'University of Michigan MMSS: Offer to attend Michigan Math and Science Scholars') do |format|
