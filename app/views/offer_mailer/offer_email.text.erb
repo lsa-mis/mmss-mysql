@@ -1,0 +1,38 @@
+<%= "Dear #{@application.firstname} #{@application.lastname}," %>
+
+We are pleased to inform you that you have been admitted into the <%= @enrollment.campyear %> Michigan Math and Science Scholars (MMSS) summer program at the University of Michigan in Ann Arbor!
+
+To finalize your admission, please log in to <%= @url %> to accept or decline your admission.
+
+<%= @offer_letter_text.html_safe %>
+
+=======================================
+
+YOUR PROGRAM ASSIGNMENTS
+=======================================
+
+Session Assignment:
+<% @assigned_sessions.each do |as| %>
+  • <%= as.camp_occurrence.display_name %>
+<% end %>
+
+Course Assignment:
+<% @assigned_courses.each do |ac| %>
+  • <%= ac.course.display_name %>
+<% end %>
+
+=======================================
+
+IMPORTANT INFORMATION
+=======================================
+
+Response Deadline: <%= @enrollment.application_deadline.strftime("%B %d, %Y") %>
+
+To accept or decline this offer, please visit your application at:
+<%= @url %>
+
+We look forward to your response.
+
+Sincerely,
+Michigan Math and Science Scholars Program
+University of Michigan
