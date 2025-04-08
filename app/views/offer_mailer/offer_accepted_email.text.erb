@@ -1,0 +1,15 @@
+Hello <%= @application.firstname %> <%= @application.lastname %>,
+
+=======================================
+You have accepted:
+  <%= @session_assignment.camp_occurrence.display_name %>
+
+To participate in:
+  <%= @course_assignment %>
+=======================================
+
+Retain the login id: <%= @user.email %> and password that you created
+during the application process. You will need it to refer back to the
+application web site to review the events associated with your application.
+
+Please review the MMSS <%= @camp_config.camp_year %> Student Information Packet ( <%= @camp_config.student_packet_url %> ) for more information regarding program policies and procedures.
