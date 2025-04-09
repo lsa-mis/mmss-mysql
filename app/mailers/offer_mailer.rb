@@ -8,7 +8,7 @@ class OfferMailer < ApplicationMailer
     @assigned_sessions = @enrollment.session_assignments.reverse
 
     result = mail(to: @user.email,
-                 subject: 'University of Michigan MMSS: Offer to attend Michigan Math and Science Scholars') do |format|
+                 subject: 'University of Michigan - Michigan Math and Science Scholars: Offer to attend Michigan Math and Science Scholars') do |format|
       format.html
       format.text
     end
@@ -25,7 +25,7 @@ class OfferMailer < ApplicationMailer
     @session_assignment = session_assignment
     @course_assignment = format_course_assignment(course_assignment)
 
-    mail(to: @user.email, subject: 'UM MMSS: Offer Accepted')
+    mail(to: @user.email, subject: 'University of Michigan - Michigan Math and Science Scholars: Offer Accepted')
   rescue StandardError => e
     log_error("Failed to send offer accepted email for user #{user_id}", e)
     raise
@@ -36,7 +36,7 @@ class OfferMailer < ApplicationMailer
     @session_assignment = session_assignment
     @course_assignment = format_course_assignment(course_assignment)
 
-    mail(to: @user.email, subject: 'UM MMSS: Offer Declined')
+    mail(to: @user.email, subject: 'University of Michigan - Michigan Math and Science Scholars: Offer Declined')
   rescue StandardError => e
     log_error("Failed to send offer declined email for user #{user_id}", e)
     raise

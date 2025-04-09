@@ -1,13 +1,12 @@
-<h4>Hello <%= "#{@application.firstname} #{@application.lastname}" %></h4>
+<h4>Hello <%= "#{@application.firstname} #{@application.lastname}" %>,</h4>
 <p>
   This is to inform you that your application with the Michigan Math &
   Science Scholars High School Program for the Summer
-  <%= @camp_config.camp_year %> camp was rejected. 
-</p> 
+  <%= @camp_config.camp_year %> camp was rejected.
+</p>
 <p>
   <%= @camp_config.reject_letter.html_safe %>
 </p>
 <p>
-  We have reviewed your 
-  application and it was rejected for the following reason(s): <%= @reason %>
+  We have reviewed your application and it was rejected for the following reason(s): <%= @reason %>
 </p>

@@ -10,6 +10,6 @@ class RecommendationMailer < ApplicationMailer
     headers['X-SMTPAPI'] = '{"filters":{"clicktrack":{"settings":{"enable":0}}}}'
 
     mail(to: @recommendation.email,
-         subject: "Recommendation request for #{@student.firstname} #{@student.lastname}")
+         subject: "University of Michigan - Michigan Math and Science Scholars: Recommendation Request for #{@student.firstname} #{@student.lastname}")
   end
 end
