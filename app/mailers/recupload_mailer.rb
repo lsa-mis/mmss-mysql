@@ -1,6 +1,4 @@
 class RecuploadMailer < ApplicationMailer
-    default from: 'University of Michigan MMSS High School Summer Program <mmss-recommend@umich.edu>'
-
   def received_email
     @recupload = params[:recupload]
     @recommendation = Recommendation.find(@recupload.recommendation_id)

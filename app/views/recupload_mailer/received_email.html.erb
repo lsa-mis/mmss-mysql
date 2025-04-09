@@ -1,16 +1,13 @@
-
-<p> Hello,
+<div> Hello <%= "#{@recommendation.firstname} #{@recommendation.lastname}" %>,
   <p>
     This is confirmation that we received your recommendation letter for
     <%= "#{@student.firstname} #{@student.lastname}" %>.
-    <br>
-    Please contact the MMSS office at <%= mail_to "mmss@umich.edu" %> or by mail
-    at the address below, if you have any questions.
   </p>
-
   <p>
     Thank you very much for assisting with
-    <%= "#{@student.firstname} #{@student.lastname}" %>'s academic
-    development.
+    <%= "#{@student.firstname} #{@student.lastname}" %>'s academic development.
   </p>
-</p>
+  <p>
+    Please contact the MMSS office at <%= mail_to "mmss@umich.edu" %> or by mail at the address below, if you have any questions.
+  </p>
+</div>

@@ -1,13 +1,17 @@
-<p> Hello,
+<div> Hello <%= "#{@student.firstname} #{@student.lastname}" %>,
   <p>
     This is confirmation that we received your recommendation letter from
     <%= "#{@recommendation.firstname} #{@recommendation.lastname} at #{@recommendation.organization}" %>.
-    <br>
-    Please contact the MMSS office at <%= mail_to "mmss@umich.edu" %> or by mail
-    at the address below, if you have any questions.
   </p>
 
   <p>
-    The recommendation will be noted in the progress window section of the Web Apply application <%= @url %>.
+    The recommendation will be noted in the progress window section of the MMSS student portal
+    <div style="text-align: center; margin: 20px 0;">
+      <%= link_to "Access Student Portal", @url, style: "background-color: #1a5a96; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;" %>
+    </div>
   </p>
-</p>
+  <p>
+    Please contact the MMSS office at <%= mail_to "mmss@umich.edu" %> or by mail
+    at the address below, if you have any questions.
+  </p>
+</div>
