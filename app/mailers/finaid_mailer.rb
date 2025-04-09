@@ -1,6 +1,6 @@
 class FinaidMailer < ApplicationMailer
   def fin_aid_awarded_email(finaid, balance_due)
-    @url = ConstantData::HOST_URL
+    @url = root_url
     @finaid = finaid
     @email = finaid.enrollment.user.email
     @balance_due = balance_due
@@ -9,7 +9,7 @@ class FinaidMailer < ApplicationMailer
   end
 
   def fin_aid_rejected_email(finaid, balance_due)
-    @url = ConstantData::HOST_URL
+    @url = root_url
     @email = finaid.enrollment.user.email
     @finaid = finaid
     @balance_due = balance_due
@@ -21,8 +21,7 @@ class FinaidMailer < ApplicationMailer
   def fin_aid_request_email
     @enrollment = Enrollment.find_by(id: params[:enrollment])
     @student = ApplicantDetail.find_by(user_id: @enrollment.user_id)
-    @url = "#{ConstantData::HOST_URL}" \
-           "/financial_aids/new"
+    @url = new_financial_aid_url
     mail(to: @enrollment.user.email,
          subject: 'University of Michigan - Michigan Math and Science Scholars: Financial Aid Request Form')
   end

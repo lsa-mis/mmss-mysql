@@ -50,7 +50,7 @@ class OfferMailer < ApplicationMailer
     @offer_letter_text = @camp_config&.offer_letter
     @application = find_application(user_id)
     @enrollment = find_enrollment(user_id)
-    @url = ConstantData::HOST_URL
+    @url = root_url
   end
 
   def find_user(user_id)
