@@ -1,6 +1,4 @@
 class RegistrationMailer < ApplicationMailer
-  default from: 'University of Michigan MMSS High School Summer Program <mmss@umich.edu>'
-
   def app_complete_email(user)
     @user_detail = user
     @application = ApplicantDetail.find_by(user_id: user)
