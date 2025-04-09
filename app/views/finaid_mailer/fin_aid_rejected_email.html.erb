@@ -1,12 +1,16 @@
 <h4>Hello <%= "#{@student.firstname} #{@student.lastname}" %></h4>
 <p>
-  Thank you for your interest in the Michigan Math and Science Scholars! 
-  Your financial aid application has been reviewed. I am sorry to tell 
+  Thank you for your interest in the Michigan Math and Science Scholars!
+  Your financial aid application has been reviewed. I am sorry to tell
   you that we are not able to award you financial aid this <%= @camp_config.camp_year %> year.
 </p>
 <p>
-  Your account balance is <%= "#{humanized_money_with_symbol(@balance_due / 100)}" %>. Please log in to your student 
+  Your account balance is <%= "#{humanized_money_with_symbol(@balance_due / 100)}" %>. Please log in to your student
   portal and pay your balance by <%= "#{@finaid.payments_deadline.strftime("%B %d, %Y")}" %> in order to finalize admission.
+
+  <div style="text-align: center; margin: 20px 0;">
+  <%= link_to "Access Student Portal", @url, style: "background-color: #1a5a96; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;" %>
+</div>
 </p>
 <p>
   Congratulations on your achievements in your scholastic studies!  We hope to see you soon.

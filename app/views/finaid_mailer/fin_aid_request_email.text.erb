@@ -1,44 +1,15 @@
-   Hello <%= "#{ @student.firstname } #{ @student.lastname }" %>
-   ======================================================================
 
-      You are a student applying to the University
-      of Michigan's - Michigan Math & Science Scholars High School Summer
-      Program.
+Dear <%= "#{ @student.firstname } #{ @student.lastname }" %>,
 
-      You can apply for MMSS Financial Aid by either clicking on or pasting the link below into
-      the address line of your favorite web browser.
+Thank you for applying to the University of Michigan's Michigan Math & Science Scholars (MMSS) High School Summer Program.
 
-      To login to the site, just follow this link:
-      <%= @url %>
+You are eligible to apply for MMSS Financial Aid. To submit your financial aid request, please visit the following URL:
 
-      You will be notified by email of any financial award decisions.
-      
-      Thank you,
+<%= @url %>
 
+If you have any trouble accessing the link, please ensure you copy and paste the entire URL into your web browser. The link will start with "https://mmss-registration.math.lsa.umich.edu".
 
-<h4>Hello <%= "#{ @student.firstname } #{ @student.lastname }" %></h4>
-<p>
-  You are a student applying to the University
-  of Michigan's - Michigan Math & Science Scholars High School Summer
-  Program.
-  <br>
-  You can apply for MMSS Financial Aid by either clicking on or pasting the link below into
-  the address line of your favorite web browser.
-  <br>
-  <%= link_to "Financial Aid Request", @url %>
-</p>
-<div style="padding: 4px;border: 2px solid black;">
-  <strong>Trouble clicking the link above?</strong>
-  <br>
-  Copy the following link and paste it into a browser to view.
-  <br>
-    <%= @url %>
-  <br>
-  <i>The link provided in this email starts with “https://mmss-registration.math.lsa.umich.edu”.</i>
-</div>
+After submitting your financial aid request, you will receive an email notification regarding the decision on your application.
 
-<p>
-  You will be notified by email of any financial award decisions
-  <br>
-  Thank you, 
-</p>
+Best regards,
+MMSS Program Team

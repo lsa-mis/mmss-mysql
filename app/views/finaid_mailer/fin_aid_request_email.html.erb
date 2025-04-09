@@ -1,23 +1,21 @@
+<h4>Dear <%= "#{ @student.firstname } #{ @student.lastname }" %>,</h4>
 
-<h4>Hello <%= "#{ @student.firstname } #{ @student.lastname }" %></h4>
-<p>
-  You are a student applying to the University
-  of Michigan's - Michigan Math & Science Scholars High School Summer
-  Program. Applicants may apply for MMSS Financial Aid by either clicking on or pasting the link below into
-  the address line of your favorite web browser.
-  <br>
-  <%= link_to "Financial Aid Request", @url %>
-</p>
-<div style="padding: 4px;border: 2px solid black;">
-  <strong>Trouble clicking the link above?</strong>
-  <br>
-  Copy the following link and paste it into a browser to view.
-  <br>
-    <%= @url %>
-  <br>
-  <i>The link provided in this email starts with “https://mmss-registration.math.lsa.umich.edu”.</i>
+<p>Thank you for applying to the University of Michigan's Michigan Math & Science Scholars (MMSS) High School Summer Program.</p>
+
+<p>You are eligible to apply for MMSS Financial Aid. To submit your financial aid request, please click the link below:</p>
+
+<div style="text-align: center; margin: 20px 0;">
+  <%= link_to "Submit Financial Aid Request", @url, style: "background-color: #00274C; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;" %>
 </div>
 
-<p>
-  You will be notified by email of any financial award decisions Thank you, 
-</p>
+<div style="padding: 15px; border: 1px solid #00274C; background-color: #f8f9fa; margin: 20px 0;">
+  <strong>Having trouble with the link?</strong>
+  <p>If the button above doesn't work, you can copy and paste this URL into your web browser:</p>
+  <p style="word-break: break-all;"><%= @url %></p>
+  <p><em>Note: The link will start with "https://mmss-registration.math.lsa.umich.edu"</em></p>
+</div>
+
+<p>After submitting your financial aid request, you will receive an email notification regarding the decision on your application.</p>
+
+<p>Best regards,<br>
+MMSS Program Team</p>
