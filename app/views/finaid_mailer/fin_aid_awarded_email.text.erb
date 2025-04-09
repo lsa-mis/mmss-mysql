@@ -1,17 +1,30 @@
-Hello <%= "#{@student.firstname} #{@student.lastname}" %>
-    <%= "\r\n" %>
-      Thank you for your interest in the Michigan Math and Science Scholars! 
-      I am happy to report that you have been awarded financial aid in the amount 
-      of <%= "#{humanized_money_with_symbol(@finaid.amount)}" %>.
+
+Hello <%= "#{@student.firstname} #{@student.lastname}" %>,
+
+Thank you for your interest in the Michigan Math and Science Scholars program! We are pleased to inform you that you have been awarded financial aid in the amount of <%= humanized_money_with_symbol(@finaid.amount) %>.
+
 <% unless @balance_due <= 0 %>
-<%= "\r\n" %>
-      Your remaining balance is <%= "#{humanized_money_with_symbol(@balance_due / 100)}" %>.
-<%= "\r\n" %>
-      Please log in to your student portal and pay your balance by <%= "#{@finaid.payments_deadline.strftime("%B %d, %Y")}" %>
-      in order to finalize your enrollment.
+Your remaining balance is <%= humanized_money_with_symbol(@balance_due / 100) %>.
+<% if @finaid.payments_deadline.present? %>
+To finalize your enrollment, please log in to your student portal and pay your balance by <%= @finaid.payments_deadline.strftime("%B %d, %Y") %>.
+<% else %>
+To finalize your enrollment, please log in to your student portal and pay your balance.
 <% end %>
-<%= "\r\n" %>
-      Please ensure that you accept your offer and upload the required documents to your student portal by May 1.
-<%= "\r\n" %>
-      Congratulations on your achievements in your scholastic studies! 
-<%= "\r\n" %>
+<% end %>
+
+Next Steps:
+1. Accept your offer in the student portal
+2. Upload all required documents by May 1
+<% unless @balance_due <= 0 %>
+3. Pay your remaining balance<% if @finaid.payments_deadline.present? %> by <%= @finaid.payments_deadline.strftime("%B %d, %Y") %><% end %>
+<% end %>
+
+To access your student portal, visit: <%= @url %>
+
+Congratulations on your achievements in your scholastic studies! We look forward to welcoming you to the program.
+
+If you have any questions, please contact us at mmss@umich.edu.
+
+--
+Michigan Math and Science Scholars Program
+University of Michigan

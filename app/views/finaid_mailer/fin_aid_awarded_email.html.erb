@@ -1,23 +1,31 @@
-    <h4>Hello <%= "#{@student.firstname} #{@student.lastname}" %></h4>
-    <p>
-      Thank you for your interest in the Michigan Math and Science Scholars! 
-      I am happy to report that you have been awarded financial aid in the amount 
-      of <%= "#{humanized_money_with_symbol(@finaid.amount)}" %>.
-    </p>
-    <% unless @balance_due <= 0 %>
-      <p>
-        Your remaining balance is <%= "#{humanized_money_with_symbol(@balance_due / 100)}" %>.
-      </p>
-      <p>
-        Please log in to your student portal and pay your balance by <%= "#{@finaid.payments_deadline.strftime("%B %d, %Y")}" %>
-        in order to finalize your enrollment.
-      </p>
-    <% end %>
-    <p>
-      Please ensure that you accept your offer and upload the required documents to your student portal by May 1.
-    </p>
+<h3>Hello <%= "#{@student.firstname} #{@student.lastname}" %>,</h3>
 
-    <p>
-      Congratulations on your achievements in your scholastic studies! 
-    </p>
+<p>Thank you for your interest in the Michigan Math and Science Scholars program! We are pleased to inform you that you have been awarded financial aid in the amount of <strong><%= humanized_money_with_symbol(@finaid.amount) %></strong>.</p>
 
+<% unless @balance_due <= 0 %>
+  <p>Your remaining balance is <strong><%= humanized_money_with_symbol(@balance_due / 100) %></strong>.</p>
+  <% if @finaid.payments_deadline.present? %>
+    <p>To finalize your enrollment, please log in to your student portal and pay your balance by <strong><%= @finaid.payments_deadline.strftime("%B %d, %Y") %></strong>.</p>
+  <% else %>
+    <p>To finalize your enrollment, please log in to your student portal and pay your balance.</p>
+  <% end %>
+<% end %>
+
+<p>Next Steps:</p>
+<ol>
+  <li>Accept your offer in the student portal</li>
+  <li>Upload all required documents by May 1</li>
+  <% unless @balance_due <= 0 %>
+    <li>Pay your remaining balance<% if @finaid.payments_deadline.present? %> by <%= @finaid.payments_deadline.strftime("%B %d, %Y") %><% end %></li>
+  <% end %>
+</ol>
+
+<div style="text-align: center; margin: 20px 0;">
+  <%= link_to "Access Student Portal", @url, style: "background-color: #1a5a96; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;" %>
+</div>
+
+<p>Congratulations on your achievements in your scholastic studies! We look forward to welcoming you to the program.</p>
+
+<div class="contact-info">
+  <p>If you have any questions, please contact us at <%= mail_to "mmss@umich.edu" %>.</p>
+</div>
