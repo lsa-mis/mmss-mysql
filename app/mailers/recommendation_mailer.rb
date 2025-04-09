@@ -1,6 +1,4 @@
 class RecommendationMailer < ApplicationMailer
-  default from: 'University of Michigan MMSS High School Summer Program <mmss-recommend@umich.edu>'
-
   def request_email
     @recommendation = params[:recommendation]
     @enrollment = Enrollment.find(@recommendation.enrollment_id)
