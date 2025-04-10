@@ -1,2 +1,34 @@
+# Default owners for everything in the repo
 * @rsmoke
+
+# GitHub specific files
 /.github/ @rsmoke
+
+# Ruby and Rails specific files
+/Gemfile* @rsmoke
+/config/ @rsmoke
+/app/ @rsmoke
+/db/ @rsmoke
+/lib/ @rsmoke
+
+# Frontend specific files
+/app/javascript/ @rsmoke
+/app/assets/ @rsmoke
+/tailwind.config.js @rsmoke
+/postcss.config.js @rsmoke
+/babel.config.js @rsmoke
+
+# Test files
+/test/ @rsmoke
+/spec/ @rsmoke
+
+# Documentation
+/README.md @rsmoke
+/working_documents/ @rsmoke
+
+# Configuration files
+/.rubocop.yml @rsmoke
+/.rspec @rsmoke
+/.ruby-version @rsmoke
+/.tool-versions @rsmoke
+/.gitignore @rsmoke

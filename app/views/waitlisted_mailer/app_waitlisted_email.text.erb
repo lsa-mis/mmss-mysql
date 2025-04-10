@@ -1,9 +1,7 @@
 <%= "Hello #{@application.firstname} #{@application.lastname}," %>
-<%= "\r\n" %>
-  This is to inform you that your application with the Michigan Math &
-  Science Scholars High School Program for the Summer
-  <%= @camp_config.camp_year %> camp was placed on a wait list. 
-  <%= "\r\n" %>
-  <%= @camp_config.waitlist_letter.html_safe %>
-  <%= "\r\n" %>
-  If an opening becomes available we will contact you with further instructions.
+
+This is to inform you that your application with the Michigan Math & Science Scholars High School Program for the Summer <%= @camp_config.camp_year %> camp was placed on a wait list.
+
+<%= @camp_config.waitlist_letter.html_safe %>
+
+If an opening becomes available we will contact you with further instructions.

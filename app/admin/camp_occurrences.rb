@@ -15,10 +15,25 @@ ActiveAdmin.register CampOccurrence, as: "Session Configurations" do
   #   permitted << :other if params[:action] == 'create' && current_user.admin?
   #   permitted
   # end
+
+  batch_action :destroy, confirm: "Are you sure you want to delete the selected records? This action cannot be undone." do |ids|
+    batch_action_collection.find(ids).each do |record|
+      record.destroy
+    end
+    redirect_to collection_path, notice: "Successfully deleted selected records"
+  end
+
+  batch_action :toggle_active, confirm: "Are you sure you want to toggle the active status of the selected records?" do |ids|
+    batch_action_collection.find(ids).each do |record|
+      record.update(active: !record.active)
+    end
+    redirect_to collection_path, notice: "Successfully toggled active status for selected records"
+  end
+
   filter :camp_configuration
-  filter :description, as: :select 
-  filter :begin_date 
-  filter :end_date 
+  filter :description, as: :select
+  filter :begin_date
+  filter :end_date
   filter :active
 
   form do |f| # This is a formtastic form builder

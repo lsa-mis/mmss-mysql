@@ -76,7 +76,7 @@
 
         <% if current_enrollment.offer_status == "offered" %>
           <hr>
-          <% current_enrollment.session_assignments.each do |as| %>
+          <% current_enrollment.session_assignments.reverse.each do |as| %>
             <%= as.camp_occurrence.display_name %>
                 <div>
                   <% course_ids = CourseAssignment.where(enrollment_id: current_enrollment).pluck(:course_id) %>

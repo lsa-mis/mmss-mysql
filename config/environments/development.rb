@@ -12,6 +12,10 @@ Rails.application.configure do
   # Show full error reports.
   config.consider_all_requests_local = true
 
+  # Enable mailer previews
+  config.action_mailer.preview_path = "#{Rails.root}/test/mailers/previews"
+  config.action_mailer.show_previews = true
+
   # Enable/disable caching. By default caching is disabled.
   # Run rails dev:cache to toggle caching.
   if Rails.root.join('tmp', 'caching-dev.txt').exist?
@@ -32,7 +36,7 @@ Rails.application.configure do
   config.active_storage.service = :local
 
   # # Store uploaded files on the GCP file system (see config/storage.yml for options).
-  # config.active_storage.service = :google 
+  # config.active_storage.service = :google
 
   config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
 

@@ -16,6 +16,20 @@ ActiveAdmin.register Activity do
   #   permitted
   # end
 
+  batch_action :destroy, confirm: "Are you sure you want to delete the selected records? This action cannot be undone." do |ids|
+    batch_action_collection.find(ids).each do |record|
+      record.destroy
+    end
+    redirect_to collection_path, notice: "Successfully deleted selected records"
+  end
+
+  batch_action :toggle_active, confirm: "Are you sure you want to toggle the active status of the selected records?" do |ids|
+    batch_action_collection.find(ids).each do |record|
+      record.update(active: !record.active)
+    end
+    redirect_to collection_path, notice: "Successfully toggled active status for selected records"
+  end
+
   filter :camp_occurrence_id, label: "Session", as: :select, collection: CampOccurrence.order(begin_date: :desc).no_any_session
   filter :description, as: :select
   filter :cost_cents

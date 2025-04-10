@@ -31,7 +31,6 @@ Rails.application.configure do
   # config.serve_static_assets = true
   # config.assets.compile = true
 
-
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
   # config.action_controller.asset_host = 'http://assets.example.com'
 
@@ -43,7 +42,7 @@ Rails.application.configure do
   # config.active_storage.service = :local
 
   # Store uploaded files on the GCP file system (see config/storage.yml for options).
-  config.active_storage.service = :google 
+  config.active_storage.service = :google
 
   # Mount Action Cable outside main process or domain.
   # config.action_cable.mount_path = nil
@@ -56,13 +55,12 @@ Rails.application.configure do
   # Ensure the session cookies are also set to secure in production
   Rails.application.config.session_store :cookie_store, key: 'mmss_security_session', secure: Rails.env.production?
 
-
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.
   config.log_level = :info
 
   # Prepend all log lines with the following tags.
-  config.log_tags = [ :request_id ]
+  config.log_tags = [:request_id]
 
   # Use a different cache store in production.
   # config.cache_store = :mem_cache_store
@@ -71,31 +69,33 @@ Rails.application.configure do
   # config.active_job.queue_adapter     = :resque
   # config.active_job.queue_name_prefix = "mmss_production"
 
-# The `perform_caching` option determines whether or not Action Mailer will 
-# cache emails. When set to `true`, Action Mailer will cache emails to improve 
-# performance. This can be useful if your application sends out a lot of emails 
-# that are identical or very similar, as it can reduce the amount of work the 
-# server has to do.
-# When set to `false`, which means that Action Mailer will not cache emails. 
-# This might be because the emails your application sends are unique, so caching 
-# wouldn't provide a performance benefit. Or it might be to avoid potential issues 
-# with stale or incorrect emails being sent out due to caching.
-config.action_mailer.perform_caching = false
-config.action_mailer.perform_deliveries = true
-config.action_mailer.default_options = {from: 'mmss-support@umich.edu'}
-config.action_mailer.raise_delivery_errors = true
-config.action_mailer.delivery_method = :smtp
-host = 'https://mmss-registration.math.lsa.umich.edu/'
-config.action_mailer.default_url_options = { host: host }
-ActionMailer::Base.smtp_settings = {
-  :address        => 'smtp.sendgrid.net',
-  :port           => '587',
-  :authentication => :plain,
-  :user_name      => 'apikey',
-  :password       => Rails.application.credentials.SENDGRID_API_KEY,
-  :domain         => 'umich.edu',
-  :enable_starttls_auto => true
-}
+  # The `perform_caching` option determines whether or not Action Mailer will
+  # cache emails. When set to `true`, Action Mailer will cache emails to improve
+  # performance. This can be useful if your application sends out a lot of emails
+  # that are identical or very similar, as it can reduce the amount of work the
+  # server has to do.
+  # When set to `false`, which means that Action Mailer will not cache emails.
+  # This might be because the emails your application sends are unique, so caching
+  # wouldn't provide a performance benefit. Or it might be to avoid potential issues
+  # with stale or incorrect emails being sent out due to caching.
+  config.action_mailer.perform_caching = false
+  config.action_mailer.perform_deliveries = true
+  config.action_mailer.raise_delivery_errors = true
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.default_url_options = { host: 'mmss-registration.math.lsa.umich.edu', protocol: 'https' }
+  ActionMailer::Base.smtp_settings = {
+    address: 'smtp.sendgrid.net',
+    port: '587',
+    authentication: :plain,
+    user_name: 'apikey',
+    password: Rails.application.credentials.SENDGRID_API_KEY,
+    domain: 'math.lsa.umich.edu',
+    enable_starttls_auto: true
+  }
+
+  # Ignore bad email addresses and do not raise email delivery errors.
+  # Set this to true and configure the email server for immediate delivery to raise delivery errors.
+  # config.action_mailer.raise_delivery_errors = false
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).
@@ -112,7 +112,7 @@ ActionMailer::Base.smtp_settings = {
   # require 'syslog/logger'
   # config.logger = ActiveSupport::TaggedLogging.new(Syslog::Logger.new 'app-name')
 
-  if ENV["RAILS_LOG_TO_STDOUT"].present?
+  if ENV['RAILS_LOG_TO_STDOUT'].present?
     logger           = ActiveSupport::Logger.new(STDOUT)
     logger.formatter = config.log_formatter
     config.logger    = ActiveSupport::TaggedLogging.new(logger)

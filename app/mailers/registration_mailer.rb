@@ -1,20 +1,18 @@
 class RegistrationMailer < ApplicationMailer
-  default from: 'University of Michigan MMSS High School Summer Program <mmss@umich.edu>'
-
   def app_complete_email(user)
     @user_detail = user
     @application = ApplicantDetail.find_by(user_id: user)
-    @url = ConstantData::HOST_URL
+    @url = root_url
     @camp_config = CampConfiguration.find_by(active: true)
-    mail(to: user.email, subject: "UM MMSS: Confirmation of application")
+    mail(to: user.email, subject: "University of Michigan - Michigan Math and Science Scholars: Confirmation of application")
   end
 
   def app_enrolled_email(user)
     @user_detail = user
     @application = ApplicantDetail.find_by(user_id: user)
-    @url = ConstantData::HOST_URL
+    @url = root_url
     @camp_config = CampConfiguration.find_by(active: true)
     # @enrollment = user.enrollments.last
-    mail(to: user.email, subject: "UM MMSS: Your enrollment in the #{@camp_config.display_name} camp is complete")
+    mail(to: user.email, subject: "University of Michigan - Michigan Math and Science Scholars: Your enrollment in the #{@camp_config.display_name} camp is complete")
   end
 end

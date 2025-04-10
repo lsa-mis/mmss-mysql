@@ -1,10 +1,9 @@
 <%= "Hello #{@application.firstname} #{@application.lastname}," %>
-<%= "\r\n" %>
-This is a confirmation that you are enrolled for the Michigan
-Math & Science Scholars High School Program for the Summer <%= @camp_config.camp_year %> camp.
-<%= "\r\n" %>
-Continue to check your email for any further updates.
-<%= "\r\n" %>
-Retain the login id: <%= @user_detail.email %> and password that you created
-during the application process. You will need it to refer back to the
-application web site to review the events associated with your application.
+
+This is a confirmation that you are enrolled for the Michigan Math & Science Scholars High School Program for the Summer <%= @camp_config.camp_year %> camp.
+
+Continue to check your email and the status area of the MMSS student portal for updates on your application.
+
+<%= @url %>
+
+Retain the login id: <%= @user_detail.email %> and password that you created during the application process. You will need it to refer back to the application web site to review the events associated with your application.

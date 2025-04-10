@@ -15,6 +15,21 @@ ActiveAdmin.register Course do
   #   permitted << :other if params[:action] == 'create' && current_user.admin?
   #   permitted
   # end
+
+  batch_action :destroy, confirm: "Are you sure you want to delete the selected records? This action cannot be undone." do |ids|
+    batch_action_collection.find(ids).each do |record|
+      record.destroy
+    end
+    redirect_to collection_path, notice: "Successfully deleted selected records"
+  end
+
+  batch_action :toggle_status, confirm: "Are you sure you want to toggle the status of the selected records between open and closed?" do |ids|
+    batch_action_collection.find(ids).each do |record|
+      record.update(status: record.status == "open" ? "closed" : "open")
+    end
+    redirect_to collection_path, notice: "Successfully toggled status for selected records"
+  end
+
   filter :camp_occurrence_id, label: "Session", as: :select, collection: -> { CampOccurrence.order(begin_date: :desc).no_any_session }
   filter :title
   filter :available_spaces, as: :select
@@ -83,7 +98,7 @@ ActiveAdmin.register Course do
         students = enrollment_ids.collect { |id| Enrollment.find(id) }
         if students.present?
           table_for students do
-            column "Name" do |student| 
+            column "Name" do |student|
               link_to("#{student.applicant_detail.full_name}", admin_application_path(student))
             end
             column "Name" do |student|

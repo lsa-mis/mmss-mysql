@@ -1,14 +1,18 @@
-<h4>Hello <%= "#{@application.firstname} #{@application.lastname}" %></h4>
+<h4>Hello <%= "#{@application.firstname} #{@application.lastname}" %>,</h4>
 <p>
   This is a confirmation that you are enrolled for the Michigan
   Math & Science Scholars High School Program for the Summer <%= @camp_config.camp_year %> camp.
 </p>
 <p>
-  Continue to check your email for any further updates.
+  Continue to check your email and the status area of the MMSS student portal for updates on your application.
+
+    <div style="text-align: center; margin: 20px 0;">
+      <%= link_to 'MMSS Student Portal', @url, style: "background-color: #1a5a96; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;" %>
+  </div>
 </p>
 <p>
-  Retain the login id: <span class="text-semibold"><%= @user_detail.email %>
-  </span> and password that you created during the application process. You
+  Retain the login id: <strong><%= @user_detail.email %></strong>
+  and password that you created during the application process. You
   will need it to refer back to the application web site to review the
   events associated with your application.
 </p>

@@ -1,8 +1,14 @@
-User Feedback
-================================
-<%= "#{@sender.email} has feedback" %>
 
-<%= "Feedback Type: #{@feedback.genre}" %>
-<%= "Feedback Message: #{@feedback.message}" %>
+New Feedback Received
+====================
 
+From: <%= @sender.email %>
+
+Feedback Type: <%= @feedback.genre %>
+
+Message:
+--------
+<%= @feedback.message %>
+
+--
 Your friendly MMSS Registration server

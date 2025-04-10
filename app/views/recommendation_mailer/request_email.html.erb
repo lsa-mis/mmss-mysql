@@ -1,16 +1,17 @@
-
 <h4>Hello <%= "#{@recommendation.firstname} #{@recommendation.lastname}" %></h4>
 <p>
-  You are receiving this email because a student applying to the University
+  You are receiving this email because <%= "#{@student.firstname} #{@student.lastname}" %>, a student applying to the University
   of Michigan's - Michigan Math & Science Scholars High School Summer
-  Program has listed you as a recommender.
-  <br>
+  Program, has listed you as a recommender.
+</p>
+<p>
   Please follow the link below by either clicking on it, or pasting it into
   the address line of your favorite web browser. You will be taken to a
   web-page where you can type or paste in your recommendation for
   <%= "#{@student.firstname} #{@student.lastname}" %>.
-  <br>
-  <%= link_to "Recommendation Submission", @url %>
+  <div style="text-align: center; margin: 20px 0;">
+    <%= link_to "Recommendation Submission", @url, style: "background-color: #1a5a96; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;" %>
+  </div>
 </p>
 <div style="padding: 4px;border: 2px solid black;">
   <strong>Trouble clicking the link above?</strong>
@@ -18,12 +19,9 @@
   Copy the following link and paste it into a browser to view.
   <br>
     <%= @url %>
-  <br>
-  <i>The link provided in this email starts with “https://mmss-registration.math.lsa.umich.edu”.</i>
 </div>
 
 <p>
-  Thank you very much for assisting with
-  <%= "#{@student.firstname} #{@student.lastname}" %>'s academic
+  Thank you very much for assisting with <%= "#{@student.firstname} #{@student.lastname}" %>'s academic
   development.
 </p>

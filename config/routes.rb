@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
 
   devise_for :faculties, controllers: {
     sessions: 'faculties/sessions'
@@ -95,7 +96,7 @@ Rails.application.routes.draw do
   resources :course_preferences
   resources :course_assignments
   resources :session_assignments
-  
+
   # post 'accept_offer', to: 'enrollments#accept_offer'
   # post 'decline_offer', to: 'enrollments#decline_offer'
 
@@ -119,9 +120,6 @@ Rails.application.routes.draw do
   get 'recupload_error', to: 'recuploads#error'
   get 'recupload_success', to: 'recuploads#success'
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
-  if Rails.env.development?
-    mount LetterOpenerWeb::Engine, at: "/letter_opener"
-  end
 
   get 'send_request_email', to: 'recommendations#send_request_email', as: :send_request_email
 
