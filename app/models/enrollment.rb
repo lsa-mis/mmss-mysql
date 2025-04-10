@@ -124,6 +124,24 @@ class Enrollment < ApplicationRecord
     "#{applicant_detail.lastname} - #{user.email}"
   end
 
+  def update_status_based_on_session_assignments!
+    status_array = session_assignments.pluck(:offer_status)
+
+    if all_session_assignments_declined?(status_array)
+      update!(
+        offer_status: "declined",
+        application_status: "offer declined",
+        application_status_updated_on: Date.current
+      )
+    elsif all_session_assignments_responded?(status_array)
+      update!(
+        offer_status: "accepted",
+        application_status: "offer accepted",
+        application_status_updated_on: Date.current
+      )
+    end
+  end
+
   private
 
   def at_least_one_session_is_checked
@@ -241,5 +259,13 @@ class Enrollment < ApplicationRecord
   def self.ransackable_associations(auth_object = nil)
     %w[applicant_detail course_assignments course_preferences course_registrations
        covid_test_record_attachment covid_test_record_blob enrollment_activities financial_aids recommendation registration_activities rejection session_activities session_assignments session_registrations student_packet_attachment student_packet_blob transcript_attachment transcript_blob travels user vaccine_record_attachment vaccine_record_blob]
+  end
+
+  def all_session_assignments_declined?(status_array)
+    status_array.all? { |status| status == "declined" }
+  end
+
+  def all_session_assignments_responded?(status_array)
+    status_array.all? { |status| ["accepted", "declined"].include?(status) }
   end
 end
