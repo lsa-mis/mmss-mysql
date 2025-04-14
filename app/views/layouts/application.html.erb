@@ -11,6 +11,7 @@
     <noscript>
       <meta http-equiv="refresh" content="2;url=nojavascript.html">
     </noscript>
+    <%= Sentry.get_trace_propagation_meta.html_safe %>
   </head>
 
   <body data-environment = Rails.env >

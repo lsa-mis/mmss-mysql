@@ -30,6 +30,10 @@ gem 'net-smtp', require: false
 
 gem 'nokogiri', '~> 1.16.0'
 
+gem "stackprof"
+gem "sentry-ruby"
+gem "sentry-rails"
+
 group :development, :test do
   gem 'capybara', '~> 3.35', '>= 3.35.3'
   gem 'factory_bot_rails', '~> 6.2'
