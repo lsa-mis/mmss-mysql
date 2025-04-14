@@ -42,13 +42,13 @@ class CourseAssignment < ApplicationRecord
 
   def self.handle_session_acceptance(session_assignment, user)
     course_assignment = find_for_session(session_assignment.camp_occurrence_id, session_assignment.enrollment_id)
-    OfferMailer.offer_accepted_email(user, session_assignment, course_assignment).deliver_now
+    OfferMailer.offer_accepted_email(user.id, session_assignment, course_assignment).deliver_now
   end
 
   def self.handle_session_declination(session_assignment, user)
     course_assignment = find_for_session(session_assignment.camp_occurrence_id, session_assignment.enrollment_id)
     remove_for_session(session_assignment.camp_occurrence_id, session_assignment.enrollment_id)
-    OfferMailer.offer_declined_email(user, session_assignment, course_assignment).deliver_now
+    OfferMailer.offer_declined_email(user.id, session_assignment, course_assignment).deliver_now
   end
 
   scope :number_of_assignments, ->(course_id="") {where(course_id: course_id, wait_list: false).size}
