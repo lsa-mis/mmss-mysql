@@ -28,7 +28,7 @@ gem 'net-imap', require: false
 gem 'net-pop', require: false
 gem 'net-smtp', require: false
 
-gem 'nokogiri', '~> 1.16.0'
+gem 'nokogiri', '~> 1.18.8'
 
 gem "stackprof"
 gem "sentry-ruby"
