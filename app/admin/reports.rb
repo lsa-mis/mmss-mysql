@@ -247,11 +247,27 @@ ActiveAdmin.register_page 'Reports' do
     end
 
     def dorm_by_gender_by_session
-      enroll_ids = Enrollment.enrolled.pluck(:id).join(', ')
+      enrolled_ids = Enrollment.enrolled.pluck(:id)
+
+      if enrolled_ids.empty?
+        Rails.logger.warn "No enrolled students found for dorm report"
+        data = CSV.generate(headers: false) do |csv|
+          csv << ["Dorm By Gender By Session"]
+          csv << ["No enrolled students found"]
+        end
+        respond_to do |format|
+          format.html { send_data data, filename: "MMSS-report-dorm_by_gender_by_session-#{DateTime.now.strftime('%-b-%-d-%Y')}.csv" }
+        end
+        return
+      end
+
+      # Note: Activity descriptions vary between environments
+      # Development: "Dormitory (Residential Stay)"
+      # Production: "Residential Stay"
+      # Using LOWER for case-insensitive matching to ensure compatibility
       query = "SELECT ad.country, a.description AS 'Event Activity', co.description AS Session, ad.lastname,
         ad.firstname, u.email,
-        (CASE WHEN ad.gender = '' THEN NULL
-         ELSE (SELECT genders.name FROM genders WHERE CAST(ad.gender AS UNSIGNED) = genders.id) END) as gender,
+        COALESCE(g.name, 'Not Specified') as gender,
         e.room_mate_request, ad.city, ad.state
         FROM session_assignments AS sa
         JOIN enrollments AS e ON e.id = sa.enrollment_id
@@ -260,13 +276,21 @@ ActiveAdmin.register_page 'Reports' do
         JOIN camp_occurrences AS co ON co.id = a.camp_occurrence_id
         JOIN applicant_details AS ad ON ad.user_id = e.user_id
         JOIN users AS u ON u.id = ad.user_id
-        WHERE sa.enrollment_id IN (#{enroll_ids}) AND sa.offer_status = 'accepted' AND a.description LIKE ('Dormitory%')
+        LEFT JOIN genders AS g ON CAST(ad.gender AS UNSIGNED) = g.id
+        WHERE sa.enrollment_id IN (#{enrolled_ids.join(',')})
+          AND sa.offer_status = 'accepted'
+          AND (LOWER(a.description) LIKE LOWER('%dormitory%') OR LOWER(a.description) LIKE LOWER('%residential stay%'))
         ORDER BY co.description, a.description, ad.lastname, e.id"
-      title = 'events_per_session_for_enrolled'
+
+      title = 'dorm_by_gender_by_session'
       data = data_to_csv_with_country(query, title)
       respond_to do |format|
         format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-b-%-d-%Y')}.csv" }
       end
+    rescue => e
+      Rails.logger.error "ERROR in dorm_by_gender_by_session: #{e.message}"
+      Rails.logger.error e.backtrace.join("\n")
+      raise e
     end
 
     def complete_applications_with_course_preferences
