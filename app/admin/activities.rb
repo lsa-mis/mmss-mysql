@@ -40,7 +40,7 @@ ActiveAdmin.register Activity do
     f.semantic_errors
     f.inputs do
       f.input :camp_occurrence, label: "Session", as: :select, collection: CampOccurrence.order(begin_date: :desc).no_any_session
-      f.input :description
+      f.input :description, hint: 'For dormitory activities, please use "Residential Stay" (not "Dormitory") to ensure consistency across all environments'
       f.input :cost
       f.input :date_occurs
       f.input :active
