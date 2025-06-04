@@ -483,7 +483,10 @@ ActiveAdmin.register_page 'Reports' do
     def add_demographic_data_rows(csv, records)
       records.rows.each do |row|
         c = row[0]
-        row[0] = "#{ISO3166::Country[c].name} - #{c}" if c != 'country'
+        if c && c != 'country'
+          country = ISO3166::Country[c]
+          row[0] = country ? "#{country.name} - #{c}" : c
+        end
         csv << row
       end
     end
@@ -498,8 +501,11 @@ ActiveAdmin.register_page 'Reports' do
     def add_country_data_rows(csv, records)
       records.rows.each do |row|
         c = row[0]
-        row[0] = "#{ISO3166::Country[c].name} - #{c}" if c != 'country'
-        csv << row.rotate(1)
+        if c && c != 'country'
+          country = ISO3166::Country[c]
+          row[0] = country ? "#{country.name} - #{c}" : c
+        end
+        csv << row
       end
     end
 
@@ -510,8 +516,8 @@ ActiveAdmin.register_page 'Reports' do
       end
     end
 
-    def add_formatted_data_rows(csv)
-      track_previous_values do |prev_session, prev_course, row|
+    def add_formatted_data_rows(csv, records)
+      track_previous_values(records) do |prev_session, prev_course, row|
         session = row[0]
         course = row[1]
         row[0] = session == prev_session ? '' : session
@@ -521,7 +527,7 @@ ActiveAdmin.register_page 'Reports' do
       end
     end
 
-    def track_previous_values(&block)
+    def track_previous_values(records, &block)
       prev_session = nil
       prev_course = nil
       records.rows.each do |row|
