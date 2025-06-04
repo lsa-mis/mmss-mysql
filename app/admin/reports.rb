@@ -510,8 +510,8 @@ ActiveAdmin.register_page 'Reports' do
       end
     end
 
-    def add_formatted_data_rows(csv)
-      track_previous_values do |prev_session, prev_course, row|
+    def add_formatted_data_rows(csv, records)
+      track_previous_values(records) do |prev_session, prev_course, row|
         session = row[0]
         course = row[1]
         row[0] = session == prev_session ? '' : session
@@ -521,7 +521,7 @@ ActiveAdmin.register_page 'Reports' do
       end
     end
 
-    def track_previous_values(&block)
+    def track_previous_values(records, &block)
       prev_session = nil
       prev_course = nil
       records.rows.each do |row|
