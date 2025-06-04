@@ -483,7 +483,10 @@ ActiveAdmin.register_page 'Reports' do
     def add_demographic_data_rows(csv, records)
       records.rows.each do |row|
         c = row[0]
-        row[0] = "#{ISO3166::Country[c].name} - #{c}" if c != 'country'
+        if c && c != 'country'
+          country = ISO3166::Country[c]
+          row[0] = country ? "#{country.name} - #{c}" : c
+        end
         csv << row
       end
     end
@@ -498,8 +501,11 @@ ActiveAdmin.register_page 'Reports' do
     def add_country_data_rows(csv, records)
       records.rows.each do |row|
         c = row[0]
-        row[0] = "#{ISO3166::Country[c].name} - #{c}" if c != 'country'
-        csv << row.rotate(1)
+        if c && c != 'country'
+          country = ISO3166::Country[c]
+          row[0] = country ? "#{country.name} - #{c}" : c
+        end
+        csv << row
       end
     end
 
