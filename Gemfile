@@ -28,11 +28,14 @@ gem 'net-imap', require: false
 gem 'net-pop', require: false
 gem 'net-smtp', require: false
 
-gem 'nokogiri', '~> 1.18.9', platforms: [:ruby]
+# Nokogiri: avoid yanked/invalid versions and ensure Linux-compatible builds
+# Rails HTML Sanitizer requires >= 1.15.7 and excludes vulnerable 1.16.0–1.16.7.
+# Use a modern, supported version and allow Bundler to pick the right platform build.
+gem 'nokogiri', '~> 1.16.8', platforms: [:ruby]
 
-gem "stackprof"
-gem "sentry-ruby"
-gem "sentry-rails"
+gem 'sentry-rails'
+gem 'sentry-ruby'
+gem 'stackprof'
 
 group :development, :test do
   gem 'capybara', '~> 3.35', '>= 3.35.3'
