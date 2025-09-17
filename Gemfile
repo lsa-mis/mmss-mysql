@@ -31,7 +31,7 @@ gem 'net-smtp', require: false
 # Nokogiri: avoid yanked/invalid versions and ensure Linux-compatible builds
 # Rails HTML Sanitizer requires >= 1.15.7 and excludes vulnerable 1.16.0–1.16.7.
 # Use a modern, supported version and allow Bundler to pick the right platform build.
-gem 'nokogiri', '~> 1.16.8', platforms: [:ruby]
+gem 'nokogiri', '~> 1.18.9', platforms: [:ruby]
 
 gem 'sentry-rails'
 gem 'sentry-ruby'
