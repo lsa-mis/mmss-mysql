@@ -66,15 +66,31 @@ RSpec.configure do |config|
   # config.include Devise::Test::ControllerHelpers, type: :controller
   config.include Warden::Test::Helpers
 
-  config.use_transactional_fixtures = true
+  # FactoryBot methods
+  config.include FactoryBot::Syntax::Methods
+
+  # Database cleaner configuration
+  config.before(:suite) do
+    DatabaseCleaner.strategy = :transaction
+    DatabaseCleaner.clean_with(:truncation)
+  end
+
+  config.around(:each) do |example|
+    DatabaseCleaner.cleaning do
+      example.run
+    end
+  end
+
+  config.use_transactional_fixtures = false
 
 end
 
-# Shoulda::Matchers.configure do |config|
-#   config.integrate do |with|
-#     with.test_framework :rspec
-#     with.library :rails
-#   end
-# end
+# Shoulda::Matchers configuration
+Shoulda::Matchers.configure do |config|
+  config.integrate do |with|
+    with.test_framework :rspec
+    with.library :rails
+  end
+end
 
 Capybara.javascript_driver = ENV['SHOW_BROWSER'] ? :selenium_chrome : :selenium_chrome_headless

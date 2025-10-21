@@ -6,8 +6,8 @@ ActiveAdmin.register Travel do
   #
   # Uncomment all parameters which should be permitted for assignment
   #
-   permit_params :enrollment_id, :arrival_session, :depart_session, 
-                  :arrival_transport, :arrival_carrier, :arrival_route_num, :arrival_date, :arrival_time, 
+   permit_params :enrollment_id, :arrival_session, :depart_session,
+                  :arrival_transport, :arrival_carrier, :arrival_route_num, :arrival_date, :arrival_time,
                   :depart_transport, :depart_carrier, :depart_route_num, :depart_date, :depart_time, :note
   #
   # or
@@ -30,8 +30,8 @@ ActiveAdmin.register Travel do
   index do
     selectable_column
     actions
-    column "Applicant" do |travel| 
-      link_to travel.enrollment.display_name, admin_application_path(travel.enrollment) 
+    column "Applicant" do |travel|
+      link_to travel.enrollment.display_name, admin_application_path(travel.enrollment)
     end
     column :arrival_session
     column :depart_session
@@ -67,7 +67,7 @@ ActiveAdmin.register Travel do
   show do
     attributes_table do
       row "Applicant" do |travel|
-        link_to travel.enrollment.display_name, admin_application_path(travel.enrollment) 
+        link_to travel.enrollment.display_name, admin_application_path(travel.enrollment)
       end
       row :arrival_session
       row :depart_session
@@ -99,29 +99,29 @@ ActiveAdmin.register Travel do
       end
       row :note
       row :created_at
-      row :updated_at 
+      row :updated_at
     end
   end
 
   form do |f| # This is a formtastic form builder
     f.semantic_errors *f.object.errors.keys # shows errors on :base
     f.inputs do
-      f.input :enrollment_id, as: :select, collection: Enrollment.current_camp_year_applications.map { |enrol| [enrol.display_name.downcase, enrol.id]}.sort
+      f.input :enrollment_id, as: :select, collection: proc { Enrollment.current_camp_year_applications.map { |enrol| [enrol.display_name.downcase, enrol.id]}.sort }
       if f.object.new_record?
-        f.input :arrival_session, as: :select, collection: CampOccurrence.active.no_any_session.map { |s| s.description_with_month_and_day }
+        f.input :arrival_session, as: :select, collection: proc { CampOccurrence.active.no_any_session.map { |s| s.description_with_month_and_day } }
       else
-        f.input :arrival_session, as: :select, collection: Enrollment.find(Travel.find(params[:id]).enrollment_id).session_assignments.map { |s| s.camp_occurrence.description_with_month_and_day }
+        f.input :arrival_session, as: :select, collection: proc { Enrollment.find(Travel.find(params[:id]).enrollment_id).session_assignments.map { |s| s.camp_occurrence.description_with_month_and_day } }
       end
       if f.object.new_record?
-        f.input :depart_session, as: :select, collection: CampOccurrence.active.no_any_session.map { |s| s.description_with_month_and_day }
+        f.input :depart_session, as: :select, collection: proc { CampOccurrence.active.no_any_session.map { |s| s.description_with_month_and_day } }
       else
-        f.input :depart_session, as: :select, collection: Enrollment.find(Travel.find(params[:id]).enrollment_id).session_assignments.map { |s| s.camp_occurrence.description_with_month_and_day }
+        f.input :depart_session, as: :select, collection: proc { Enrollment.find(Travel.find(params[:id]).enrollment_id).session_assignments.map { |s| s.camp_occurrence.description_with_month_and_day } }
       end
       f.input :arrival_transport, as: :select, collection: transportation
       f.inputs :arrival_carrier
       f.inputs :arrival_route_num
-      f.inputs :arrival_date 
-      f.inputs :arrival_time 
+      f.inputs :arrival_date
+      f.inputs :arrival_time
       f.input :depart_transport, as: :select, collection: transportation
       f.inputs :depart_carrier
       f.inputs :depart_route_num

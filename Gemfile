@@ -41,8 +41,14 @@ group :development, :test do
   gem 'pry-byebug', '~> 3.9'
   gem 'pry-rails', '~> 0.3.9'
   gem 'rspec-rails', '~> 5.0', '>= 5.0.2'
+  gem 'shoulda-matchers', '~> 5.0'
   gem 'standard'
   gem 'webdrivers', '~> 5.2'
+end
+
+group :test do
+  gem 'database_cleaner-active_record', '~> 2.0'
+  gem 'simplecov', '~> 0.21', require: false
 end
 
 group :development do

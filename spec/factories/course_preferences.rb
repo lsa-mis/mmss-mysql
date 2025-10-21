@@ -1,18 +1,8 @@
-# == Schema Information
-#
-# Table name: course_preferences
-#
-#  id            :bigint           not null, primary key
-#  enrollment_id :bigint           not null
-#  course_id     :bigint           not null
-#  ranking       :integer
-#  created_at    :datetime         not null
-#  updated_at    :datetime         not null
-#
 FactoryBot.define do
   factory :course_preference do
-    enrollment { nil }
-    course { nil }
-    ranking { 1 }
+    association :enrollment
+    association :course
+
+    ranking { rand(1..10) }
   end
 end

@@ -90,6 +90,7 @@ class ApplicantDetail < ApplicationRecord
   end
 
   def parentemail_not_user_email
+    return true if user.nil? || parentemail.blank?
     return true unless user.email == parentemail
 
     errors.add(:base, "Parent/Guardian email should be different than the applicant's email")

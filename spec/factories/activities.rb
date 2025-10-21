@@ -1,22 +1,31 @@
-# == Schema Information
-#
-# Table name: activities
-#
-#  id                 :bigint           not null, primary key
-#  camp_occurrence_id :bigint
-#  description        :string(255)
-#  cost_cents         :integer
-#  date_occurs        :date
-#  active             :boolean          default(FALSE)
-#  created_at         :datetime         not null
-#  updated_at         :datetime         not null
-#
 FactoryBot.define do
   factory :activity do
-    session { nil }
-    description { "MyString" }
-    cost_cents { 20000 }
-    date_occurs { "2019-07-23" }
-    active { false }
+    association :camp_occurrence
+
+    sequence(:description) { |n| "Activity #{n}" }
+    cost_cents { [0, 5000, 10000, 15000].sample }
+    date_occurs { camp_occurrence&.begin_date || Faker::Date.forward(days: 30) }
+    active { true }
+
+    trait :inactive do
+      active { false }
+    end
+
+    trait :free do
+      cost_cents { 0 }
+    end
+
+    trait :residential do
+      description { 'Residential Stay' }
+      cost_cents { 50000 }
+    end
+
+    trait :past do
+      date_occurs { Faker::Date.backward(days: 30) }
+    end
+
+    trait :future do
+      date_occurs { Faker::Date.forward(days: 30) }
+    end
   end
 end

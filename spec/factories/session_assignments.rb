@@ -1,17 +1,20 @@
-# == Schema Information
-#
-# Table name: session_assignments
-#
-#  id                 :bigint           not null, primary key
-#  enrollment_id      :bigint           not null
-#  camp_occurrence_id :bigint           not null
-#  created_at         :datetime         not null
-#  updated_at         :datetime         not null
-#  offer_status       :string(255)
-#
 FactoryBot.define do
   factory :session_assignment do
-    enrollment { nil }
-    camp_occurrence { nil }
+    association :enrollment
+    association :camp_occurrence
+
+    offer_status { nil }
+
+    trait :accepted do
+      offer_status { 'accepted' }
+    end
+
+    trait :declined do
+      offer_status { 'declined' }
+    end
+
+    trait :pending do
+      offer_status { nil }
+    end
   end
 end

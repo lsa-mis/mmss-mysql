@@ -21,7 +21,7 @@ ActiveAdmin.register Recommendation do
   form do |f|
     f.semantic_errors
     f.inputs do
-      f.input :enrollment_id, as: :select, collection: Enrollment.current_camp_year_applications.map { |enrol| [enrol.display_name.downcase, enrol.id]}.sort
+      f.input :enrollment_id, as: :select, collection: proc { Enrollment.current_camp_year_applications.map { |enrol| [enrol.display_name.downcase, enrol.id]}.sort }
       f.input :email
       f.input :lastname
       f.input :firstname
