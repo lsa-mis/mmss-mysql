@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ActiveAdmin.register CampOccurrence, as: "Session Configurations" do
   menu parent: 'Camp Setup', priority: 2
 

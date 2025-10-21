@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RejectedMailer < ApplicationMailer
   def app_rejected_email(enrollment)
     @application = ApplicantDetail.find_by(user_id: enrollment.user)

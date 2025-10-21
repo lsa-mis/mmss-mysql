@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Shared examples for common model validations
 
 RSpec.shared_examples 'a model with timestamps' do

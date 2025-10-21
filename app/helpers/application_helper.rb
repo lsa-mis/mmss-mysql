@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ApplicationHelper
   def current_camp_year
     CampConfiguration.active_camp_year

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ActiveAdmin.register SessionAssignment do
   menu parent: 'Applicant Info', priority: 1
 

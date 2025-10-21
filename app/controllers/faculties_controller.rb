@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class FacultiesController < ApplicationController
   layout 'faculty'
   before_action :authenticate_faculty!

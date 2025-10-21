@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SessionAssignmentsController < ApplicationController
   devise_group :logged_in, contains: [:user, :admin]
   before_action :authenticate_logged_in!

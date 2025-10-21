@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ApplicantState
   def registration_activities
     @current_enrollment.registration_activities.order(camp_occurrence_id: :asc)

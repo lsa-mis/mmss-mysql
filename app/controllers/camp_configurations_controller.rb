@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CampConfigurationsController < ApplicationController
   before_action :authenticate_admin!
   before_action :set_camp_configuration, only: [:show, :edit, :update, :destroy]

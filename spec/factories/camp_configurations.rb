@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :camp_configuration do
     sequence(:camp_year) { |n| 2025 + n }

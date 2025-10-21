@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :demographic do
     sequence(:name) { |n| "Demographic #{n}" }

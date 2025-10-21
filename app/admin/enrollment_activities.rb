@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ActiveAdmin.register EnrollmentActivity, as: "Applicant Activities" do
   menu parent: 'Applicant Info', priority: 3
 

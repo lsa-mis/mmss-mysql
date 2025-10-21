@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ActiveAdmin.register Gender, as: "Gender Types" do
   menu parent: 'Camp Setup'
 

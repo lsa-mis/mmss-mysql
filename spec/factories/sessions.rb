@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This factory is for session model if it exists
 # Note: Based on the project structure, sessions might refer to camp_occurrences
 # Keeping this file for compatibility with existing test references

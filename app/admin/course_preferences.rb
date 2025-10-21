@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ActiveAdmin.register CoursePreference do
   menu parent: 'Applicant Info', priority: 2
 

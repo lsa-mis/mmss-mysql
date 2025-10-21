@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ActiveAdmin.register SessionActivity, as: 'Session Selection' do
   menu parent: 'Applicant Info', priority: 1
   # See permitted parameters documentation:

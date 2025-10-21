@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ActiveAdmin.register Course do
   menu parent: 'Camp Setup', priority: 3
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class FeedbackMailer < ApplicationMailer
   def feedback_email
     @url = root_url

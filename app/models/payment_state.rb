@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PaymentState
   def initialize(enrollment)
     @curr_enrollment = enrollment

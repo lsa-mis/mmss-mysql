@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "webdrivers"
 
 driver = Selenium::WebDriver.for :chrome

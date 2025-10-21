@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class FinaidMailer < ApplicationMailer
   def fin_aid_awarded_email(finaid, balance_due)
     @url = root_url

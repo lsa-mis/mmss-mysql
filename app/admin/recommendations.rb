@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ActiveAdmin.register Recommendation do
   menu parent: 'Applicant Info', priority: 3
 

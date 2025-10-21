@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RecommendationsController < ApplicationController
   devise_group :logged_in, contains: %i[user admin]
   before_action :authenticate_logged_in!

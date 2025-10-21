@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class FeedbacksController < ApplicationController
   devise_group :logged_in, contains: [:user, :admin, :faculty]
   before_action :authenticate_logged_in!
