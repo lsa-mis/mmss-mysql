@@ -60,6 +60,48 @@ FactoryBot.define do
     camp_doc_form_completed { false }
     application_fee_required { true }
 
+    # Create required session and course registrations
+    after(:build) do |enrollment|
+      # Find or create camp configuration for the enrollment year
+      camp_config = CampConfiguration.find_by(camp_year: enrollment.campyear)
+
+      unless camp_config
+        # Deactivate any existing active camp configurations
+        CampConfiguration.update_all(active: false)
+
+        camp_config = CampConfiguration.create!(
+          camp_year: enrollment.campyear,
+          active: true,
+          application_open: Date.new(enrollment.campyear, 1, 1),
+          application_close: Date.new(enrollment.campyear, 10, 31),
+          priority: Date.new(enrollment.campyear, 4, 1),
+          application_materials_due: Date.new(enrollment.campyear, 5, 20),
+          camper_acceptance_due: Date.new(enrollment.campyear, 6, 1),
+          application_fee_cents: 10_000,
+          application_fee_required: true,
+          offer_letter: 'Default offer letter content',
+          reject_letter: 'Default rejection letter content',
+          waitlist_letter: 'Default waitlist letter content'
+        )
+      end
+
+      # Create session occurrences if they don't exist
+      if camp_config.camp_occurrences.active.empty?
+        create(:camp_occurrence, camp_configuration: camp_config, active: true)
+      end
+
+      # Create courses if they don't exist
+      if Course.where(camp_occurrence: camp_config.camp_occurrences.active).empty?
+        camp_config.camp_occurrences.active.each do |occurrence|
+          create(:course, camp_occurrence: occurrence, status: 'open')
+        end
+      end
+
+      # Set session and course registration IDs
+      enrollment.session_registration_ids = camp_config.camp_occurrences.active.pluck(:id)
+      enrollment.course_registration_ids = Course.where(camp_occurrence: camp_config.camp_occurrences.active).pluck(:id)
+    end
+
     # Attach a transcript file
     after(:build) do |enrollment|
       link_to_default_transcript = "#{Rails.root}/spec/files/test.pdf"

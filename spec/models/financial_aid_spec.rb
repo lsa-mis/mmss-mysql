@@ -48,7 +48,6 @@ RSpec.describe FinancialAid, type: :model do
   end
 
   describe 'scopes' do
-    let(:camp_config) { create(:camp_configuration, :active, camp_year: Date.current.year) }
     let(:enrollment) { create(:enrollment, campyear: Date.current.year) }
     let!(:current_aid) { create(:financial_aid, enrollment: enrollment) }
 
@@ -56,8 +55,12 @@ RSpec.describe FinancialAid, type: :model do
     let!(:old_aid) { create(:financial_aid, enrollment: old_enrollment) }
 
     before do
-      CampConfiguration.update_all(active: false)
-      camp_config.update(active: true)
+      # Ensure the current year's camp configuration is active
+      current_camp_config = CampConfiguration.find_by(camp_year: Date.current.year)
+      if current_camp_config
+        CampConfiguration.update_all(active: false)
+        current_camp_config.update!(active: true)
+      end
     end
 
     describe '.current_camp_requests' do
