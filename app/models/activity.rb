@@ -16,7 +16,7 @@
 class Activity < ApplicationRecord
   include MoneyRails::ActionViewExtension
   belongs_to :camp_occurrence
-  has_many :enrollment_activities
+  has_many :enrollment_activities, dependent: :destroy
   has_many :enrolled_users, through: :enrollment_activities, source: :enrollment
 
   monetize :cost_cents
