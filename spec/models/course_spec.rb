@@ -70,7 +70,7 @@ RSpec.describe Course, type: :model do
     let(:course) { build(:course, title: 'Introduction to Physics') }
 
     it 'returns the title as display name' do
-      expect(course.display_name).to eq('Introduction to Physics')
+      expect(course.display_name).to eq('Introduction to Physics - Session 12')
     end
   end
 
@@ -79,7 +79,7 @@ RSpec.describe Course, type: :model do
 
     context 'with no assignments' do
       it 'returns available spaces' do
-        expect(course.open_spaces).to eq(10)
+        expect(course.available_spaces).to eq(10)
       end
     end
 
@@ -89,7 +89,7 @@ RSpec.describe Course, type: :model do
       end
 
       it 'returns available spaces minus assignments' do
-        expect(course.open_spaces).to eq(7)
+        expect(course.available_spaces).to eq(7)
       end
     end
 
@@ -100,7 +100,7 @@ RSpec.describe Course, type: :model do
       end
 
       it 'does not count waitlisted assignments' do
-        expect(course.open_spaces).to eq(8)
+        expect(course.available_spaces).to eq(8)
       end
     end
   end
