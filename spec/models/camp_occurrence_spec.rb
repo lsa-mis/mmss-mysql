@@ -71,10 +71,16 @@ RSpec.describe CampOccurrence, type: :model do
   end
 
   describe '#display_name' do
-    let(:occurrence) { build(:camp_occurrence, description: 'Session 1') }
+    let(:occurrence) do
+      build(:camp_occurrence,
+        description: 'Session 1',
+        begin_date: Date.new(2025, 7, 1),
+        end_date: Date.new(2025, 7, 8)
+      )
+    end
 
-    it 'returns the description as display name' do
-      expect(occurrence.display_name).to eq('Session 1')
+    it 'returns the description with date range' do
+      expect(occurrence.display_name).to eq('Session 1 - 2025-07-01 to 2025-07-08')
     end
   end
 
@@ -88,7 +94,7 @@ RSpec.describe CampOccurrence, type: :model do
     end
 
     it 'returns description with date range' do
-      expected = 'Session 1: July 1 - July 8'
+      expected = 'Session 1: July 01 to July 08'
       expect(occurrence.description_with_month_and_day).to eq(expected)
     end
   end
