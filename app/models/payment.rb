@@ -29,7 +29,10 @@ class Payment < ApplicationRecord
 
   validates :transaction_id, presence: true, uniqueness: true
   validates :total_amount, presence: true
+  validates :transaction_type, presence: true
+  validates :transaction_status, presence: true
   validates :transaction_date, presence: true
+  validates :camp_year, presence: true
 
   belongs_to :user
 
@@ -42,6 +45,7 @@ class Payment < ApplicationRecord
     return unless transaction_status == '1'
 
     @current_enrollment = user.enrollments.current_camp_year_applications.last
+    return unless @current_enrollment
 
     # Check if this is the first payment (when required)
     if @current_enrollment.application_fee_required && user.payments.status1_current_camp_payments.count == 1

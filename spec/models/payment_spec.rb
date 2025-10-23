@@ -49,12 +49,12 @@ RSpec.describe Payment, type: :model do
   describe 'monetary amounts' do
     let(:payment) { create(:payment, total_amount: 50000) }
 
-    it 'stores amounts in cents' do
-      expect(payment.total_amount).to eq(50000)
+    it 'stores amounts in cents as string' do
+      expect(payment.total_amount).to eq('50000')
     end
 
     it 'can be converted to dollars' do
-      expect(payment.total_amount / 100.0).to eq(500.00)
+      expect(payment.total_amount.to_i / 100.0).to eq(500.00)
     end
   end
 
