@@ -67,7 +67,7 @@ class ApplicantDetail < ApplicationRecord
   validate :parentemail_not_user_email
   validate :demographic_other_if_other_selected
 
-  scope :current_camp_enrolled, -> { where('user_id IN (?)', Enrollment.enrolled.pluck(:user_id)) }
+  scope :current_camp_enrolled, -> { joins(:user).joins('INNER JOIN enrollments ON enrollments.user_id = users.id').where('enrollments.campyear = ? AND enrollments.application_status = ?', CampConfiguration.active.pick(:camp_year), 'enrolled') }
 
   def full_name
     "#{lastname}, #{firstname}"
