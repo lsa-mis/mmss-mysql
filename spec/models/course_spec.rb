@@ -67,7 +67,8 @@ RSpec.describe Course, type: :model do
   end
 
   describe '#display_name' do
-    let(:course) { build(:course, title: 'Introduction to Physics') }
+    let(:camp_occurrence) { create(:camp_occurrence, description: 'Session 12') }
+    let(:course) { build(:course, title: 'Introduction to Physics', camp_occurrence: camp_occurrence) }
 
     it 'returns the title as display name' do
       expect(course.display_name).to eq('Introduction to Physics - Session 12')
