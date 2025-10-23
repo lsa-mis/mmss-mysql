@@ -67,7 +67,7 @@ RSpec.describe CampConfiguration, type: :model do
       end
 
       it 'returns nil when no active config exists' do
-        CampConfiguration.update_all(active: false)
+        CampConfiguration.destroy_all
         expect(CampConfiguration.active_camp_year).to be_nil
       end
     end

@@ -37,11 +37,25 @@ class CampConfiguration < ApplicationRecord
 
   scope :active, -> { where(active: true) }
 
-  scope :active_camp_year, -> { active.pick(:camp_year) }
-  scope :active_camp_year_application_open, -> { active.pick(:application_open) }
-  scope :active_camp_year_application_close, -> { active.pick(:application_close) }
-  scope :active_camp_materials_due_date, -> { active.pick(:application_materials_due) }
-  scope :active_camp_fee_cents, -> { active.pick(:application_fee_cents) }
+  def self.active_camp_year
+    active.pick(:camp_year)
+  end
+
+  def self.active_camp_year_application_open
+    active.pick(:application_open)
+  end
+
+  def self.active_camp_year_application_close
+    active.pick(:application_close)
+  end
+
+  def self.active_camp_materials_due_date
+    active.pick(:application_materials_due)
+  end
+
+  def self.active_camp_fee_cents
+    active.pick(:application_fee_cents)
+  end
 
   def display_name
     camp_year # or whatever column you want
