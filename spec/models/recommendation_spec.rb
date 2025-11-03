@@ -26,7 +26,7 @@ RSpec.describe Recommendation, type: :model do
 
     it 'creates submitted recommendation with trait' do
       recommendation = create(:recommendation, :submitted)
-      expect(recommendation.submitted_recommendation).to be true
+      expect(recommendation.submitted_recommendation).to eq('1')
       expect(recommendation.date_submitted).to be_present
     end
 

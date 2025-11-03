@@ -78,11 +78,12 @@ RSpec.describe Enrollment, type: :model do
     before do
       CampConfiguration.update_all(active: false)
       camp_config.update(active: true)
+      allow(CampConfiguration).to receive(:active_camp_year).and_return(camp_config.camp_year)
     end
 
     describe '.current_camp_year_applications' do
-      let!(:current_enrollment) { create(:enrollment, campyear: Date.current.year) }
-      let!(:old_enrollment) { create(:enrollment, campyear: Date.current.year - 1) }
+      let!(:current_enrollment) { create(:enrollment, campyear: camp_config.camp_year) }
+      let!(:old_enrollment) { create(:enrollment, campyear: camp_config.camp_year - 1) }
 
       it 'returns enrollments for current camp year' do
         expect(Enrollment.current_camp_year_applications).to include(current_enrollment)
@@ -91,8 +92,8 @@ RSpec.describe Enrollment, type: :model do
     end
 
     describe '.offered' do
-      let!(:offered_enrollment) { create(:enrollment, :offered, campyear: Date.current.year) }
-      let!(:regular_enrollment) { create(:enrollment, campyear: Date.current.year) }
+      let!(:offered_enrollment) { create(:enrollment, :offered, campyear: camp_config.camp_year) }
+      let!(:regular_enrollment) { create(:enrollment, campyear: camp_config.camp_year) }
 
       it 'returns offered enrollments' do
         expect(Enrollment.offered).to include(offered_enrollment)
@@ -101,8 +102,8 @@ RSpec.describe Enrollment, type: :model do
     end
 
     describe '.enrolled' do
-      let!(:enrolled_enrollment) { create(:enrollment, :enrolled, campyear: Date.current.year) }
-      let!(:offered_enrollment) { create(:enrollment, :offered, campyear: Date.current.year) }
+      let!(:enrolled_enrollment) { create(:enrollment, :enrolled, campyear: camp_config.camp_year) }
+      let!(:offered_enrollment) { create(:enrollment, :offered, campyear: camp_config.camp_year) }
 
       it 'returns enrolled students' do
         expect(Enrollment.enrolled).to include(enrolled_enrollment)
@@ -113,7 +114,7 @@ RSpec.describe Enrollment, type: :model do
 
   describe 'callbacks' do
     describe 'setting application_fee_required' do
-      let(:camp_config) { create(:camp_configuration, :active, application_fee_required: false) }
+      let(:camp_config) { create(:camp_configuration, :active, application_fee_required: false, camp_year: Date.current.year) }
 
       before do
         CampConfiguration.update_all(active: false)

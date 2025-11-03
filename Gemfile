@@ -48,6 +48,7 @@ end
 
 group :test do
   gem 'database_cleaner-active_record', '~> 2.0'
+  gem 'rails-controller-testing'
   gem 'simplecov', '~> 0.21', require: false
 end
 

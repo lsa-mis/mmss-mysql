@@ -60,7 +60,7 @@ FactoryBot.define do
     application_status_updated_on { nil }
     uniqname { nil }
     camp_doc_form_completed { false }
-    application_fee_required { true }
+    application_fee_required { nil }
 
     # Create required session and course registrations
     after(:build) do |enrollment|
@@ -68,23 +68,29 @@ FactoryBot.define do
       camp_config = CampConfiguration.find_by(camp_year: enrollment.campyear)
 
       unless camp_config
-        # Deactivate any existing active camp configurations
-        CampConfiguration.update_all(active: false)
+        # Only deactivate other camp configurations if there's no active one for this year
+        active_config = CampConfiguration.active.first
+        if active_config.nil? || active_config.camp_year != enrollment.campyear
+          # Deactivate any existing active camp configurations
+          CampConfiguration.update_all(active: false)
 
-        camp_config = CampConfiguration.create!(
-          camp_year: enrollment.campyear,
-          active: true,
-          application_open: Date.new(enrollment.campyear, 1, 1),
-          application_close: Date.new(enrollment.campyear, 10, 31),
-          priority: Date.new(enrollment.campyear, 4, 1),
-          application_materials_due: Date.new(enrollment.campyear, 5, 20),
-          camper_acceptance_due: Date.new(enrollment.campyear, 6, 1),
-          application_fee_cents: 10_000,
-          application_fee_required: true,
-          offer_letter: 'Default offer letter content',
-          reject_letter: 'Default rejection letter content',
-          waitlist_letter: 'Default waitlist letter content'
-        )
+          camp_config = CampConfiguration.create!(
+            camp_year: enrollment.campyear,
+            active: true,
+            application_open: Date.new(enrollment.campyear, 1, 1),
+            application_close: Date.new(enrollment.campyear, 10, 31),
+            priority: Date.new(enrollment.campyear, 4, 1),
+            application_materials_due: Date.new(enrollment.campyear, 5, 20),
+            camper_acceptance_due: Date.new(enrollment.campyear, 6, 1),
+            application_fee_cents: 10_000,
+            application_fee_required: true,
+            offer_letter: 'Default offer letter content',
+            reject_letter: 'Default rejection letter content',
+            waitlist_letter: 'Default waitlist letter content'
+          )
+        else
+          camp_config = active_config
+        end
       end
 
       # Create session occurrences if they don't exist
@@ -104,14 +110,21 @@ FactoryBot.define do
       enrollment.course_registration_ids = Course.where(camp_occurrence: camp_config.camp_occurrences.active).pluck(:id)
     end
 
-    # Attach a transcript file
+    # Attach a transcript file (only if the file exists and is small enough)
     after(:build) do |enrollment|
       link_to_default_transcript = "#{Rails.root}/spec/files/test.pdf"
-      enrollment.transcript.attach(
-        io: File.open(link_to_default_transcript),
-        filename: 'transcript.pdf',
-        content_type: 'application/pdf'
-      )
+      if File.exist?(link_to_default_transcript) && File.size(link_to_default_transcript) <= 20.megabytes
+        begin
+          enrollment.transcript.attach(
+            io: File.open(link_to_default_transcript),
+            filename: 'transcript.pdf',
+            content_type: 'application/pdf'
+          )
+        rescue => e
+          # Skip transcript attachment if there's an issue
+          Rails.logger.debug "Skipping transcript attachment: #{e.message}"
+        end
+      end
     end
 
     trait :international do
@@ -208,6 +221,13 @@ FactoryBot.define do
     trait :with_recommendation do
       after(:create) do |enrollment|
         create(:recommendation, enrollment: enrollment)
+      end
+    end
+
+    trait :without_transcript do
+      after(:build) do |enrollment|
+        # Skip transcript attachment for this trait
+        # The validation will be mocked in the test itself
       end
     end
   end

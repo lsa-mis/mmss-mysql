@@ -3,10 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Create user', type: :system do
-
-  before :each do
-    load "#{Rails.root}/spec/test_seeds.rb" 
-  end
+  include ApplicationHelper
 
   context 'create new user' do
     let(:user) { User.new }
@@ -16,6 +13,13 @@ RSpec.describe 'Create user', type: :system do
 
   context 'create user' do
     it 'show password mismatch error' do
+      # Create test data directly in the test
+      create(:camp_configuration,
+             camp_year: 2025,
+             application_open: Date.current - 30.days,
+             application_close: Date.current + 90.days,
+             active: true)
+
       visit root_path
       click_on "Sign up"
       sleep(inspection_time=2)
@@ -31,6 +35,13 @@ RSpec.describe 'Create user', type: :system do
 
   context 'create user' do
     it 'shows the right content' do
+      # Create test data directly in the test
+      create(:camp_configuration,
+             camp_year: 2026,
+             application_open: Date.current - 30.days,
+             application_close: Date.current + 90.days,
+             active: true)
+
       visit root_path
       click_on "Sign up"
       fill_in 'Email', with: "testuser@test.com"
@@ -45,6 +56,13 @@ RSpec.describe 'Create user', type: :system do
 
   context 'create user' do
     it 'shows the right content' do
+      # Create test data directly in the test
+      create(:camp_configuration,
+             camp_year: 2027,
+             application_open: Date.current - 30.days,
+             application_close: Date.current + 90.days,
+             active: true)
+
       @user = FactoryBot.create(:user)
       visit root_path
       click_on "Sign up"

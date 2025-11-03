@@ -324,6 +324,10 @@ GEM
       bundler (>= 1.15.0)
       railties (= 6.1.7.9)
       sprockets-rails (>= 2.0.0)
+    rails-controller-testing (1.0.5)
+      actionpack (>= 5.0.1.rc1)
+      actionview (>= 5.0.1.rc1)
+      activesupport (>= 5.0.1.rc1)
     rails-dom-testing (2.2.0)
       activesupport (>= 5.0.0)
       minitest
@@ -534,6 +538,7 @@ DEPENDENCIES
   pry-rails (~> 0.3.9)
   puma (= 5.6.9)
   rails (~> 6.1)
+  rails-controller-testing
   rspec-rails (~> 5.0, >= 5.0.2)
   sass-rails (~> 6.0)
   sd_notify
