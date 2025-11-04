@@ -1,74 +1,74 @@
-Gender.create!([
-                 { name: 'Female', description: 'dudette' },
-                 { name: 'Male', description: 'dude' }
-               ])
-Demographic.create!([
-                      { name: 'Test Demographic', description: 'Test Description', protected: false },
-                      { name: 'Other', description: 'Other demographic option', protected: true }
-                    ])
+# frozen_string_literal: true
 
-CampConfiguration.create([
-                           { camp_year: 2022, application_open: '2022-01-01', application_close: '2022-11-01', priority: '2022-04-01',
-                             application_materials_due: '2022-05-20', camper_acceptance_due: '2022-06-01', application_fee_cents: 10_000, active: true }
-                         ])
+Gender.find_or_create_by(name: 'Female') { |g| g.description = 'dudette' }
+Gender.find_or_create_by(name: 'Male') { |g| g.description = 'dude' }
 
-camp_config = CampConfiguration.first
+Demographic.find_or_create_by(name: 'Test Demographic') { |d| d.description = 'Test Description'; d.protected = false }
+Demographic.find_or_create_by(name: 'Other') { |d| d.description = 'Other demographic option'; d.protected = true }
 
-camp_config.camp_occurrences.create([
-                                      { description: 'Session 1', begin_date: '2022-09-14',
-                                        end_date: '2022-09-21', cost_cents: 20_000, active: true },
-                                      { description: 'Session 2', begin_date: '2022-09-23',
-                                        end_date: '2022-09-30', cost_cents: 20_000, active: true },
-                                      { description: 'Session 3', begin_date: '2022-10-3',
-                                        end_date: '2022-10-10', cost_cents: 20_000, active: true }
-                                    ])
+camp_config = CampConfiguration.find_or_create_by(camp_year: Date.current.year) do |cc|
+  cc.application_open = Date.current - 30.days
+  cc.application_close = Date.current + 90.days
+  cc.priority = Date.current + 30.days
+  cc.application_materials_due = Date.current + 60.days
+  cc.camper_acceptance_due = Date.current + 75.days
+  cc.application_fee_cents = 10_000
+  cc.active = true
+  cc.offer_letter = 'Default offer letter'
+  cc.reject_letter = 'Default reject letter'
+  cc.waitlist_letter = 'Default waitlist letter'
+end
+
+camp_config.camp_occurrences.find_or_create_by(description: 'Session 1') do |co|
+  co.begin_date = Date.current + 120.days
+  co.end_date = Date.current + 127.days
+  co.cost_cents = 20_000
+  co.active = true
+end
+
+camp_config.camp_occurrences.find_or_create_by(description: 'Session 2') do |co|
+  co.begin_date = Date.current + 130.days
+  co.end_date = Date.current + 137.days
+  co.cost_cents = 20_000
+  co.active = true
+end
+
+camp_config.camp_occurrences.find_or_create_by(description: 'Session 3') do |co|
+  co.begin_date = Date.current + 140.days
+  co.end_date = Date.current + 147.days
+  co.cost_cents = 20_000
+  co.active = true
+end
 
 camp1 = CampOccurrence.first
 camp2 = CampOccurrence.second
 
-camp1.courses.create([
-                       { title: 'Survey in Modern Physics', available_spaces: 16, status: 'open' },
-                       { title: 'Greatest Hits in Vertebrate Evolution', available_spaces: 16,
-                         status: 'open' },
-                       { title: 'Data, Distributions and Decisions: The Science of Statistics',
-                         available_spaces: 16, status: 'open' },
-                       { title: 'Catalysis, Solar Energy and Green Chemical Synthesis', available_spaces: 16,
-                         status: 'open' },
-                       { title: 'Art and Mathematics', available_spaces: 16, status: 'open' },
-                       { title: 'The Physics of Magic and the Magic of Physics', available_spaces: 16,
-                         status: 'open' },
-                       { title: 'Life, Death and Change: Landscapes and Human Impact', available_spaces: 16,
-                         status: 'open' },
-                       { title: 'Hex and the 4 Cs', available_spaces: 16, status: 'open' },
-                       { title: 'Data Science of Happiness', available_spaces: 16, status: 'open' },
-                       { title: 'Climbing the Distance Ladder to the Big Bang: How Astronomers Survey the Universe', available_spaces: 16,
-                         status: 'open' },
-                       { title: 'Sustainable Polymers', available_spaces: 25, status: 'open' },
-                       { title: 'Surface Chemistry', available_spaces: 16, status: 'open' },
-                       { title: 'Relativity: A Journey through Warped Space and Time', available_spaces: 16,
-                         status: 'open' },
-                       { title: 'Organic Chemistry 101: Orgo Boot Camp', available_spaces: 16,
-                         status: 'open' }
-                     ])
+camp1.courses.find_or_create_by(title: 'Survey in Modern Physics') { |c| c.available_spaces = 16; c.status = 'open' }
+camp1.courses.find_or_create_by(title: 'Greatest Hits in Vertebrate Evolution') { |c| c.available_spaces = 16; c.status = 'open' }
+camp1.courses.find_or_create_by(title: 'Data, Distributions and Decisions: The Science of Statistics') { |c| c.available_spaces = 16; c.status = 'open' }
+camp1.courses.find_or_create_by(title: 'Catalysis, Solar Energy and Green Chemical Synthesis') { |c| c.available_spaces = 16; c.status = 'open' }
+camp1.courses.find_or_create_by(title: 'Art and Mathematics') { |c| c.available_spaces = 16; c.status = 'open' }
+camp1.courses.find_or_create_by(title: 'The Physics of Magic and the Magic of Physics') { |c| c.available_spaces = 16; c.status = 'open' }
+camp1.courses.find_or_create_by(title: 'Life, Death and Change: Landscapes and Human Impact') { |c| c.available_spaces = 16; c.status = 'open' }
+camp1.courses.find_or_create_by(title: 'Hex and the 4 Cs') { |c| c.available_spaces = 16; c.status = 'open' }
+camp1.courses.find_or_create_by(title: 'Data Science of Happiness') { |c| c.available_spaces = 16; c.status = 'open' }
+camp1.courses.find_or_create_by(title: 'Climbing the Distance Ladder to the Big Bang: How Astronomers Survey the Universe') { |c| c.available_spaces = 16; c.status = 'open' }
+camp1.courses.find_or_create_by(title: 'Sustainable Polymers') { |c| c.available_spaces = 25; c.status = 'open' }
+camp1.courses.find_or_create_by(title: 'Surface Chemistry') { |c| c.available_spaces = 16; c.status = 'open' }
+camp1.courses.find_or_create_by(title: 'Relativity: A Journey through Warped Space and Time') { |c| c.available_spaces = 16; c.status = 'open' }
+camp1.courses.find_or_create_by(title: 'Organic Chemistry 101: Orgo Boot Camp') { |c| c.available_spaces = 16; c.status = 'open' }
 
-camp2.courses.create([
-                       { title: 'Mathematics of Cryptography', available_spaces: 16, status: 'open' },
-                       { title: 'Human Identification: Forensic Anthropology Methods', available_spaces: 16,
-                         status: 'open' },
-                       { title: 'Fibonacci Numbers', available_spaces: 16, status: 'open' },
-                       { title: 'Dissecting Life: Human Anatomy and Physiology', available_spaces: 16,
-                         status: 'open' },
-                       { title: 'Brain and Behavior', available_spaces: 16, status: 'open' },
-                       { title: 'Organic Chemistry 101: Orgo Boot Camp', available_spaces: 16,
-                         status: 'open' },
-                       { title: 'Mathematics of Decisions, Elections and Games', available_spaces: 16,
-                         status: 'open' },
-                       { title: 'Mathematics and the Internet', available_spaces: 16, status: 'open' },
-                       { title: 'Graph Theory', available_spaces: 16, status: 'open' },
-                       { title: 'Forensic Physics', available_spaces: 16, status: 'open' },
-                       { title: 'Mathematics and Music Theory', available_spaces: 16, status: 'open' },
-                       { title: 'Mathematical Modeling in Biology', available_spaces: 16, status: 'open' },
-                       { title: 'Forensic Physics', available_spaces: 16, status: 'open' },
-                       { title: 'Catalysis, Solar Energy and Green Chemical Synthesis', available_spaces: 16,
-                         status: 'open' }
-                     ])
+camp2.courses.find_or_create_by(title: 'Mathematics of Cryptography') { |c| c.available_spaces = 16; c.status = 'open' }
+camp2.courses.find_or_create_by(title: 'Human Identification: Forensic Anthropology Methods') { |c| c.available_spaces = 16; c.status = 'open' }
+camp2.courses.find_or_create_by(title: 'Fibonacci Numbers') { |c| c.available_spaces = 16; c.status = 'open' }
+camp2.courses.find_or_create_by(title: 'Dissecting Life: Human Anatomy and Physiology') { |c| c.available_spaces = 16; c.status = 'open' }
+camp2.courses.find_or_create_by(title: 'Brain and Behavior') { |c| c.available_spaces = 16; c.status = 'open' }
+camp2.courses.find_or_create_by(title: 'Organic Chemistry 101: Orgo Boot Camp') { |c| c.available_spaces = 16; c.status = 'open' }
+camp2.courses.find_or_create_by(title: 'Mathematics of Decisions, Elections and Games') { |c| c.available_spaces = 16; c.status = 'open' }
+camp2.courses.find_or_create_by(title: 'Mathematics and the Internet') { |c| c.available_spaces = 16; c.status = 'open' }
+camp2.courses.find_or_create_by(title: 'Graph Theory') { |c| c.available_spaces = 16; c.status = 'open' }
+camp2.courses.find_or_create_by(title: 'Forensic Physics') { |c| c.available_spaces = 16; c.status = 'open' }
+camp2.courses.find_or_create_by(title: 'Mathematics and Music Theory') { |c| c.available_spaces = 16; c.status = 'open' }
+camp2.courses.find_or_create_by(title: 'Mathematical Modeling in Biology') { |c| c.available_spaces = 16; c.status = 'open' }
+camp2.courses.find_or_create_by(title: 'Forensic Physics') { |c| c.available_spaces = 16; c.status = 'open' }
+camp2.courses.find_or_create_by(title: 'Catalysis, Solar Energy and Green Chemical Synthesis') { |c| c.available_spaces = 16; c.status = 'open' }

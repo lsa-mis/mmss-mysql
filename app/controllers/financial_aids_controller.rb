@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class FinancialAidsController < ApplicationController
   devise_group :logged_in, contains: [:user, :admin]
   before_action :authenticate_logged_in!

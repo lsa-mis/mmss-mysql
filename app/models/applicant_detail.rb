@@ -56,6 +56,15 @@ class ApplicantDetail < ApplicationRecord
   validates :state, presence: { message: "needs to be selected or if you are
                                           outside of the US select *Non-US*" }
   validates :postalcode, presence: true
+  validates :postalcode,
+            length: { minimum: 1, maximum: 25, message: 'must be between 1 and 25 characters' },
+            format: { with: /\A[a-zA-Z0-9\s\-]+\z/, message: 'can only contain letters, numbers, spaces, and dashes' }
+
+  validates :parentzip,
+            length: { minimum: 1, maximum: 25, message: 'must be between 1 and 25 characters' },
+            format: { with: /\A[a-zA-Z0-9\s\-]+\z/, message: 'can only contain letters, numbers, spaces, and dashes' },
+            allow_blank: true
+
   validates :country, presence: true
   validates :phone, presence: true,
                     format: { with: /\A(\+|00)?[0-9][0-9 \-?().]{7,}\z/, message: 'number format is incorrect' }
@@ -67,7 +76,7 @@ class ApplicantDetail < ApplicationRecord
   validate :parentemail_not_user_email
   validate :demographic_other_if_other_selected
 
-  scope :current_camp_enrolled, -> { where('user_id IN (?)', Enrollment.enrolled.pluck(:user_id)) }
+  scope :current_camp_enrolled, -> { joins(:user).joins('INNER JOIN enrollments ON enrollments.user_id = users.id').where('enrollments.campyear = ? AND enrollments.application_status = ?', CampConfiguration.active.pick(:camp_year), 'enrolled') }
 
   def full_name
     "#{lastname}, #{firstname}"
@@ -90,6 +99,7 @@ class ApplicantDetail < ApplicationRecord
   end
 
   def parentemail_not_user_email
+    return true if user.nil? || parentemail.blank?
     return true unless user.email == parentemail
 
     errors.add(:base, "Parent/Guardian email should be different than the applicant's email")

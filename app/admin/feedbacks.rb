@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ActiveAdmin.register Feedback do
   menu parent: 'Logins Info', priority: 5
 

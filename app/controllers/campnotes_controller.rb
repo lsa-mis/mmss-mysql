@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CampnotesController < ApplicationController
   before_action :authenticate_admin!
   before_action :set_campnote, only: [:show, :edit, :update, :destroy]

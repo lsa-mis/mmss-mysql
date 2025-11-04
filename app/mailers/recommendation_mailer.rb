@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RecommendationMailer < ApplicationMailer
   def request_email
     @recommendation = params[:recommendation]

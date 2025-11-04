@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ActiveAdmin.register Activity do
   menu parent: 'Camp Setup', priority: 3
 
@@ -30,7 +32,7 @@ ActiveAdmin.register Activity do
     redirect_to collection_path, notice: "Successfully toggled active status for selected records"
   end
 
-  filter :camp_occurrence_id, label: "Session", as: :select, collection: CampOccurrence.order(begin_date: :desc).no_any_session
+  filter :camp_occurrence_id, label: "Session", as: :select, collection: proc { CampOccurrence.order(begin_date: :desc).no_any_session }
   filter :description, as: :select
   filter :cost_cents
   filter :date_occurs
@@ -39,7 +41,7 @@ ActiveAdmin.register Activity do
   form do |f|
     f.semantic_errors
     f.inputs do
-      f.input :camp_occurrence, label: "Session", as: :select, collection: CampOccurrence.order(begin_date: :desc).no_any_session
+      f.input :camp_occurrence, label: "Session", as: :select, collection: proc { CampOccurrence.order(begin_date: :desc).no_any_session }
       f.input :description, hint: 'For dormitory activities, please use "Residential Stay" (not "Dormitory") to ensure consistency across all environments'
       f.input :cost
       f.input :date_occurs

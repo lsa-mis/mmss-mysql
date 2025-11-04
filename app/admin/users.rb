@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ActiveAdmin.register User do
   menu parent: 'Logins Info', priority: 1
   config.filters = true

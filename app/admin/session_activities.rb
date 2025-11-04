@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ActiveAdmin.register SessionActivity, as: 'Session Selection' do
   menu parent: 'Applicant Info', priority: 1
   # See permitted parameters documentation:
@@ -15,13 +17,13 @@ ActiveAdmin.register SessionActivity, as: 'Session Selection' do
   #   permitted
   # end
 
-  filter :enrollment_id, as: :select, collection: Enrollment.current_camp_year_applications.map { |enrol| [enrol.display_name.downcase, enrol.id]}.sort
-  filter :camp_occurrence_id, label: "Session", as: :select, collection: CampOccurrence.active.no_any_session
+  filter :enrollment_id, as: :select, collection: proc { Enrollment.current_camp_year_applications.map { |enrol| [enrol.display_name.downcase, enrol.id]}.sort }
+  filter :camp_occurrence_id, label: "Session", as: :select, collection: proc { CampOccurrence.active.no_any_session }
 
   form do |f|
     f.inputs do
-      f.input :enrollment_id, as: :select, collection: Enrollment.current_camp_year_applications.map { |enrol| [enrol.display_name.downcase, enrol.id]}.sort 
-      f.input :camp_occurrence_id, label: "Session", as: :select, collection: CampOccurrence.active.no_any_session 
+      f.input :enrollment_id, as: :select, collection: proc { Enrollment.current_camp_year_applications.map { |enrol| [enrol.display_name.downcase, enrol.id]}.sort }
+      f.input :camp_occurrence_id, label: "Session", as: :select, collection: proc { CampOccurrence.active.no_any_session }
     end
     f.actions
   end
@@ -44,5 +46,5 @@ ActiveAdmin.register SessionActivity, as: 'Session Selection' do
     end
     active_admin_comments
   end
-  
+
 end

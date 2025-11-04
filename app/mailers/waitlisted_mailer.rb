@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class WaitlistedMailer < ApplicationMailer
   def app_waitlisted_email(enrollment)
     @application = ApplicantDetail.find_by(user_id: enrollment.user)

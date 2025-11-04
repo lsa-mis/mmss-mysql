@@ -1,76 +1,263 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: enrollments
 #
-#  id                            :bigint           not null, primary key
-#  user_id                       :bigint           not null
-#  international                 :boolean          default(FALSE), not null
-#  high_school_name              :string(255)      not null
-#  high_school_address1          :string(255)      not null
-#  high_school_address2          :string(255)
-#  high_school_city              :string(255)      not null
-#  high_school_state             :string(255)
-#  high_school_non_us            :string(255)
-#  high_school_postalcode        :string(255)
-#  high_school_country           :string(255)      not null
-#  year_in_school                :string(255)      not null
-#  anticipated_graduation_year   :string(255)      not null
-#  room_mate_request             :string(255)
-#  personal_statement            :text(65535)      not null
-#  notes                         :text(65535)
-#  application_status            :string(255)
-#  offer_status                  :string(255)
-#  partner_program               :string(255)
-#  created_at                    :datetime         not null
-#  updated_at                    :datetime         not null
-#  campyear                      :integer
-#  application_deadline          :date
-#  application_status_updated_on :date
-#  uniqname                      :string(255)
-#  camp_doc_form_completed       :boolean          default(FALSE)
-#  application_fee_required      :boolean          default(TRUE), not null
-#
 require 'rails_helper'
 
 RSpec.describe Enrollment, type: :model do
+  before { setup_basic_test_data }
 
-  before :each do
-    load "#{Rails.root}/spec/test_seeds.rb" 
+  describe 'associations' do
+    it { is_expected.to belong_to(:user) }
+    it { is_expected.to have_one(:applicant_detail).through(:user) }
+    it { is_expected.to have_many(:enrollment_activities).dependent(:destroy) }
+    it { is_expected.to have_many(:session_activities).dependent(:destroy) }
+    it { is_expected.to have_many(:session_assignments).dependent(:destroy) }
+    it { is_expected.to have_many(:course_preferences).dependent(:destroy) }
+    it { is_expected.to have_many(:course_assignments).dependent(:destroy) }
+    it { is_expected.to have_many(:financial_aids).dependent(:destroy) }
+    it { is_expected.to have_many(:travels).dependent(:destroy) }
+    it { is_expected.to have_one(:recommendation).dependent(:destroy) }
+    it { is_expected.to have_one(:rejection).dependent(:destroy) }
   end
 
-  context "all required fields are present" do
-    let!(:user) { FactoryBot.create(:user) }
-    let!(:applicant_detail) { FactoryBot.create(:applicant_detail, user: user) }
-    let!(:session_registration_ids) { CampOccurrence.all.pluck(:id)}
-    let!(:course_registration_ids) { Course.where(camp_occurrence_id: session_registration_ids).pluck(:id)}
+  describe 'validations' do
+    subject { build(:enrollment) }
 
-    it 'test database' do
-      expect(ActiveRecord::Base.connection_config[:database]).to match(/test/)
-    end
+    it { is_expected.to validate_presence_of(:high_school_name) }
+    it { is_expected.to validate_presence_of(:high_school_address1) }
+    it { is_expected.to validate_presence_of(:high_school_city) }
+    it { is_expected.to validate_presence_of(:high_school_country) }
+    it { is_expected.to validate_presence_of(:year_in_school) }
+    it { is_expected.to validate_presence_of(:anticipated_graduation_year) }
+    it { is_expected.to validate_presence_of(:personal_statement) }
+    it { is_expected.to validate_length_of(:personal_statement).is_at_least(100) }
+    it { is_expected.to validate_presence_of(:high_school_postalcode) }
 
-    it 'is valid' do
-      expect(FactoryBot.create(:enrollment, user: user, session_registration_ids: session_registration_ids, course_registration_ids: course_registration_ids))
-        .to be_valid
-    end
+    describe 'high_school_postalcode validation' do
+      let(:enrollment) { build(:enrollment) }
 
-    it 'not valid without session_registration' do
-      session_registration_ids = []
-      course_registration_ids = []
-      expect { (FactoryBot.create(:enrollment, user: user, session_registration_ids: session_registration_ids, course_registration_ids: course_registration_ids)) }
-        .to raise_error(ActiveRecord::RecordInvalid, "Validation failed: Select at least one session, Select at least one course")
-    end
+      it 'is valid with a postal code between 1 and 25 characters' do
+        enrollment.high_school_postalcode = '12345'
+        expect(enrollment).to be_valid
+      end
 
-    it 'not valid without course_registration' do
-      course_registration_ids = []
-      expect { (FactoryBot.create(:enrollment, user: user, session_registration_ids: session_registration_ids, course_registration_ids: course_registration_ids)) }
-        .to raise_error(ActiveRecord::RecordInvalid, "Validation failed: Select at least one course")
-    end
+      it 'is valid with alphanumeric characters, spaces, and dashes' do
+        enrollment.high_school_postalcode = 'SW1A 1AA'
+        expect(enrollment).to be_valid
+      end
 
-    it 'prevent creating second enrollment records for a user for the current camp' do
-      enroll1 = FactoryBot.create(:enrollment, user: user, session_registration_ids: session_registration_ids, course_registration_ids: course_registration_ids)
-      expect(enroll1).to be_valid
-      expect { (FactoryBot.create(:enrollment, user: user, session_registration_ids: session_registration_ids, course_registration_ids: course_registration_ids)) }
-        .to raise_error(ActiveRecord::RecordInvalid, "Validation failed: User has already been taken")
+      it 'is valid with a dash in postal code' do
+        enrollment.high_school_postalcode = '12345-6789'
+        expect(enrollment).to be_valid
+      end
+
+      it 'is valid with a single character' do
+        enrollment.high_school_postalcode = 'A'
+        expect(enrollment).to be_valid
+      end
+
+      it 'is valid with exactly 25 characters' do
+        enrollment.high_school_postalcode = 'A' * 25
+        expect(enrollment).to be_valid
+      end
+
+      it 'is invalid when blank' do
+        enrollment.high_school_postalcode = nil
+        expect(enrollment).not_to be_valid
+        expect(enrollment.errors[:high_school_postalcode]).to include("can't be blank")
+      end
+
+      it 'is invalid when empty string' do
+        enrollment.high_school_postalcode = ''
+        expect(enrollment).not_to be_valid
+        expect(enrollment.errors[:high_school_postalcode]).to include("can't be blank")
+      end
+
+      it 'is invalid with more than 25 characters' do
+        enrollment.high_school_postalcode = 'A' * 26
+        expect(enrollment).not_to be_valid
+        expect(enrollment.errors[:high_school_postalcode]).to include('must be between 1 and 25 characters')
+      end
+
+      it 'is invalid with special characters other than spaces and dashes' do
+        enrollment.high_school_postalcode = '12345@678'
+        expect(enrollment).not_to be_valid
+        expect(enrollment.errors[:high_school_postalcode]).to include('can only contain letters, numbers, spaces, and dashes')
+      end
+
+      it 'is invalid with invalid characters like underscores' do
+        enrollment.high_school_postalcode = '12345_678'
+        expect(enrollment).not_to be_valid
+        expect(enrollment.errors[:high_school_postalcode]).to include('can only contain letters, numbers, spaces, and dashes')
+      end
     end
   end
+
+  describe 'attachments' do
+    it { is_expected.to have_one_attached(:transcript) }
+    it { is_expected.to have_one_attached(:student_packet) }
+    it { is_expected.to have_one_attached(:vaccine_record) }
+    it { is_expected.to have_one_attached(:covid_test_record) }
+  end
+
+  describe 'factory' do
+    it 'has a valid factory' do
+      enrollment = build(:enrollment)
+      expect(enrollment).to be_valid
+    end
+
+    it 'creates international enrollment with trait' do
+      enrollment = create(:enrollment, :international)
+      expect(enrollment.international).to be true
+      expect(enrollment.high_school_country).not_to eq('US')
+    end
+
+    it 'creates enrollment with different statuses' do
+      expect(create(:enrollment, :offered).offer_status).to eq('offered')
+      expect(create(:enrollment, :accepted).offer_status).to eq('accepted')
+      expect(create(:enrollment, :enrolled).application_status).to eq('enrolled')
+    end
+  end
+
+  describe '#display_name' do
+    let(:user) { create(:user) }
+    let!(:applicant_detail) { create(:applicant_detail, user: user, firstname: 'John', lastname: 'Doe') }
+    let(:enrollment) { create(:enrollment, user: user) }
+
+    it 'returns full name and email' do
+      expect(enrollment.display_name).to eq("Doe, John - #{user.email}")
+    end
+  end
+
+  describe 'scopes' do
+    let(:camp_config) { create(:camp_configuration, :active, camp_year: Date.current.year) }
+
+    before do
+      CampConfiguration.update_all(active: false)
+      camp_config.update(active: true)
+      allow(CampConfiguration).to receive(:active_camp_year).and_return(camp_config.camp_year)
+    end
+
+    describe '.current_camp_year_applications' do
+      let!(:current_enrollment) { create(:enrollment, campyear: camp_config.camp_year) }
+      let!(:old_enrollment) { create(:enrollment, campyear: camp_config.camp_year - 1) }
+
+      it 'returns enrollments for current camp year' do
+        expect(Enrollment.current_camp_year_applications).to include(current_enrollment)
+        expect(Enrollment.current_camp_year_applications).not_to include(old_enrollment)
+      end
+    end
+
+    describe '.offered' do
+      let!(:offered_enrollment) { create(:enrollment, :offered, campyear: camp_config.camp_year) }
+      let!(:regular_enrollment) { create(:enrollment, campyear: camp_config.camp_year) }
+
+      it 'returns offered enrollments' do
+        expect(Enrollment.offered).to include(offered_enrollment)
+        expect(Enrollment.offered).not_to include(regular_enrollment)
+      end
+    end
+
+    describe '.enrolled' do
+      let!(:enrolled_enrollment) { create(:enrollment, :enrolled, campyear: camp_config.camp_year) }
+      let!(:offered_enrollment) { create(:enrollment, :offered, campyear: camp_config.camp_year) }
+
+      it 'returns enrolled students' do
+        expect(Enrollment.enrolled).to include(enrolled_enrollment)
+        expect(Enrollment.enrolled).not_to include(offered_enrollment)
+      end
+    end
+  end
+
+  describe 'callbacks' do
+    describe 'setting application_fee_required' do
+      let(:camp_config) { create(:camp_configuration, :active, application_fee_required: false, camp_year: Date.current.year) }
+
+      before do
+        CampConfiguration.update_all(active: false)
+        camp_config.update(active: true)
+      end
+
+      it 'sets application_fee_required based on active camp configuration' do
+        enrollment = create(:enrollment)
+        expect(enrollment.application_fee_required).to be false
+      end
+    end
+
+    describe 'email notifications' do
+      let(:user) { create(:user) }
+      let!(:applicant_detail) { create(:applicant_detail, user: user) }
+      let(:enrollment) { create(:enrollment, user: user) }
+
+      it 'sends offer email when offer_status changes to offered' do
+        expect(OfferMailer).to receive(:offer_email).with(user.id).and_return(double(deliver_now: true))
+        enrollment.update(offer_status: 'offered')
+      end
+
+      it 'sends enrolled email when application_status changes to enrolled' do
+        expect(RegistrationMailer).to receive(:app_enrolled_email).with(user).and_return(double(deliver_now: true))
+        enrollment.update(application_status: 'enrolled')
+      end
+
+      it 'sends rejected email when application_status changes to rejected' do
+        expect(RejectedMailer).to receive(:app_rejected_email).with(enrollment).and_return(double(deliver_now: true))
+        enrollment.update(application_status: 'rejected')
+      end
+
+      it 'sends waitlisted email when application_status changes to waitlisted' do
+        expect(WaitlistedMailer).to receive(:app_waitlisted_email).with(enrollment).and_return(double(deliver_now: true))
+        enrollment.update(application_status: 'waitlisted')
+      end
+    end
+  end
+
+  describe '#update_status_based_on_session_assignments!' do
+    let(:enrollment) { create(:enrollment) }
+    let(:session1) { create(:camp_occurrence) }
+    let(:session2) { create(:camp_occurrence) }
+
+    context 'when all assignments are declined' do
+      before do
+        create(:session_assignment, enrollment: enrollment, camp_occurrence: session1, offer_status: 'declined')
+        create(:session_assignment, enrollment: enrollment, camp_occurrence: session2, offer_status: 'declined')
+      end
+
+      it 'updates enrollment to declined status' do
+        enrollment.update_status_based_on_session_assignments!
+        expect(enrollment.offer_status).to eq('declined')
+        expect(enrollment.application_status).to eq('offer declined')
+      end
+    end
+
+    context 'when all assignments are accepted' do
+      before do
+        create(:session_assignment, enrollment: enrollment, camp_occurrence: session1, offer_status: 'accepted')
+        create(:session_assignment, enrollment: enrollment, camp_occurrence: session2, offer_status: 'accepted')
+      end
+
+      it 'updates enrollment to accepted status' do
+        enrollment.update_status_based_on_session_assignments!
+        expect(enrollment.offer_status).to eq('accepted')
+        expect(enrollment.application_status).to eq('offer accepted')
+      end
+    end
+
+    context 'when assignments have mixed statuses' do
+      before do
+        create(:session_assignment, enrollment: enrollment, camp_occurrence: session1, offer_status: 'accepted')
+        create(:session_assignment, enrollment: enrollment, camp_occurrence: session2, offer_status: nil)
+      end
+
+      it 'does not update enrollment status' do
+        original_status = enrollment.offer_status
+        enrollment.update_status_based_on_session_assignments!
+        expect(enrollment.offer_status).to eq(original_status)
+      end
+    end
+  end
+
+  it_behaves_like 'a model with timestamps'
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: financial_aids
@@ -14,7 +16,7 @@
 #
 class FinancialAid < ApplicationRecord
   include ApplicantState
-  
+
   after_commit :send_status_watch_email, if: :persisted?
 
   belongs_to :enrollment
@@ -24,6 +26,8 @@ class FinancialAid < ApplicationRecord
   monetize :amount_cents
 
   validates :note, presence: :true
+  validates :source, presence: true
+  validates :status, presence: true
   validate :acceptable_taxform
   validate :set_deadline
 
@@ -61,7 +65,7 @@ class FinancialAid < ApplicationRecord
 
   def set_deadline
     return if self.status == 'pending'
-    
+
     if self.payments_deadline.blank?
       errors.add(:payments_deadline, "you need to set a date")
     end
@@ -71,7 +75,7 @@ class FinancialAid < ApplicationRecord
       errors.add(:amount_cents, "you need to set an amount")
     end
   end
-    
+
   def self.ransackable_associations(auth_object = nil)
     ["enrollment", "taxform_attachment", "taxform_blob"]
   end

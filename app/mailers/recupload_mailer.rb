@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RecuploadMailer < ApplicationMailer
   def received_email
     @recupload = params[:recupload]

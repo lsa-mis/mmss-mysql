@@ -51,5 +51,5 @@ puma-prod.rb
 /working_documents/*
 
 
-
+coverage/*
 *copy.erb

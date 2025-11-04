@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ActiveAdmin.register Course do
   menu parent: 'Camp Setup', priority: 3
 
@@ -42,7 +44,7 @@ ActiveAdmin.register Course do
     f.semantic_errors # shows errors on :base
     # f.inputs           # builds an input field for every attribute
     f.inputs do
-      f.input :camp_occurrence, label: "Session", as: :select, collection: CampOccurrence.active.order(begin_date: :desc).no_any_session
+      f.input :camp_occurrence, label: "Session", as: :select, collection: proc { CampOccurrence.active.order(begin_date: :desc).no_any_session }
       f.input :title
       f.input :available_spaces
       f.input :faculty_uniqname

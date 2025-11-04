@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Gender.create!([
   {name: "Female-1", description: "dudette"},
   {name: "Male-1", description: "dude"}

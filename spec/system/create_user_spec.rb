@@ -1,10 +1,9 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'Create user', type: :system do
-
-  before :each do
-    load "#{Rails.root}/spec/test_seeds.rb" 
-  end
+  include ApplicationHelper
 
   context 'create new user' do
     let(:user) { User.new }
@@ -14,13 +13,22 @@ RSpec.describe 'Create user', type: :system do
 
   context 'create user' do
     it 'show password mismatch error' do
+      # Create test data directly in the test
+      create(:camp_configuration,
+             camp_year: 2025,
+             application_open: Date.current - 30.days,
+             application_close: Date.current + 90.days,
+             active: true)
+
       visit root_path
       click_on "Sign up"
-      sleep(inspection_time=2)
+      
+      # Wait for form fields to be available
+      expect(page).to have_field('Email')
+      
       fill_in 'Email', with: "testuser@test.com"
       fill_in 'Password', with: "secretsecret"
       fill_in 'Password confirmation', with: "secret"
-      sleep(inspection_time=2)
       click_on "Sign up"
 
       expect(page).to have_content("Password confirmation doesn't match Password")
@@ -29,13 +37,23 @@ RSpec.describe 'Create user', type: :system do
 
   context 'create user' do
     it 'shows the right content' do
+      # Create test data directly in the test
+      create(:camp_configuration,
+             camp_year: 2026,
+             application_open: Date.current - 30.days,
+             application_close: Date.current + 90.days,
+             active: true)
+
       visit root_path
       click_on "Sign up"
+      
+      # Wait for form fields to be available
+      expect(page).to have_field('Email')
+      
       fill_in 'Email', with: "testuser@test.com"
       fill_in 'Password', with: "secretsecret"
       fill_in 'Password confirmation', with: "secretsecret"
       click_on "Sign up"
-      sleep(inspection_time=2)
 
       expect(page).to have_content("Welcome! You have signed up successfully.")
     end
@@ -43,14 +61,24 @@ RSpec.describe 'Create user', type: :system do
 
   context 'create user' do
     it 'shows the right content' do
+      # Create test data directly in the test
+      create(:camp_configuration,
+             camp_year: 2027,
+             application_open: Date.current - 30.days,
+             application_close: Date.current + 90.days,
+             active: true)
+
       @user = FactoryBot.create(:user)
       visit root_path
       click_on "Sign up"
+      
+      # Wait for form fields to be available
+      expect(page).to have_field('Email')
+      
       fill_in 'Email', with: @user.email
       fill_in 'Password', with: @user.password
       fill_in 'Password confirmation', with: @user.password
       click_on "Sign up"
-      sleep(inspection_time=2)
 
       expect(page).to have_content("Email has already been taken")
     end

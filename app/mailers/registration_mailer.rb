@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RegistrationMailer < ApplicationMailer
   def app_complete_email(user)
     @user_detail = user

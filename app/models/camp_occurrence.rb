@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: camp_occurrences
@@ -18,7 +20,7 @@ class CampOccurrence < ApplicationRecord
   has_many :activities, dependent: :destroy
   has_many :courses, dependent: :destroy
 
-  has_many :session_activities
+  has_many :session_activities, dependent: :destroy
   has_many :enrollments, through: :session_activities
 
   has_many :session_assignments, dependent: :destroy
@@ -47,7 +49,7 @@ class CampOccurrence < ApplicationRecord
     if description == "Any Session"
       "#{description}"
     else
-      "#{description} -- #{begin_date} until #{end_date} -- #{humanized_money_with_symbol(self.cost)}" 
+      "#{description} -- #{begin_date} until #{end_date} -- #{humanized_money_with_symbol(self.cost)}"
     end
   end
 

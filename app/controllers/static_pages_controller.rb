@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class StaticPagesController < ApplicationController
   include ApplicantState
   # devise_group :logged_in, contains: [:user, :admin]

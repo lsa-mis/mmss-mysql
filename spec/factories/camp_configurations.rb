@@ -1,32 +1,44 @@
-# == Schema Information
-#
-# Table name: camp_configurations
-#
-#  id                        :bigint           not null, primary key
-#  camp_year                 :integer          not null
-#  application_open          :date             not null
-#  application_close         :date             not null
-#  priority                  :date             not null
-#  application_materials_due :date             not null
-#  camper_acceptance_due     :date             not null
-#  active                    :boolean          default(FALSE), not null
-#  created_at                :datetime         not null
-#  updated_at                :datetime         not null
-#  offer_letter              :text(65535)
-#  student_packet_url        :string(255)
-#  application_fee_cents     :integer
-#  reject_letter             :text(65535)
-#  waitlist_letter           :text(65535)
-#  application_fee_required  :boolean          default(TRUE), not null
-#
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :camp_configuration do
-    camp_year { 2019 }
-    application_open { "2019-07-17" }
-    application_close { "2019-07-17" }
-    priority { "2019-07-17" }
-    application_materials_due { "2019-07-17" }
-    camper_acceptance_due { "2019-07-17" }
+    sequence(:camp_year) { |n| 2025 + n }
+
+    application_open { Date.new(camp_year, 1, 1) }
+    application_close { Date.new(camp_year, 10, 31) }
+    priority { Date.new(camp_year, 4, 1) }
+    application_materials_due { Date.new(camp_year, 5, 20) }
+    camper_acceptance_due { Date.new(camp_year, 6, 1) }
+    application_fee_cents { 10_000 }
+    application_fee_required { true }
     active { false }
+    offer_letter { 'Default offer letter content' }
+    reject_letter { 'Default rejection letter content' }
+    waitlist_letter { 'Default waitlist letter content' }
+
+    trait :active do
+      active { true }
+    end
+
+    trait :current_year do
+      camp_year { Date.current.year }
+      active { true }
+    end
+
+    trait :next_year do
+      camp_year { Date.current.year + 1 }
+      active { false }
+    end
+
+    trait :no_application_fee do
+      application_fee_required { false }
+      application_fee_cents { 0 }
+    end
+
+    trait :with_sessions do
+      after(:create) do |camp_config|
+        create_list(:camp_occurrence, 3, camp_configuration: camp_config, active: true)
+      end
+    end
   end
 end

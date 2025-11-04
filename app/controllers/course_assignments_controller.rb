@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CourseAssignmentsController < InheritedResources::Base
   before_action :authenticate_admin!
 

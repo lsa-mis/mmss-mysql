@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class OfferMailer < ApplicationMailer
   # @param user_id [Integer] The ID of the user to send the offer email to
   # @return [Mail::Message] The email message that was sent

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module FinancialAidsHelper
   def financial_aid_status
     [
