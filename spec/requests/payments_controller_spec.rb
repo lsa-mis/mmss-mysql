@@ -79,7 +79,7 @@ RSpec.describe PaymentsController, type: :request do
 
       expect(response).to redirect_to(all_payments_path)
       follow_redirect!
-      expect(response.body).to include('not successfull')
+      expect(response.body).to include('not successful')
     end
   end
 

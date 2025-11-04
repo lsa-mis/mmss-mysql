@@ -40,9 +40,9 @@ class PaymentsController < ApplicationController
         camp_year: CampConfiguration.active_camp_year
       )
       if params['transactionStatus'] != '1'
-        redirect_to all_payments_path, alert: "Your payment was not successfull"
+        redirect_to all_payments_path, alert: 'Your payment was not successful'
       else
-        redirect_to all_payments_path, notice: "Your payment was successfully recorded"
+        redirect_to all_payments_path, notice: 'Your payment was successfully recorded'
       end
     end
   end
