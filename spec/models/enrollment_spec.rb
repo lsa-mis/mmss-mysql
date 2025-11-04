@@ -34,6 +34,66 @@ RSpec.describe Enrollment, type: :model do
     it { is_expected.to validate_presence_of(:anticipated_graduation_year) }
     it { is_expected.to validate_presence_of(:personal_statement) }
     it { is_expected.to validate_length_of(:personal_statement).is_at_least(100) }
+    it { is_expected.to validate_presence_of(:high_school_postalcode) }
+
+    describe 'high_school_postalcode validation' do
+      let(:enrollment) { build(:enrollment) }
+
+      it 'is valid with a postal code between 1 and 25 characters' do
+        enrollment.high_school_postalcode = '12345'
+        expect(enrollment).to be_valid
+      end
+
+      it 'is valid with alphanumeric characters, spaces, and dashes' do
+        enrollment.high_school_postalcode = 'SW1A 1AA'
+        expect(enrollment).to be_valid
+      end
+
+      it 'is valid with a dash in postal code' do
+        enrollment.high_school_postalcode = '12345-6789'
+        expect(enrollment).to be_valid
+      end
+
+      it 'is valid with a single character' do
+        enrollment.high_school_postalcode = 'A'
+        expect(enrollment).to be_valid
+      end
+
+      it 'is valid with exactly 25 characters' do
+        enrollment.high_school_postalcode = 'A' * 25
+        expect(enrollment).to be_valid
+      end
+
+      it 'is invalid when blank' do
+        enrollment.high_school_postalcode = nil
+        expect(enrollment).not_to be_valid
+        expect(enrollment.errors[:high_school_postalcode]).to include("can't be blank")
+      end
+
+      it 'is invalid when empty string' do
+        enrollment.high_school_postalcode = ''
+        expect(enrollment).not_to be_valid
+        expect(enrollment.errors[:high_school_postalcode]).to include("can't be blank")
+      end
+
+      it 'is invalid with more than 25 characters' do
+        enrollment.high_school_postalcode = 'A' * 26
+        expect(enrollment).not_to be_valid
+        expect(enrollment.errors[:high_school_postalcode]).to include('must be between 1 and 25 characters')
+      end
+
+      it 'is invalid with special characters other than spaces and dashes' do
+        enrollment.high_school_postalcode = '12345@678'
+        expect(enrollment).not_to be_valid
+        expect(enrollment.errors[:high_school_postalcode]).to include('can only contain letters, numbers, spaces, and dashes')
+      end
+
+      it 'is invalid with invalid characters like underscores' do
+        enrollment.high_school_postalcode = '12345_678'
+        expect(enrollment).not_to be_valid
+        expect(enrollment.errors[:high_school_postalcode]).to include('can only contain letters, numbers, spaces, and dashes')
+      end
+    end
   end
 
   describe 'attachments' do

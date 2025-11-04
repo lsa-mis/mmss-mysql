@@ -40,6 +40,110 @@ RSpec.describe ApplicantDetail, type: :model do
         expect(applicant).to be_valid
       end
     end
+
+    describe 'postalcode validation' do
+      let(:applicant_detail) { build(:applicant_detail) }
+
+      it 'is valid with a postal code between 1 and 25 characters' do
+        applicant_detail.postalcode = '12345'
+        expect(applicant_detail).to be_valid
+      end
+
+      it 'is valid with alphanumeric characters, spaces, and dashes' do
+        applicant_detail.postalcode = 'SW1A 1AA'
+        expect(applicant_detail).to be_valid
+      end
+
+      it 'is valid with a dash in postal code' do
+        applicant_detail.postalcode = '12345-6789'
+        expect(applicant_detail).to be_valid
+      end
+
+      it 'is valid with a single character' do
+        applicant_detail.postalcode = 'A'
+        expect(applicant_detail).to be_valid
+      end
+
+      it 'is valid with exactly 25 characters' do
+        applicant_detail.postalcode = 'A' * 25
+        expect(applicant_detail).to be_valid
+      end
+
+      it 'is invalid with more than 25 characters' do
+        applicant_detail.postalcode = 'A' * 26
+        expect(applicant_detail).not_to be_valid
+        expect(applicant_detail.errors[:postalcode]).to include('must be between 1 and 25 characters')
+      end
+
+      it 'is invalid with special characters other than spaces and dashes' do
+        applicant_detail.postalcode = '12345@678'
+        expect(applicant_detail).not_to be_valid
+        expect(applicant_detail.errors[:postalcode]).to include('can only contain letters, numbers, spaces, and dashes')
+      end
+
+      it 'is invalid with invalid characters like underscores' do
+        applicant_detail.postalcode = '12345_678'
+        expect(applicant_detail).not_to be_valid
+        expect(applicant_detail.errors[:postalcode]).to include('can only contain letters, numbers, spaces, and dashes')
+      end
+    end
+
+    describe 'parentzip validation' do
+      let(:applicant_detail) { build(:applicant_detail) }
+
+      it 'is valid with a postal code between 1 and 25 characters' do
+        applicant_detail.parentzip = '12345'
+        expect(applicant_detail).to be_valid
+      end
+
+      it 'is valid with alphanumeric characters, spaces, and dashes' do
+        applicant_detail.parentzip = 'SW1A 1AA'
+        expect(applicant_detail).to be_valid
+      end
+
+      it 'is valid with a dash in postal code' do
+        applicant_detail.parentzip = '12345-6789'
+        expect(applicant_detail).to be_valid
+      end
+
+      it 'is valid with a single character' do
+        applicant_detail.parentzip = 'A'
+        expect(applicant_detail).to be_valid
+      end
+
+      it 'is valid with exactly 25 characters' do
+        applicant_detail.parentzip = 'A' * 25
+        expect(applicant_detail).to be_valid
+      end
+
+      it 'is valid when blank' do
+        applicant_detail.parentzip = nil
+        expect(applicant_detail).to be_valid
+      end
+
+      it 'is valid when empty string' do
+        applicant_detail.parentzip = ''
+        expect(applicant_detail).to be_valid
+      end
+
+      it 'is invalid with more than 25 characters' do
+        applicant_detail.parentzip = 'A' * 26
+        expect(applicant_detail).not_to be_valid
+        expect(applicant_detail.errors[:parentzip]).to include('must be between 1 and 25 characters')
+      end
+
+      it 'is invalid with special characters other than spaces and dashes' do
+        applicant_detail.parentzip = '12345@678'
+        expect(applicant_detail).not_to be_valid
+        expect(applicant_detail.errors[:parentzip]).to include('can only contain letters, numbers, spaces, and dashes')
+      end
+
+      it 'is invalid with invalid characters like underscores' do
+        applicant_detail.parentzip = '12345_678'
+        expect(applicant_detail).not_to be_valid
+        expect(applicant_detail.errors[:parentzip]).to include('can only contain letters, numbers, spaces, and dashes')
+      end
+    end
   end
 
   describe 'factory' do

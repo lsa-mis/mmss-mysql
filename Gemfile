@@ -43,7 +43,7 @@ group :development, :test do
   gem 'rspec-rails', '~> 5.0', '>= 5.0.2'
   gem 'shoulda-matchers', '~> 5.0'
   gem 'standard'
-  gem 'webdrivers', '~> 5.2'
+  gem 'webdrivers', '~> 5.3'
 end
 
 group :test do

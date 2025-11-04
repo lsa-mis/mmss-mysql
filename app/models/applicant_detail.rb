@@ -56,6 +56,15 @@ class ApplicantDetail < ApplicationRecord
   validates :state, presence: { message: "needs to be selected or if you are
                                           outside of the US select *Non-US*" }
   validates :postalcode, presence: true
+  validates :postalcode,
+            length: { minimum: 1, maximum: 25, message: 'must be between 1 and 25 characters' },
+            format: { with: /\A[a-zA-Z0-9\s\-]+\z/, message: 'can only contain letters, numbers, spaces, and dashes' }
+
+  validates :parentzip,
+            length: { minimum: 1, maximum: 25, message: 'must be between 1 and 25 characters' },
+            format: { with: /\A[a-zA-Z0-9\s\-]+\z/, message: 'can only contain letters, numbers, spaces, and dashes' },
+            allow_blank: true
+
   validates :country, presence: true
   validates :phone, presence: true,
                     format: { with: /\A(\+|00)?[0-9][0-9 \-?().]{7,}\z/, message: 'number format is incorrect' }

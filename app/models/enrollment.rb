@@ -81,6 +81,11 @@ class Enrollment < ApplicationRecord
   validates :personal_statement, presence: true
   validates :personal_statement, length: { minimum: 100 }
 
+  validates :high_school_postalcode, presence: true
+  validates :high_school_postalcode,
+            length: { minimum: 1, maximum: 25, message: 'must be between 1 and 25 characters' },
+            format: { with: /\A[a-zA-Z0-9\s\-]+\z/, message: 'can only contain letters, numbers, spaces, and dashes' }
+
   validate :at_least_one_session_is_checked
   validate :at_least_one_course_is_checked
 
