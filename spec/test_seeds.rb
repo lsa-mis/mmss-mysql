@@ -6,7 +6,7 @@ Gender.find_or_create_by(name: 'Male') { |g| g.description = 'dude' }
 Demographic.find_or_create_by(name: 'Test Demographic') { |d| d.description = 'Test Description'; d.protected = false }
 Demographic.find_or_create_by(name: 'Other') { |d| d.description = 'Other demographic option'; d.protected = true }
 
-camp_config = CampConfiguration.find_or_create_by(camp_year: 2025) do |cc|
+camp_config = CampConfiguration.find_or_create_by(camp_year: Date.current.year) do |cc|
   cc.application_open = Date.current - 30.days
   cc.application_close = Date.current + 90.days
   cc.priority = Date.current + 30.days
