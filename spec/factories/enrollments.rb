@@ -63,7 +63,7 @@ FactoryBot.define do
     application_fee_required { nil }
 
     # Create required session and course registrations
-    after(:build) do |enrollment|
+    after(:create) do |enrollment|
       # Find or create camp configuration for the enrollment year
       camp_config = CampConfiguration.find_by(camp_year: enrollment.campyear)
 
