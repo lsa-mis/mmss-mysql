@@ -62,40 +62,42 @@ FactoryBot.define do
     camp_doc_form_completed { false }
     application_fee_required { nil }
 
-    # Create required session and course registrations
-    after(:create) do |enrollment|
+    # Create required session and course registrations before validation
+    after(:build) do |enrollment|
+      # Ensure test seeds are loaded for basic data
+      load "#{Rails.root}/spec/test_seeds.rb" if Gender.count.zero?
+
       # Find or create camp configuration for the enrollment year
-      camp_config = CampConfiguration.find_by(camp_year: enrollment.campyear)
+      camp_config = CampConfiguration.find_by(camp_year: enrollment.campyear) ||
+                    CampConfiguration.active.first
 
       unless camp_config
-        # Only deactivate other camp configurations if there's no active one for this year
-        active_config = CampConfiguration.active.first
-        if active_config.nil? || active_config.camp_year != enrollment.campyear
-          # Deactivate any existing active camp configurations
-          CampConfiguration.update_all(active: false)
+        # Deactivate any existing active camp configurations
+        CampConfiguration.update_all(active: false)
 
-          camp_config = CampConfiguration.create!(
-            camp_year: enrollment.campyear,
-            active: true,
-            application_open: Date.new(enrollment.campyear, 1, 1),
-            application_close: Date.new(enrollment.campyear, 10, 31),
-            priority: Date.new(enrollment.campyear, 4, 1),
-            application_materials_due: Date.new(enrollment.campyear, 5, 20),
-            camper_acceptance_due: Date.new(enrollment.campyear, 6, 1),
-            application_fee_cents: 10_000,
-            application_fee_required: true,
-            offer_letter: 'Default offer letter content',
-            reject_letter: 'Default rejection letter content',
-            waitlist_letter: 'Default waitlist letter content'
-          )
-        else
-          camp_config = active_config
-        end
+        camp_config = CampConfiguration.create!(
+          camp_year: enrollment.campyear || Date.current.year,
+          active: true,
+          application_open: Date.new(enrollment.campyear || Date.current.year, 1, 1),
+          application_close: Date.new(enrollment.campyear || Date.current.year, 10, 31),
+          priority: Date.new(enrollment.campyear || Date.current.year, 4, 1),
+          application_materials_due: Date.new(enrollment.campyear || Date.current.year, 5, 20),
+          camper_acceptance_due: Date.new(enrollment.campyear || Date.current.year, 6, 1),
+          application_fee_cents: 10_000,
+          application_fee_required: true,
+          offer_letter: 'Default offer letter content',
+          reject_letter: 'Default rejection letter content',
+          waitlist_letter: 'Default waitlist letter content'
+        )
       end
+
+      # Ensure we have a camp_year set
+      enrollment.campyear ||= camp_config.camp_year
 
       # Create session occurrences if they don't exist
       if camp_config.camp_occurrences.active.empty?
         create(:camp_occurrence, camp_configuration: camp_config, active: true)
+        camp_config.reload
       end
 
       # Create courses if they don't exist
@@ -105,9 +107,14 @@ FactoryBot.define do
         end
       end
 
-      # Set session and course registration IDs
-      enrollment.session_registration_ids = camp_config.camp_occurrences.active.pluck(:id)
-      enrollment.course_registration_ids = Course.where(camp_occurrence: camp_config.camp_occurrences.active).pluck(:id)
+      # Set session and course registration IDs before validation
+      session_ids = camp_config.camp_occurrences.active.pluck(:id)
+      course_ids = Course.where(camp_occurrence: camp_config.camp_occurrences.active).pluck(:id)
+
+      if session_ids.any? && course_ids.any?
+        enrollment.session_registration_ids = session_ids
+        enrollment.course_registration_ids = course_ids
+      end
     end
 
     # Attach a transcript file (only if the file exists and is small enough)

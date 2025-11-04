@@ -50,6 +50,20 @@ RSpec.describe FinancialAid, type: :model do
   end
 
   describe 'scopes' do
+    let(:camp_config) do
+      CampConfiguration.find_or_create_by!(camp_year: Date.current.year) do |cc|
+        cc.application_open = Date.current - 30.days
+        cc.application_close = Date.current + 90.days
+        cc.priority = Date.current + 30.days
+        cc.application_materials_due = Date.current + 60.days
+        cc.camper_acceptance_due = Date.current + 75.days
+        cc.application_fee_cents = 10_000
+        cc.active = true
+        cc.offer_letter = 'Default offer letter'
+        cc.reject_letter = 'Default reject letter'
+        cc.waitlist_letter = 'Default waitlist letter'
+      end
+    end
     let(:enrollment) { create(:enrollment, campyear: Date.current.year) }
     let!(:current_aid) { create(:financial_aid, enrollment: enrollment) }
 
@@ -58,11 +72,9 @@ RSpec.describe FinancialAid, type: :model do
 
     before do
       # Ensure the current year's camp configuration is active
-      current_camp_config = CampConfiguration.find_by(camp_year: Date.current.year)
-      if current_camp_config
-        CampConfiguration.update_all(active: false)
-        current_camp_config.update!(active: true)
-      end
+      CampConfiguration.update_all(active: false)
+      camp_config.update!(active: true)
+      allow(CampConfiguration).to receive(:active_camp_year).and_return(camp_config.camp_year)
     end
 
     describe '.current_camp_requests' do
