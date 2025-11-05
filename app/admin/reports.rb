@@ -406,7 +406,7 @@ ActiveAdmin.register_page 'Reports' do
 
       # Format the CSV with balance_due converted from cents to dollars
       data = CSV.generate(headers: false) do |csv|
-        csv << Array('Offer Accepted with Balance Due')
+        csv << ['Offer Accepted with Balance Due']
         csv << ["Total number of records: #{records_array.count}"]
 
         # Define header mapping to ensure BALANCE DUE is always included
