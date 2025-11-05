@@ -30,6 +30,43 @@ ActiveAdmin.register_page 'Dashboard' do
             end
           end
 
+          panel link_to("Offer Accepted with Balance Due", admin_reports_offer_accepted_with_balance_due_path) do
+            offer_accepted_enrollments = Enrollment.current_camp_year_applications.where(application_status: 'offer accepted')
+              .includes(:user, :applicant_detail)
+              .order('applicant_details.lastname, applicant_details.firstname')
+
+            enrollments_with_balance = offer_accepted_enrollments.select do |enroll|
+              payment_state = PaymentState.new(enroll)
+              payment_state.balance_due > 0
+            end
+
+            if enrollments_with_balance.any?
+              ul do
+                enrollments_with_balance.first(20).map do |enroll|
+                  payment_state = PaymentState.new(enroll)
+                  balance_due = payment_state.balance_due
+                  applicant_detail = enroll.applicant_detail
+                  birthdate_str = applicant_detail.birthdate.strftime('%Y-%m-%d')
+
+                  li do
+                    link_to(
+                      "#{applicant_detail.full_name} - DOB: #{birthdate_str} - Parent: #{applicant_detail.parentname} - Balance: #{humanized_money_with_symbol(balance_due / 100)}",
+                      admin_application_path(enroll)
+                    )
+                  end
+                end
+              end
+
+              if enrollments_with_balance.count > 20
+                div do
+                  text_node link_to("View full report (#{enrollments_with_balance.count} total)...", admin_reports_offer_accepted_with_balance_due_path)
+                end
+              end
+            else
+              text_node "No offer accepted applications with balance due"
+            end
+          end
+
           panel link_to('Financial Aid Requests', admin_financial_aid_requests_path) do
             div do
               render('/admin/pending_finaid_requests', model: 'dashboard')

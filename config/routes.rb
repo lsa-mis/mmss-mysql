@@ -36,6 +36,7 @@ Rails.application.routes.draw do
   get '/admin/reports/enrolled_for_more_than_one_session', to: 'admin/reports#enrolled_for_more_than_one_session', as: :admin_reports_enrolled_for_more_than_one_session
   get '/admin/reports/dorm_by_gender_by_session', to: 'admin/reports#dorm_by_gender_by_session', as: :admin_reports_dorm_by_gender_by_session
   get '/admin/reports/finaid_with_app_and_offer_status', to: 'admin/reports#finaid_with_app_and_offer_status', as: :admin_reports_finaid_with_app_and_offer_status
+  get '/admin/reports/offer_accepted_with_balance_due', to: 'admin/reports#offer_accepted_with_balance_due', as: :admin_reports_offer_accepted_with_balance_due
 
   ActiveAdmin.routes(self)
   # authenticated :admin do

@@ -35,8 +35,8 @@ ActiveAdmin.register EnrollmentActivity, as: "Applicant Activities" do
 
   form do |f|
     f.inputs do
-      f.input :enrollment_id, as: :select, collection: proc { Enrollment.current_camp_year_applications.map { |enrol| [enrol.display_name.downcase, enrol.id]}.sort }
-      f.input :activity_id, label: "Activity", as: :select, collection: proc { Activity.where(camp_occurrence_id: CampOccurrence.active).order(camp_occurrence_id: :asc, description: :asc) }
+      f.input :enrollment_id, as: :select, collection: Enrollment.current_camp_year_applications.map { |enrol| [enrol.display_name.downcase, enrol.id]}.sort
+      f.input :activity_id, label: "Activity", as: :select, collection: Activity.where(camp_occurrence_id: CampOccurrence.active).order(camp_occurrence_id: :asc, description: :asc)
     end
     f.actions
   end

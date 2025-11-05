@@ -12,12 +12,10 @@ ActiveAdmin.register SessionAssignment do
 
   form do |f|
     f.inputs do
-      f.input :enrollment_id, as: :select, collection: proc {
-        Enrollment.current_camp_year_applications.map { |enrol|
-          [enrol.display_name.downcase, enrol.id]
-        }.sort
-      }
-      f.input :camp_occurrence_id, label: 'Session', as: :select, collection: proc { CampOccurrence.active.no_any_session }
+      f.input :enrollment_id, as: :select, collection: Enrollment.current_camp_year_applications.map { |enrol|
+        [enrol.display_name.downcase, enrol.id]
+      }.sort
+      f.input :camp_occurrence_id, label: 'Session', as: :select, collection: CampOccurrence.active.no_any_session
       f.input :offer_status, as: :select, collection: %w[accepted declined]
     end
     f.actions

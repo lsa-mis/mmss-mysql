@@ -20,6 +20,7 @@ ActiveAdmin.register_page 'Reports' do
           li link_to 'report - Finaid with App and Offer Status', admin_reports_finaid_with_app_and_offer_status_path
           li link_to 'report - Complete Applications Demographic Report',
                      admin_reports_complete_apps_demographic_report_path
+          li link_to 'report - Offer Accepted with Balance Due', admin_reports_offer_accepted_with_balance_due_path
         end
         text_node '----- ENROLLED USERS -----'.html_safe
         ul do
@@ -339,6 +340,104 @@ ActiveAdmin.register_page 'Reports' do
         ORDER BY enroll.application_status, enroll.offer_status"
       title = 'finaid_with_app_and_offer_status'
       data = data_to_csv(query, title)
+      respond_to do |format|
+        format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-b-%-d-%Y')}.csv" }
+      end
+    end
+
+    def offer_accepted_with_balance_due
+      # Calculate balance_due using PaymentState logic via SQL
+      # balance_due = total_cost - finaids_awarded - ttl_paid
+      # total_cost = session_costs + activity_costs + (application_fee if required)
+      active_camp_year = CampConfiguration.active.last.camp_year
+      active_camp_id = CampConfiguration.active.last.id
+
+      query = "SELECT
+        CONCAT(REPLACE(ad.firstname, ',', ' '), ' ', REPLACE(ad.lastname, ',', ' ')) AS name,
+        DATE_FORMAT(ad.birthdate, '%Y-%m-%d') AS 'date_of_birth',
+        (CASE WHEN ad.gender = '' THEN NULL ELSE
+        (SELECT genders.name FROM genders WHERE CAST(ad.gender AS UNSIGNED) = genders.id) END) as gender,
+        ad.parentemail AS 'parent_email',
+        (
+          -- Total cost = session costs + activity costs + application fee (if required)
+          COALESCE((
+            SELECT SUM(COALESCE(co.cost_cents, 0))
+            FROM session_assignments sa
+            JOIN camp_occurrences co ON sa.camp_occurrence_id = co.id
+            WHERE sa.enrollment_id = e.id AND sa.offer_status = 'accepted'
+          ), 0) +
+          COALESCE((
+            SELECT SUM(COALESCE(a.cost_cents, 0))
+            FROM enrollment_activities ea
+            JOIN activities a ON ea.activity_id = a.id
+            WHERE ea.enrollment_id = e.id
+            AND a.camp_occurrence_id IN (
+              SELECT camp_occurrence_id
+              FROM session_assignments
+              WHERE enrollment_id = e.id AND offer_status = 'accepted'
+            )
+          ), 0) +
+          CASE WHEN e.application_fee_required THEN
+            COALESCE((SELECT application_fee_cents FROM camp_configurations WHERE id = #{active_camp_id}), 0)
+          ELSE 0 END
+        ) -
+        -- Financial aid awarded
+        COALESCE((
+          SELECT SUM(amount_cents)
+          FROM financial_aids
+          WHERE enrollment_id = e.id AND status = 'awarded'
+        ), 0) -
+        -- Total paid
+        COALESCE((
+          SELECT SUM(CAST(total_amount AS UNSIGNED))
+          FROM payments
+          WHERE user_id = e.user_id AND camp_year = #{active_camp_year} AND transaction_status = '1'
+        ), 0)
+        AS 'balance_due_cents'
+        FROM enrollments AS e
+        LEFT JOIN users AS u ON e.user_id = u.id
+        LEFT JOIN applicant_details AS ad ON ad.user_id = e.user_id
+        WHERE e.application_status = 'offer accepted'
+        AND e.campyear = #{active_camp_year}
+        ORDER BY name"
+
+      # Fetch records and format balance_due as dollars
+      records_array = fetch_records(query)
+
+      # Format the CSV with balance_due converted from cents to dollars
+      data = CSV.generate(headers: false) do |csv|
+        csv << Array('Offer Accepted with Balance Due')
+        csv << ["Total number of records: #{records_array.count}"]
+
+        # Define header mapping to ensure BALANCE DUE is always included
+        header_mapping = {
+          'balance_due_cents' => 'BALANCE DUE'
+        }
+
+        # Build headers - the column is always in the SELECT so it'll always be present
+        headers = records_array.columns.map do |col|
+          header_mapping[col] || col.titleize.upcase
+        end
+
+        csv << headers
+
+        # Get column index for formatting
+        balance_cents_index = records_array.columns.index('balance_due_cents')
+
+        records_array.rows.each do |row|
+          # Convert balance_due_cents to dollars, ensuring nil/zero values are displayed as "0.00"
+          formatted_row = row.dup
+
+          if balance_cents_index
+            balance_value = formatted_row[balance_cents_index]
+            formatted_row[balance_cents_index] = sprintf('%.2f', (balance_value || 0).to_f / 100)
+          end
+
+          csv << formatted_row
+        end
+      end
+
+      title = 'offer_accepted_with_balance_due'
       respond_to do |format|
         format.html { send_data data, filename: "MMSS-report-#{title}-#{DateTime.now.strftime('%-b-%-d-%Y')}.csv" }
       end
