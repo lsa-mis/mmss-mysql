@@ -136,14 +136,14 @@ class Enrollment < ApplicationRecord
 
     if all_session_assignments_declined?(status_array)
       update!(
-        offer_status: "declined",
-        application_status: "offer declined",
+        offer_status: 'declined',
+        application_status: 'offer declined',
         application_status_updated_on: Date.current
       )
     elsif all_session_assignments_responded?(status_array)
       update!(
-        offer_status: "accepted",
-        application_status: "offer accepted",
+        offer_status: 'accepted',
+        application_status: 'offer accepted',
         application_status_updated_on: Date.current
       )
     end
@@ -208,7 +208,7 @@ class Enrollment < ApplicationRecord
 
   def if_camp_doc_form_completed
     payment = PaymentState.new(self)
-    return unless camp_doc_form_completed && payment.balance_due == 0
+    return unless camp_doc_form_completed && payment.balance_due.zero?
 
     self.application_status = 'enrolled'
   end
@@ -259,17 +259,31 @@ class Enrollment < ApplicationRecord
   end
 
   def self.ransackable_attributes(auth_object = nil)
-    %w[anticipated_graduation_year application_deadline application_status application_status_updated_on
-       campyear created_at high_school_address1 high_school_address2 high_school_city high_school_country high_school_name high_school_non_us high_school_postalcode high_school_state id international notes offer_status partner_program personal_statement room_mate_request uniqname updated_at user_id year_in_school]
+    %w[
+      anticipated_graduation_year application_deadline application_status
+      application_status_updated_on campyear created_at high_school_address1
+      high_school_address2 high_school_city high_school_country
+      high_school_name high_school_non_us high_school_postalcode
+      high_school_state id international notes offer_status partner_program
+      personal_statement room_mate_request uniqname updated_at user_id
+      year_in_school
+    ]
   end
 
   def self.ransackable_associations(auth_object = nil)
-    %w[applicant_detail course_assignments course_preferences course_registrations
-       covid_test_record_attachment covid_test_record_blob enrollment_activities financial_aids recommendation registration_activities rejection session_activities session_assignments session_registrations student_packet_attachment student_packet_blob transcript_attachment transcript_blob travels user vaccine_record_attachment vaccine_record_blob]
+    %w[
+      applicant_detail course_assignments course_preferences course_registrations
+      covid_test_record_attachment covid_test_record_blob enrollment_activities
+      financial_aids recommendation registration_activities rejection
+      session_activities session_assignments session_registrations
+      student_packet_attachment student_packet_blob transcript_attachment
+      transcript_blob travels user vaccine_record_attachment
+      vaccine_record_blob
+    ]
   end
 
   def all_session_assignments_declined?(status_array)
-    status_array.all? { |status| status == "declined" }
+    status_array.all? { |status| status == 'declined' }
   end
 
   def all_session_assignments_responded?(status_array)

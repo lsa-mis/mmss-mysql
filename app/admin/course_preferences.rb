@@ -29,13 +29,11 @@ ActiveAdmin.register CoursePreference do
 
   form do |f|
     f.inputs do
-      f.input :enrollment_id, as: :select, collection: proc {
-        Enrollment.current_camp_year_applications.map { |enrol|
-          [enrol.display_name.downcase, enrol.id]
-        }.sort
-      }
+      f.input :enrollment_id, as: :select, collection: Enrollment.current_camp_year_applications.map { |enrol|
+        [enrol.display_name.downcase, enrol.id]
+      }.sort
       f.input :course_id, label: 'Course', as: :select,
-                          collection: proc { Course.where(camp_occurrence_id: CampOccurrence.active) }
+                          collection: Course.where(camp_occurrence_id: CampOccurrence.active)
       f.input :ranking, as: :select, collection: (1..12).to_a
     end
     f.actions
