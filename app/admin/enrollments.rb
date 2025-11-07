@@ -30,6 +30,7 @@ ActiveAdmin.register Enrollment, as: 'Application' do
   scope :application_complete, group: :application_status
   scope :application_complete_not_offered, group: :application_status
   scope :enrolled, group: :application_status
+  scope :withdrawn, group: :application_status
 
   scope :no_recomendation, group: :missing
   scope :no_letter, group: :missing
@@ -54,6 +55,12 @@ ActiveAdmin.register Enrollment, as: 'Application' do
                         new_admin_rejection_path(enrollment_id: application))
     end
   end
+  action_item :withdraw_enrollment, only: :show do
+    if ['enrolled'].include? application.application_status
+      text_node link_to('Withdraw Enrollment', withdraw_enrollment_path(application),
+                        data: { confirm: 'Are you sure you want to withdraw this enrollment? This will delete all associated course assignments.' }, method: :post)
+    end
+  end
 
   form do |f| # This is a formtastic form builder
     f.semantic_errors(*f.object.errors.keys) # shows errors on :base
@@ -74,14 +81,13 @@ ActiveAdmin.register Enrollment, as: 'Application' do
       f.input :anticipated_graduation_year
       f.input :room_mate_request
       f.input :personal_statement
-
+      f.input :camp_doc_form_completed
       table_for application do
         column 'Current Transcript' do |item|
           link_to item.transcript.filename, url_for(item.transcript) if item.transcript.attached?
         end
       end
       f.input :transcript, as: :file, label: 'Update transcript'
-      f.input :camp_doc_form_completed
       hr
       f.input :notes
       f.input :partner_program
@@ -106,7 +112,7 @@ ActiveAdmin.register Enrollment, as: 'Application' do
         a.input :course_id, as: :select, collection:
           application.course_registrations.order(:camp_occurrence_id).map { |u|
             ["#{u.title}, #{u.camp_occurrence.description},
-                      rank - #{application.course_preferences.find_by(course_id: u.id).ranking}, available - #{u.available_spaces - CourseAssignment.number_of_assignments(u.id)}", u.id]
+                      rank - #{application.course_preferences.find_by(course_id: u.id).ranking}, available - #{u.remaining_spaces}", u.id]
           }
         a.input :wait_list
       end
@@ -115,11 +121,32 @@ ActiveAdmin.register Enrollment, as: 'Application' do
       f.inputs do
         f.input :offer_status, as: :select, collection: %w[accepted declined offered]
         f.input :application_deadline
+        status_options = ['enrolled', 'application complete', 'offer accepted', 'offer declined', 'submitted']
+        status_options << 'withdrawn' if application.application_status == 'withdrawn'
+
         f.input :application_status, as: :select,
-                                     collection: ['enrolled', 'application complete', 'offer accepted', 'offer declined', 'submitted']
+                                     collection: status_options,
+                                     input_html: { id: 'application_application_status' }
       end
     end
-    f.actions # adds the 'Submit' and 'Cancel' button
+    f.actions do
+      submit_label = f.object.persisted? ? 'Update Application' : 'Create Application'
+      withdrawal_message = 'Are you sure you want to withdraw this enrollment? This will delete all associated course assignments.'
+
+      f.action :submit, label: submit_label
+
+      if f.object.persisted? && f.object.application_status != 'withdrawn'
+        f.action :submit,
+                 label: 'Withdraw Enrollment',
+                 button_html: {
+                   name: 'withdraw_enrollment',
+                   value: 'Withdraw Enrollment',
+                   data: { confirm: withdrawal_message, turbo_confirm: withdrawal_message }
+                 }
+      end
+
+      f.cancel_link
+    end
   end
 
   filter :applicant_detail_lastname_start, label: 'Last Name (Starts with)'
@@ -176,6 +203,7 @@ ActiveAdmin.register Enrollment, as: 'Application' do
       row :application_deadline
       row :application_status
       row :application_status_updated_on
+      row :camp_doc_form_completed
       row :partner_program
       row :application_fee_required
       row :campyear
@@ -216,7 +244,7 @@ ActiveAdmin.register Enrollment, as: 'Application' do
           item.course.camp_occurrence.description
         end
         column 'Available' do |item|
-          item.course.available_spaces - CourseAssignment.number_of_assignments(item.course_id)
+          item.course.remaining_spaces
         end
       end
     end
@@ -351,6 +379,58 @@ ActiveAdmin.register Enrollment, as: 'Application' do
     end
     column 'Camp Year' do |app|
       app.campyear
+    end
+  end
+
+  controller do
+    def update
+      if params[:withdraw_enrollment].present?
+        params[:application] ||= {}
+        params[:application][:application_status] = 'withdrawn'
+      end
+
+      # Check if application_status is being changed to withdrawn
+      if params[:application] && params[:application][:application_status] == 'withdrawn'
+        enrollment = resource
+        original_status = enrollment.application_status
+
+        # Only proceed if status is actually changing to withdrawn
+        if original_status != 'withdrawn'
+          # Collect course assignment information before deletion
+          deleted_course_assignments = enrollment.course_assignments.includes(course: :camp_occurrence).map do |ca|
+            {
+              course_title: ca.course.title,
+              session_description: ca.course.camp_occurrence.description
+            }
+          end
+
+          # Delete all course assignments
+          enrollment.course_assignments.destroy_all
+
+          # Update the params to include the status update
+          params[:application][:application_status_updated_on] = Date.today
+
+          # Call the parent update method and capture result
+          result = super
+
+          # Build notice message with deleted course assignment details
+          # Set flash notice after update (will override ActiveAdmin's default message)
+          if deleted_course_assignments.any?
+            assignment_details = deleted_course_assignments.map do |ca|
+              "Course: #{ca[:course_title]}, Session: #{ca[:session_description]}"
+            end.join('; ')
+            flash[:notice] = "Enrollment has been withdrawn. Deleted course assignment(s): #{assignment_details}"
+          else
+            flash[:notice] = 'Enrollment has been withdrawn.'
+          end
+
+          result
+        else
+          super
+        end
+      else
+        super
+      end
     end
   end
 end

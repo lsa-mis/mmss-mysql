@@ -52,7 +52,8 @@ module ApplicationHelper
       ['application complete', 'application complete'],
       ['offer accepted', 'offer accepted'],
       ['offer declined', 'offer declined'],
-      ['submitted', 'submitted']
+      ['submitted', 'submitted'],
+      ['withdrawn', 'withdrawn']
     ]
   end
 

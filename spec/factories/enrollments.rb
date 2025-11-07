@@ -193,6 +193,11 @@ FactoryBot.define do
       application_status_updated_on { Date.current }
     end
 
+    trait :withdrawn do
+      application_status { 'withdrawn' }
+      application_status_updated_on { Date.current }
+    end
+
     trait :with_student_packet do
       after(:create) do |enrollment|
         link_to_default_pdf = "#{Rails.root}/spec/files/test.pdf"

@@ -62,8 +62,8 @@ ActiveAdmin.register Course do
     end
     column :title
     column :available_spaces
-    column "Open Spaces" do |op|
-      op.available_spaces - CourseAssignment.number_of_assignments(op.id)
+    column "Open Spaces" do |course|
+      course.remaining_spaces
     end
     column "Wait List" do |op|
       CourseAssignment.wait_list_number(op.id)
@@ -83,8 +83,8 @@ ActiveAdmin.register Course do
       end
       row :title
       row :available_spaces
-      row "Open Spaces" do |op|
-        op.available_spaces - CourseAssignment.number_of_assignments(op.id)
+      row "Open Spaces" do |course|
+        course.remaining_spaces
       end
       row "Wait List" do |op|
         CourseAssignment.wait_list_number(op.id)

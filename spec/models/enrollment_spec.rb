@@ -170,6 +170,16 @@ RSpec.describe Enrollment, type: :model do
         expect(Enrollment.enrolled).not_to include(offered_enrollment)
       end
     end
+
+    describe '.withdrawn' do
+      let!(:withdrawn_enrollment) { create(:enrollment, application_status: 'withdrawn', campyear: camp_config.camp_year) }
+      let!(:enrolled_enrollment) { create(:enrollment, :enrolled, campyear: camp_config.camp_year) }
+
+      it 'returns withdrawn enrollments' do
+        expect(Enrollment.withdrawn).to include(withdrawn_enrollment)
+        expect(Enrollment.withdrawn).not_to include(enrolled_enrollment)
+      end
+    end
   end
 
   describe 'callbacks' do

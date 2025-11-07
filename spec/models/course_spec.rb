@@ -75,12 +75,12 @@ RSpec.describe Course, type: :model do
     end
   end
 
-  describe '#open_spaces' do
+  describe '#remaining_spaces' do
     let(:course) { create(:course, available_spaces: 10) }
 
     context 'with no assignments' do
       it 'returns available spaces' do
-        expect(course.available_spaces).to eq(10)
+        expect(course.remaining_spaces).to eq(10)
       end
     end
 
@@ -90,7 +90,7 @@ RSpec.describe Course, type: :model do
       end
 
       it 'returns available spaces minus assignments' do
-        expect(course.available_spaces).to eq(7)
+        expect(course.remaining_spaces).to eq(7)
       end
     end
 
@@ -101,8 +101,17 @@ RSpec.describe Course, type: :model do
       end
 
       it 'does not count waitlisted assignments' do
-        expect(course.available_spaces).to eq(8)
+        expect(course.remaining_spaces).to eq(8)
       end
+    end
+  end
+
+  describe '#available_spaces' do
+    it 'returns the stored capacity' do
+      course = create(:course, available_spaces: 10)
+      create_list(:course_assignment, 3, course: course, wait_list: false)
+
+      expect(course.available_spaces).to eq(10)
     end
   end
 

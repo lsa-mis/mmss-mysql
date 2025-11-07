@@ -104,6 +104,39 @@ class EnrollmentsController < ApplicationController
     end
   end
 
+  def withdraw
+    @enrollment = Enrollment.find(params[:id])
+
+    # Collect course assignment information before deletion
+    deleted_course_assignments = @enrollment.course_assignments.includes(:course).map do |ca|
+      {
+        course_title: ca.course.title,
+        session_description: ca.course.camp_occurrence.description
+      }
+    end
+
+    # Delete all course assignments
+    @enrollment.course_assignments.destroy_all
+
+    # Update enrollment status
+    @enrollment.update(application_status: 'withdrawn', application_status_updated_on: Date.today)
+
+    # Build notice message with deleted course assignment details
+    notice_message = if deleted_course_assignments.any?
+      assignment_details = deleted_course_assignments.map do |ca|
+        "Course: #{ca[:course_title]}, Session: #{ca[:session_description]}"
+      end.join('; ')
+      "Enrollment has been withdrawn. Deleted course assignment(s): #{assignment_details}"
+    else
+      'Enrollment has been withdrawn.'
+    end
+
+    respond_to do |format|
+      format.html { redirect_to admin_application_path(@enrollment), notice: notice_message }
+      format.json { head :no_content }
+    end
+  end
+
   def send_finaid_request_email
     @enrollment = Enrollment.find_by(id: params[:enrollment_id])
     FinaidMailer.with(enrollment: @enrollment).fin_aid_request_email.deliver_now
@@ -125,11 +158,11 @@ class EnrollmentsController < ApplicationController
         end
         if ca.description == "Session 2"
           @courses_session2 = ca.courses.is_open.order(title: :asc)
-        end 
+        end
         if ca.description == "Session 3"
           @courses_session3 = ca.courses.is_open.order(title: :asc)
         end
-      end  
+      end
     end
 
     def set_activities_sessions
@@ -143,7 +176,7 @@ class EnrollmentsController < ApplicationController
         if as.description == "Session 3"
           @activities_session3 = as.activities.active.order(description: :asc)
         end
-      end  
+      end
     end
 
     def get_room_mate

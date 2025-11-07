@@ -101,6 +101,7 @@ class Enrollment < ApplicationRecord
   scope :offered, -> { current_camp_year_applications.where("offer_status = 'offered'") }
   scope :accepted, -> { current_camp_year_applications.where("offer_status = 'accepted'") }
   scope :enrolled, -> { current_camp_year_applications.where("application_status = 'enrolled'") }
+  scope :withdrawn, -> { current_camp_year_applications.where("application_status = 'withdrawn'") }
   scope :application_complete, lambda {
     current_camp_year_applications.where("application_status = 'application complete'")
   }
