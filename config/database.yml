@@ -17,7 +17,7 @@ test:
 production:
   <<: *default
   database: mmssprod
-  username: <%= Rails.application.credentials.mysql[:prod_user] %>
-  password: <%= Rails.application.credentials.mysql[:prod_password] %>
-  host: <%= Rails.application.credentials.mysql[:prod_servername] %>
-  sslca: <%= Rails.application.credentials.mysql[:prod_sslca] %>
+  username: <%= Rails.env.production? ? Rails.application.credentials.dig(:mysql, :prod_user) : ENV['MYSQL_PROD_USER'] %>
+  password: <%= Rails.env.production? ? Rails.application.credentials.dig(:mysql, :prod_password) : ENV['MYSQL_PROD_PASSWORD'] %>
+  host: <%= Rails.env.production? ? Rails.application.credentials.dig(:mysql, :prod_servername) : ENV['MYSQL_PROD_HOST'] %>
+  sslca: <%= Rails.env.production? ? Rails.application.credentials.dig(:mysql, :prod_sslca) : ENV['MYSQL_PROD_SSLCA'] %>
