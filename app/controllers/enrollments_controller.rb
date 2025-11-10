@@ -119,17 +119,10 @@ class EnrollmentsController < ApplicationController
     @enrollment.course_assignments.destroy_all
 
     # Update enrollment status
-    @enrollment.update(application_status: 'withdrawn', application_status_updated_on: Date.today)
+    @enrollment.update(application_status: 'withdrawn', application_status_updated_on: Time.zone.today)
 
     # Build notice message with deleted course assignment details
-    notice_message = if deleted_course_assignments.any?
-      assignment_details = deleted_course_assignments.map do |ca|
-        "Course: #{ca[:course_title]}, Session: #{ca[:session_description]}"
-      end.join('; ')
-      "Enrollment has been withdrawn. Deleted course assignment(s): #{assignment_details}"
-    else
-      'Enrollment has been withdrawn.'
-    end
+    notice_message = build_withdraw_notice(deleted_course_assignments)
 
     respond_to do |format|
       format.html { redirect_to admin_application_path(@enrollment), notice: notice_message }
@@ -146,6 +139,17 @@ class EnrollmentsController < ApplicationController
   end
 
   private
+
+  def build_withdraw_notice(deleted_course_assignments)
+    return 'Enrollment has been withdrawn.' if deleted_course_assignments.blank?
+
+    assignment_details = deleted_course_assignments.map do |ca|
+      "Course: #{ca[:course_title]}, Session: #{ca[:session_description]}"
+    end.join('; ')
+
+    "Enrollment has been withdrawn. Deleted course assignment(s): #{assignment_details}"
+  end
+
     # Use callbacks to share common setup or constraints between actions.
     def set_current_enrollment
       @current_enrollment = current_user.enrollments.current_camp_year_applications.last
