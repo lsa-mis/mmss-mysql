@@ -1,3 +1,7 @@
 ---
 # The authentication token for the application.
-authentication: <%= Rails.application.credentials.skylight[:authentication] %>
+authentication: <%= if Rails.env.production? || Rails.env.staging?
+  Rails.application.credentials.dig(:skylight, :authentication)
+else
+  ENV['SKYLIGHT_AUTHENTICATION']
+end %>
