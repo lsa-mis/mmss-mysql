@@ -210,6 +210,7 @@ class Enrollment < ApplicationRecord
   def if_camp_doc_form_completed
     payment = PaymentState.new(self)
     return unless camp_doc_form_completed && payment.balance_due.zero?
+    return if application_status_changed? && application_status == 'withdrawn'
 
     self.application_status = 'enrolled'
   end
