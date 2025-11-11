@@ -42,7 +42,7 @@ class Recupload < ApplicationRecord
   def update_enrollment_status
     enrollment = Recommendation.find(recommendation_id).enrollment
     if !enrollment.application_fee_required || Payment.where(user_id: enrollment.user_id).status1_current_camp_payments.exists?
-      enrollment.update!(application_status: 'application complete', application_status_updated_on: Date.today)
+      enrollment.transition_application_status!('application complete')
     end
   end
 end

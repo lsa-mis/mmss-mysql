@@ -50,7 +50,7 @@ class RecommendationsController < ApplicationController
         RecommendationMailer.with(recommendation: @recommendation).request_email.deliver_now
         unless @current_enrollment.application_fee_required
           RegistrationMailer.app_complete_email(current_user).deliver_now
-          @current_enrollment.update!(application_status: 'submitted', application_status_updated_on: Date.today)
+        @current_enrollment.transition_application_status!('submitted')
         end
       else
         format.html { render :new }

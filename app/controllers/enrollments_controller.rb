@@ -60,9 +60,7 @@ class EnrollmentsController < ApplicationController
   def update
     respond_to do |format|
       if @current_enrollment.update(enrollment_params)
-        if @current_enrollment.camp_doc_form_completed && balance_due == 0
-          @current_enrollment.update!(application_status: "enrolled", application_status_updated_on: Date.today)
-        end
+        @current_enrollment.auto_enroll_if_ready!
         format.html { redirect_to root_path, notice: 'Application was successfully updated.' }
         format.json { render :show, status: :ok, location: @current_enrollment }
       else
@@ -88,7 +86,7 @@ class EnrollmentsController < ApplicationController
 
   def add_to_waitlist
     @enrollment = Enrollment.find(params[:id])
-    @enrollment.update(application_status: 'waitlisted', application_status_updated_on: Date.today)
+    @enrollment.transition_application_status!('waitlisted')
     respond_to do |format|
       format.html { redirect_to admin_applications_path, notice: 'Application was placed on waitlist.' }
       format.json { head :no_content }
@@ -97,7 +95,7 @@ class EnrollmentsController < ApplicationController
 
   def remove_from_waitlist
     @enrollment = Enrollment.find(params[:id])
-    @enrollment.update(application_status: 'application complete', application_status_updated_on: Date.today)
+    @enrollment.transition_application_status!('application complete')
     respond_to do |format|
       format.html { redirect_to admin_applications_path, notice: 'Application was removed from waitlist. Send an email to an applicant with further instructions.' }
       format.json { head :no_content }
@@ -119,7 +117,7 @@ class EnrollmentsController < ApplicationController
     @enrollment.course_assignments.destroy_all
 
     # Update enrollment status
-    @enrollment.update(application_status: 'withdrawn', application_status_updated_on: Time.zone.today)
+    @enrollment.transition_application_status!('withdrawn')
 
     # Build notice message with deleted course assignment details
     notice_message = build_withdraw_notice(deleted_course_assignments)

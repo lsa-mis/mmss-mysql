@@ -23,14 +23,17 @@ class Rejection < ApplicationRecord
         ca.destroy
       end
     end
-    
+
     if SessionAssignment.where(enrollment_id: enrollment).present?
       SessionAssignment.where(enrollment_id: enrollment).each do |sa|
         sa.destroy
       end
     end
 
-    Enrollment.find(enrollment_id).update!(application_status: "rejected", application_status_updated_on: Date.today, offer_status: "")
+    Enrollment.find(enrollment_id).transition_application_status!(
+      'rejected',
+      extra_attrs: { offer_status: '' }
+    )
   end
 
   def self.ransackable_associations(auth_object = nil)

@@ -33,7 +33,16 @@
 #  application_fee_required      :boolean          default(TRUE), not null
 #
 class Enrollment < ApplicationRecord
-  before_update :if_camp_doc_form_completed
+  class InvalidStatusTransition < StandardError; end
+
+  STATUS_TRANSITIONS = {
+    nil => :any,
+    'enrolled' => %w[withdrawn],
+    'withdrawn' => []
+  }.freeze
+
+  attr_accessor :force_application_status_transition
+
   before_update :if_application_status_changed
   before_update :set_application_deadline
   before_create :set_application_fee_required
@@ -41,6 +50,9 @@ class Enrollment < ApplicationRecord
   after_commit :send_enroll_letter, if: :persisted?
   after_commit :send_rejected_letter, if: :persisted?
   after_commit :send_waitlisted_letter, if: :persisted?
+  after_commit :auto_enroll_if_ready_callback, if: :saved_change_to_camp_doc_form_completed?
+
+  validate :validate_application_status_transition, if: :will_save_change_to_application_status?
 
   belongs_to :user
   has_one :applicant_detail, through: :user
@@ -150,6 +162,36 @@ class Enrollment < ApplicationRecord
     end
   end
 
+  def auto_enroll_if_ready!
+    return if application_status == 'enrolled'
+    return unless camp_doc_form_completed
+
+    payment = PaymentState.new(self)
+    return unless payment.balance_due.zero?
+
+    transition_application_status!('enrolled', force: true)
+  end
+
+  def transition_application_status!(target_status, update_timestamp: true, extra_attrs: {}, force: false)
+    normalized_target = normalize_status(target_status)
+    with_forced_transition(force) do
+      attributes_to_update = extra_attrs.merge(application_status: normalized_target)
+      attributes_to_update[:application_status_updated_on] = Date.current if update_timestamp
+      update!(attributes_to_update)
+    end
+  end
+
+  def can_transition_application_status?(target_status)
+    normalized_target = normalize_status(target_status)
+    from_status = normalize_status(application_status_before_change)
+    return true if from_status == normalized_target
+
+    allowed_targets = STATUS_TRANSITIONS.fetch(from_status) { :any }
+    return true if allowed_targets == :any
+
+    allowed_targets.include?(normalized_target)
+  end
+
   private
 
   def at_least_one_session_is_checked
@@ -207,14 +249,6 @@ class Enrollment < ApplicationRecord
     end
   end
 
-  def if_camp_doc_form_completed
-    payment = PaymentState.new(self)
-    return unless camp_doc_form_completed && payment.balance_due.zero?
-    return if application_status_changed? && application_status == 'withdrawn'
-
-    self.application_status = 'enrolled'
-  end
-
   def send_offer_letter
     return unless previous_changes[:offer_status]
     return unless offer_status == 'offered'
@@ -252,12 +286,51 @@ class Enrollment < ApplicationRecord
   def if_application_status_changed
     return unless application_status_changed?
 
-    self.application_status_updated_on = Date.today
+    self.application_status_updated_on = Date.current
   end
 
   def set_application_fee_required
     active_camp = CampConfiguration.active.first
     self.application_fee_required = active_camp&.application_fee_required || false
+  end
+
+  def auto_enroll_if_ready_callback
+    auto_enroll_if_ready!
+  end
+
+  def with_forced_transition(force)
+    previous_value = force_application_status_transition?
+    self.force_application_status_transition = force
+    yield
+  ensure
+    self.force_application_status_transition = previous_value
+  end
+
+  def force_application_status_transition?
+    !!@force_application_status_transition
+  end
+
+  def normalize_status(status)
+    status.present? ? status : nil
+  end
+
+  def application_status_before_change
+    attribute_in_database(:application_status)
+  end
+
+  def validate_application_status_transition
+    return if force_application_status_transition?
+
+    from_status = normalize_status(application_status_before_change)
+    to_status = normalize_status(application_status)
+
+    return if from_status == to_status
+
+    allowed_targets = STATUS_TRANSITIONS.fetch(from_status) { :any }
+    return if allowed_targets == :any
+    return if allowed_targets.include?(to_status)
+
+    errors.add(:application_status, "cannot transition from #{from_status || '(none)'} to #{to_status || '(none)'}")
   end
 
   def self.ransackable_attributes(auth_object = nil)
