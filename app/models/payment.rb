@@ -48,16 +48,21 @@ class Payment < ApplicationRecord
     return unless @current_enrollment
 
     # Check if this is the first payment (when required)
-    if @current_enrollment.application_fee_required && user.payments.status1_current_camp_payments.count == 1
+    first_successful_payment = user.payments.status1_current_camp_payments.count == 1
+
+    if @current_enrollment.application_fee_required &&
+       first_successful_payment &&
+       @current_enrollment.can_transition_application_status?('submitted')
       RegistrationMailer.app_complete_email(user).deliver_now
       if @current_enrollment.recommendation.present? && @current_enrollment.recommendation.recupload.present?
-        @current_enrollment.update!(application_status: 'application complete',
-                                    application_status_updated_on: Date.today)
+        if @current_enrollment.can_transition_application_status?('application complete')
+          @current_enrollment.transition_application_status!('application complete')
+        end
       else
-        @current_enrollment.update!(application_status: 'submitted', application_status_updated_on: Date.today)
+        @current_enrollment.transition_application_status!('submitted')
       end
     elsif balance_due == 0 && @current_enrollment.camp_doc_form_completed
-      @current_enrollment.update!(application_status: 'enrolled', application_status_updated_on: Date.today)
+      @current_enrollment.auto_enroll_if_ready!
     end
   end
 

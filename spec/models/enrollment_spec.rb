@@ -132,6 +132,75 @@ RSpec.describe Enrollment, type: :model do
     end
   end
 
+  describe 'status transitions' do
+    describe '#can_transition_application_status?' do
+      context 'when current status is nil' do
+        let(:enrollment) { create(:enrollment, application_status: nil) }
+
+        it 'allows transition to any status' do
+          expect(enrollment.can_transition_application_status?('enrolled')).to be true
+          expect(enrollment.can_transition_application_status?('submitted')).to be true
+        end
+      end
+
+      context 'when current status is enrolled' do
+        let(:enrollment) { create(:enrollment, :enrolled) }
+
+        it 'allows transition to withdrawn' do
+          expect(enrollment.can_transition_application_status?('withdrawn')).to be true
+        end
+
+        it 'disallows transition to submitted' do
+          expect(enrollment.can_transition_application_status?('submitted')).to be false
+        end
+      end
+    end
+
+    describe '#transition_application_status!' do
+      let(:enrollment) { create(:enrollment, :enrolled) }
+
+      it 'transitions to withdrawn when allowed' do
+        enrollment.transition_application_status!('withdrawn')
+        enrollment.reload
+
+        expect(enrollment.application_status).to eq('withdrawn')
+        expect(enrollment.application_status_updated_on).to eq(Date.current)
+      end
+
+      it 'does not transition when not allowed and leaves status unchanged' do
+        expect {
+          enrollment.transition_application_status!('submitted')
+        }.to raise_error(ActiveRecord::RecordInvalid, /cannot transition/)
+
+        expect(enrollment.reload.application_status).to eq('enrolled')
+      end
+    end
+
+    describe '#auto_enroll_if_ready!' do
+      let(:enrollment) { create(:enrollment, application_status: 'submitted', camp_doc_form_completed: false) }
+
+      it 'promotes to enrolled when documents complete and balance is zero' do
+        enrollment.camp_doc_form_completed = true
+        allow(PaymentState).to receive(:new).with(enrollment).and_return(instance_double(PaymentState, balance_due: 0))
+
+        enrollment.auto_enroll_if_ready!
+        enrollment.reload
+
+        expect(enrollment.application_status).to eq('enrolled')
+        expect(enrollment.application_status_updated_on).to eq(Date.current)
+      end
+
+      it 'does not change status when a balance remains' do
+        enrollment.camp_doc_form_completed = true
+        allow(PaymentState).to receive(:new).with(enrollment).and_return(instance_double(PaymentState, balance_due: 100))
+
+        enrollment.auto_enroll_if_ready!
+
+        expect(enrollment.application_status).to eq('submitted')
+      end
+    end
+  end
+
   describe 'scopes' do
     let(:camp_config) { create(:camp_configuration, :active, camp_year: Date.current.year) }
 
@@ -168,6 +237,16 @@ RSpec.describe Enrollment, type: :model do
       it 'returns enrolled students' do
         expect(Enrollment.enrolled).to include(enrolled_enrollment)
         expect(Enrollment.enrolled).not_to include(offered_enrollment)
+      end
+    end
+
+    describe '.withdrawn' do
+      let!(:withdrawn_enrollment) { create(:enrollment, application_status: 'withdrawn', campyear: camp_config.camp_year) }
+      let!(:enrolled_enrollment) { create(:enrollment, :enrolled, campyear: camp_config.camp_year) }
+
+      it 'returns withdrawn enrollments' do
+        expect(Enrollment.withdrawn).to include(withdrawn_enrollment)
+        expect(Enrollment.withdrawn).not_to include(enrolled_enrollment)
       end
     end
   end

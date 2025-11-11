@@ -54,9 +54,7 @@ class FinancialAid < ApplicationRecord
 
     if self.status == 'awarded'
       FinaidMailer.fin_aid_awarded_email(self, balance_due).deliver_now
-      if @current_enrollment.camp_doc_form_completed && balance_due == 0
-        @current_enrollment.update!(application_status: "enrolled", application_status_updated_on: Date.today)
-      end
+      @current_enrollment.auto_enroll_if_ready! if @current_enrollment.camp_doc_form_completed && balance_due == 0
     end
     if self.status == 'rejected'
       FinaidMailer.fin_aid_rejected_email(self, balance_due).deliver_now

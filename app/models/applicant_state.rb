@@ -46,7 +46,7 @@ module ApplicantState
 
     # Include application fee only if it was required for this enrollment
     if @current_enrollment.application_fee_required
-      base_cost + active_camp.application_fee_cents
+      base_cost + active_camp&.application_fee_cents.to_i
     else
       base_cost
     end

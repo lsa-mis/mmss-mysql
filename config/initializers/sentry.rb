@@ -1,8 +1,12 @@
 # frozen_string_literal: true
 
 Sentry.init do |config|
-  # Use credentials instead of ENV or hardcoded value
-  config.dsn = Rails.application.credentials.dig(:sentry, :dsn)
+  # Use credentials in production/staging when available, otherwise fall back to ENV
+  config.dsn = begin
+    Rails.application.credentials.dig(:sentry, :dsn)
+  rescue Errno::ENOENT, Errno::EACCES, Errno::EPERM, IOError, ActiveSupport::MessageEncryptor::InvalidMessage, ArgumentError
+    ENV['SENTRY_DSN']
+  end
 
   # Only enable in production and staging environments
   config.enabled_environments = %w[production staging]

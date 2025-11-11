@@ -33,12 +33,11 @@ class Course < ApplicationRecord
     "#{self.title} - #{self.camp_occurrence.description}" # or whatever column you want
   end
 
-  def available_spaces
-    base_spaces = read_attribute(:available_spaces)
-    return base_spaces if base_spaces.nil?
+  def remaining_spaces
+    base_spaces = self[:available_spaces]
+    return 0 if base_spaces.nil?
 
-    confirmed_assignments = course_assignments.where(wait_list: false).count
-    [base_spaces - confirmed_assignments, 0].max
+    [base_spaces - course_assignments.confirmed.count, 0].max
   end
 
   def self.ransackable_associations(_auth_object = nil)

@@ -106,6 +106,7 @@ Rails.application.routes.draw do
 
   post 'waitlisted/:id', to: 'enrollments#add_to_waitlist', as: :waitlisted
   post 'remove_from_waitlist/:id', to: 'enrollments#remove_from_waitlist', as: :remove_from_waitlist
+  post 'withdraw/:id', to: 'enrollments#withdraw', as: :withdraw_enrollment
 
   get 'static_pages/index'
   get 'static_pages/contact'

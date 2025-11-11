@@ -60,9 +60,7 @@ class EnrollmentsController < ApplicationController
   def update
     respond_to do |format|
       if @current_enrollment.update(enrollment_params)
-        if @current_enrollment.camp_doc_form_completed && balance_due == 0
-          @current_enrollment.update!(application_status: "enrolled", application_status_updated_on: Date.today)
-        end
+        @current_enrollment.auto_enroll_if_ready!
         format.html { redirect_to root_path, notice: 'Application was successfully updated.' }
         format.json { render :show, status: :ok, location: @current_enrollment }
       else
@@ -88,7 +86,7 @@ class EnrollmentsController < ApplicationController
 
   def add_to_waitlist
     @enrollment = Enrollment.find(params[:id])
-    @enrollment.update(application_status: 'waitlisted', application_status_updated_on: Date.today)
+    @enrollment.transition_application_status!('waitlisted')
     respond_to do |format|
       format.html { redirect_to admin_applications_path, notice: 'Application was placed on waitlist.' }
       format.json { head :no_content }
@@ -97,9 +95,35 @@ class EnrollmentsController < ApplicationController
 
   def remove_from_waitlist
     @enrollment = Enrollment.find(params[:id])
-    @enrollment.update(application_status: 'application complete', application_status_updated_on: Date.today)
+    @enrollment.transition_application_status!('application complete')
     respond_to do |format|
       format.html { redirect_to admin_applications_path, notice: 'Application was removed from waitlist. Send an email to an applicant with further instructions.' }
+      format.json { head :no_content }
+    end
+  end
+
+  def withdraw
+    @enrollment = Enrollment.find(params[:id])
+
+    # Collect course assignment information before deletion
+    deleted_course_assignments = @enrollment.course_assignments.includes(:course).map do |ca|
+      {
+        course_title: ca.course.title,
+        session_description: ca.course.camp_occurrence.description
+      }
+    end
+
+    # Delete all course assignments
+    @enrollment.course_assignments.destroy_all
+
+    # Update enrollment status
+    @enrollment.transition_application_status!('withdrawn')
+
+    # Build notice message with deleted course assignment details
+    notice_message = build_withdraw_notice(deleted_course_assignments)
+
+    respond_to do |format|
+      format.html { redirect_to admin_application_path(@enrollment), notice: notice_message }
       format.json { head :no_content }
     end
   end
@@ -113,6 +137,17 @@ class EnrollmentsController < ApplicationController
   end
 
   private
+
+  def build_withdraw_notice(deleted_course_assignments)
+    return 'Enrollment has been withdrawn.' if deleted_course_assignments.blank?
+
+    assignment_details = deleted_course_assignments.map do |ca|
+      "Course: #{ca[:course_title]}, Session: #{ca[:session_description]}"
+    end.join('; ')
+
+    "Enrollment has been withdrawn. Deleted course assignment(s): #{assignment_details}"
+  end
+
     # Use callbacks to share common setup or constraints between actions.
     def set_current_enrollment
       @current_enrollment = current_user.enrollments.current_camp_year_applications.last
@@ -125,11 +160,11 @@ class EnrollmentsController < ApplicationController
         end
         if ca.description == "Session 2"
           @courses_session2 = ca.courses.is_open.order(title: :asc)
-        end 
+        end
         if ca.description == "Session 3"
           @courses_session3 = ca.courses.is_open.order(title: :asc)
         end
-      end  
+      end
     end
 
     def set_activities_sessions
@@ -143,7 +178,7 @@ class EnrollmentsController < ApplicationController
         if as.description == "Session 3"
           @activities_session3 = as.activities.active.order(description: :asc)
         end
-      end  
+      end
     end
 
     def get_room_mate
