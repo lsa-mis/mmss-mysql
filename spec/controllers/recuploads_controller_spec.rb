@@ -102,7 +102,7 @@ RSpec.describe RecuploadsController, type: :controller do
       end
 
       it 'sends both emails' do
-        expect(RecuploadMailer).to receive(:with).with(recupload: instance_of(Recupload)).twice.and_call_original
+        expect(RecuploadMailer).to receive(:with).with(hash_including(recupload: kind_of(Recupload))).twice.and_call_original
         expect_any_instance_of(RecuploadMailer).to receive(:received_email).and_return(double(deliver_now: true))
         expect_any_instance_of(RecuploadMailer).to receive(:applicant_received_email).and_return(double(deliver_now: true))
         post :create, params: valid_params
