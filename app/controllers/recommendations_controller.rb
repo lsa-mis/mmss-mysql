@@ -79,7 +79,7 @@ class RecommendationsController < ApplicationController
     @enrollment = Enrollment.find_by(id: params[:enrollment_id])
     @recommendation.destroy
     respond_to do |format|
-      format.html { redirect_to enrollment_recommendations_url, notice: 'Recommendation was successfully destroyed.' }
+      format.html { redirect_to enrollment_recommendations_url(@enrollment), notice: 'Recommendation was successfully destroyed.' }
       format.json { head :no_content }
     end
   end
