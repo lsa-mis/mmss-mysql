@@ -408,7 +408,7 @@ ActiveAdmin.register Enrollment, as: 'Application' do
           enrollment.course_assignments.destroy_all
 
           # Update the params to include the status update
-          params[:application][:application_status_updated_on] = Date.today
+          params[:application][:application_status_updated_on] = Date.current
 
           # Call the parent update method and capture result
           result = super
