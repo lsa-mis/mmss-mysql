@@ -23,10 +23,13 @@ gem 'turnout', '~> 2.5'
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 gem 'webpacker', '~> 5.4', '>= 5.4.2'
 
+gem 'base64', require: false
 gem 'matrix', '~> 0.4.2', require: false
+gem 'mutex_m', require: false
 gem 'net-imap', require: false
 gem 'net-pop', require: false
 gem 'net-smtp', require: false
+gem 'observer', require: false
 
 gem 'nokogiri', '~> 1.16', '>= 1.16.8'
 
