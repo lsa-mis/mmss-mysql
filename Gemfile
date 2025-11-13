@@ -8,6 +8,7 @@ gem 'bootsnap', '~> 1.8', '>= 1.8.1', require: false
 gem 'country_select', '~> 6.0'
 gem 'devise', '~> 4.8'
 gem 'dump', '~> 1.2', '>= 1.2.2'
+gem 'drb', '~> 2.1.0'
 gem 'google-cloud-storage', '~> 1.34', '>= 1.34.1', require: false
 gem 'money-rails', '~> 1.14'
 # gem install mysql2 -v '0.5.4' -- --with-ldflags=-L/usr/local/opt/openssl/lib --with-cppflags=-I/usr/local/opt/openssl/include
