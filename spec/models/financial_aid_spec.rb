@@ -61,7 +61,7 @@ RSpec.describe FinancialAid, type: :model do
       context 'when status is awarded but amount is zero' do
         it 'does not require source' do
           aid = build(:financial_aid, status: 'awarded', amount_cents: 0, source: nil)
-          expect(aid).to be_invalid
+          expect(aid).to be_valid
         end
       end
     end
