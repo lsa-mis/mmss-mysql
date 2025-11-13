@@ -1,5 +1,26 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: activities
+#
+#  id                 :bigint           not null, primary key
+#  camp_occurrence_id :bigint
+#  description        :string(255)
+#  cost_cents         :integer
+#  date_occurs        :date
+#  active             :boolean          default(FALSE)
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#
+# Indexes
+#
+#  index_activities_on_camp_occurrence_id  (camp_occurrence_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (camp_occurrence_id => camp_occurrences.id)
+#
 require 'rails_helper'
 
 RSpec.describe Activity, type: :model do

@@ -11,9 +11,22 @@
 #  updated_at    :datetime         not null
 #  wait_list     :boolean          default(FALSE)
 #
+# Indexes
+#
+#  index_course_assignments_on_course_id      (course_id)
+#  index_course_assignments_on_enrollment_id  (enrollment_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (course_id => courses.id)
+#  fk_rails_...  (enrollment_id => enrollments.id)
+#
 class CourseAssignment < ApplicationRecord
   belongs_to :enrollment
   belongs_to :course
+
+  validates :enrollment_id, presence: true
+  validates :course_id, presence: true
 
   scope :for_session, ->(session_id) { joins(:course).where(courses: { camp_occurrence_id: session_id }) }
   scope :wait_list, -> { where(wait_list: true) }

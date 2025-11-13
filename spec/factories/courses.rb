@@ -1,5 +1,27 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: courses
+#
+#  id                 :bigint           not null, primary key
+#  camp_occurrence_id :bigint           not null
+#  title              :string(255)
+#  available_spaces   :integer
+#  status             :string(255)
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  faculty_uniqname   :string(255)
+#  faculty_name       :string(255)
+#
+# Indexes
+#
+#  index_courses_on_camp_occurrence_id  (camp_occurrence_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (camp_occurrence_id => camp_occurrences.id)
+#
 FactoryBot.define do
   factory :course do
     association :camp_occurrence

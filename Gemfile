@@ -8,6 +8,7 @@ gem 'bootsnap', '~> 1.8', '>= 1.8.1', require: false
 gem 'country_select', '~> 6.0'
 gem 'devise', '~> 4.8'
 gem 'dump', '~> 1.2', '>= 1.2.2'
+gem 'drb', '~> 2.1.0'
 gem 'google-cloud-storage', '~> 1.34', '>= 1.34.1', require: false
 gem 'money-rails', '~> 1.14'
 # gem install mysql2 -v '0.5.4' -- --with-ldflags=-L/usr/local/opt/openssl/lib --with-cppflags=-I/usr/local/opt/openssl/include
@@ -23,10 +24,13 @@ gem 'turnout', '~> 2.5'
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 gem 'webpacker', '~> 5.4', '>= 5.4.2'
 
+gem 'base64', require: false
 gem 'matrix', '~> 0.4.2', require: false
+gem 'mutex_m', require: false
 gem 'net-imap', require: false
 gem 'net-pop', require: false
 gem 'net-smtp', require: false
+gem 'observer', require: false
 
 gem 'nokogiri', '~> 1.16', '>= 1.16.8'
 

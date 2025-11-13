@@ -1,5 +1,27 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: camp_occurrences
+#
+#  id                    :bigint           not null, primary key
+#  camp_configuration_id :bigint           not null
+#  description           :string(255)      not null
+#  begin_date            :date             not null
+#  end_date              :date             not null
+#  active                :boolean          default(FALSE), not null
+#  created_at            :datetime         not null
+#  updated_at            :datetime         not null
+#  cost_cents            :integer
+#
+# Indexes
+#
+#  index_camp_occurrences_on_camp_configuration_id  (camp_configuration_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (camp_configuration_id => camp_configurations.id)
+#
 FactoryBot.define do
   factory :camp_occurrence do
     association :camp_configuration

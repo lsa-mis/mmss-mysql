@@ -11,6 +11,16 @@
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
 #
+# Indexes
+#
+#  index_course_preferences_on_course_id      (course_id)
+#  index_course_preferences_on_enrollment_id  (enrollment_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (course_id => courses.id)
+#  fk_rails_...  (enrollment_id => enrollments.id)
+#
 class CoursePreference < ApplicationRecord
   belongs_to :enrollment
   belongs_to :course

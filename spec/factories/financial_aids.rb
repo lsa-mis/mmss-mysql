@@ -1,5 +1,28 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: financial_aids
+#
+#  id                    :bigint           not null, primary key
+#  enrollment_id         :bigint           not null
+#  amount_cents          :integer          default(0)
+#  source                :string(255)
+#  note                  :text(65535)
+#  status                :string(255)      default("pending")
+#  created_at            :datetime         not null
+#  updated_at            :datetime         not null
+#  payments_deadline     :date
+#  adjusted_gross_income :integer
+#
+# Indexes
+#
+#  index_financial_aids_on_enrollment_id  (enrollment_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (enrollment_id => enrollments.id)
+#
 FactoryBot.define do
   factory :financial_aid do
     association :enrollment
@@ -7,6 +30,7 @@ FactoryBot.define do
     amount_cents { rand(50000..200000) }
     source { ['Scholarship', 'Grant', 'Need-based Aid', 'Merit Award'].sample }
     note { Faker::Lorem.sentence }
+    adjusted_gross_income { rand(20000..150000) }
     status { 'pending' }
     payments_deadline { 30.days.from_now }
 

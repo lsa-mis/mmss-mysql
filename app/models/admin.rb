@@ -21,6 +21,11 @@
 #  reset_password_sent_at :datetime
 #  remember_created_at    :datetime
 #
+# Indexes
+#
+#  index_admins_on_email                 (email) UNIQUE
+#  index_admins_on_reset_password_token  (reset_password_token) UNIQUE
+#
 class Admin < ApplicationRecord
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable

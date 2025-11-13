@@ -35,8 +35,18 @@
 #  parentemail        :string(255)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
-#  demographic_id     :bigint
 #  demographic_other  :string(255)
+#  demographic_id     :bigint
+#
+# Indexes
+#
+#  index_applicant_details_on_demographic_id  (demographic_id)
+#  index_applicant_details_on_user_id         (user_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (demographic_id => demographics.id)
+#  fk_rails_...  (user_id => users.id)
 #
 FactoryBot.define do
   factory :applicant_detail do

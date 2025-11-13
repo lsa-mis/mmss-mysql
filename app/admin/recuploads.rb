@@ -49,7 +49,9 @@ ActiveAdmin.register Recupload do
       row :recommendation_id do |ri|
         link_to ri.recommendation_id, admin_recommendation_path(ri.recommendation_id)
       end
-      row :studentname
+      row :applicant_name do |ri|
+        ri.recommendation.enrollment
+      end
       row :letter
       row :recletter do |rl|
         link_to rl.recletter.filename, url_for(rl.recletter), target: '_blank' if rl.recletter.attached?

@@ -7,7 +7,7 @@ class AvailabilityValidator < ActiveModel::EachValidator
     date_ranges = all_notes.map { |b| b.opendate..b.closedate }
 
     date_ranges.each do |range|
-      if range.include? value
+      if range.cover? value
         record.errors.add(attribute, "not available")
       end
     end

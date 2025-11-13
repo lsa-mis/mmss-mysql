@@ -4,7 +4,7 @@ class FinancialAidsController < ApplicationController
   devise_group :logged_in, contains: [:user, :admin]
   before_action :authenticate_logged_in!
   before_action :authenticate_admin!, only: [:index, :destroy]
-  
+
   before_action :set_current_enrollment
   before_action :set_financial_aid, only: [:show, :edit, :update, :destroy]
 
@@ -80,11 +80,18 @@ class FinancialAidsController < ApplicationController
 
     # Use callbacks to share common setup or constraints between actions.
     def set_financial_aid
-      @financial_aid = @current_enrollment.financial_aids
+      @financial_aid = @current_enrollment.financial_aids.find(params[:id])
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def financial_aid_params
-      params.require(:financial_aid).permit(:enrollment_id, :amount_cents, :source, :note, :status, :taxform, :payments_deadline)
+      permitted = [:enrollment_id, :note, :adjusted_gross_income]
+
+      # Only allow admin-only fields if user is an admin
+      if admin_signed_in?
+        permitted += [:amount_cents, :source, :status, :payments_deadline]
+      end
+
+      params.require(:financial_aid).permit(*permitted)
     end
 end

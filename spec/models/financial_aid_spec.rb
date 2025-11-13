@@ -1,5 +1,28 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: financial_aids
+#
+#  id                    :bigint           not null, primary key
+#  enrollment_id         :bigint           not null
+#  amount_cents          :integer          default(0)
+#  source                :string(255)
+#  note                  :text(65535)
+#  status                :string(255)      default("pending")
+#  created_at            :datetime         not null
+#  updated_at            :datetime         not null
+#  payments_deadline     :date
+#  adjusted_gross_income :integer
+#
+# Indexes
+#
+#  index_financial_aids_on_enrollment_id  (enrollment_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (enrollment_id => enrollments.id)
+#
 require 'rails_helper'
 
 RSpec.describe FinancialAid, type: :model do
@@ -10,8 +33,38 @@ RSpec.describe FinancialAid, type: :model do
   describe 'validations' do
     subject { build(:financial_aid) }
 
-    it { is_expected.to validate_presence_of(:source) }
     it { is_expected.to validate_presence_of(:status) }
+    it { is_expected.to validate_presence_of(:adjusted_gross_income) }
+    it { is_expected.to validate_numericality_of(:adjusted_gross_income).is_greater_than_or_equal_to(0) }
+
+    describe 'source validation' do
+      context 'when status is awarded and amount is assigned' do
+        it 'requires source to be present' do
+          aid = build(:financial_aid, status: 'awarded', amount_cents: 100000, source: nil)
+          expect(aid).not_to be_valid
+          expect(aid.errors[:source]).to include("is required when status is awarded and an amount is assigned")
+        end
+
+        it 'is valid when source is present' do
+          aid = build(:financial_aid, status: 'awarded', amount_cents: 100000, source: 'Scholarship')
+          expect(aid).to be_valid
+        end
+      end
+
+      context 'when status is not awarded' do
+        it 'does not require source' do
+          aid = build(:financial_aid, status: 'pending', source: nil)
+          expect(aid).to be_valid
+        end
+      end
+
+      context 'when status is awarded but amount is zero' do
+        it 'does not require source' do
+          aid = build(:financial_aid, status: 'awarded', amount_cents: 0, source: nil)
+          expect(aid).not_to be_valid
+        end
+      end
+    end
   end
 
   describe 'monetize' do

@@ -22,6 +22,14 @@
 #  updated_at         :datetime         not null
 #  camp_year          :integer
 #
+# Indexes
+#
+#  index_payments_on_user_id  (user_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (user_id => users.id)
+#
 class Payment < ApplicationRecord
   include ApplicantState
 
@@ -35,6 +43,20 @@ class Payment < ApplicationRecord
   validates :camp_year, presence: true
 
   belongs_to :user
+
+  # Virtual attribute for dollar amounts in admin forms
+  def total_amount_dollars
+    return nil if total_amount.blank?
+    (total_amount.to_f / 100).round(2)
+  end
+
+  def total_amount_dollars=(value)
+    if value.blank? || value.to_s.strip.empty?
+      self.total_amount = nil
+    else
+      self.total_amount = (value.to_f * 100).round.to_s
+    end
+  end
 
   scope :current_camp_payments, -> { where('camp_year = ? ', CampConfiguration.active_camp_year) }
   scope :status1_current_camp_payments, -> { current_camp_payments.where('transaction_status = ?', '1') }

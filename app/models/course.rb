@@ -14,6 +14,14 @@
 #  faculty_uniqname   :string(255)
 #  faculty_name       :string(255)
 #
+# Indexes
+#
+#  index_courses_on_camp_occurrence_id  (camp_occurrence_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (camp_occurrence_id => camp_occurrences.id)
+#
 class Course < ApplicationRecord
   belongs_to :camp_occurrence
   has_many :course_preferences, dependent: :destroy
