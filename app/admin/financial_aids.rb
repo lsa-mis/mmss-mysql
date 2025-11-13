@@ -8,7 +8,7 @@ ActiveAdmin.register FinancialAid, as: "Financial Aid Request" do
   #
   # Uncomment all parameters which should be permitted for assignment
   #
-   permit_params :enrollment_id, :amount, :source, :note, :status, :payments_deadline, :taxform
+   permit_params :enrollment_id, :amount, :source, :note, :status, :payments_deadline, :taxform, :adjusted_gross_income
   #
   # or
   #
@@ -36,9 +36,10 @@ ActiveAdmin.register FinancialAid, as: "Financial Aid Request" do
       f.input :amount
       f.input :source
       f.input :note
+      f.input :adjusted_gross_income, label: "Adjusted Gross Income (AGI)"
       f.input :status, as: :select, collection: financial_aid_status
       f.input :payments_deadline
-      f.input :taxform, as: :file
+      f.input :taxform, as: :file, label: "Supporting Document (Admin Use Only)"
     end
     f.actions         # adds the 'Submit' and 'Cancel' button
   end
@@ -52,9 +53,14 @@ ActiveAdmin.register FinancialAid, as: "Financial Aid Request" do
     column 'Enrollment' do |e|
       e.enrollment
     end
-    column "Taxform" do |t|
+    column "AGI" do |f|
+      f.adjusted_gross_income ? number_to_currency(f.adjusted_gross_income, unit: "$", separator: ".", delimiter: ",") : "-"
+    end
+    column "Supporting Doc" do |t|
       if t.taxform.attached?
         link_to t.taxform.filename, url_for(t.taxform)
+      else
+        "-"
       end
     end
     column "Amount" do |co|
@@ -74,9 +80,14 @@ ActiveAdmin.register FinancialAid, as: "Financial Aid Request" do
       row "Application" do |ap|
         ap.enrollment
       end
-      row :taxform do |tf|
+      row "Adjusted Gross Income (AGI)" do |f|
+        f.adjusted_gross_income ? number_to_currency(f.adjusted_gross_income, unit: "$", separator: ".", delimiter: ",") : "-"
+      end
+      row "Supporting Document" do |tf|
         if tf.taxform.attached?
           link_to tf.taxform.filename, url_for(tf.taxform)
+        else
+          "-"
         end
       end
       row "Amount" do |co|
@@ -120,6 +131,9 @@ ActiveAdmin.register FinancialAid, as: "Financial Aid Request" do
     end
     column "Funding Source" do |fa|
       fa.source
+    end
+    column "AGI" do |fa|
+      fa.adjusted_gross_income ? number_to_currency(fa.adjusted_gross_income, unit: "$", separator: ".", delimiter: ",") : "-"
     end
     column :updated_at
   end

@@ -15,44 +15,22 @@
     <%= form.label :note, "Explanation" %>
     <%= form.text_area :note, required: true %>
   </div>
-  <% if @financial_aid.taxform.attached? %>
-    <div class='current-uploaded-docs'>
-      <p>
-        <strong>Tax Form currently uploaded:</strong>
-        <%= link_to @financial_aid.taxform.filename, url_for(@financial_aid.taxform) %>
-      </p>
-    </div>
-    <div class="field">
-      <%= form.label :taxform, 'Update Tax Form' %>
-      <%= form.file_field :taxform,
-       data: { controller: "filesize-check", 
-       action: "filesize-check#validateFileSize", 
-       filesize_check_max_file_size_value: 20 * 1024 * 1024 } %>
-    </div>
-  <% else %>
-    <div class="field">
-      <%= form.label :taxform %>
-      <%= form.file_field :taxform, required: true, data: { controller: "filesize-check", 
-       action: "filesize-check#validateFileSize", 
-       filesize_check_max_file_size_value: 20 * 1024 * 1024 } %>
-    </div>
-  <% end %>
-<div class="direction_notes">
-  <p class="text-red-700">
-    Upload a pdf copy of your parents' or guardians' latest tax return (first page only) 
-    <strong>with the Social Security Number redacted</strong>.
-    <br> 
-    (Maximum size is 20Mb and file format is PDF, JPG, PNG)
-  </p>
-  <p>
-    Your application for financial aid will not be considered until the MMSS program 
-    receives this document. Include any additional documentation describing 
-    extenuating circumstances.
-  <br>
-    The Tax form can be e-mailed as a scanned attachment to mmss@umich.edu.
-  </p>
-
-</div>
+  <div class="field">
+    <%= form.label :adjusted_gross_income, "Adjusted Gross Income (AGI)" %>
+    <%= form.number_field :adjusted_gross_income, required: true, min: 0, step: 1 %>
+  </div>
+  <div class="direction_notes">
+    <p class="text-red-700">
+      Please enter your Adjusted Gross Income (AGI) from your parents' or guardians' latest tax return.
+      <br>
+      This is the amount found on line 11 of Form 1040 (or the equivalent line on other tax forms).
+    </p>
+    <p>
+      Your application for financial aid will not be considered until the MMSS program
+      receives this information. Include any additional documentation describing
+      extenuating circumstances in the explanation field above.
+    </p>
+  </div>
 
   <% if admin_signed_in? %>
     <h2>========== Administrative area ==========</h2>

@@ -26,8 +26,9 @@ class FinancialAid < ApplicationRecord
   monetize :amount_cents
 
   validates :note, presence: :true
-  validates :source, presence: true
   validates :status, presence: true
+  validates :adjusted_gross_income, presence: true, numericality: { greater_than_or_equal_to: 0 }
+  validate :source_required_when_awarded
   validate :acceptable_taxform
   validate :set_deadline
 
@@ -35,6 +36,14 @@ class FinancialAid < ApplicationRecord
 
 
   private
+
+  def source_required_when_awarded
+    if status == 'awarded' && amount_cents > 0
+      if source.blank?
+        errors.add(:source, "is required when status is awarded and an amount is assigned")
+      end
+    end
+  end
 
   def acceptable_taxform
     return unless taxform.attached?
@@ -79,7 +88,7 @@ class FinancialAid < ApplicationRecord
   end
 
   def self.ransackable_attributes(auth_object = nil)
-    ["amount_cents", "created_at", "enrollment_id", "id", "note", "payments_deadline", "source", "status", "updated_at"]
+    ["adjusted_gross_income", "amount_cents", "created_at", "enrollment_id", "id", "note", "payments_deadline", "source", "status", "updated_at"]
   end
 
 end

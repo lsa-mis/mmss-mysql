@@ -7,6 +7,7 @@ FactoryBot.define do
     amount_cents { rand(50000..200000) }
     source { ['Scholarship', 'Grant', 'Need-based Aid', 'Merit Award'].sample }
     note { Faker::Lorem.sentence }
+    adjusted_gross_income { rand(20000..150000) }
     status { 'pending' }
     payments_deadline { 30.days.from_now }
 
