@@ -79,9 +79,11 @@ ActiveAdmin.register Payment do
   show do
     attributes_table do
       row :user_id do |p|
-        link_to(p.user.email)
+        p.user.email
       end
-
+      row 'Applicant' do |p|
+        p.user.enrollments.last
+      end
       row :transaction_type
       row :transaction_status
       row :transaction_id

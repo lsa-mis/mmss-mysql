@@ -33,7 +33,7 @@ ActiveAdmin.register SessionAssignment do
 
   show do
     attributes_table do
-      row('Enrollment') { |sa| link_to sa.enrollment.user.email, admin_application_path(sa.enrollment_id) }
+      row 'Applicant', &:enrollment
       row 'Session', &:camp_occurrence
       row :created_at
       row :updated_at
