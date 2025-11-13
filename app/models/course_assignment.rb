@@ -15,6 +15,9 @@ class CourseAssignment < ApplicationRecord
   belongs_to :enrollment
   belongs_to :course
 
+  validates :enrollment_id, presence: true
+  validates :course_id, presence: true
+
   scope :for_session, ->(session_id) { joins(:course).where(courses: { camp_occurrence_id: session_id }) }
   scope :wait_list, -> { where(wait_list: true) }
   scope :confirmed, -> { where(wait_list: false) }
