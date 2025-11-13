@@ -2,13 +2,9 @@
 
 FactoryBot.define do
   factory :campnote do
-    association :camp_configuration
-
     note { Faker::Lorem.paragraph }
-    active { true }
-
-    trait :inactive do
-      active { false }
-    end
+    notetype { 'general' }
+    opendate { 1.week.from_now }
+    closedate { 2.weeks.from_now }
   end
 end
