@@ -11,6 +11,16 @@
 #  updated_at         :datetime         not null
 #  offer_status       :string(255)
 #
+# Indexes
+#
+#  index_session_assignments_on_camp_occurrence_id  (camp_occurrence_id)
+#  index_session_assignments_on_enrollment_id       (enrollment_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (camp_occurrence_id => camp_occurrences.id)
+#  fk_rails_...  (enrollment_id => enrollments.id)
+#
 require 'rails_helper'
 
 RSpec.describe SessionAssignment, type: :model do

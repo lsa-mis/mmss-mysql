@@ -10,6 +10,16 @@
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #
+# Indexes
+#
+#  index_session_activities_on_camp_occurrence_id  (camp_occurrence_id)
+#  index_session_activities_on_enrollment_id       (enrollment_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (camp_occurrence_id => camp_occurrences.id)
+#  fk_rails_...  (enrollment_id => enrollments.id)
+#
 require 'rails_helper'
 
 RSpec.describe SessionActivity, type: :model do

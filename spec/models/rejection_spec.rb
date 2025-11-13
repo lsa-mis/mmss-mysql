@@ -10,6 +10,14 @@
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
 #
+# Indexes
+#
+#  index_rejections_on_enrollment_id  (enrollment_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (enrollment_id => enrollments.id)
+#
 require 'rails_helper'
 
 RSpec.describe Rejection, type: :model do

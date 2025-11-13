@@ -24,6 +24,14 @@
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
 #
+# Indexes
+#
+#  index_recommendations_on_enrollment_id  (enrollment_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (enrollment_id => enrollments.id)
+#
 class Recommendation < ApplicationRecord
   belongs_to :enrollment
   has_one :recupload, dependent: :destroy

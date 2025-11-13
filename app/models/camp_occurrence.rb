@@ -14,6 +14,14 @@
 #  updated_at            :datetime         not null
 #  cost_cents            :integer
 #
+# Indexes
+#
+#  index_camp_occurrences_on_camp_configuration_id  (camp_configuration_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (camp_configuration_id => camp_configurations.id)
+#
 class CampOccurrence < ApplicationRecord
   include MoneyRails::ActionViewExtension
   belongs_to :camp_configuration

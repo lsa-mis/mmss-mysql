@@ -18,6 +18,11 @@
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #
+# Indexes
+#
+#  index_faculties_on_email                 (email) UNIQUE
+#  index_faculties_on_reset_password_token  (reset_password_token) UNIQUE
+#
 require 'rails_helper'
 
 RSpec.describe Faculty, type: :model do

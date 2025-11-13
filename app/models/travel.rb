@@ -22,6 +22,14 @@
 #  arrival_session   :string(255)
 #  depart_session    :string(255)
 #
+# Indexes
+#
+#  index_travels_on_enrollment_id  (enrollment_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (enrollment_id => enrollments.id)
+#
 class Travel < ApplicationRecord
   belongs_to :enrollment
 

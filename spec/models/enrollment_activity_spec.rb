@@ -10,6 +10,16 @@
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
 #
+# Indexes
+#
+#  index_enrollment_activities_on_activity_id    (activity_id)
+#  index_enrollment_activities_on_enrollment_id  (enrollment_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (activity_id => activities.id)
+#  fk_rails_...  (enrollment_id => enrollments.id)
+#
 require 'rails_helper'
 
 RSpec.describe EnrollmentActivity, type: :model do

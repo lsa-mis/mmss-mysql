@@ -4,15 +4,24 @@
 #
 # Table name: financial_aids
 #
-#  id                :bigint           not null, primary key
-#  enrollment_id     :bigint           not null
-#  amount_cents      :integer          default(0)
-#  source            :string(255)
-#  note              :text(65535)
-#  status            :string(255)      default("pending")
-#  created_at        :datetime         not null
-#  updated_at        :datetime         not null
-#  payments_deadline :date
+#  id                    :bigint           not null, primary key
+#  enrollment_id         :bigint           not null
+#  amount_cents          :integer          default(0)
+#  source                :string(255)
+#  note                  :text(65535)
+#  status                :string(255)      default("pending")
+#  created_at            :datetime         not null
+#  updated_at            :datetime         not null
+#  payments_deadline     :date
+#  adjusted_gross_income :integer
+#
+# Indexes
+#
+#  index_financial_aids_on_enrollment_id  (enrollment_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (enrollment_id => enrollments.id)
 #
 class FinancialAid < ApplicationRecord
   include ApplicantState

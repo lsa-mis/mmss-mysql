@@ -1,5 +1,25 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: recuploads
+#
+#  id                :bigint           not null, primary key
+#  letter            :text(65535)
+#  authorname        :string(255)      not null
+#  studentname       :string(255)      not null
+#  recommendation_id :bigint           not null
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#
+# Indexes
+#
+#  index_recuploads_on_recommendation_id  (recommendation_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (recommendation_id => recommendations.id)
+#
 FactoryBot.define do
   factory :recupload do
     association :recommendation

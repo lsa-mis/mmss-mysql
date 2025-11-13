@@ -22,6 +22,14 @@
 #  updated_at         :datetime         not null
 #  camp_year          :integer
 #
+# Indexes
+#
+#  index_payments_on_user_id  (user_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (user_id => users.id)
+#
 class Payment < ApplicationRecord
   include ApplicantState
 

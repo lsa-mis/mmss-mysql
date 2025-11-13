@@ -21,6 +21,10 @@
 #  waitlist_letter           :text(65535)
 #  application_fee_required  :boolean          default(TRUE), not null
 #
+# Indexes
+#
+#  index_camp_configurations_on_camp_year  (camp_year) UNIQUE
+#
 class CampConfiguration < ApplicationRecord
   has_many :camp_occurrences, dependent: :destroy
 

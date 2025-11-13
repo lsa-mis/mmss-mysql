@@ -32,6 +32,14 @@
 #  camp_doc_form_completed       :boolean          default(FALSE)
 #  application_fee_required      :boolean          default(TRUE), not null
 #
+# Indexes
+#
+#  index_enrollments_on_user_id  (user_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (user_id => users.id)
+#
 FactoryBot.define do
   factory :enrollment do
     association :user

@@ -13,6 +13,14 @@
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #
+# Indexes
+#
+#  index_activities_on_camp_occurrence_id  (camp_occurrence_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (camp_occurrence_id => camp_occurrences.id)
+#
 class Activity < ApplicationRecord
   include MoneyRails::ActionViewExtension
   belongs_to :camp_occurrence

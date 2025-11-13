@@ -12,6 +12,14 @@
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #
+# Indexes
+#
+#  index_recuploads_on_recommendation_id  (recommendation_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (recommendation_id => recommendations.id)
+#
 class Recupload < ApplicationRecord
   belongs_to :recommendation
   after_create :update_enrollment_status
