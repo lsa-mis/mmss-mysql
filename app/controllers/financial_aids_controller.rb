@@ -80,7 +80,11 @@ class FinancialAidsController < ApplicationController
 
     # Use callbacks to share common setup or constraints between actions.
     def set_financial_aid
-      @financial_aid = @current_enrollment.financial_aids.find(params[:id])
+      if admin_signed_in?
+        @financial_aid = FinancialAid.find(params[:id])
+      else
+        @financial_aid = @current_enrollment.financial_aids.find(params[:id])
+      end
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
