@@ -8,7 +8,7 @@ ActiveAdmin.register Payment do
   #
   # Uncomment all parameters which should be permitted for assignment
   #
-  permit_params :user_id, :total_amount, :transaction_type, :transaction_status, :transaction_id, :transaction_date,
+  permit_params :user_id, :total_amount_dollars, :transaction_type, :transaction_status, :transaction_id, :transaction_date,
                 :account_type, :result_code, :result_message, :user_account, :timestamp, :transaction_hash, :camp_year
   #
   # or
@@ -36,7 +36,7 @@ ActiveAdmin.register Payment do
           [enrol.display_name.downcase, enrol.user_id]
         }.sort
       end
-      f.input :total_amount, label: 'Total amount in cents'
+      f.input :total_amount_dollars, label: 'Total amount ($)', input_html: { step: 1.00 }
       li "Transaction Type #{f.object.transaction_type}" unless f.object.new_record?
       f.input :transaction_type, input_html: { value: '1' } unless f.object.persisted?
       li "Transaction Status #{f.object.transaction_status}" unless f.object.new_record?

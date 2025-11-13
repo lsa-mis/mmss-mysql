@@ -44,6 +44,20 @@ class Payment < ApplicationRecord
 
   belongs_to :user
 
+  # Virtual attribute for dollar amounts in admin forms
+  def total_amount_dollars
+    return nil if total_amount.blank?
+    (total_amount.to_f / 100).round(2)
+  end
+
+  def total_amount_dollars=(value)
+    if value.blank? || value.to_s.strip.empty?
+      self.total_amount = nil
+    else
+      self.total_amount = (value.to_f * 100).round.to_s
+    end
+  end
+
   scope :current_camp_payments, -> { where('camp_year = ? ', CampConfiguration.active_camp_year) }
   scope :status1_current_camp_payments, -> { current_camp_payments.where('transaction_status = ?', '1') }
 
