@@ -131,7 +131,7 @@ class Enrollment < ApplicationRecord
     current_camp_year_applications.where(id: Recommendation.where.missing(:recupload).pluck(:enrollment_id))
   }
   scope :no_payments, lambda {
-    current_camp_year_applications.where.not(user_id: Payment.where(camp_year: CampConfiguration.active.last.camp_year).pluck(:user_id))
+    current_camp_year_applications.where.not(user_id: Payment.where(camp_year: CampConfiguration.active_camp_year).pluck(:user_id))
   }
   scope :no_student_packet, lambda {
     current_camp_year_applications.where.not(id: Enrollment.current_camp_year_applications.joins(:student_packet_attachment).pluck(:id))
