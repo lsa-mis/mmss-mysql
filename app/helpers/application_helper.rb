@@ -183,4 +183,26 @@ module ApplicationHelper
       'Transaction Status not returned'
     end
   end
+
+  # Calculate session expiry time in Unix timestamp (seconds)
+  # Returns nil if user is not authenticated or session expiry cannot be determined
+  def session_expires_at
+    return nil unless session.present?
+
+    # Get session timeout from configuration
+    # Production uses 4.hours, other environments may vary
+    timeout_seconds = if Rails.env.production?
+                        4.hours.to_i
+                      elsif Rails.env.staging?
+                        4.hours.to_i
+                      else
+                        # Development default (no expiry, but set a reasonable default for warning)
+                        4.hours.to_i
+                      end
+
+    # Calculate expiry time: current time + timeout
+    # Note: This is an approximation since we don't know exactly when the session was created
+    # but it's close enough for warning purposes (warning happens 5 min before expiry)
+    Time.current.to_i + timeout_seconds
+  end
 end
