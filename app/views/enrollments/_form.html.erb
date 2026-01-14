@@ -3,7 +3,7 @@
     using English characters and standard punctuation.<p>
     <br>
 <p>All fields are required unless marked <span class="text-gray-700">(optional)</span></p>
-<%= form_with(model: enrollment, local: true, data: { controller: "required-stars" }) do |form| %>
+<%= form_with(model: enrollment, local: true, data: { controller: "required-stars autosave", autosave_storage_key_value: "enrollment_form_#{enrollment.new_record? ? 'new' : enrollment.id}" }) do |form| %>
   <% if enrollment.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(enrollment.errors.count, "error") %> prohibited this enrollment from being saved:</h2>
