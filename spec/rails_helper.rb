@@ -26,7 +26,12 @@ require "money-rails/test_helpers"
 # directory. Alternatively, in the individual `*_spec.rb` files, manually
 # require only the support files necessary.
 #
-Dir[Rails.root.join('spec', 'support', '**', '*.rb')].each { |f| require f }
+# Load support files in a specific order to avoid dependency issues
+support_files = Dir[Rails.root.join('spec', 'support', '**', '*.rb')]
+# Load feature helpers first, then configuration files
+feature_files = support_files.select { |f| f.include?('features/') }
+other_files = support_files.reject { |f| f.include?('features/') }
+(feature_files + other_files).each { |f| require f }
 
 # Checks for pending migrations and applies them before tests are run.
 # If you are not using ActiveRecord, you can remove these lines.

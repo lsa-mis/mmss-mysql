@@ -21,4 +21,89 @@ RSpec.describe ApplicationHelper, type: :helper do
       expect(statuses.last).to eq(['withdrawn', 'withdrawn'])
     end
   end
+
+  describe '#session_expires_at' do
+    let(:current_time) { Time.zone.parse('2024-01-01 12:00:00') }
+    let(:four_hours_in_seconds) { 4.hours.to_i }
+
+    before do
+      allow(Time).to receive(:current).and_return(current_time)
+    end
+
+    context 'when session is not present' do
+      it 'returns nil when session is not present' do
+        # Stub session to return something that responds to present? as false
+        session_double = double('session')
+        allow(session_double).to receive(:present?).and_return(false)
+        allow(helper).to receive(:session).and_return(session_double)
+        expect(helper.session_expires_at).to be_nil
+      end
+    end
+
+    context 'when session is present' do
+      let(:session_double) { double('session') }
+      
+      before do
+        allow(session_double).to receive(:present?).and_return(true)
+        allow(helper).to receive(:session).and_return(session_double)
+      end
+
+      context 'in production environment' do
+        before do
+          allow(Rails.env).to receive(:production?).and_return(true)
+          allow(Rails.env).to receive(:staging?).and_return(false)
+        end
+
+        it 'returns a Unix timestamp' do
+          result = helper.session_expires_at
+          expect(result).to be_a(Integer)
+          expect(result).to be > 0
+        end
+
+        it 'returns timestamp approximately 4 hours from current time' do
+          result = helper.session_expires_at
+          expected_time = current_time.to_i + four_hours_in_seconds
+          expect(result).to eq(expected_time)
+        end
+      end
+
+      context 'in staging environment' do
+        before do
+          allow(Rails.env).to receive(:production?).and_return(false)
+          allow(Rails.env).to receive(:staging?).and_return(true)
+        end
+
+        it 'returns a Unix timestamp' do
+          result = helper.session_expires_at
+          expect(result).to be_a(Integer)
+          expect(result).to be > 0
+        end
+
+        it 'returns timestamp approximately 4 hours from current time' do
+          result = helper.session_expires_at
+          expected_time = current_time.to_i + four_hours_in_seconds
+          expect(result).to eq(expected_time)
+        end
+      end
+
+      context 'in development environment' do
+        before do
+          allow(Rails.env).to receive(:production?).and_return(false)
+          allow(Rails.env).to receive(:staging?).and_return(false)
+        end
+
+        it 'returns a Unix timestamp' do
+          result = helper.session_expires_at
+          expect(result).to be_a(Integer)
+          expect(result).to be > 0
+        end
+
+        it 'returns timestamp approximately 4 hours from current time' do
+          result = helper.session_expires_at
+          expected_time = current_time.to_i + four_hours_in_seconds
+          expect(result).to eq(expected_time)
+        end
+      end
+    end
+  end
 end
