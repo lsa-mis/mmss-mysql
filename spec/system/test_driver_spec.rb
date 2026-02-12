@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-require "webdrivers"
-
-# Webdrivers 5.3.1 supports the Chrome for Testing API (non-deprecated)
-# It will automatically download the correct ChromeDriver version for your Chrome browser
-# The gem handles Chrome version detection and uses the modern Chrome for Testing infrastructure
+# Selenium 4.11+ includes Selenium Manager which automatically downloads and manages drivers
+# No need for webdrivers gem - Selenium Manager handles ChromeDriver version detection
+# and uses the Chrome for Testing infrastructure automatically
 
 # Configure Chrome options
 options = Selenium::WebDriver::Chrome::Options.new
@@ -13,7 +11,7 @@ options.add_argument("--disable-dev-shm-usage")
 options.add_argument("--disable-gpu")
 options.add_argument("--remote-allow-origins=*")
 
-# Webdrivers will automatically download the matching ChromeDriver using Chrome for Testing API
+# Selenium Manager automatically downloads the matching ChromeDriver
 driver = Selenium::WebDriver.for :chrome, options: options
 driver.navigate.to "http://www.google.com"
 element = driver.find_element(:name, 'q')

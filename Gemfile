@@ -45,9 +45,11 @@ group :development, :test do
   gem 'pry-byebug', '~> 3.9'
   gem 'pry-rails', '~> 0.3.9'
   gem 'rspec-rails', '~> 5.0', '>= 5.0.2'
+  gem 'selenium-webdriver', '~> 4.40'
   gem 'shoulda-matchers', '~> 5.0'
   gem 'standard'
-  gem 'webdrivers', '~> 5.3'
+  # webdrivers gem is deprecated - Selenium 4.11+ includes Selenium Manager
+  # gem 'webdrivers', '~> 5.3'
 end
 
 group :test do
