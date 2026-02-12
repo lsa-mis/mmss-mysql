@@ -59,7 +59,9 @@ Rails.application.routes.draw do
     resources :courses
   # end
 
-  devise_for :users
+  devise_for :users, controllers: {
+    registrations: 'users/registrations'
+  }
   resources :applicant_details
 
   resources :enrollments do
