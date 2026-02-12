@@ -27,25 +27,26 @@ RSpec.describe ApplicationHelper, type: :helper do
     let(:four_hours_in_seconds) { 4.hours.to_i }
 
     before do
+      allow(Time.zone).to receive(:now).and_return(current_time)
       allow(Time).to receive(:current).and_return(current_time)
     end
 
     context 'when session is not present' do
       it 'returns nil when session is not present' do
-        # Stub session to return something that responds to present? as false
-        session_double = double('session')
-        allow(session_double).to receive(:present?).and_return(false)
-        allow(helper).to receive(:session).and_return(session_double)
+        # Stub authentication helpers to return false
+        allow(helper).to receive(:user_signed_in?).and_return(false)
+        allow(helper).to receive(:admin_signed_in?).and_return(false)
+        allow(helper).to receive(:faculty_signed_in?).and_return(false)
         expect(helper.session_expires_at).to be_nil
       end
     end
 
     context 'when session is present' do
-      let(:session_double) { double('session') }
-      
       before do
-        allow(session_double).to receive(:present?).and_return(true)
-        allow(helper).to receive(:session).and_return(session_double)
+        # Stub authentication helpers to return true (user is signed in)
+        allow(helper).to receive(:user_signed_in?).and_return(true)
+        allow(helper).to receive(:admin_signed_in?).and_return(false)
+        allow(helper).to receive(:faculty_signed_in?).and_return(false)
       end
 
       context 'in production environment' do
