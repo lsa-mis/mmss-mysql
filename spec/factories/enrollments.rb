@@ -144,7 +144,12 @@ FactoryBot.define do
 
     trait :international do
       international { true }
-      high_school_country { Faker::Address.country_code }
+      high_school_country do
+        loop do
+          country_code = Faker::Address.country_code
+          break country_code unless country_code == 'US'
+        end
+      end
       high_school_state { nil }
       high_school_non_us { Faker::Address.state }
     end
