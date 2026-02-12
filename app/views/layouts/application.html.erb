@@ -14,7 +14,7 @@
     <%= Sentry.get_trace_propagation_meta.html_safe %>
   </head>
 
-  <body data-environment = Rails.env
+  <body data-environment="<%= Rails.env %>"
         data-controller="session-timeout"
         data-session-timeout-expires-at-value="<%= session_expires_at %>">
     <div data-session-timeout-target="warning" class="hidden fixed top-0 left-0 right-0 bg-yellow-500 text-yellow-900 px-4 py-3 shadow-lg z-50">

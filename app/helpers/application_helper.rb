@@ -187,7 +187,11 @@ module ApplicationHelper
   # Calculate session expiry time in Unix timestamp (seconds)
   # Returns nil if user is not authenticated or session expiry cannot be determined
   def session_expires_at
-    return nil unless session.present?
+    authenticated = false
+    authenticated ||= defined?(user_signed_in?) && user_signed_in?
+    authenticated ||= defined?(admin_signed_in?) && admin_signed_in?
+    authenticated ||= defined?(faculty_signed_in?) && faculty_signed_in?
+    return nil unless authenticated
 
     # Get session timeout from configuration
     # Production uses 4.hours, other environments may vary
