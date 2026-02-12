@@ -35,30 +35,55 @@ export default class extends Controller {
     // Restore saved data on load
     this.restoreFormData()
 
-    // Store bound handlers so we can remove them in disconnect (prevents duplicate listeners on Turbo reconnect)
-    this.boundOnInputChange = () => this.debouncedSave()
-    this.boundOnSubmit = () => {
-      setTimeout(() => {
-        this.clearSavedData()
-        this.hideRestoreMessage()
-      }, 1000)
+    // Ensure handler references exist and remove any existing listeners
+    if (this.onInput) {
+      this.form.removeEventListener('input', this.onInput, true)
     }
-    this.boundOnBeforeUnload = () => this.saveFormData()
+    if (this.onChange) {
+      this.form.removeEventListener('change', this.onChange, true)
+    }
+    if (this.onSubmit) {
+      this.form.removeEventListener('submit', this.onSubmit)
+    }
+    if (this.onBeforeUnload) {
+      window.removeEventListener('beforeunload', this.onBeforeUnload)
+    }
+
+    // Create stable handler references
+    this.onInput = this.onInput || (() => this.debouncedSave())
+    this.onChange = this.onChange || (() => this.debouncedSave())
+    this.onSubmit =
+      this.onSubmit ||
+      (() => {
+        // Clear after a short delay to allow form submission to complete
+        setTimeout(() => {
+          this.clearSavedData()
+          this.hideRestoreMessage()
+        }, 1000)
+      })
+    this.onBeforeUnload =
+      this.onBeforeUnload ||
+      (() => {
+        this.saveFormData()
+      })
 
     // Auto-save on input/change events (these bubble up from inputs to form)
-    this.form.addEventListener('input', this.boundOnInputChange, true)
-    this.form.addEventListener('change', this.boundOnInputChange, true)
+    this.form.addEventListener('input', this.onInput, true)
+    this.form.addEventListener('change', this.onChange, true)
 
-    // Auto-save periodically
+    // Auto-save periodically (avoid duplicate intervals on reconnect)
+    if (this.saveIntervalId) {
+      clearInterval(this.saveIntervalId)
+    }
     this.saveIntervalId = setInterval(() => {
       this.saveFormData()
     }, this.saveIntervalValue)
 
     // Clear saved data on successful form submission
-    this.form.addEventListener('submit', this.boundOnSubmit)
+    this.form.addEventListener('submit', this.onSubmit)
 
     // Handle beforeunload to save data before page unload
-    window.addEventListener('beforeunload', this.boundOnBeforeUnload)
+    window.addEventListener('beforeunload', this.onBeforeUnload)
 
     // Show restore message if data was restored
     if (this.hasRestoredData) {
@@ -76,16 +101,18 @@ export default class extends Controller {
       this.saveIntervalId = null
     }
     if (this.form) {
-      if (this.boundOnInputChange) {
-        this.form.removeEventListener('input', this.boundOnInputChange, true)
-        this.form.removeEventListener('change', this.boundOnInputChange, true)
+      if (this.onInput) {
+        this.form.removeEventListener('input', this.onInput, true)
       }
-      if (this.boundOnSubmit) {
-        this.form.removeEventListener('submit', this.boundOnSubmit)
+      if (this.onChange) {
+        this.form.removeEventListener('change', this.onChange, true)
+      }
+      if (this.onSubmit) {
+        this.form.removeEventListener('submit', this.onSubmit)
       }
     }
-    if (this.boundOnBeforeUnload) {
-      window.removeEventListener('beforeunload', this.boundOnBeforeUnload)
+    if (this.onBeforeUnload) {
+      window.removeEventListener('beforeunload', this.onBeforeUnload)
     }
   }
 
