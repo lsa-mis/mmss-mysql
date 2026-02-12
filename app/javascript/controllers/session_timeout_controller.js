@@ -20,31 +20,38 @@ export default class extends Controller {
     // Also check immediately
     this.checkSessionExpiry()
 
-    // Check before form submission - attach to all forms in the document
+    // Check before form submission - use a single delegated submit handler
     this.setupFormSubmissionWarning()
   }
 
   setupFormSubmissionWarning() {
-    // Find all forms and attach submit handler
-    const forms = document.querySelectorAll('form')
-    forms.forEach(form => {
-      form.addEventListener('submit', (e) => {
-        if (this.isSessionAboutToExpire()) {
-          const proceed = confirm(
-            'Your session is about to expire. If you submit now, you may need to sign in again. Do you want to continue?'
-          )
-          if (!proceed) {
-            e.preventDefault()
-            return false
-          }
-        }
-      })
-    })
+    // Avoid attaching multiple listeners if connect() is called again
+    if (!this.formSubmitHandler) {
+      this.formSubmitHandler = this.handleFormSubmit.bind(this)
+      document.addEventListener('submit', this.formSubmitHandler)
+    }
+  }
+
+  handleFormSubmit(e) {
+    if (this.isSessionAboutToExpire()) {
+      const proceed = confirm(
+        'Your session is about to expire. If you submit now, you may need to sign in again. Do you want to continue?'
+      )
+      if (!proceed) {
+        e.preventDefault()
+        return false
+      }
+    }
   }
 
   disconnect() {
     if (this.checkInterval) {
       clearInterval(this.checkInterval)
+    }
+
+    if (this.formSubmitHandler) {
+      document.removeEventListener('submit', this.formSubmitHandler)
+      this.formSubmitHandler = null
     }
   }
 
