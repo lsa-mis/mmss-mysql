@@ -7,7 +7,7 @@ class ApplicationController < ActionController::Base
     if user_signed_in? || admin_signed_in? || faculty_signed_in?
       # User is authenticated but CSRF token invalid - likely session expired
       flash[:alert] = "Your session expired. Please try submitting again. If the problem persists, please sign out and sign back in."
-      redirect_to request.referrer || root_path
+      redirect_back fallback_location: root_path
     else
       # User not authenticated - redirect to sign in
       flash[:alert] = "Your session expired. Please sign in again to continue."
