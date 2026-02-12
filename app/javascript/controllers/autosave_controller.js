@@ -35,9 +35,19 @@ export default class extends Controller {
     // Restore saved data on load
     this.restoreFormData()
 
+    // Store bound handlers so we can remove them in disconnect (prevents duplicate listeners on Turbo reconnect)
+    this.boundOnInputChange = () => this.debouncedSave()
+    this.boundOnSubmit = () => {
+      setTimeout(() => {
+        this.clearSavedData()
+        this.hideRestoreMessage()
+      }, 1000)
+    }
+    this.boundOnBeforeUnload = () => this.saveFormData()
+
     // Auto-save on input/change events (these bubble up from inputs to form)
-    this.form.addEventListener('input', () => this.debouncedSave(), true)
-    this.form.addEventListener('change', () => this.debouncedSave(), true)
+    this.form.addEventListener('input', this.boundOnInputChange, true)
+    this.form.addEventListener('change', this.boundOnInputChange, true)
 
     // Auto-save periodically
     this.saveIntervalId = setInterval(() => {
@@ -45,18 +55,10 @@ export default class extends Controller {
     }, this.saveIntervalValue)
 
     // Clear saved data on successful form submission
-    this.form.addEventListener('submit', () => {
-      // Clear after a short delay to allow form submission to complete
-      setTimeout(() => {
-        this.clearSavedData()
-        this.hideRestoreMessage()
-      }, 1000)
-    })
+    this.form.addEventListener('submit', this.boundOnSubmit)
 
     // Handle beforeunload to save data before page unload
-    window.addEventListener('beforeunload', () => {
-      this.saveFormData()
-    })
+    window.addEventListener('beforeunload', this.boundOnBeforeUnload)
 
     // Show restore message if data was restored
     if (this.hasRestoredData) {
@@ -65,8 +67,25 @@ export default class extends Controller {
   }
 
   disconnect() {
+    if (this.saveTimeout) {
+      clearTimeout(this.saveTimeout)
+      this.saveTimeout = null
+    }
     if (this.saveIntervalId) {
       clearInterval(this.saveIntervalId)
+      this.saveIntervalId = null
+    }
+    if (this.form) {
+      if (this.boundOnInputChange) {
+        this.form.removeEventListener('input', this.boundOnInputChange, true)
+        this.form.removeEventListener('change', this.boundOnInputChange, true)
+      }
+      if (this.boundOnSubmit) {
+        this.form.removeEventListener('submit', this.boundOnSubmit)
+      }
+    }
+    if (this.boundOnBeforeUnload) {
+      window.removeEventListener('beforeunload', this.boundOnBeforeUnload)
     }
   }
 
