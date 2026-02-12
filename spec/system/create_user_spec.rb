@@ -20,12 +20,9 @@ RSpec.describe 'Create user', type: :system do
              application_close: Date.current + 90.days,
              active: true)
 
-      visit root_path
-      click_on "Sign up"
-      
-      # Wait for form fields to be available
+      visit new_user_registration_path
+
       expect(page).to have_field('Email')
-      
       fill_in 'Email', with: "testuser@test.com"
       fill_in 'Password', with: "secretsecret"
       fill_in 'Password confirmation', with: "secret"
@@ -44,12 +41,9 @@ RSpec.describe 'Create user', type: :system do
              application_close: Date.current + 90.days,
              active: true)
 
-      visit root_path
-      click_on "Sign up"
-      
-      # Wait for form fields to be available
+      visit new_user_registration_path
+
       expect(page).to have_field('Email')
-      
       fill_in 'Email', with: "testuser@test.com"
       fill_in 'Password', with: "secretsecret"
       fill_in 'Password confirmation', with: "secretsecret"
@@ -69,12 +63,9 @@ RSpec.describe 'Create user', type: :system do
              active: true)
 
       @user = FactoryBot.create(:user)
-      visit root_path
-      click_on "Sign up"
-      
-      # Wait for form fields to be available
+      visit new_user_registration_path
+
       expect(page).to have_field('Email')
-      
       fill_in 'Email', with: @user.email
       fill_in 'Password', with: @user.password
       fill_in 'Password confirmation', with: @user.password
