@@ -3,7 +3,11 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static values = {
     storageKey: String,
-    saveInterval: { type: Number, default: 30000 } // Default: 30 seconds
+    saveInterval: { type: Number, default: 30000 }, // Default: 30 seconds
+    // "local" (default) = localStorage, survives browser close. "session" = sessionStorage, cleared when tab closes.
+    storageType: { type: String, default: 'local' },
+    // Max age in ms before restored data is considered stale (localStorage only). e.g. 86400000 = 24 hours. Unset = no limit.
+    maxAgeMs: Number
   }
 
   connect() {
@@ -76,6 +80,22 @@ export default class extends Controller {
     }, 1000) // Wait 1 second after last change
   }
 
+  // Field names that must never be persisted (security/PII, Rails internals)
+  static DENYLIST_KEYS = [
+    'authenticity_token', 'utf8', 'commit', '_method',
+    'password', 'password_confirmation', 'current_password',
+    'token', 'api_key', 'secret', 'csrf_token'
+  ]
+
+  static isDenylisted(key) {
+    const lower = key.toLowerCase()
+    return this.DENYLIST_KEYS.some(d => lower === d || lower.includes('password') || lower.includes('secret'))
+  }
+
+  get storage() {
+    return (this.storageTypeValue === 'session') ? sessionStorage : localStorage
+  }
+
   saveFormData() {
     try {
       if (!this.form) return
@@ -83,8 +103,10 @@ export default class extends Controller {
       const formData = new FormData(this.form)
       const data = {}
 
-      // Save all form fields except file inputs (can't be serialized)
+      // Save form fields except denylisted and file inputs (can't be serialized)
       for (const [key, value] of formData.entries()) {
+        if (this.constructor.isDenylisted(key)) continue
+
         const input = this.form.querySelector(`[name="${key}"]`)
         if (input && input.type === 'file') {
           // For file inputs, save metadata only
@@ -112,7 +134,7 @@ export default class extends Controller {
       // Save timestamp
       data._saved_at = new Date().toISOString()
 
-      localStorage.setItem(this.storageKeyValue, JSON.stringify(data))
+      this.storage.setItem(this.storageKeyValue, JSON.stringify(data))
     } catch (error) {
       console.warn('Autosave failed:', error)
     }
@@ -122,16 +144,21 @@ export default class extends Controller {
     try {
       if (!this.form) return
       
-      const savedData = localStorage.getItem(this.storageKeyValue)
+      const savedData = this.storage.getItem(this.storageKeyValue)
       if (!savedData) return
 
       const data = JSON.parse(savedData)
+      if (this.hasMaxAgeMsValue && data._saved_at) {
+        const age = Date.now() - new Date(data._saved_at).getTime()
+        if (age > this.maxAgeMsValue) return // Data too old, don't restore
+      }
 
       let hasRestored = false
 
       // Restore form fields
       for (const [key, value] of Object.entries(data)) {
         if (key.startsWith('_')) continue // Skip metadata
+        if (this.constructor.isDenylisted(key)) continue
 
         const input = this.form.querySelector(`[name="${key}"]`)
         if (!input) continue
@@ -183,21 +210,25 @@ export default class extends Controller {
   }
 
   showFileRestoreWarning(input, filename) {
-    // Create a warning message next to the file input
+    // Create a warning message next to the file input (use textContent to avoid XSS from untrusted filename)
     const warningId = `file-warning-${input.name}`
     if (document.getElementById(warningId)) return // Already shown
 
     const warning = document.createElement('div')
     warning.id = warningId
     warning.className = 'text-yellow-600 text-sm mt-1'
-    warning.innerHTML = `<span class="font-semibold">Note:</span> Previously selected file "${filename}" could not be restored. Please select your file again.`
+    const noteSpan = document.createElement('span')
+    noteSpan.className = 'font-semibold'
+    noteSpan.textContent = 'Note: '
+    warning.appendChild(noteSpan)
+    warning.appendChild(document.createTextNode(`Previously selected file "${filename}" could not be restored. Please select your file again.`))
     
     input.parentNode.insertBefore(warning, input.nextSibling)
   }
 
   clearSavedData() {
     try {
-      localStorage.removeItem(this.storageKeyValue)
+      this.storage.removeItem(this.storageKeyValue)
       // Clear any file warnings
       const warnings = document.querySelectorAll('[id^="file-warning-"]')
       warnings.forEach(warning => warning.remove())
