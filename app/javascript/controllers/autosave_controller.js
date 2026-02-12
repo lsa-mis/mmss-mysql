@@ -133,7 +133,7 @@ export default class extends Controller {
       for (const [key, value] of Object.entries(data)) {
         if (key.startsWith('_')) continue // Skip metadata
 
-        const input = form.querySelector(`[name="${key}"]`)
+        const input = this.form.querySelector(`[name="${key}"]`)
         if (!input) continue
 
         // Handle checkboxes and radio buttons
