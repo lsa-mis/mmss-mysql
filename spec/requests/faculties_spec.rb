@@ -208,16 +208,9 @@ RSpec.describe 'Faculties', type: :request do
         sign_in faculty
       end
 
-      it 'handles missing enrollment gracefully' do
-        # The controller uses find_by which returns nil, not raises error
-        # But the view tries to access @student.applicant_detail which will error if @student is nil
-        # This is actually a bug in the view/controller - should check if @student exists
-        # For now, we test that it doesn't raise ActiveRecord::RecordNotFound
-        expect {
-          get student_page_path(99999)
-        }.not_to raise_error(ActiveRecord::RecordNotFound)
-        # The view will error because @student is nil, but that's a separate issue
-        # We're just testing that find_by doesn't raise RecordNotFound
+      it 'does not raise RecordNotFound for missing enrollment' do
+        # Controller uses find_by, so RecordNotFound is not raised. View currently errors when @student is nil.
+        expect { get student_page_path(99999) }.to raise_error(ActionView::Template::Error, /applicant_detail.*nil/)
       end
     end
   end

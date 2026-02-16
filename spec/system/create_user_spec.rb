@@ -26,7 +26,7 @@ RSpec.describe 'Create user', type: :system do
       fill_in 'Email', with: "testuser@test.com"
       fill_in 'Password', with: "secretsecret"
       fill_in 'Password confirmation', with: "secret"
-      click_on "Sign up"
+      click_button "Sign up"
 
       expect(page).to have_content("Password confirmation doesn't match Password")
     end
@@ -47,7 +47,7 @@ RSpec.describe 'Create user', type: :system do
       fill_in 'Email', with: "testuser@test.com"
       fill_in 'Password', with: "secretsecret"
       fill_in 'Password confirmation', with: "secretsecret"
-      click_on "Sign up"
+      within("form[action*='user']") { click_button "Sign up" }
 
       expect(page).to have_content("Welcome! You have signed up successfully.")
     end
@@ -69,7 +69,7 @@ RSpec.describe 'Create user', type: :system do
       fill_in 'Email', with: @user.email
       fill_in 'Password', with: @user.password
       fill_in 'Password confirmation', with: @user.password
-      click_on "Sign up"
+      click_button "Sign up"
 
       expect(page).to have_content("Email has already been taken")
     end
