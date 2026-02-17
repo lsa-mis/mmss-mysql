@@ -209,7 +209,7 @@ RSpec.describe 'Faculties', type: :request do
       end
 
       it 'does not raise RecordNotFound for missing enrollment' do
-        # Controller uses find_by, so RecordNotFound is not raised. View currently errors when @student is nil.
+        # Controller uses find_by, so RecordNotFound is not raised; instead, the view raises an error when @student is nil (expected here).
         expect { get student_page_path(99999) }.to raise_error(ActionView::Template::Error, /applicant_detail.*nil/)
       end
     end
