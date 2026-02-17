@@ -34,6 +34,9 @@ RSpec.describe 'Create user', type: :system do
 
   context 'create user' do
     it 'shows the right content' do
+      # Use unique email to avoid collision when tests run in different order
+      email = "testuser_#{SecureRandom.hex(8)}@test.com"
+
       # Create test data directly in the test
       create(:camp_configuration,
              camp_year: 2026,
@@ -44,7 +47,7 @@ RSpec.describe 'Create user', type: :system do
       visit new_user_registration_path
 
       expect(page).to have_field('Email')
-      fill_in 'Email', with: "testuser@test.com"
+      fill_in 'Email', with: email
       fill_in 'Password', with: "secretsecret"
       fill_in 'Password confirmation', with: "secretsecret"
       within("form[action*='user']") { click_button "Sign up" }

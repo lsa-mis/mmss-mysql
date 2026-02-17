@@ -74,6 +74,9 @@ RSpec.configure do |config|
   config.include Devise::Test::IntegrationHelpers, type: :request
   config.include Warden::Test::Helpers
 
+  # Reset Warden state after each test to prevent session leakage between tests
+  config.after(:each) { Warden.test_reset! }
+
   # FactoryBot methods
   config.include FactoryBot::Syntax::Methods
 
