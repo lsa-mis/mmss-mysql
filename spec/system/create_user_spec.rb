@@ -20,16 +20,13 @@ RSpec.describe 'Create user', type: :system do
              application_close: Date.current + 90.days,
              active: true)
 
-      visit root_path
-      click_on "Sign up"
-      
-      # Wait for form fields to be available
+      visit new_user_registration_path
+
       expect(page).to have_field('Email')
-      
       fill_in 'Email', with: "testuser@test.com"
       fill_in 'Password', with: "secretsecret"
       fill_in 'Password confirmation', with: "secret"
-      click_on "Sign up"
+      click_button "Sign up"
 
       expect(page).to have_content("Password confirmation doesn't match Password")
     end
@@ -37,6 +34,9 @@ RSpec.describe 'Create user', type: :system do
 
   context 'create user' do
     it 'shows the right content' do
+      # Use unique email to avoid collision when tests run in different order
+      email = "testuser_#{SecureRandom.hex(8)}@test.com"
+
       # Create test data directly in the test
       create(:camp_configuration,
              camp_year: 2026,
@@ -44,16 +44,13 @@ RSpec.describe 'Create user', type: :system do
              application_close: Date.current + 90.days,
              active: true)
 
-      visit root_path
-      click_on "Sign up"
-      
-      # Wait for form fields to be available
+      visit new_user_registration_path
+
       expect(page).to have_field('Email')
-      
-      fill_in 'Email', with: "testuser@test.com"
+      fill_in 'Email', with: email
       fill_in 'Password', with: "secretsecret"
       fill_in 'Password confirmation', with: "secretsecret"
-      click_on "Sign up"
+      within("form[action*='user']") { click_button "Sign up" }
 
       expect(page).to have_content("Welcome! You have signed up successfully.")
     end
@@ -69,16 +66,13 @@ RSpec.describe 'Create user', type: :system do
              active: true)
 
       @user = FactoryBot.create(:user)
-      visit root_path
-      click_on "Sign up"
-      
-      # Wait for form fields to be available
+      visit new_user_registration_path
+
       expect(page).to have_field('Email')
-      
       fill_in 'Email', with: @user.email
       fill_in 'Password', with: @user.password
       fill_in 'Password confirmation', with: @user.password
-      click_on "Sign up"
+      click_button "Sign up"
 
       expect(page).to have_content("Email has already been taken")
     end

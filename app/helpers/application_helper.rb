@@ -183,4 +183,70 @@ module ApplicationHelper
       'Transaction Status not returned'
     end
   end
+
+  # Calculate session expiry time in Unix timestamp (seconds)
+  # Returns nil if user is not authenticated or session expiry cannot be determined
+  def session_expires_at
+    authenticated = false
+    authenticated ||= defined?(user_signed_in?) && user_signed_in?
+    authenticated ||= defined?(admin_signed_in?) && admin_signed_in?
+    authenticated ||= defined?(faculty_signed_in?) && faculty_signed_in?
+    return nil unless authenticated
+
+    # Get session timeout from configuration
+    # Production uses 4.hours, other environments may vary
+    timeout_seconds = if Rails.env.production?
+                        4.hours.to_i
+                      elsif Rails.env.staging?
+                        4.hours.to_i
+                      else
+                        # Development default (no expiry, but set a reasonable default for warning)
+                        4.hours.to_i
+                      end
+
+    # Try to determine when the session was created so we can calculate the real expiry time.
+    session_created_at = nil
+
+    # Prefer an explicitly stored session creation time, if the application sets one
+    if session.key?(:session_created_at)
+      raw_created_at = session[:session_created_at]
+      if raw_created_at.respond_to?(:to_time)
+        session_created_at = raw_created_at.to_time
+      elsif raw_created_at.respond_to?(:to_i)
+        session_created_at = Time.at(raw_created_at.to_i)
+      end
+    end
+
+    # Fallback: try to infer creation time from Devise/Warden session data, if present
+    if session_created_at.nil?
+      # Look for any Warden session hash keyed like "warden.user.xxx.session"
+      warden_session_entry = session.to_h.find do |key, value|
+        key.to_s.start_with?("warden.user.") && key.to_s.end_with?(".session") && value.is_a?(Hash)
+      end
+
+      if warden_session_entry
+        warden_session = warden_session_entry.last
+        raw_created_at = warden_session['session_created_at'] ||
+                         warden_session[:session_created_at] ||
+                         warden_session['created_at'] ||
+                         warden_session[:created_at]
+
+        if raw_created_at
+          if raw_created_at.respond_to?(:to_time)
+            session_created_at = raw_created_at.to_time
+          elsif raw_created_at.respond_to?(:to_i)
+            session_created_at = Time.at(raw_created_at.to_i)
+          end
+        end
+      end
+    end
+
+    # If we could determine the creation time, use it to compute expiry.
+    # Otherwise, fall back to the previous approximation based on current time.
+    if session_created_at
+      (session_created_at.to_i + timeout_seconds)
+    else
+      Time.current.to_i + timeout_seconds
+    end
+  end
 end

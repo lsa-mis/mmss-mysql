@@ -53,7 +53,12 @@ Rails.application.configure do
   config.force_ssl = true
 
   # Ensure the session cookies are also set to secure in production
-  Rails.application.config.session_store :cookie_store, key: 'mmss_security_session', secure: Rails.env.production?
+  # Extended timeout (4 hours) to accommodate long forms like enrollment applications
+  # This prevents CSRF token expiration while users fill out lengthy forms
+  Rails.application.config.session_store :cookie_store,
+                                         key: 'mmss_security_session',
+                                         secure: Rails.env.production?,
+                                         expire_after: 4.hours
 
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.
