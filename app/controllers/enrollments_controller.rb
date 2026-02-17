@@ -151,6 +151,8 @@ class EnrollmentsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_current_enrollment
       @current_enrollment = current_user.enrollments.current_camp_year_applications.last
+      return if @current_enrollment.present?
+      redirect_to root_path, alert: "No current enrollment found." and return if %i[show edit update destroy].include?(action_name.to_sym)
     end
 
     def set_course_sessions
