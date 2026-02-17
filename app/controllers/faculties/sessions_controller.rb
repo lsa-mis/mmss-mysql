@@ -2,18 +2,16 @@
 
 class Faculties::SessionsController < Devise::SessionsController
 
-  # GET /resource/sign_in
-  def new
-    super 
-  end
-
   # POST /resource/sign_in
   def create
     faculty = Faculty.find_by(email: params[:faculty][:email].downcase)
     if faculty 
       uniqname = faculty.email.split('@').first
       if Course.current_camp.pluck(:faculty_uniqname).uniq.compact.include?(uniqname)
-        sign_in_and_redirect faculty
+        sign_in faculty
+        # Set session creation time for accurate expiry calculation
+        session[:session_created_at] = Time.current.to_i
+        redirect_to faculty_path
       else
         redirect_to root_path, :alert => "You don't have any courses, please contact the administrator"
       end

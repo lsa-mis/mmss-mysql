@@ -17,13 +17,27 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def after_sign_in_path_for(resource)
+  def after_sign_in_path_for(_resource)
     if faculty_signed_in?
       faculty_path
     elsif admin_signed_in?
       admin_root_path
     else
       root_path
+    end
+  end
+
+  # Set session creation time when user signs in
+  # This is used by session_expires_at helper to calculate accurate expiry times
+  before_action :set_session_creation_time
+
+  private
+
+  def set_session_creation_time
+    # Only set if user is authenticated and session_created_at is not already set
+    # This ensures we capture the actual sign-in time, not subsequent requests
+    if (user_signed_in? || admin_signed_in? || faculty_signed_in?) && session[:session_created_at].nil?
+      session[:session_created_at] = Time.current.to_i
     end
   end
 
