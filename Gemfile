@@ -32,7 +32,7 @@ gem 'net-pop', require: false
 gem 'net-smtp', require: false
 gem 'observer', require: false
 
-gem 'nokogiri', '~> 1.16', '>= 1.16.8'
+gem 'nokogiri', '~> 1.19'
 
 gem 'sentry-rails'
 gem 'sentry-ruby'
