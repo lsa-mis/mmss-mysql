@@ -27,6 +27,7 @@ class User < ApplicationRecord
   has_one :applicant_detail, dependent: :destroy, inverse_of: :user
   has_many :enrollments, dependent: :destroy
   has_many :payments, dependent: :destroy
+  has_many :payment_requests, dependent: :nullify
   has_many :feedbacks, dependent: :destroy
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
