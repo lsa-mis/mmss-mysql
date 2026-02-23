@@ -2,6 +2,11 @@
 
 require 'rails_helper'
 
+# These tests do NOT touch the production Nelnet gateway:
+# - Rails.application.credentials is stubbed with SERVICE_SELECTOR: 'QA', so the app
+#   always uses DEVELOPMENT_KEY/DEVELOPMENT_URL when make_payment runs.
+# - Tests never follow the redirect to the gateway; they only assert the Location header.
+# - payment_receipt tests simulate Nelnet callbacks with inline params; no outbound HTTP.
 RSpec.describe PaymentsController, type: :request do
   let!(:camp_config) { create(:camp_configuration, :active, camp_year: Date.current.year) }
   let(:user) { create(:user, :with_applicant_detail) }
@@ -10,7 +15,7 @@ RSpec.describe PaymentsController, type: :request do
   # Order number format sent to/from Nelnet: email prefix + '-' + user id
   let(:order_number) { "#{user.email.partition('@').first}-#{user.id}" }
 
-  # Stub Nelnet credentials (QA/development)
+  # Stub Nelnet credentials so production is never used (QA selector + fake prod URL).
   let(:nelnet_credentials) do
     OpenStruct.new(
       NELNET_SERVICE: {
@@ -18,7 +23,7 @@ RSpec.describe PaymentsController, type: :request do
         DEVELOPMENT_KEY: 'dev-key',
         DEVELOPMENT_URL: 'https://auth-interstitial.it.umich.edu/',
         PRODUCTION_KEY: 'prod-key',
-        PRODUCTION_URL: 'https://prod.example.com/pay'
+        PRODUCTION_URL: 'https://prod.example.com/pay'  # fake; never used in tests
       }
     )
   end
