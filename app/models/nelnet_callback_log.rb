@@ -6,4 +6,12 @@
 class NelnetCallbackLog < ApplicationRecord
   # No associations; this is a raw request log
   # raw_params stores the full params hash as JSON
+
+  def self.ransackable_associations(_auth_object = nil)
+    []
+  end
+
+  def self.ransackable_attributes(_auth_object = nil)
+    %w[created_at id order_number raw_params transaction_id transaction_status transaction_total_amount updated_at]
+  end
 end

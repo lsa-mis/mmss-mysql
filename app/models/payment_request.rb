@@ -15,4 +15,12 @@ class PaymentRequest < ApplicationRecord
 
   scope :unmatched, -> { where(payment_id: nil) }
   scope :for_camp_year, ->(year) { where(camp_year: year) }
+
+  def self.ransackable_associations(_auth_object = nil)
+    %w[payment user]
+  end
+
+  def self.ransackable_attributes(_auth_object = nil)
+    %w[amount_cents camp_year created_at id order_number payment_id request_timestamp updated_at user_id]
+  end
 end
