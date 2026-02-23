@@ -281,6 +281,33 @@ ActiveRecord::Schema.define(version: 2025_11_12_171302) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "nelnet_callback_logs", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.string "transaction_id", comment: "Nelnet transactionId from callback"
+    t.string "order_number", comment: "orderNumber from callback (user_account)"
+    t.string "transaction_status"
+    t.string "transaction_total_amount"
+    t.text "raw_params", comment: "Full request params as JSON"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["created_at"], name: "index_nelnet_callback_logs_on_created_at"
+    t.index ["order_number"], name: "index_nelnet_callback_logs_on_order_number"
+    t.index ["transaction_id"], name: "index_nelnet_callback_logs_on_transaction_id"
+  end
+
+  create_table "payment_requests", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "order_number", null: false, comment: "Sent to Nelnet as orderNumber (user_account)"
+    t.integer "amount_cents", null: false, comment: "Amount sent in request (cents)"
+    t.integer "camp_year"
+    t.bigint "request_timestamp", null: false, comment: "Epoch timestamp sent in URL to Nelnet"
+    t.bigint "payment_id", comment: "Set when receipt received"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["payment_id"], name: "index_payment_requests_on_payment_id"
+    t.index ["user_id", "order_number"], name: "index_payment_requests_on_user_id_and_order_number"
+    t.index ["user_id"], name: "index_payment_requests_on_user_id"
+  end
+
   create_table "payments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "transaction_type"
     t.string "transaction_status"
@@ -412,6 +439,8 @@ ActiveRecord::Schema.define(version: 2025_11_12_171302) do
   add_foreign_key "enrollments", "users"
   add_foreign_key "feedbacks", "users"
   add_foreign_key "financial_aids", "enrollments"
+  add_foreign_key "payment_requests", "payments"
+  add_foreign_key "payment_requests", "users"
   add_foreign_key "payments", "users"
   add_foreign_key "recommendations", "enrollments"
   add_foreign_key "recuploads", "recommendations"
