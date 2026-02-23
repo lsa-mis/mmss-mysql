@@ -37,6 +37,7 @@
 yarn-debug.log*
 .yarn-integrity
 .vscode
+.cursor
 .notes
 myname@gmail.com
 
