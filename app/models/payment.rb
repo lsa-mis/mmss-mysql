@@ -43,6 +43,7 @@ class Payment < ApplicationRecord
   validates :camp_year, presence: true
 
   belongs_to :user
+  has_one :payment_request, dependent: :nullify
 
   # Virtual attribute for dollar amounts in admin forms
   def total_amount_dollars
