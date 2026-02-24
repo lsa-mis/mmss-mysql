@@ -64,6 +64,14 @@ namespace :deploy do
     end
   end
 
+  # Write REVISION file for Sentry release tracking (config.release in sentry.rb)
+  task :write_revision do
+    on roles(:app) do
+      execute "cd #{repo_path} && git rev-parse HEAD > #{release_path}/REVISION"
+    end
+  end
+  after "deploy:updating", "deploy:write_revision"
+
   desc 'Upload to shared/config'
   task :upload do
     on roles(:app) do

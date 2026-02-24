@@ -11,33 +11,34 @@ Sentry.init do |config|
   # Only enable in production and staging environments
   config.enabled_environments = %w[production staging]
 
+  # Release for deploy tracking and suspect commits (set by Capistrano REVISION file or ENV)
+  config.release = ENV["SENTRY_RELEASE"].presence ||
+    (File.read(Rails.root.join("REVISION")).strip if Rails.root.join("REVISION").exist?)
+
+  # Structured logging (sentry-ruby 5.24+); view in Sentry Logs and link to errors/traces
+  config.enable_logs = true
+
   # Logging configuration
   config.breadcrumbs_logger = [:active_support_logger, :http_logger]
 
   # Add user context data (PII)
   config.send_default_pii = true
 
-  # Performance monitoring
-  # In production, you might want to lower this to something like 0.1 (10%)
-  # depending on your traffic volume
-  config.traces_sample_rate = Rails.env.production? ? 0.1 : 1.0
-
-  # Profile sampling - adjust based on your needs
-  config.profiles_sample_rate = Rails.env.production? ? 0.1 : 1.0
-
-  # Custom sampling logic if needed
+  # Performance monitoring: traces_sampler is the single source of truth (overrides traces_sample_rate)
   config.traces_sampler = lambda do |context|
-    # Don't sample health check endpoints
-    if context[:transaction_context][:name]&.include?('health_check')
+    name = context[:transaction_context][:name].to_s
+    if name.include?("health_check")
       0.0
     else
-      # Sample based on environment
       Rails.env.production? ? 0.1 : 1.0
     end
   end
 
+  # Profile sampling - adjust based on your needs
+  config.profiles_sample_rate = Rails.env.production? ? 0.1 : 1.0
+
   # Add additional context to errors
-  config.before_send = lambda do |event, hint|
+  config.before_send = lambda do |event, _hint|
     # You can add custom data here
     if defined?(Current) && Current.user
       event.user = {
