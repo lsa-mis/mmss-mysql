@@ -34,8 +34,8 @@ gem 'observer', require: false
 
 gem 'nokogiri', '~> 1.19'
 
-gem 'sentry-rails'
-gem 'sentry-ruby', '>= 5.24' # 5.24+ for Sentry Logging (enable_logs)
+gem 'sentry-rails', '~> 6.3'
+gem 'sentry-ruby', '~> 6.3' # 5.24+ for Sentry Logging (enable_logs)
 gem 'stackprof'
 
 group :development, :test do
