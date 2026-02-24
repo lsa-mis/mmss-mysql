@@ -14,8 +14,6 @@ class PaymentsController < ApplicationController
 
   before_action :set_current_enrollment
 
-
-
   def index
     redirect_to root_url
   end
