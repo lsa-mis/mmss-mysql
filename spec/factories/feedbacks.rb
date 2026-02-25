@@ -1,55 +1,25 @@
 # frozen_string_literal: true
 
-# == Schema Information
-#
-# Table name: feedbacks
-#
-#  id         :bigint           not null, primary key
-#  genre      :string(255)
-#  message    :string(255)
-#  user_id    :bigint
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#
-# Indexes
-#
-#  index_feedbacks_on_user_id  (user_id)
-#
-# Foreign Keys
-#
-#  fk_rails_...  (user_id => users.id)
-#
 FactoryBot.define do
   factory :feedback do
     association :user
-    association :camp_configuration
+    genre { "page_error" }
+    message { Faker::Lorem.sentence(word_count: 10) }
 
-    communication_rating { rand(1..5) }
-    food_rating { rand(1..5) }
-    housing_rating { rand(1..5) }
-    courses_rating { rand(1..5) }
-    activities_rating { rand(1..5) }
-    overall_rating { rand(1..5) }
-    what_liked { Faker::Lorem.paragraph }
-    what_to_improve { Faker::Lorem.paragraph }
-    comments { Faker::Lorem.paragraph }
-
-    trait :excellent do
-      communication_rating { 5 }
-      food_rating { 5 }
-      housing_rating { 5 }
-      courses_rating { 5 }
-      activities_rating { 5 }
-      overall_rating { 5 }
+    trait :page_error do
+      genre { "page_error" }
     end
 
-    trait :poor do
-      communication_rating { 2 }
-      food_rating { 2 }
-      housing_rating { 2 }
-      courses_rating { 2 }
-      activities_rating { 2 }
-      overall_rating { 2 }
+    trait :layout_issue do
+      genre { "layout_issue" }
+    end
+
+    trait :suggestion do
+      genre { "suggestion" }
+    end
+
+    trait :max_message do
+      message { "x" * Feedback::MESSAGE_MAX_LENGTH }
     end
   end
 end
