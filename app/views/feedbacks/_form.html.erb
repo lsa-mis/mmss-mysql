@@ -15,9 +15,10 @@
     <%= form.select :genre, ([["Error on Page","page_error"],["Layout Issue","layout_issue"],["Suggestion","suggestion"]]), include_blank: true, required: true %>
   </div>
 
-  <div class="field">
+  <div class="field" data-controller="character-counter" data-character-counter-max-value="<%= Feedback::MESSAGE_MAX_LENGTH %>">
     <%= form.label :message %>
-    <%= form.text_area :message, size: "24x6" %>
+    <%= form.text_area :message, size: "24x6", maxlength: Feedback::MESSAGE_MAX_LENGTH, data: { character_counter_target: "input" } %>
+    <div class="form-text text-muted" data-character-counter-target="counter" aria-live="polite">0 / <%= Feedback::MESSAGE_MAX_LENGTH %> characters</div>
   </div>
 
   <div class="actions">

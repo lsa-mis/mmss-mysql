@@ -22,8 +22,11 @@
 class Feedback < ApplicationRecord
   belongs_to :user
 
+  MESSAGE_MAX_LENGTH = 255
+
   validates :genre, presence: true
   validates :message, presence: true
+  validates :message, length: { maximum: MESSAGE_MAX_LENGTH, message: "is too long (maximum is %{count} characters)" }
 
   def self.ransackable_associations(auth_object = nil)
     ["user"]
