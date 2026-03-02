@@ -76,88 +76,102 @@ class PaymentsController < ApplicationController
 
   private
 
-    def set_current_enrollment
-      @current_enrollment = current_user.enrollments.current_camp_year_applications.last
-      return if @current_enrollment.present?
+  def set_current_enrollment
+    @current_enrollment = current_user.enrollments.current_camp_year_applications.last
+    return if @current_enrollment.present?
 
-      redirect_to root_url, alert: 'No current enrollment found for this camp year.' and return
+    redirect_to root_url, alert: 'No current enrollment found for this camp year.' and return
+  end
+
+  def generate_hash(amount = current_camp_fee / 100)
+    user_account = current_user.email.partition('@').first + '-' + current_user.id.to_s
+    amount_to_be_payed = amount.to_i
+    if Rails.env.development? || Rails.application.credentials.NELNET_SERVICE[:SERVICE_SELECTOR] == "QA"
+      key_to_use = 'test_key'
+      url_to_use = 'test_URL'
+    else
+      key_to_use = 'prod_key'
+      url_to_use = 'prod_URL'
     end
 
-    def generate_hash(amount = current_camp_fee / 100)
-      user_account = current_user.email.partition('@').first + '-' + current_user.id.to_s
-      amount_to_be_payed = amount.to_i
-      if Rails.env.development? || Rails.application.credentials.NELNET_SERVICE[:SERVICE_SELECTOR] == "QA"
-        key_to_use = 'test_key'
-        url_to_use = 'test_URL'
-      else
-        key_to_use = 'prod_key'
-        url_to_use = 'prod_URL'
-      end
+    connection_hash = {
+      'test_key' => Rails.application.credentials.NELNET_SERVICE[:DEVELOPMENT_KEY],
+      'test_URL' => Rails.application.credentials.NELNET_SERVICE[:DEVELOPMENT_URL],
+      'prod_key' => Rails.application.credentials.NELNET_SERVICE[:PRODUCTION_KEY],
+      'prod_URL' => Rails.application.credentials.NELNET_SERVICE[:PRODUCTION_URL]
+    }
 
-      connection_hash = {
-        'test_key' => Rails.application.credentials.NELNET_SERVICE[:DEVELOPMENT_KEY],
-        'test_URL' => Rails.application.credentials.NELNET_SERVICE[:DEVELOPMENT_URL],
-        'prod_key' => Rails.application.credentials.NELNET_SERVICE[:PRODUCTION_KEY],
-        'prod_URL' => Rails.application.credentials.NELNET_SERVICE[:PRODUCTION_URL]
-      }
+    redirect_url = connection_hash[url_to_use]
+    current_epoch_time = DateTime.now.strftime("%Q").to_i
+    initial_hash = {
+      'orderNumber' => user_account,
+      'orderType' => 'MMSS Univ of Michigan',
+      'orderDescription' => 'MMSS Conference Fees',
+      'amountDue' => amount_to_be_payed * 100,
+      'redirectUrl' => redirect_url,
+      'redirectUrlParameters' => 'transactionType,transactionStatus,transactionId,transactionTotalAmount,transactionDate,transactionAcountType,transactionResultCode,transactionResultMessage,orderNumber',
+      'timestamp' => current_epoch_time,
+      'key' => connection_hash[key_to_use]
+    }
 
-      redirect_url = connection_hash[url_to_use]
-      current_epoch_time = DateTime.now.strftime("%Q").to_i
-      initial_hash = {
-        'orderNumber' => user_account,
-        'orderType' => 'MMSS Univ of Michigan',
-        'orderDescription' => 'MMSS Conference Fees',
-        'amountDue' => amount_to_be_payed * 100,
-        'redirectUrl' => redirect_url,
-        'redirectUrlParameters' => 'transactionType,transactionStatus,transactionId,transactionTotalAmount,transactionDate,transactionAcountType,transactionResultCode,transactionResultMessage,orderNumber',
-        'timestamp' => current_epoch_time,
-        'key' => connection_hash[key_to_use]
-      }
+    # Sample Hash Creation
+    hash_to_be_encoded = initial_hash.values.map { |v| "#{v}" }.join('')
+    encoded_hash = Digest::SHA256.hexdigest hash_to_be_encoded
 
-      # Sample Hash Creation
-      hash_to_be_encoded = initial_hash.values.map { |v| "#{v}" }.join('')
-      encoded_hash = Digest::SHA256.hexdigest hash_to_be_encoded
+    # Final URL
+    url_for_payment = initial_hash.map { |k, v| "#{k}=#{v}&" unless k == 'key' }.join('')
+    final_url = connection_hash[url_to_use] + '?' + url_for_payment + 'hash=' + encoded_hash
 
-      # Final URL
-      url_for_payment = initial_hash.map { |k, v| "#{k}=#{v}&" unless k == 'key' }.join('')
-      final_url = connection_hash[url_to_use] + '?' + url_for_payment + 'hash=' + encoded_hash
+    {
+      url: final_url,
+      order_number: user_account,
+      amount_cents: amount_to_be_payed * 100,
+      request_timestamp: current_epoch_time
+    }
+  end
 
-      {
-        url: final_url,
-        order_number: user_account,
-        amount_cents: amount_to_be_payed * 100,
-        request_timestamp: current_epoch_time
-      }
-    end
+  def log_nelnet_callback
+    NelnetCallbackLog.create!(
+      transaction_id: params['transactionId'],
+      order_number: params['orderNumber'],
+      transaction_status: params['transactionStatus'],
+      transaction_total_amount: params['transactionTotalAmount'],
+      raw_params: params.to_unsafe_h.slice(
+        'transactionType', 'transactionStatus', 'transactionId', 'transactionTotalAmount',
+        'transactionDate', 'transactionAcountType', 'transactionResultCode', 'transactionResultMessage',
+        'orderNumber', 'timestamp', 'hash'
+      ).to_json
+    )
+  rescue StandardError => e
+    Rails.logger.error("[NelnetCallbackLog] Failed to log callback: #{e.message}")
+  end
 
-    def log_nelnet_callback
-      NelnetCallbackLog.create!(
-        transaction_id: params['transactionId'],
-        order_number: params['orderNumber'],
-        transaction_status: params['transactionStatus'],
-        transaction_total_amount: params['transactionTotalAmount'],
-        raw_params: params.to_unsafe_h.slice(
-          'transactionType', 'transactionStatus', 'transactionId', 'transactionTotalAmount',
-          'transactionDate', 'transactionAcountType', 'transactionResultCode', 'transactionResultMessage',
-          'orderNumber', 'timestamp', 'hash'
-        ).to_json
-      )
-    rescue StandardError => e
-      Rails.logger.error("[NelnetCallbackLog] Failed to log callback: #{e.message}")
-    end
+  def link_payment_request_to_receipt(payment)
+    return unless payment && params['orderNumber'].present?
 
-    def link_payment_request_to_receipt(payment)
-      return unless payment && params['orderNumber'].present?
+    PaymentRequest
+      .unmatched
+      .where(user_id: current_user.id, order_number: params['orderNumber'])
+      .order(created_at: :asc)
+      .limit(1)
+      .update_all(payment_id: payment.id)
+  end
 
-      PaymentRequest
-        .unmatched
-        .where(user_id: current_user.id, order_number: params['orderNumber'])
-        .order(created_at: :asc)
-        .limit(1)
-        .update_all(payment_id: payment.id)
-    end
-
-    def url_params
-      params.permit(:amount, :transactionType, :transactionStatus, :transactionId, :transactionTotalAmount, :transactionDate, :transactionAcountType, :transactionResultCode, :transactionResultMessage, :orderNumber, :timestamp, :hash, :camp_year)
-    end
+  def url_params
+    params.permit(
+      :amount,
+      :transactionType,
+      :transactionStatus,
+      :transactionId,
+      :transactionTotalAmount,
+      :transactionDate,
+      :transactionAcountType,
+      :transactionResultCode,
+      :transactionResultMessage,
+      :orderNumber,
+      :timestamp,
+      :hash,
+      :camp_year
+    )
+  end
 end
