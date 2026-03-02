@@ -78,6 +78,9 @@ class PaymentsController < ApplicationController
 
     def set_current_enrollment
       @current_enrollment = current_user.enrollments.current_camp_year_applications.last
+      return if @current_enrollment.present?
+
+      redirect_to root_url, alert: 'No current enrollment found for this camp year.' and return
     end
 
     def generate_hash(amount = current_camp_fee / 100)

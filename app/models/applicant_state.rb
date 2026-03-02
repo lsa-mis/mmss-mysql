@@ -2,10 +2,14 @@
 
 module ApplicantState
   def registration_activities
+    return Activity.none unless @current_enrollment
+
     @current_enrollment.registration_activities.order(camp_occurrence_id: :asc)
   end
 
   def session_registrations
+    return CampOccurrence.none unless @current_enrollment
+
     @current_enrollment.session_registrations.order(description: :asc)
   end
 
@@ -14,11 +18,13 @@ module ApplicantState
   end
 
   def finaids
+    return FinancialAid.none unless @current_enrollment
+
     @current_enrollment.financial_aids
   end
 
   def has_any_session
-    @session_registrations.pluck(:description).include?('Any Session')
+    session_registrations.pluck(:description).include?('Any Session')
   end
 
   def finaids_ttl
