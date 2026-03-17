@@ -6,16 +6,16 @@ ruby '3.3.4'
 gem 'activeadmin', '~> 3.2'
 gem 'bootsnap', '~> 1.8', '>= 1.8.1', require: false
 gem 'country_select', '~> 6.0'
-gem 'devise', '~> 4.8'
+gem 'devise', '~> 5.0'
 gem 'dump', '~> 1.2', '>= 1.2.2'
 gem 'drb', '~> 2.1.0'
-gem 'google-cloud-storage', '~> 1.34', '>= 1.34.1', require: false
+gem 'google-cloud-storage', '~> 1.58', require: false
 gem 'money-rails', '~> 1.14'
 # gem install mysql2 -v '0.5.4' -- --with-ldflags=-L/usr/local/opt/openssl/lib --with-cppflags=-I/usr/local/opt/openssl/include
 # gem install mysql2 -v '0.5.6' -- --with-mysql-dir=/opt/homebrew/bin/mysql --with-mysql-lib=/opt/homebrew/Cellar/mysql/8.3.0/lib --with-mysql-include=/opt/homebrew/Cellar/mysql/8.3.0/include/mysql
 gem 'mysql2', '~> 0.5.6'
 gem 'puma', '5.6.9'
-gem 'rails', '~> 6.1'
+gem 'rails', '~> 7.2'
 gem 'sass-rails', '~> 6.0'
 gem 'sd_notify'
 gem 'skylight'
@@ -40,9 +40,9 @@ gem 'stackprof'
 
 group :development, :test do
   gem 'capybara', '~> 3.35', '>= 3.35.3'
-  gem 'factory_bot_rails', '~> 6.2'
+  gem 'factory_bot_rails', '~> 6.5'
   gem 'faker', '~> 2.23'
-  gem 'pry-byebug', '~> 3.9'
+  gem 'pry-byebug', '~> 3.12'
   gem 'pry-rails', '~> 0.3.9'
   gem 'rspec-rails', '~> 5.0', '>= 5.0.2'
   gem 'selenium-webdriver', '~> 4.40'
