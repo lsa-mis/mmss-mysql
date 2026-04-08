@@ -10,9 +10,12 @@ class PaymentsController < ApplicationController
   devise_group :logged_in, contains: [:user, :admin]
   prepend_before_action :log_nelnet_callback, only: [:payment_receipt]
   before_action :authenticate_logged_in!
+  skip_before_action :authenticate_logged_in!, only: [:payment_receipt]
   before_action :authenticate_admin!, only: [:index, :destroy]
 
   before_action :set_current_enrollment
+  skip_before_action :set_current_enrollment, only: [:payment_receipt]
+  before_action :identify_user_for_payment_receipt!, only: [:payment_receipt]
 
   def index
     redirect_to root_url
@@ -21,7 +24,7 @@ class PaymentsController < ApplicationController
   def payment_receipt
     if Payment.pluck(:transaction_id).include?(params['transactionId'])
       link_payment_request_to_receipt(Payment.find_by(transaction_id: params['transactionId']))
-      redirect_to all_payments_path
+      redirect_to payment_receipt_completion_path
     else
       payment = Payment.create(
         transaction_type: params['transactionType'],
@@ -33,17 +36,17 @@ class PaymentsController < ApplicationController
         result_code: params['transactionResultCode'],
         result_message: params['transactionResultMessage'],
         user_account: params['orderNumber'],
-        payer_identity: current_user.email,
+        payer_identity: payment_receipt_user.email,
         timestamp: params['timestamp'],
         transaction_hash: params['hash'],
-        user_id: current_user.id,
+        user_id: payment_receipt_user.id,
         camp_year: CampConfiguration.active_camp_year
       )
       link_payment_request_to_receipt(payment)
       if params['transactionStatus'] != '1'
-        redirect_to all_payments_path, alert: 'Your payment was not successful'
+        redirect_to payment_receipt_completion_path, alert: 'Your payment was not successful'
       else
-        redirect_to all_payments_path, notice: 'Your payment was successfully recorded'
+        redirect_to payment_receipt_completion_path, notice: 'Your payment was successfully recorded'
       end
     end
   end
@@ -151,10 +154,39 @@ class PaymentsController < ApplicationController
 
     PaymentRequest
       .unmatched
-      .where(user_id: current_user.id, order_number: params['orderNumber'])
+      .where(user_id: payment_receipt_user.id, order_number: params['orderNumber'])
       .order(created_at: :asc)
       .limit(1)
       .update_all(payment_id: payment.id)
+  end
+
+  def payment_receipt_user
+    @payment_receipt_user || current_user
+  end
+
+  def payment_receipt_completion_path
+    logged_in_signed_in? ? all_payments_path : new_user_session_path
+  end
+
+  def identify_user_for_payment_receipt!
+    order_number = params['orderNumber'].to_s
+    if order_number.blank?
+      redirect_to new_user_session_path, alert: 'Invalid payment callback.'
+      return
+    end
+
+    user_id = order_number.match(/\A.*-(\d+)\z/)&.[](1)&.to_i
+    candidate = user_id&.positive? ? User.find_by(id: user_id) : nil
+    expected_order = candidate && "#{candidate.email.partition('@').first}-#{candidate.id}"
+
+    if candidate.blank? || expected_order.blank? || order_number != expected_order
+      Rails.logger.warn('[PaymentsController] Rejected payment_receipt: orderNumber did not match a user')
+      redirect_to new_user_session_path,
+                  alert: 'Unable to verify payment. Please sign in; contact support if your account was charged.'
+      return
+    end
+
+    @payment_receipt_user = candidate
   end
 
   def url_params

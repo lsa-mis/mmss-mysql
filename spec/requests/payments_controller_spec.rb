@@ -252,6 +252,24 @@ RSpec.describe PaymentsController, type: :request do
     end
   end
 
+  describe 'payment_receipt when only admin is signed in (no applicant user session)' do
+    let(:admin) { create(:admin) }
+
+    before do
+      sign_in admin
+      allow_any_instance_of(Payment).to receive(:set_status).and_return(nil)
+    end
+
+    it 'redirects to all_payments_path, not user sign-in' do
+      get payment_receipt_path, params: nelnet_receipt_params('transactionId' => 'admin-session-only-1')
+      expect(response).to redirect_to(all_payments_path)
+      expect(response.location).not_to include('users/sign_in')
+      payment = Payment.find_by(transaction_id: 'admin-session-only-1')
+      expect(payment).to be_present
+      expect(payment.user_id).to eq(user.id)
+    end
+  end
+
   # ---------------------------------------------------------------------------
   # Full payment cycle: request → redirect → return from Nelnet → Payment + link
   # ---------------------------------------------------------------------------
@@ -354,19 +372,48 @@ RSpec.describe PaymentsController, type: :request do
   # Edge cases: unauthenticated callback, callback log before auth
   # ---------------------------------------------------------------------------
   describe 'payment_receipt when not authenticated' do
-    it 'creates NelnetCallbackLog then redirects to sign-in (callback is logged before auth)' do
+    before { allow_any_instance_of(Payment).to receive(:set_status).and_return(nil) }
+
+    it 'logs callback, creates Payment from orderNumber, and redirects to sign-in with notice' do
       params = nelnet_receipt_params('transactionId' => 'no-auth-1')
       expect {
         get payment_receipt_path, params: params
       }.to change(NelnetCallbackLog, :count).by(1)
+        .and change(Payment, :count).by(1)
 
       expect(response).to have_http_status(:found)
       expect(response.location).to include('sign_in')
-      expect(Payment.count).to eq(0)
+      expect(flash[:notice]).to include('successfully recorded')
+
+      payment = Payment.find_by(transaction_id: 'no-auth-1')
+      expect(payment.user_id).to eq(user.id)
+      expect(payment.payer_identity).to eq(user.email)
 
       log = NelnetCallbackLog.last
       expect(log.transaction_id).to eq('no-auth-1')
       expect(log.order_number).to eq(order_number)
+    end
+
+    it 'rejects callback when orderNumber does not match a user' do
+      params = nelnet_receipt_params('transactionId' => 'bad-order', 'orderNumber' => 'not-a-real-order-999999999')
+      expect {
+        get payment_receipt_path, params: params
+      }.to change(NelnetCallbackLog, :count).by(1)
+
+      expect(response).to redirect_to(new_user_session_path)
+      expect(Payment.count).to eq(0)
+    end
+
+    it 'rejects orderNumber with no trailing user id without raising' do
+      %w[invalid test-abc].each do |bad_order|
+        params = nelnet_receipt_params('transactionId' => "txn-#{bad_order}", 'orderNumber' => bad_order)
+        expect {
+          get payment_receipt_path, params: params
+        }.not_to raise_error
+
+        expect(response).to redirect_to(new_user_session_path)
+        expect(Payment.count).to eq(0)
+      end
     end
   end
 end
