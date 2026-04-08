@@ -31,6 +31,14 @@
 #  fk_rails_...  (user_id => users.id)
 #
 FactoryBot.define do
+  factory :payment_request do
+    association :user
+    order_number { "#{user.email.partition('@').first}-#{user.id}" }
+    amount_cents { 10_000 }
+    request_timestamp { 1_771_827_677_567 }
+    camp_year { CampConfiguration.active_camp_year || Date.current.year }
+  end
+
   factory :payment do
     association :user
 
