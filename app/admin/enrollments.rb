@@ -63,7 +63,7 @@ ActiveAdmin.register Enrollment, as: 'Application' do
   end
 
   form do |f| # This is a formtastic form builder
-    f.semantic_errors(*f.object.errors.keys) # shows errors on :base
+    f.semantic_errors(*f.object.errors.attribute_names) # shows errors on :base
     f.inputs do
       f.input :user_id, as: :select, collection: User.all.order(:email)
       f.input :uniqname if application.application_status == 'enrolled'

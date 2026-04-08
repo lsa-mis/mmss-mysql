@@ -106,7 +106,7 @@ ActiveAdmin.register Travel do
   end
 
   form do |f| # This is a formtastic form builder
-    f.semantic_errors *f.object.errors.keys # shows errors on :base
+    f.semantic_errors(*f.object.errors.attribute_names) # shows errors on :base
     f.inputs do
       f.input :enrollment_id, as: :select, collection: Enrollment.current_camp_year_applications.map { |enrol| [enrol.display_name.downcase, enrol.id]}.sort
       if f.object.new_record?

@@ -39,7 +39,7 @@ ActiveAdmin.register CampOccurrence, as: "Session Configurations" do
   filter :active
 
   form do |f| # This is a formtastic form builder
-    f.semantic_errors *f.object.errors.keys # shows errors on :base
+    f.semantic_errors(*f.object.errors.attribute_names) # shows errors on :base
     f.inputs do
     #  f.input :camp_configuration_id
      f.input :camp_configuration, label: "Camp", as: :select, collection: CampConfiguration.order(camp_year: :desc)
