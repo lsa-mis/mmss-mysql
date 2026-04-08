@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'digest'
 require 'rails_helper'
 
 # These tests do NOT touch the production Nelnet gateway:
@@ -28,12 +29,25 @@ RSpec.describe PaymentsController, type: :request do
     )
   end
 
-  # Params as returned by Nelnet on GET /payment_receipt (from your FROM example)
+  # Mirrors PaymentsController::NELNET_RECEIPT_SIGNATURE_PARAM_ORDER + timestamp + key (SHA256 hex).
+  def nelnet_receipt_signature_param_order
+    PaymentsController::NELNET_RECEIPT_SIGNATURE_PARAM_ORDER
+  end
+
+  def nelnet_receipt_hash_for(params_hash, signing_key: nelnet_credentials.NELNET_SERVICE[:DEVELOPMENT_KEY])
+    payload = nelnet_receipt_signature_param_order.map { |k| params_hash[k].to_s }.join +
+      params_hash['timestamp'].to_s +
+      signing_key
+    Digest::SHA256.hexdigest(payload)
+  end
+
+  # Params as returned by Nelnet on GET /payment_receipt. Default hash is computed from params + dev key.
   def nelnet_receipt_params(overrides = {})
-    {
+    ov = overrides.stringify_keys
+    base = {
       'transactionType' => '1',
       'transactionStatus' => '1',
-      'transactionId' => (overrides['transactionId'] || "TXN-#{SecureRandom.hex(4)}"),
+      'transactionId' => (ov['transactionId'] || "TXN-#{SecureRandom.hex(4)}"),
       'transactionTotalAmount' => '10000',
       'transactionDate' => '202602230121',
       'transactionAcountType' => 'MASTERCARD',
@@ -41,9 +55,18 @@ RSpec.describe PaymentsController, type: :request do
       'transactionResultMessage' => 'Approved',
       'orderNumber' => order_number,
       'orderType' => 'MMSS Univ of Michigan',
-      'timestamp' => '1771827677567',
-      'hash' => '451b5f85a1741a0114c41c14529f47d55c18ab12d8f6ffacb06e96b6481e195a'
-    }.merge(overrides.stringify_keys)
+      'timestamp' => '1771827677567'
+    }.merge(ov.except('hash'))
+    base['hash'] = ov.fetch('hash', nelnet_receipt_hash_for(base))
+    base
+  end
+
+  def nelnet_receipt_params_for_payment_request(payment_request, overrides = {})
+    nelnet_receipt_params({
+      'transactionTotalAmount' => payment_request.amount_cents.to_s,
+      'timestamp' => payment_request.request_timestamp.to_s,
+      'orderNumber' => payment_request.order_number
+    }.merge(overrides.stringify_keys))
   end
 
   before do
@@ -142,7 +165,12 @@ RSpec.describe PaymentsController, type: :request do
   # Payment cycle: payment_receipt (inbound FROM Nelnet)
   # ---------------------------------------------------------------------------
   describe 'payment_receipt (inbound from Nelnet)' do
-    before { sign_in user }
+    before do
+      sign_in user
+      allow(Rails.application).to receive(:credentials).and_return(nelnet_credentials)
+      create(:payment_request, user: user, order_number: order_number, amount_cents: 10_000,
+                             request_timestamp: 1_771_827_677_567, camp_year: camp_config.camp_year)
+    end
 
     context 'when transaction is successful (transactionStatus=1)' do
       it 'creates a Payment and redirects with success notice (POST)' do
@@ -216,6 +244,27 @@ RSpec.describe PaymentsController, type: :request do
         expect(response).to redirect_to(all_payments_path)
         expect(Payment.count).to eq(1)
       end
+
+      it 'does not link another user\'s PaymentRequest when orderNumber identifies a different user' do
+        allow_any_instance_of(Payment).to receive(:set_status).and_return(nil)
+
+        post payment_receipt_path, params: nelnet_receipt_params('transactionId' => 'mismatch-txn')
+        expect(Payment.find_by(transaction_id: 'mismatch-txn').user_id).to eq(user.id)
+
+        other_user = create(:user, :with_applicant_detail)
+        other_order = "#{other_user.email.partition('@').first}-#{other_user.id}"
+        other_pr = create(:payment_request, user: other_user, order_number: other_order, amount_cents: 10_000,
+                          request_timestamp: 1_771_827_677_567, camp_year: camp_config.camp_year)
+
+        get payment_receipt_path, params: nelnet_receipt_params(
+          'transactionId' => 'mismatch-txn',
+          'orderNumber' => other_order
+        )
+
+        expect(response).to redirect_to(all_payments_path)
+        expect(flash[:alert]).to eq('Payment receipt could not be verified')
+        expect(other_pr.reload.payment_id).to be_nil
+      end
     end
 
     context 'Nelnet callback log' do
@@ -250,6 +299,34 @@ RSpec.describe PaymentsController, type: :request do
         expect(NelnetCallbackLog.pluck(:transaction_id)).to all(eq('dup-callback'))
       end
     end
+
+    context 'when Nelnet hash does not match payload' do
+      it 'does not create a Payment and redirects to sign-in' do
+        allow_any_instance_of(Payment).to receive(:set_status).and_return(nil)
+        params = nelnet_receipt_params('transactionId' => 'bad-hash-1', 'hash' => 'a' * 64)
+
+        expect {
+          get payment_receipt_path, params: params
+        }.not_to change(Payment, :count)
+
+        expect(response).to redirect_to(new_user_session_path)
+      end
+    end
+
+    context 'when no unmatched PaymentRequest matches amount and timestamp' do
+      before { PaymentRequest.delete_all }
+
+      it 'does not create a Payment' do
+        allow_any_instance_of(Payment).to receive(:set_status).and_return(nil)
+        params = nelnet_receipt_params('transactionId' => 'no-pr-match')
+
+        expect {
+          get payment_receipt_path, params: params
+        }.not_to change(Payment, :count)
+
+        expect(response).to redirect_to(new_user_session_path)
+      end
+    end
   end
 
   describe 'payment_receipt when only admin is signed in (no applicant user session)' do
@@ -257,6 +334,9 @@ RSpec.describe PaymentsController, type: :request do
 
     before do
       sign_in admin
+      allow(Rails.application).to receive(:credentials).and_return(nelnet_credentials)
+      create(:payment_request, user: user, order_number: order_number, amount_cents: 10_000,
+                             request_timestamp: 1_771_827_677_567, camp_year: camp_config.camp_year)
       allow_any_instance_of(Payment).to receive(:set_status).and_return(nil)
     end
 
@@ -288,9 +368,9 @@ RSpec.describe PaymentsController, type: :request do
       expect(pr.payment_id).to be_nil
 
       # 2. User returns from Nelnet (FROM Nelnet) with success params
-      receipt_params = nelnet_receipt_params(
-        'transactionId' => '432051518',
-        'orderNumber' => order_number
+      receipt_params = nelnet_receipt_params_for_payment_request(
+        pr,
+        'transactionId' => '432051518'
       )
       get payment_receipt_path, params: receipt_params
 
@@ -308,7 +388,10 @@ RSpec.describe PaymentsController, type: :request do
       post make_payment_path, params: { amount: '100' }
       pr = PaymentRequest.last
 
-      receipt_params = nelnet_receipt_params('transactionId' => '432051520', 'orderNumber' => order_number)
+      receipt_params = nelnet_receipt_params_for_payment_request(
+        pr,
+        'transactionId' => '432051520'
+      )
       get payment_receipt_path, params: receipt_params
       expect(Payment.count).to eq(1)
       pr.reload
@@ -329,8 +412,11 @@ RSpec.describe PaymentsController, type: :request do
       second_pr = PaymentRequest.last
       expect(PaymentRequest.unmatched.count).to eq(2)
 
-      # One return from Nelnet
-      receipt_params = nelnet_receipt_params('transactionId' => 'single-return', 'orderNumber' => order_number)
+      # One return from Nelnet (matches oldest outstanding request: amount + timestamp)
+      receipt_params = nelnet_receipt_params_for_payment_request(
+        first_pr,
+        'transactionId' => 'single-return'
+      )
       get payment_receipt_path, params: receipt_params
 
       first_pr.reload
@@ -372,7 +458,12 @@ RSpec.describe PaymentsController, type: :request do
   # Edge cases: unauthenticated callback, callback log before auth
   # ---------------------------------------------------------------------------
   describe 'payment_receipt when not authenticated' do
-    before { allow_any_instance_of(Payment).to receive(:set_status).and_return(nil) }
+    before do
+      allow(Rails.application).to receive(:credentials).and_return(nelnet_credentials)
+      create(:payment_request, user: user, order_number: order_number, amount_cents: 10_000,
+                             request_timestamp: 1_771_827_677_567, camp_year: camp_config.camp_year)
+      allow_any_instance_of(Payment).to receive(:set_status).and_return(nil)
+    end
 
     it 'logs callback, creates Payment from orderNumber, and redirects to sign-in with notice' do
       params = nelnet_receipt_params('transactionId' => 'no-auth-1')
@@ -395,7 +486,10 @@ RSpec.describe PaymentsController, type: :request do
     end
 
     it 'rejects callback when orderNumber does not match a user' do
-      params = nelnet_receipt_params('transactionId' => 'bad-order', 'orderNumber' => 'not-a-real-order-999999999')
+      params = nelnet_receipt_params(
+        'transactionId' => 'bad-order',
+        'orderNumber' => 'not-a-real-order-999999999'
+      )
       expect {
         get payment_receipt_path, params: params
       }.to change(NelnetCallbackLog, :count).by(1)

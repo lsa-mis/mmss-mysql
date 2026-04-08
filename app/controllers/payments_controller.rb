@@ -6,6 +6,12 @@ require 'time'
 class PaymentsController < ApplicationController
   include ApplicantState
 
+  # Order matches redirectUrlParameters sent to Nelnet in #generate_hash (values concatenated + timestamp + key).
+  NELNET_RECEIPT_SIGNATURE_PARAM_ORDER = %w[
+    transactionType transactionStatus transactionId transactionTotalAmount transactionDate
+    transactionAcountType transactionResultCode transactionResultMessage orderNumber
+  ].freeze
+
   skip_before_action :verify_authenticity_token, only: [:payment_receipt]
   devise_group :logged_in, contains: [:user, :admin]
   prepend_before_action :log_nelnet_callback, only: [:payment_receipt]
@@ -16,38 +22,62 @@ class PaymentsController < ApplicationController
   before_action :set_current_enrollment
   skip_before_action :set_current_enrollment, only: [:payment_receipt]
   before_action :identify_user_for_payment_receipt!, only: [:payment_receipt]
+  before_action :validate_nelnet_receipt_signature!, only: [:payment_receipt]
+  before_action :verify_payment_request_for_new_transaction!, only: [:payment_receipt]
 
   def index
     redirect_to root_url
   end
 
   def payment_receipt
-    if Payment.pluck(:transaction_id).include?(params['transactionId'])
-      link_payment_request_to_receipt(Payment.find_by(transaction_id: params['transactionId']))
+    tid = params['transactionId'].to_s
+    existing = Payment.find_by(transaction_id: tid)
+
+    if existing
+      reject_payment_receipt_if_payment_user_mismatch!(existing)
+      return if performed?
+
+      link_payment_request_to_receipt(existing)
       redirect_to payment_receipt_completion_path
-    else
-      payment = Payment.create(
-        transaction_type: params['transactionType'],
-        transaction_status: params['transactionStatus'],
-        transaction_id: params['transactionId'],
-        total_amount: params['transactionTotalAmount'],
-        transaction_date: params['transactionDate'],
-        account_type: params['transactionAcountType'],
-        result_code: params['transactionResultCode'],
-        result_message: params['transactionResultMessage'],
-        user_account: params['orderNumber'],
-        payer_identity: payment_receipt_user.email,
-        timestamp: params['timestamp'],
-        transaction_hash: params['hash'],
-        user_id: payment_receipt_user.id,
-        camp_year: CampConfiguration.active_camp_year
-      )
-      link_payment_request_to_receipt(payment)
-      if params['transactionStatus'] != '1'
-        redirect_to payment_receipt_completion_path, alert: 'Your payment was not successful'
-      else
-        redirect_to payment_receipt_completion_path, notice: 'Your payment was successfully recorded'
+      return
+    end
+
+    payment = Payment.create(
+      transaction_type: params['transactionType'],
+      transaction_status: params['transactionStatus'],
+      transaction_id: tid,
+      total_amount: params['transactionTotalAmount'],
+      transaction_date: params['transactionDate'],
+      account_type: params['transactionAcountType'],
+      result_code: params['transactionResultCode'],
+      result_message: params['transactionResultMessage'],
+      user_account: params['orderNumber'],
+      payer_identity: payment_receipt_user.email,
+      timestamp: params['timestamp'],
+      transaction_hash: params['hash'],
+      user_id: payment_receipt_user.id,
+      camp_year: CampConfiguration.active_camp_year
+    )
+
+    unless payment.persisted?
+      if payment.errors.of_kind?(:transaction_id, :taken)
+        payment = Payment.find_by(transaction_id: tid)
       end
+    end
+
+    unless payment&.persisted?
+      redirect_to payment_receipt_completion_path, alert: 'Unable to record payment.'
+      return
+    end
+
+    reject_payment_receipt_if_payment_user_mismatch!(payment)
+    return if performed?
+
+    link_payment_request_to_receipt(payment)
+    if params['transactionStatus'] != '1'
+      redirect_to payment_receipt_completion_path, alert: 'Your payment was not successful'
+    else
+      redirect_to payment_receipt_completion_path, notice: 'Your payment was successfully recorded'
     end
   end
 
@@ -90,17 +120,13 @@ class PaymentsController < ApplicationController
     user_account = current_user.email.partition('@').first + '-' + current_user.id.to_s
     amount_to_be_payed = amount.to_i
     if Rails.env.development? || Rails.application.credentials.NELNET_SERVICE[:SERVICE_SELECTOR] == "QA"
-      key_to_use = 'test_key'
       url_to_use = 'test_URL'
     else
-      key_to_use = 'prod_key'
       url_to_use = 'prod_URL'
     end
 
     connection_hash = {
-      'test_key' => Rails.application.credentials.NELNET_SERVICE[:DEVELOPMENT_KEY],
       'test_URL' => Rails.application.credentials.NELNET_SERVICE[:DEVELOPMENT_URL],
-      'prod_key' => Rails.application.credentials.NELNET_SERVICE[:PRODUCTION_KEY],
       'prod_URL' => Rails.application.credentials.NELNET_SERVICE[:PRODUCTION_URL]
     }
 
@@ -112,9 +138,9 @@ class PaymentsController < ApplicationController
       'orderDescription' => 'MMSS Conference Fees',
       'amountDue' => amount_to_be_payed * 100,
       'redirectUrl' => redirect_url,
-      'redirectUrlParameters' => 'transactionType,transactionStatus,transactionId,transactionTotalAmount,transactionDate,transactionAcountType,transactionResultCode,transactionResultMessage,orderNumber',
+      'redirectUrlParameters' => NELNET_RECEIPT_SIGNATURE_PARAM_ORDER.join(','),
       'timestamp' => current_epoch_time,
-      'key' => connection_hash[key_to_use]
+      'key' => nelnet_signing_key
     }
 
     # Sample Hash Creation
@@ -168,7 +194,21 @@ class PaymentsController < ApplicationController
     logged_in_signed_in? ? all_payments_path : new_user_session_path
   end
 
+  def reject_payment_receipt_if_payment_user_mismatch!(payment)
+    return if payment.blank?
+    return if payment.user_id == payment_receipt_user.id
+
+    Rails.logger.warn(
+      "Payment receipt user mismatch for transaction_id=#{params['transactionId']}, " \
+      "payment_user_id=#{payment.user_id}, receipt_user_id=#{payment_receipt_user.id}, " \
+      "order_number=#{params['orderNumber']}"
+    )
+    redirect_to payment_receipt_completion_path, alert: 'Payment receipt could not be verified'
+  end
+
   def identify_user_for_payment_receipt!
+    return if performed?
+
     order_number = params['orderNumber'].to_s
     if order_number.blank?
       redirect_to new_user_session_path, alert: 'Invalid payment callback.'
@@ -177,16 +217,84 @@ class PaymentsController < ApplicationController
 
     user_id = order_number.match(/\A.*-(\d+)\z/)&.[](1)&.to_i
     candidate = user_id&.positive? ? User.find_by(id: user_id) : nil
-    expected_order = candidate && "#{candidate.email.partition('@').first}-#{candidate.id}"
+    matching_payment_request = candidate && PaymentRequest.where(user_id: candidate.id, order_number: order_number).exists?
 
-    if candidate.blank? || expected_order.blank? || order_number != expected_order
-      Rails.logger.warn('[PaymentsController] Rejected payment_receipt: orderNumber did not match a user')
+    if candidate.blank? || !matching_payment_request
+      Rails.logger.warn('[PaymentsController] Rejected payment_receipt: orderNumber did not match a stored payment request')
       redirect_to new_user_session_path,
                   alert: 'Unable to verify payment. Please sign in; contact support if your account was charged.'
       return
     end
 
     @payment_receipt_user = candidate
+  end
+
+  def validate_nelnet_receipt_signature!
+    return if performed?
+
+    actual = params['hash'].to_s.strip
+    if actual.blank?
+      Rails.logger.warn('[PaymentsController] Rejected payment_receipt: missing hash')
+      redirect_to new_user_session_path,
+                  alert: 'Unable to verify payment. Please sign in; contact support if your account was charged.'
+      return
+    end
+
+    payload = nelnet_receipt_signature_payload
+    expected = Digest::SHA256.hexdigest(payload)
+    actual_down = actual.downcase
+    unless actual_down.match?(/\A[a-f0-9]{64}\z/) &&
+           ActiveSupport::SecurityUtils.secure_compare(expected, actual_down)
+      Rails.logger.warn('[PaymentsController] Rejected payment_receipt: invalid Nelnet hash')
+      redirect_to new_user_session_path,
+                  alert: 'Unable to verify payment. Please sign in; contact support if your account was charged.'
+      return
+    end
+  end
+
+  def verify_payment_request_for_new_transaction!
+    return if performed?
+
+    tid = params['transactionId'].to_s
+    return if tid.present? && Payment.exists?(transaction_id: tid)
+
+    if params['timestamp'].blank?
+      Rails.logger.warn('[PaymentsController] Rejected payment_receipt: missing timestamp')
+      redirect_to new_user_session_path,
+                  alert: 'Unable to verify payment. Please sign in; contact support if your account was charged.'
+      return
+    end
+
+    amount_cents = params['transactionTotalAmount'].to_i
+    ts = params['timestamp'].to_i
+
+    matched = PaymentRequest.unmatched.exists?(
+      user_id: payment_receipt_user.id,
+      order_number: params['orderNumber'].to_s,
+      amount_cents: amount_cents,
+      request_timestamp: ts,
+      camp_year: CampConfiguration.active_camp_year
+    )
+
+    unless matched
+      Rails.logger.warn('[PaymentsController] Rejected payment_receipt: no matching PaymentRequest')
+      redirect_to new_user_session_path,
+                  alert: 'Unable to verify payment. Please sign in; contact support if your account was charged.'
+      return
+    end
+  end
+
+  # Return-url digest mirrors the outbound redirectUrlParameters order, then timestamp, then the Nelnet key (see #generate_hash).
+  def nelnet_receipt_signature_payload
+    NELNET_RECEIPT_SIGNATURE_PARAM_ORDER.map { |k| params[k].to_s }.join + params['timestamp'].to_s + nelnet_signing_key
+  end
+
+  def nelnet_signing_key
+    if Rails.env.development? || Rails.application.credentials.NELNET_SERVICE[:SERVICE_SELECTOR] == "QA"
+      Rails.application.credentials.NELNET_SERVICE[:DEVELOPMENT_KEY]
+    else
+      Rails.application.credentials.NELNET_SERVICE[:PRODUCTION_KEY]
+    end
   end
 
   def url_params
