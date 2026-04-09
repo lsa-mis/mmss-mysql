@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'cgi'
 
 RSpec.describe 'Faculties', type: :request do
   let(:camp_config) { create(:camp_configuration, :active, camp_year: Date.current.year) }
@@ -145,10 +146,9 @@ RSpec.describe 'Faculties', type: :request do
         sign_in faculty
       end
 
-      it 'raises an error' do
-        expect {
-          get student_list_path(99999)
-        }.to raise_error(ActiveRecord::RecordNotFound)
+      it 'returns not found' do
+        get student_list_path(99999)
+        expect(response).to have_http_status(:not_found)
       end
     end
   end
@@ -187,7 +187,9 @@ RSpec.describe 'Faculties', type: :request do
 
       it 'displays student name' do
         get student_page_path(enrollment)
-        expect(response.body).to include(enrollment.applicant_detail.full_name) if enrollment.applicant_detail
+        if enrollment.applicant_detail
+          expect(CGI.unescapeHTML(response.body)).to include(enrollment.applicant_detail.full_name)
+        end
       end
 
       it 'includes a back link' do
@@ -208,9 +210,9 @@ RSpec.describe 'Faculties', type: :request do
         sign_in faculty
       end
 
-      it 'does not raise RecordNotFound for missing enrollment' do
-        # Controller uses find_by, so RecordNotFound is not raised; instead, the view raises an error when @student is nil (expected here).
-        expect { get student_page_path(99999) }.to raise_error(ActionView::Template::Error, /applicant_detail.*nil/)
+      it 'returns not found' do
+        get student_page_path(99999)
+        expect(response).to have_http_status(:not_found)
       end
     end
   end

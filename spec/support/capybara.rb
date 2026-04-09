@@ -27,8 +27,6 @@ Capybara.register_driver :selenium_chrome_headless do |app|
   options.add_argument('--disable-extensions')
   options.add_argument('--disable-plugins-discovery')
   options.add_argument('--start-maximized')
-  options.add_experimental_option('excludeSwitches', ['enable-automation'])
-  options.add_experimental_option('useAutomationExtension', false)
   # Set a more realistic user agent
   options.add_argument('--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36')
 
@@ -50,8 +48,6 @@ Capybara.register_driver :selenium_chrome do |app|
   options.add_argument('--disable-extensions')
   options.add_argument('--disable-plugins-discovery')
   options.add_argument('--start-maximized')
-  options.add_experimental_option('excludeSwitches', ['enable-automation'])
-  options.add_experimental_option('useAutomationExtension', false)
   # Set a more realistic user agent
   options.add_argument('--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36')
 

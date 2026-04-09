@@ -3,6 +3,7 @@
 class FacultiesController < ApplicationController
   layout 'faculty'
   before_action :authenticate_faculty!
+  rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
 
   def index
     faculty = current_faculty.email.split('@').first
@@ -17,8 +18,13 @@ class FacultiesController < ApplicationController
   end
 
   def student_page
-    @student = Enrollment.find_by(id: params[:id])
+    @student = Enrollment.find(params[:id])
 
   end
 
+  private
+
+  def render_not_found
+    head :not_found
+  end
 end

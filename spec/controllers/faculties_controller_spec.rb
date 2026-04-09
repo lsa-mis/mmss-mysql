@@ -126,10 +126,9 @@ RSpec.describe FacultiesController, type: :controller do
     end
 
     context 'when course does not exist' do
-      it 'raises an error' do
-        expect {
-          get :student_list, params: { id: 99999 }
-        }.to raise_error(ActiveRecord::RecordNotFound)
+      it 'returns not found' do
+        get :student_list, params: { id: 99999 }
+        expect(response).to have_http_status(:not_found)
       end
     end
 
@@ -178,15 +177,9 @@ RSpec.describe FacultiesController, type: :controller do
     end
 
     context 'when enrollment does not exist' do
-      it 'assigns nil to student' do
+      it 'returns not found' do
         get :student_page, params: { id: 99999 }
-        expect(assigns(:student)).to be_nil
-      end
-
-      it 'still returns success (does not raise error)' do
-        expect {
-          get :student_page, params: { id: 99999 }
-        }.not_to raise_error
+        expect(response).to have_http_status(:not_found)
       end
     end
   end

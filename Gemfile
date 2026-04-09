@@ -44,7 +44,7 @@ group :development, :test do
   gem 'faker', '~> 2.23'
   gem 'pry-byebug', '~> 3.12'
   gem 'pry-rails', '~> 0.3.9'
-  gem 'rspec-rails', '~> 5.0', '>= 5.0.2'
+  gem 'rspec-rails', '~> 7.0'
   gem 'selenium-webdriver', '~> 4.40'
   gem 'shoulda-matchers', '~> 5.0'
   gem 'standard'

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'digest'
+require 'ostruct'
 require 'rails_helper'
 
 # These tests do NOT touch the production Nelnet gateway:

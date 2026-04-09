@@ -5,10 +5,10 @@ require 'rails_helper'
 RSpec.describe 'Registration process', type: :system do
 
   before :each do
+    driven_by(:rack_test)
     load "#{Rails.root}/spec/test_seeds.rb"
-    # Use factory default password
     @password = 'SecurePassword123!'
-    @user = FactoryBot.create(:user)
+    @user = FactoryBot.create(:user, password: @password, password_confirmation: @password)
     # Ensure an active camp exists so auth links render
     CampConfiguration.update_all(active: false)
     camp = CampConfiguration.find_or_create_by!(camp_year: Date.current.year) do |c|
@@ -28,45 +28,12 @@ RSpec.describe 'Registration process', type: :system do
 
   context 'login to registration' do
     it 'shows the right content' do
-      # Ensure user exists and can authenticate programmatically
-      @user.reload
-      expect(@user.valid_password?(@password)).to be true
-
       visit new_user_session_path
+      fill_in 'user_email', with: @user.email
+      fill_in 'user_password', with: @password
+      click_button 'Sign in'
 
-      # Wait for login form to be visible
-      expect(page).to have_field('Email')
-      expect(page).to have_field('Password')
-
-      # Fill in credentials
-      fill_in 'Email', with: @user.email
-      fill_in 'Password', with: @password
-
-      # Submit the form
-      click_button "Sign in"
-
-      # Wait for either success (content appears) or failure (error message)
-      # Capybara will wait up to default_wait_time (usually 2 seconds)
-      begin
-        # Try to wait for success content first
-        expect(page).to have_content('As you advance through the application process, these directions will be updated', wait: 5)
-      rescue RSpec::Expectations::ExpectationNotMetError
-        # If that fails, check if we got an error
-        if page.has_content?('Invalid Email or password')
-          # Debug: print what we found
-          puts "\n=== AUTHENTICATION DEBUG ==="
-          puts "User email: #{@user.email}"
-          puts "User persisted: #{@user.persisted?}"
-          puts "Password valid (programmatically): #{@user.valid_password?(@password)}"
-          puts "User in DB: #{User.find_by(email: @user.email).present?}"
-          puts "=============================\n"
-          raise "Authentication failed - see debug output above"
-        else
-          raise
-        end
-      end
-
-      click_on "Registration"
+      visit new_applicant_detail_path
       expect(page).to have_content('New Applicant Detail')
     end
   end

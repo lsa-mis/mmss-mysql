@@ -55,9 +55,8 @@
 
   <div class="field country-select">
     <%= form.label :country%>
-    <%= form.country_select :country, 
-                        { priority_countries: ["US"] }, 
-                        { include_blank: "Select" }, 
+    <%= form.country_select :country,
+                        { priority_countries: ["US"], include_blank: "Select" },
                         { required: true } %>
   </div>
 
