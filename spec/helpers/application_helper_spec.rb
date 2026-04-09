@@ -3,6 +3,58 @@
 require 'rails_helper'
 
 RSpec.describe ApplicationHelper, type: :helper do
+  describe '#show_applicant_progress_window?' do
+    it 'returns false when not signed in' do
+      allow(helper).to receive(:user_signed_in?).and_return(false)
+      expect(helper.show_applicant_progress_window?).to be false
+    end
+
+    context 'when signed in' do
+      let(:user) { instance_double(User) }
+
+      before do
+        allow(helper).to receive(:user_signed_in?).and_return(true)
+        allow(helper).to receive(:current_user).and_return(user)
+      end
+
+      it 'returns true when registration is open' do
+        allow(helper).to receive(:registration_open?).and_return(true)
+        expect(helper.show_applicant_progress_window?).to be true
+      end
+
+      context 'when registration is closed' do
+        before { allow(helper).to receive(:registration_open?).and_return(false) }
+
+        it 'returns false without applicant detail' do
+          allow(user).to receive(:applicant_detail).and_return(nil)
+          expect(helper.show_applicant_progress_window?).to be false
+        end
+
+        it 'returns true with persisted applicant detail and current year enrollment' do
+          applicant_detail = instance_double(ApplicantDetail, persisted?: true)
+          allow(user).to receive(:applicant_detail).and_return(applicant_detail)
+          enrollment_chain = instance_double('EnrollmentRelation')
+          allow(user).to receive(:enrollments).and_return(enrollment_chain)
+          allow(enrollment_chain).to receive(:current_camp_year_applications).and_return(enrollment_chain)
+          allow(enrollment_chain).to receive(:last).and_return(instance_double(Enrollment))
+
+          expect(helper.show_applicant_progress_window?).to be true
+        end
+
+        it 'returns false with applicant detail but no enrollment' do
+          applicant_detail = instance_double(ApplicantDetail, persisted?: true)
+          allow(user).to receive(:applicant_detail).and_return(applicant_detail)
+          enrollment_chain = instance_double('EnrollmentRelation')
+          allow(user).to receive(:enrollments).and_return(enrollment_chain)
+          allow(enrollment_chain).to receive(:current_camp_year_applications).and_return(enrollment_chain)
+          allow(enrollment_chain).to receive(:last).and_return(nil)
+
+          expect(helper.show_applicant_progress_window?).to be false
+        end
+      end
+    end
+  end
+
   describe '#applicant_status' do
     it 'includes all status options including withdrawn' do
       statuses = helper.applicant_status

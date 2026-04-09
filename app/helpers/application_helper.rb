@@ -21,6 +21,18 @@ module ApplicationHelper
     end
   end
 
+  # Progress window and applicant directions stay available after the application
+  # window closes for users who already have a current-year enrollment (e.g. offer accepted).
+  def show_applicant_progress_window?
+    return false unless user_signed_in?
+
+    return true if registration_open?
+
+    return false unless current_user.applicant_detail.present? && current_user.applicant_detail.persisted?
+
+    current_user.enrollments.current_camp_year_applications.last.present?
+  end
+
   def new_registration_closed?
     if CampConfiguration.active.exists?
       Date.today >= CampConfiguration.active_camp_year_application_close

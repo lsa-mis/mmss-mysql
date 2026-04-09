@@ -1,5 +1,5 @@
 
-<% if user_signed_in? && registration_open?%>
+<% if show_applicant_progress_window? %>
 
   <% if current_user.applicant_detail.present? && current_user.applicant_detail.persisted? %>
     <div id="sidebox">
