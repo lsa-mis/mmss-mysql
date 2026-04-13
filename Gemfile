@@ -40,10 +40,14 @@ gem 'sentry-rails', '~> 6.3'
 gem 'sentry-ruby', '~> 6.3' # 5.24+ for Sentry Logging (enable_logs)
 gem 'stackprof'
 
+# Seeds use Faker; staging loads seeds but should not install full :test tooling (Capybara, RSpec, …).
+group :development, :test, :staging do
+  gem 'faker', '~> 2.23'
+end
+
 group :development, :test do
   gem 'capybara', '~> 3.35', '>= 3.35.3'
   gem 'factory_bot_rails', '~> 6.5'
-  gem 'faker', '~> 2.23'
   gem 'pry-byebug', '~> 3.12'
   gem 'pry-rails', '~> 0.3.9'
   gem 'rspec-rails', '~> 7.0'
