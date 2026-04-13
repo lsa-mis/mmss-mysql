@@ -1,6 +1,6 @@
 # MMSS — Camp Application & Enrollment System
 
-[![View performance data on Skylight](https://badges.skylight.io/status/zrIB2wxUUwFF.svg?token=UoeFQCTqWcI88TWyt2ouASHWQ9-ymDjluAh56Up9p9A)](https://www.skylight.io/app/applications/zrIB2wxUUwFF)
+[View performance data on Skylight](https://www.skylight.io/app/applications/zrIB2wxUUwFF)
 
 A Ruby on Rails application for managing summer camp applications, enrollments, courses, financial aid, recommendations, and payments. The system supports applicants, faculty, and administrators with separate interfaces and workflows.
 
@@ -37,18 +37,20 @@ A Ruby on Rails application for managing summer camp applications, enrollments, 
 
 ## Technology Stack
 
-| Layer | Technology |
-|-------|------------|
-| **Runtime** | Ruby 3.3.4 |
-| **Framework** | Rails 6.1 |
-| **Database** | MySQL 8 (mysql2 gem), utf8mb4 |
-| **Auth** | Devise (users, admins, faculties) |
-| **Admin** | ActiveAdmin 3.x |
-| **Server** | Puma 5.6 |
-| **Frontend** | Webpacker 5, Turbolinks, Stimulus, Tailwind CSS, Flatpickr |
+
+| Layer            | Technology                                                       |
+| ---------------- | ---------------------------------------------------------------- |
+| **Runtime**      | Ruby 3.3.4                                                       |
+| **Framework**    | Rails 7.2.3.1                                                    |
+| **Database**     | MySQL 8 (mysql2 gem), utf8mb4                                    |
+| **Auth**         | Devise (users, admins, faculties)                                |
+| **Admin**        | ActiveAdmin 3.x                                                  |
+| **Server**       | Puma 5.6                                                         |
+| **Frontend**     | Webpacker 5, Turbolinks, Stimulus, Tailwind CSS, Flatpickr       |
 | **File storage** | Active Storage (local disk / Google Cloud Storage in production) |
-| **Monitoring** | Skylight, Sentry |
-| **Deployment** | Capistrano 3, asdf |
+| **Monitoring**   | Skylight, Sentry                                                 |
+| **Deployment**   | Capistrano 3, asdf                                               |
+
 
 ---
 
@@ -74,34 +76,26 @@ gem install mysql2 -v '0.5.6' -- --with-mysql-dir=/opt/homebrew/opt/mysql --with
 ## Installation
 
 1. **Clone the repository**
-
-   ```bash
+  ```bash
    git clone git@github.com:lsa-mis/mmss-mysql.git
    cd mmss-mysql
-   ```
-
+  ```
 2. **Install Ruby dependencies**
-
-   ```bash
+  ```bash
    bundle install
-   ```
-
+  ```
 3. **Install JavaScript dependencies**
-
-   ```bash
+  ```bash
    yarn install
    # or: npm install
-   ```
-
+  ```
 4. **Create and configure the database** (see [Configuration](#configuration))
-
-   ```bash
+  ```bash
    # Set LOCAL_MYSQL_DATABASE_PASSWORD (see below), then:
    bin/rails db:create
    bin/rails db:schema:load
    # Optionally: bin/rails db:seed
-   ```
-
+  ```
 5. **Prepare Rails credentials and config** (see [Configuration](#configuration))
 
 ---
@@ -111,24 +105,18 @@ gem install mysql2 -v '0.5.6' -- --with-mysql-dir=/opt/homebrew/opt/mysql --with
 ### Database
 
 - **Development / Test**  
-  Set the MySQL password via environment:
-
+Set the MySQL password via environment:
   ```bash
   export LOCAL_MYSQL_DATABASE_PASSWORD='your_local_mysql_password'
   ```
-
   Default DB names: `mmss-mysql_development`, `mmss-mysql_test`.  
   Edit `config/database.yml` if you use a different user or host.
-
 - **Production**  
-  Production uses credentials or environment variables for MySQL:
-
+Production uses credentials or environment variables for MySQL:
   - `Rails.application.credentials.dig(:mysql, :prod_user)` or `MYSQL_PROD_USER`
   - `Rails.application.credentials.dig(:mysql, :prod_password)` or `MYSQL_PROD_PASSWORD`
   - `Rails.application.credentials.dig(:mysql, :prod_servername)` or `MYSQL_PROD_HOST`
   - `Rails.application.credentials.dig(:mysql, :prod_sslca)` or `MYSQL_PROD_SSLCA`
-
-  Database name in production: `mmssprod`.
 
 ### Rails credentials
 
@@ -143,10 +131,9 @@ Keep `config/master.key` secure and do not commit it. In deployment it is linked
 ### File storage (Active Storage)
 
 - **Development / Test**  
-  Uses local disk (`storage/`, `tmp/storage`).
-
+Uses local disk (`storage/`, `tmp/storage`).
 - **Production**  
-  Configured for Google Cloud Storage (GCS). A GCS keyfile is expected at `config/lsa-was-base-c096c776ead3.json` (linked on deploy). Bucket and project are set in `config/storage.yml`.
+Configured for Google Cloud Storage (GCS). A GCS keyfile is expected. Bucket and project are set in `config/storage.yml`.
 
 ### Optional services
 
@@ -159,46 +146,34 @@ Keep `config/master.key` secure and do not commit it. In deployment it is linked
 ## Running the Application
 
 1. **Start MySQL** (if not running as a service).
-
 2. **Start the Rails server**
-
-   ```bash
+  ```bash
    bin/rails server
-   ```
-
-   Default: <http://localhost:3000>
-
+  ```
+   Default: [http://localhost:3000](http://localhost:3000)
 3. **Start Webpack dev server** (for asset compilation in development)
-
-   ```bash
+  ```bash
    bin/webpack-dev-server
-   ```
-
+  ```
 4. **Useful URLs (development)**
-
-   - Root: `/`
-   - Admin: `/admin` (Devise admin login)
-   - Faculty: `/faculty`, `/faculty_login`
-   - Letter opener (development and staging): `/letter_opener` (on staging, protect with HTTP basic auth env vars or network rules)
+  - Root: `/`
+  - Admin: `/admin` (Devise admin login)
+  - Faculty: `/faculty`, `/faculty_login`
+  - Letter opener (development and staging): `/letter_opener` (on staging, protect with HTTP basic auth env vars or network rules)
 
 ---
 
 ## Running the Test Suite
 
 - **RSpec**
-
   ```bash
   bundle exec rspec
   ```
-
   Ensure the test database exists and is migrated:
-
   ```bash
   RAILS_ENV=test bin/rails db:create db:schema:load
   ```
-
 - **Code style (Standard Ruby)**
-
   ```bash
   bundle exec standardrb
   ```
@@ -213,7 +188,7 @@ Keep `config/master.key` secure and do not commit it. In deployment it is linked
 - **Branch**: `main`
 - **Server**: `config/deploy/production.rb` (e.g. `mathmmssapp2.miserver.it.umich.edu`), roles: app, db, web.
 - **Linked files** (must exist in shared config on the server):  
-  `config/puma.rb`, `config/nginx.conf`, `config/master.key`, `config/lsa-was-base-c096c776ead3.json`, `mysql/InCommon.CA.crt`
+`config/puma.rb`, `config/nginx.conf`, `config/master.key`, `config/lsa-was-base-c096c776ead3.json`, `mysql/InCommon.CA.crt`
 
 ```bash
 bundle exec cap production deploy
@@ -228,39 +203,43 @@ Before deploy, `deploy:check_revision` ensures local HEAD matches `origin/main`.
 
 ### Staging (Hatchbox + DigitalOcean)
 
-Use a **separate Hatchbox app** (or equivalent) with the **`staging` git branch** and a **deploy webhook** so merges to `staging` trigger a deploy. Set **`RAILS_ENV=staging`** in the Hatchbox environment so Rails loads [`config/environments/staging.rb`](config/environments/staging.rb) (local Active Storage, `letter_opener_web`, no GCS keyfile).
+Use a **separate Hatchbox app** (or equivalent) with the `**staging` git branch** and a **deploy webhook** so merges to `staging` trigger a deploy. Set `**RAILS_ENV=staging`** in the Hatchbox environment so Rails loads `[config/environments/staging.rb](config/environments/staging.rb)` (local Active Storage, `letter_opener_web`, no GCS keyfile).
 
 **Suggested environment variables**
 
-| Variable | Purpose |
-|----------|---------|
-| `RAILS_ENV` | `staging` |
-| `RAILS_MASTER_KEY` | Decrypts credentials (use staging-specific credentials if you run `bin/rails credentials:edit --environment staging`) |
-| `SECRET_KEY_BASE` | Hatchbox often sets this; required for sessions |
-| `DATABASE_URL` | MySQL URL from Hatchbox / DigitalOcean (e.g. `mysql2://user:pass@host:3306/dbname`) — **or** omit and set `STAGING_DATABASE_*` in [`config/database.yml`](config/database.yml) |
-| `STAGING_MAILER_HOST` | Public hostname for mailer URLs (e.g. `staging.example.edu`) |
-| `STAGING_MAILER_PROTOCOL` | Usually `https` |
-| `STAGING_ALLOWED_HOSTS` | Comma-separated hosts if `ActionDispatch::HostAuthorization` blocks the real hostname |
-| `LETTER_OPENER_WEB_HTTP_BASIC_USER` / `LETTER_OPENER_WEB_HTTP_BASIC_PASSWORD` | Optional HTTP basic auth for `/letter_opener` |
-| `NODE_OPTIONS` | If asset precompile fails on OpenSSL, use `--openssl-legacy-provider` (same as production builds) |
-| `RAILS_SERVE_STATIC_FILES` | Set if the app serves static files without nginx in front |
 
-The root [`Procfile`](Procfile) runs Puma with [`config/puma.default.rb`](config/puma.default.rb) (binds to `$PORT`). For local **web + webpack**, use `foreman start -f Procfile.dev`.
+| Variable                                                                      | Purpose                                                                                                                                                                        |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `RAILS_ENV`                                                                   | `staging`                                                                                                                                                                      |
+| `RAILS_MASTER_KEY`                                                            | Decrypts credentials (use staging-specific credentials if you run `bin/rails credentials:edit --environment staging`)                                                          |
+| `SECRET_KEY_BASE`                                                             | Hatchbox often sets this; required for sessions                                                                                                                                |
+| `DATABASE_URL`                                                                | MySQL URL from Hatchbox / DigitalOcean (e.g. `mysql2://user:pass@host:3306/dbname`) — **or** omit and set `STAGING_DATABASE_`* in `[config/database.yml](config/database.yml)` |
+| `STAGING_MAILER_HOST`                                                         | Public hostname for mailer URLs (e.g. `staging.example.edu`)                                                                                                                   |
+| `STAGING_MAILER_PROTOCOL`                                                     | Usually `https`                                                                                                                                                                |
+| `STAGING_ALLOWED_HOSTS`                                                       | Comma-separated hosts if `ActionDispatch::HostAuthorization` blocks the real hostname                                                                                          |
+| `LETTER_OPENER_WEB_HTTP_BASIC_USER` / `LETTER_OPENER_WEB_HTTP_BASIC_PASSWORD` | Optional HTTP basic auth for `/letter_opener`                                                                                                                                  |
+| `NODE_OPTIONS`                                                                | If asset precompile fails on OpenSSL, use `--openssl-legacy-provider` (same as production builds)                                                                              |
+| `RAILS_SERVE_STATIC_FILES`                                                    | Set if the app serves static files without nginx in front                                                                                                                      |
+
+
+The root `[Procfile](Procfile)` runs Puma with `[config/puma.default.rb](config/puma.default.rb)` (binds to `$PORT`). For local **web + webpack**, use `foreman start -f Procfile.dev`.
 
 ---
 
 ## Project Structure
 
-| Path | Purpose |
-|------|--------|
-| `app/` | Models, controllers, views, mailers, helpers, ActiveAdmin config |
-| `config/` | Application, routes, environments, initializers, deploy |
-| `Procfile` / `Procfile.dev` | Puma on `$PORT` for PaaS; local Rails + webpack watcher |
-| `config/puma.default.rb` | Portable Puma (Hatchbox / DO); production Capistrano still uses linked `config/puma.rb` |
-| `db/` | Schema, migrations, seeds |
-| `lib/capistrano/tasks/` | Custom Capistrano tasks |
-| `spec/` | RSpec tests and support |
-| `config/storage.yml` | Active Storage backends (local, GCS) |
+
+| Path                        | Purpose                                                                                 |
+| --------------------------- | --------------------------------------------------------------------------------------- |
+| `app/`                      | Models, controllers, views, mailers, helpers, ActiveAdmin config                        |
+| `config/`                   | Application, routes, environments, initializers, deploy                                 |
+| `Procfile` / `Procfile.dev` | Puma on `$PORT` for PaaS; local Rails + webpack watcher                                 |
+| `config/puma.default.rb`    | Portable Puma (Hatchbox / DO); production Capistrano still uses linked `config/puma.rb` |
+| `db/`                       | Schema, migrations, seeds                                                               |
+| `lib/capistrano/tasks/`     | Custom Capistrano tasks                                                                 |
+| `spec/`                     | RSpec tests and support                                                                 |
+| `config/storage.yml`        | Active Storage backends (local, GCS)                                                    |
+
 
 ### Main domain concepts
 
