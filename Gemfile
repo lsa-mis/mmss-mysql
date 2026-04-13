@@ -25,6 +25,8 @@ gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 gem 'webpacker', '~> 5.4', '>= 5.4.2'
 
 gem 'base64', require: false
+# Match Ruby 3.3.x default gem; a newer logger from rubygems conflicts at boot (Gem::LoadError).
+gem 'logger', '1.6.0'
 gem 'matrix', '~> 0.4.2', require: false
 gem 'mutex_m', require: false
 gem 'net-imap', require: false
