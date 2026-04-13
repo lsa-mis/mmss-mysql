@@ -59,6 +59,8 @@ group :test do
 end
 
 group :development, :staging do
+  # letter_opener_web loads rexml; not guaranteed on Ruby 3.3+ without an explicit gem
+  gem 'rexml'
   gem 'letter_opener_web', '~> 1.4'
 end
 
