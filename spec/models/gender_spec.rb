@@ -13,5 +13,12 @@
 require 'rails_helper'
 
 RSpec.describe Gender, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  describe 'validations' do
+    subject { build(:gender) }
+
+    it { is_expected.to validate_presence_of(:name) }
+    it { is_expected.to validate_uniqueness_of(:name).case_insensitive }
+  end
+
+  it_behaves_like 'a model with timestamps'
 end
