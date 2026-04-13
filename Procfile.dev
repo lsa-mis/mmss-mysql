@@ -1,0 +1,7 @@
+# Local development: run web + webpack together, e.g. `foreman start -f Procfile.dev`
+#
+# If you use newer OpenSSL locally, you may need:
+#   export NODE_OPTIONS=--openssl-legacy-provider
+
+web: bin/rails server -p 3000
+webpack: bin/webpack --watch

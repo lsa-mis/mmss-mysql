@@ -8,8 +8,6 @@ set :default_env, {
 SSHKit.config.command_map[:bundle] = '/home/deployer/.asdf/shims/bundle'
 SSHKit.config.command_map[:ruby] = '/home/deployer/.asdf/shims/ruby'
 
-server 'mathmmssapp2.miserver.it.umich.edu', roles: %w[app db web], primary: true
-
 set :application, 'mmss-mysql'
 set :repo_url, 'git@github.com:lsa-mis/mmss-mysql.git'
 set :user, 'deployer'
@@ -17,7 +15,6 @@ set :branch, 'main'
 
 # Don't change these unless you know what you're doing
 set :pty,             true
-set :stage,           :production
 set :deploy_to,       "/home/#{fetch(:user)}/apps/#{fetch(:application)}"
 set :ssh_options,     { forward_agent: true, user: fetch(:user), keys: %w[~/.ssh/id_ed25519.pub] }
 set :tmp_dir, '/home/deployer/tmp'

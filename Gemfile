@@ -58,13 +58,16 @@ group :test do
   gem 'simplecov', '~> 0.21', require: false
 end
 
+group :development, :staging do
+  gem 'letter_opener_web', '~> 1.4'
+end
+
 group :development do
   gem 'annotate', '~> 3.1', '>= 3.1.1'
   gem 'better_errors', '~> 2.9', '>= 2.9.1'
   gem 'capistrano', '~> 3.16', require: false
   gem 'capistrano-asdf', require: false
   gem 'capistrano-rails', '~> 1.6', '>= 1.6.1', require: false
-  gem 'letter_opener_web', '~> 1.4'
   gem 'listen', '~> 3.7'
   gem 'spring', '~> 3.0'
   gem 'web-console', '~> 4.1'

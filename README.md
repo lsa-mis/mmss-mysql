@@ -179,7 +179,7 @@ Keep `config/master.key` secure and do not commit it. In deployment it is linked
    - Root: `/`
    - Admin: `/admin` (Devise admin login)
    - Faculty: `/faculty`, `/faculty_login`
-   - Letter opener (development only): `/letter_opener`
+   - Letter opener (development and staging): `/letter_opener` (on staging, protect with HTTP basic auth env vars or network rules)
 
 ---
 
@@ -207,33 +207,45 @@ Keep `config/master.key` secure and do not commit it. In deployment it is linked
 
 ## Deployment
 
-Deployment uses **Capistrano** with **asdf** on the server.
+### Production (Capistrano + asdf)
 
 - **Repo**: `git@github.com:lsa-mis/mmss-mysql.git`
 - **Branch**: `main`
-- **Server**: Defined in `config/deploy.rb` (e.g. `mathmmssapp2.miserver.it.umich.edu`), roles: app, db, web.
+- **Server**: `config/deploy/production.rb` (e.g. `mathmmssapp2.miserver.it.umich.edu`), roles: app, db, web.
 - **Linked files** (must exist in shared config on the server):  
   `config/puma.rb`, `config/nginx.conf`, `config/master.key`, `config/lsa-was-base-c096c776ead3.json`, `mysql/InCommon.CA.crt`
 
-### Deploy commands
-
 ```bash
-# Deploy
 bundle exec cap production deploy
-
-# Upload config files to shared (run when configs change)
 bundle exec cap production deploy:upload
-
-# Puma
 bundle exec cap production puma:restart
 bundle exec cap production puma:stop
-
-# Maintenance
 bundle exec cap production maintenance:start
 bundle exec cap production maintenance:stop
 ```
 
-Before deploy, the task `deploy:check_revision` ensures local HEAD matches `origin/main`.
+Before deploy, `deploy:check_revision` ensures local HEAD matches `origin/main`.
+
+### Staging (Hatchbox + DigitalOcean)
+
+Use a **separate Hatchbox app** (or equivalent) with the **`staging` git branch** and a **deploy webhook** so merges to `staging` trigger a deploy. Set **`RAILS_ENV=staging`** in the Hatchbox environment so Rails loads [`config/environments/staging.rb`](config/environments/staging.rb) (local Active Storage, `letter_opener_web`, no GCS keyfile).
+
+**Suggested environment variables**
+
+| Variable | Purpose |
+|----------|---------|
+| `RAILS_ENV` | `staging` |
+| `RAILS_MASTER_KEY` | Decrypts credentials (use staging-specific credentials if you run `bin/rails credentials:edit --environment staging`) |
+| `SECRET_KEY_BASE` | Hatchbox often sets this; required for sessions |
+| `DATABASE_URL` | MySQL URL from Hatchbox / DigitalOcean (e.g. `mysql2://user:pass@host:3306/dbname`) — **or** omit and set `STAGING_DATABASE_*` in [`config/database.yml`](config/database.yml) |
+| `STAGING_MAILER_HOST` | Public hostname for mailer URLs (e.g. `staging.example.edu`) |
+| `STAGING_MAILER_PROTOCOL` | Usually `https` |
+| `STAGING_ALLOWED_HOSTS` | Comma-separated hosts if `ActionDispatch::HostAuthorization` blocks the real hostname |
+| `LETTER_OPENER_WEB_HTTP_BASIC_USER` / `LETTER_OPENER_WEB_HTTP_BASIC_PASSWORD` | Optional HTTP basic auth for `/letter_opener` |
+| `NODE_OPTIONS` | If asset precompile fails on OpenSSL, use `--openssl-legacy-provider` (same as production builds) |
+| `RAILS_SERVE_STATIC_FILES` | Set if the app serves static files without nginx in front |
+
+The root [`Procfile`](Procfile) runs Puma with [`config/puma.default.rb`](config/puma.default.rb) (binds to `$PORT`). For local **web + webpack**, use `foreman start -f Procfile.dev`.
 
 ---
 
@@ -243,6 +255,8 @@ Before deploy, the task `deploy:check_revision` ensures local HEAD matches `orig
 |------|--------|
 | `app/` | Models, controllers, views, mailers, helpers, ActiveAdmin config |
 | `config/` | Application, routes, environments, initializers, deploy |
+| `Procfile` / `Procfile.dev` | Puma on `$PORT` for PaaS; local Rails + webpack watcher |
+| `config/puma.default.rb` | Portable Puma (Hatchbox / DO); production Capistrano still uses linked `config/puma.rb` |
 | `db/` | Schema, migrations, seeds |
 | `lib/capistrano/tasks/` | Custom Capistrano tasks |
 | `spec/` | RSpec tests and support |

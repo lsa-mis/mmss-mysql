@@ -119,7 +119,7 @@ class PaymentsController < ApplicationController
   def generate_hash(amount = current_camp_fee / 100)
     user_account = current_user.email.partition('@').first + '-' + current_user.id.to_s
     amount_to_be_payed = amount.to_i
-    if Rails.env.development? || Rails.application.credentials.NELNET_SERVICE[:SERVICE_SELECTOR] == "QA"
+    if Rails.env.development? || Rails.env.staging? || Rails.application.credentials.NELNET_SERVICE[:SERVICE_SELECTOR] == "QA"
       url_to_use = 'test_URL'
     else
       url_to_use = 'prod_URL'
@@ -290,7 +290,7 @@ class PaymentsController < ApplicationController
   end
 
   def nelnet_signing_key
-    if Rails.env.development? || Rails.application.credentials.NELNET_SERVICE[:SERVICE_SELECTOR] == "QA"
+    if Rails.env.development? || Rails.env.staging? || Rails.application.credentials.NELNET_SERVICE[:SERVICE_SELECTOR] == "QA"
       Rails.application.credentials.NELNET_SERVICE[:DEVELOPMENT_KEY]
     else
       Rails.application.credentials.NELNET_SERVICE[:PRODUCTION_KEY]

@@ -14,6 +14,19 @@ test:
   <<: *default
   database: mmss-mysql_test
 
+# Staging: use DATABASE_URL (e.g. Hatchbox / managed MySQL) or STAGING_DATABASE_* for a local socket/TCP DB.
+staging:
+<% if ENV["DATABASE_URL"].present? %>
+  <<: *default
+  url: <%= ENV["DATABASE_URL"] %>
+<% else %>
+  <<: *default
+  database: <%= ENV.fetch("STAGING_DATABASE_NAME", "mmss_staging") %>
+  username: <%= ENV.fetch("STAGING_DATABASE_USERNAME", "root") %>
+  password: <%= ENV["STAGING_DATABASE_PASSWORD"] %>
+  host: <%= ENV.fetch("STAGING_DATABASE_HOST", "127.0.0.1") %>
+<% end %>
+
 production:
   <<: *default
   database: mmssprod
