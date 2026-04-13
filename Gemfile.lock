@@ -274,7 +274,7 @@ GEM
     listen (3.7.1)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
-    logger (1.7.0)
+    logger (1.6.0)
     loofah (2.25.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
@@ -604,6 +604,7 @@ DEPENDENCIES
   google-cloud-storage (~> 1.58)
   letter_opener_web (~> 1.4)
   listen (~> 3.7)
+  logger (= 1.6.0)
   matrix (~> 0.4.2)
   money-rails (~> 1.14)
   mutex_m
