@@ -162,6 +162,22 @@ class Enrollment < ApplicationRecord
     application_status.blank?
   end
 
+  def recommendation_requested?
+    recommendation.present? && recommendation.persisted?
+  end
+
+  def payment_portal_ready?
+    applicant_detail.present? &&
+      applicant_detail.persisted? &&
+      session_registrations.exists? &&
+      course_rankings_complete? &&
+      recommendation_requested?
+  end
+
+  def application_fee_paid?
+    user.payments.status1_current_camp_payments.exists?
+  end
+
   def last_name
     "#{applicant_detail.lastname} - #{user.email}"
   end

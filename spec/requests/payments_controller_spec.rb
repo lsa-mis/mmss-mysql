@@ -434,8 +434,21 @@ RSpec.describe PaymentsController, type: :request do
     context 'when signed in' do
       before { sign_in user }
 
-      it 'renders successfully' do
+      it 'redirects to root until rankings and recommendation are complete' do
         get all_payments_path
+
+        expect(response).to redirect_to(root_url)
+        expect(flash[:alert]).to include('Complete your application details')
+      end
+
+      it 'renders successfully once the application is ready for payment' do
+        enrollment.course_preferences.order(:id).each.with_index(1) do |preference, ranking|
+          preference.update!(ranking: ranking)
+        end
+        create(:recommendation, enrollment: enrollment)
+
+        get all_payments_path
+
         expect(response).to have_http_status(:ok)
       end
     end

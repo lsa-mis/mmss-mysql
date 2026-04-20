@@ -64,14 +64,12 @@
           </div>
         <% end %>
 
-        <% if @curr_enrollment&.application_fee_required %>
-          <% if current_user.payments.status1_current_camp_payments.present? %>
-            <div class="sidebox_element">
-              <%= link_to "Application Fee",
-                          all_payments_path %>
-                 - paid
-            </div>
-          <% end %>
+        <% if @current_enrollment.application_fee_required? && @current_enrollment.application_fee_paid? %>
+          <div class="sidebox_element">
+            <%= link_to "Application Fee",
+                        all_payments_path %>
+               - paid
+          </div>
         <% end %>
 
         <% if current_enrollment.offer_status == "offered" %>
@@ -159,9 +157,12 @@
           </div>
         <% end %>
         <hr class="my-2">
-        <div class="sidebox_element">
-          <%= link_to "Account Summary", all_payments_path, class: "btn btn-sm btn-blue" %>
-        </div>
+        <% if @current_enrollment.payment_portal_ready? &&
+              (!@current_enrollment.application_fee_required? || @current_enrollment.application_fee_paid?) %>
+          <div class="sidebox_element">
+            <%= link_to "Account Summary", all_payments_path, class: "btn btn-sm btn-blue" %>
+          </div>
+        <% end %>
       <% end %>
     </div>
   <% end %>

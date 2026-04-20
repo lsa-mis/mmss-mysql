@@ -410,5 +410,32 @@ RSpec.describe Enrollment, type: :model do
     end
   end
 
+  describe '#payment_portal_ready?' do
+    let!(:camp_config) { create(:camp_configuration, :active, camp_year: Date.current.year) }
+    let!(:session) { create(:camp_occurrence, camp_configuration: camp_config, active: true, description: 'Session 1') }
+    let!(:course1) { create(:course, camp_occurrence: session) }
+    let!(:course2) { create(:course, camp_occurrence: session) }
+    let!(:user) { create(:user, :with_applicant_detail) }
+    let!(:enrollment) { create(:enrollment, user: user, campyear: camp_config.camp_year) }
+
+    before do
+      CampConfiguration.update_all(active: false)
+      camp_config.update!(active: true)
+      enrollment.course_preferences.destroy_all
+      create(:course_preference, enrollment: enrollment, course: course1, ranking: 1)
+      create(:course_preference, enrollment: enrollment, course: course2, ranking: 2)
+    end
+
+    it 'returns false until a recommendation has been requested' do
+      expect(enrollment.reload.payment_portal_ready?).to be false
+    end
+
+    it 'returns true once the recommendation request exists and rankings are complete' do
+      create(:recommendation, enrollment: enrollment)
+
+      expect(enrollment.reload.payment_portal_ready?).to be true
+    end
+  end
+
   it_behaves_like 'a model with timestamps'
 end

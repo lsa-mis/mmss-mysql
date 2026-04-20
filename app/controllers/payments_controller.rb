@@ -21,6 +21,7 @@ class PaymentsController < ApplicationController
 
   before_action :set_current_enrollment
   skip_before_action :set_current_enrollment, only: [:payment_receipt]
+  before_action :ensure_payment_portal_ready!, only: [:payment_show]
   before_action :identify_user_for_payment_receipt!, only: [:payment_receipt]
   before_action :validate_nelnet_receipt_signature!, only: [:payment_receipt]
   before_action :verify_payment_request_for_new_transaction!, only: [:payment_receipt]
@@ -94,17 +95,16 @@ class PaymentsController < ApplicationController
   end
 
   def payment_show
-    redirect_to root_url unless current_user.payments.current_camp_payments
-     @registration_activities = registration_activities
-     @has_any_session = session_registrations.pluck(:description).include?("Any Session")
-     @current_application_status = current_application_status
-     @finaids = finaids
-     @finaids_ttl = finaids_ttl
-     @users_current_payments = users_current_payments
-     @ttl_paid = ttl_paid
-     @total_cost = total_cost
-     @balance_due = balance_due
-     @session_registrations = session_registrations
+    @registration_activities = registration_activities
+    @has_any_session = session_registrations.pluck(:description).include?("Any Session")
+    @current_application_status = current_application_status
+    @finaids = finaids
+    @finaids_ttl = finaids_ttl
+    @users_current_payments = users_current_payments
+    @ttl_paid = ttl_paid
+    @total_cost = total_cost
+    @balance_due = balance_due
+    @session_registrations = session_registrations
   end
 
   private
@@ -114,6 +114,13 @@ class PaymentsController < ApplicationController
     return if @current_enrollment.present?
 
     redirect_to root_url, alert: 'No current enrollment found for this camp year.' and return
+  end
+
+  def ensure_payment_portal_ready!
+    return if @current_enrollment.payment_portal_ready?
+
+    redirect_to root_url,
+                alert: 'Complete your application details, session selection, course rankings, and recommendation request before viewing payment details.'
   end
 
   def generate_hash(amount = current_camp_fee / 100)
