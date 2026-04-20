@@ -148,6 +148,20 @@ class Enrollment < ApplicationRecord
     "#{applicant_detail.full_name} - #{user.email}"
   end
 
+  # True when every selected course has a ranking and all CoursePreference validations pass
+  # (range 1..12, unique rank per session, unique course per enrollment).
+  def course_rankings_complete?
+    prefs = course_preferences.includes(:course).to_a
+    return false if prefs.empty?
+    return false if prefs.any? { |cp| cp.ranking.nil? }
+
+    prefs.all?(&:valid?)
+  end
+
+  def course_rankings_editable?
+    application_status.blank?
+  end
+
   def last_name
     "#{applicant_detail.lastname} - #{user.email}"
   end

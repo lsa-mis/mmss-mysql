@@ -70,7 +70,7 @@ RSpec.describe CoursePreference, type: :model do
       expect(preference.ranking).to be_nil
     end
 
-    it 'allows ranking to be set to an integer' do
+    it 'allows ranking to be set to an integer in range' do
       preference = build(:course_preference, ranking: 5)
       expect(preference).to be_valid
       expect(preference.ranking).to eq(5)
@@ -82,13 +82,14 @@ RSpec.describe CoursePreference, type: :model do
       expect(preference.reload.ranking).to eq(7)
     end
 
-    context 'with valid ranking values' do
-      [1, 5, 10, 12, nil].each do |value|
-        it "accepts ranking value of #{value.inspect}" do
-          preference = build(:course_preference, ranking: value)
-          expect(preference).to be_valid
-        end
-      end
+    it 'rejects ranking below 1' do
+      preference = build(:course_preference, ranking: 0)
+      expect(preference).not_to be_valid
+    end
+
+    it 'rejects ranking above the upper bound for the session' do
+      preference = build(:course_preference, ranking: 100)
+      expect(preference).not_to be_valid
     end
   end
 
@@ -110,9 +111,9 @@ RSpec.describe CoursePreference, type: :model do
       expect(preference.course).to be_present
     end
 
-    it 'creates preference with a ranking' do
+    it 'creates preference with default nil ranking' do
       preference = create(:course_preference)
-      expect(preference.ranking).to be_between(1, 10)
+      expect(preference.ranking).to be_nil
     end
 
     it 'allows creating preference without ranking' do
@@ -157,6 +158,11 @@ RSpec.describe CoursePreference, type: :model do
     let!(:session) { create(:camp_occurrence, camp_configuration: camp_config, active: true) }
     let!(:course) { create(:course, camp_occurrence: session) }
     let!(:enrollment) { create(:enrollment, campyear: camp_config.camp_year) }
+
+    before do
+      enrollment.course_preferences.destroy_all
+      enrollment.reload
+    end
 
     it 'is destroyed when enrollment is destroyed' do
       # Clear any existing preferences created by the factory
@@ -286,16 +292,15 @@ RSpec.describe CoursePreference, type: :model do
       expect(enrollment.course_preferences).to include(preference1, preference2, preference3)
     end
 
-    it 'allows same ranking for different courses' do
+    it 'does not allow the same ranking for two courses in the same session' do
       course1 = create(:course, camp_occurrence: session)
       course2 = create(:course, camp_occurrence: session)
 
-      preference1 = create(:course_preference, enrollment: enrollment, course: course1, ranking: 1)
-      preference2 = create(:course_preference, enrollment: enrollment, course: course2, ranking: 1)
+      create(:course_preference, enrollment: enrollment, course: course1, ranking: 1)
+      preference2 = build(:course_preference, enrollment: enrollment, course: course2, ranking: 1)
 
-      expect(preference1).to be_valid
-      expect(preference2).to be_valid
-      expect(enrollment.course_preferences.where(ranking: 1).count).to eq(2)
+      expect(preference2).not_to be_valid
+      expect(preference2.errors[:ranking]).to include('must be unique within each camp session')
     end
   end
 
@@ -310,20 +315,19 @@ RSpec.describe CoursePreference, type: :model do
       enrollment.course_preferences.destroy_all
     end
 
-    it 'handles very large ranking values' do
+    it 'rejects very large ranking values' do
       preference = build(:course_preference, enrollment: enrollment, course: course, ranking: 999)
-      expect(preference).to be_valid
+      expect(preference).not_to be_valid
     end
 
-    it 'handles negative ranking values' do
+    it 'rejects negative ranking values' do
       preference = build(:course_preference, enrollment: enrollment, course: course, ranking: -1)
-      # Note: The model doesn't validate ranking range, so this should be valid
-      expect(preference).to be_valid
+      expect(preference).not_to be_valid
     end
 
-    it 'handles zero ranking value' do
+    it 'rejects zero ranking value' do
       preference = build(:course_preference, enrollment: enrollment, course: course, ranking: 0)
-      expect(preference).to be_valid
+      expect(preference).not_to be_valid
     end
 
     it 'can update ranking from nil to a value' do

@@ -374,5 +374,41 @@ RSpec.describe Enrollment, type: :model do
     end
   end
 
+  describe '#course_rankings_complete?' do
+    let!(:camp_config) { create(:camp_configuration, :active, camp_year: Date.current.year) }
+    let!(:session) { create(:camp_occurrence, camp_configuration: camp_config, active: true, description: 'Session 1') }
+    let!(:course1) { create(:course, camp_occurrence: session) }
+    let!(:course2) { create(:course, camp_occurrence: session) }
+    let!(:user) { create(:user) }
+    let!(:enrollment) { create(:enrollment, user: user, campyear: camp_config.camp_year) }
+
+    before do
+      CampConfiguration.update_all(active: false)
+      camp_config.update!(active: true)
+    end
+
+    it 'returns false when any course preference has a nil ranking' do
+      enrollment.course_preferences.destroy_all
+      create(:course_preference, enrollment: enrollment, course: course1, ranking: 1)
+      create(:course_preference, enrollment: enrollment, course: course2, ranking: nil)
+      expect(enrollment.reload.course_rankings_complete?).to be false
+    end
+
+    it 'returns false when two preferences in the same session share a rank' do
+      enrollment.course_preferences.destroy_all
+      p1 = create(:course_preference, enrollment: enrollment, course: course1, ranking: 1)
+      p2 = create(:course_preference, enrollment: enrollment, course: course2, ranking: 2)
+      CoursePreference.where(id: [p1.id, p2.id]).update_all(ranking: 1)
+      expect(enrollment.reload.course_rankings_complete?).to be false
+    end
+
+    it 'returns true when every preference has a valid unique rank per session' do
+      enrollment.course_preferences.destroy_all
+      create(:course_preference, enrollment: enrollment, course: course1, ranking: 1)
+      create(:course_preference, enrollment: enrollment, course: course2, ranking: 2)
+      expect(enrollment.reload.course_rankings_complete?).to be true
+    end
+  end
+
   it_behaves_like 'a model with timestamps'
 end

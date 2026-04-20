@@ -37,14 +37,13 @@
           related to your interest.
         </p>
 
-  <% elsif @current_enrollment.course_preferences.pluck(:ranking).any?{ |e| e.nil? } %>
+  <% elsif !@current_enrollment.course_rankings_complete? %>
     <div class="m-2">
       <%= link_to 'Course-Rankings',
                         enrollment_course_preferences_path(@current_enrollment.id),
                         class: 'btn btn-blue' %>
         <p class="mt-2">
-          The next step is to rank the courses you selected in priority of interest. You should give a
-          rank of "1" for the first or highest preferred course.
+          The next step is to rank the courses you selected in priority of interest. On the course rankings page you can drag courses into order or use the rank menus; rank <strong>1</strong> is your highest choice within each camp session.
         </p>
     </div>
     <div class='m-2 direction_notes'>Make sure that you give each course you selected a ranking. </div>

@@ -27,10 +27,10 @@
         <div class="sidebox_sub_element">
           <%= link_to 'Course Rankings',
                         enrollment_course_preferences_path(@current_enrollment.id) %>
-            <% if @current_enrollment.course_preferences.pluck(:ranking).any?{ |e| e.nil? } %>
-              - not complete
-            <% else %>
+            <% if @current_enrollment.course_rankings_complete? %>
               - submitted
+            <% else %>
+              - not complete
             <% end %>
         </div>
 

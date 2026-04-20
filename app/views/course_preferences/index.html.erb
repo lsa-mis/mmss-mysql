@@ -1,54 +1,74 @@
 <div class="max-w rounded overflow-hidden shadow-lg">
   <h1 class="text-yellow-um_yellow bg-blue-um_blue p-2">Course Rankings</h1>
 
-  <p class="direction_notes">
-    For each course below click edit and rank according to your interest.
+  <p class="direction_notes m-2">
+    For each camp session, put your <strong>most wanted</strong> course at the top.
+    Drag rows to reorder, use the <strong>Move up / down</strong> buttons, or pick a rank from the menu (1 is highest).
+    Ranks must be <strong>unique within each session</strong>. When you are finished for all sessions, click <strong>Save rankings</strong>.
   </p>
-  <div class = "m-2">
-    <% if @current_enrollment_session1.present? %>
-      <h3>Session 1</h3>
-        <ul>
-          <% @current_enrollment_session1_courses.each do |sc| %>
-            <li class="m-2"><%= sc.title %> Rank: [ <%= @current_enrollment_course_preferences_all.find_by(course_id: sc.id).ranking %> ]
-              <% if @current_enrollment.application_status == "" || @current_enrollment.application_status == nil %>
-                -- <%= link_to "edit", edit_enrollment_course_preference_path(@current_enrollment, @current_enrollment_course_preferences_all.find_by(course_id: sc.id)), class: 'btn btn-sm btn-blue' %>
-              <% end %>
-            </li>
-          <% end %>
-        </ul>
-      <hr>
-    <% end %>
 
-    <% if @current_enrollment_session2.present? %>
-      <h3>Session 2</h3>
-        <ul>
-          <% @current_enrollment_session2_courses.each do |sc| %>
-            <li class="m-2"><%= sc.title %> Rank: [ <%= @current_enrollment_course_preferences_all.find_by(course_id: sc.id).ranking %> ]
-              <% if @current_enrollment.application_status == "" || @current_enrollment.application_status == nil %>
-                -- <%= link_to "edit", edit_enrollment_course_preference_path(@current_enrollment, @current_enrollment_course_preferences_all.find_by(course_id: sc.id)), class: 'btn btn-sm btn-blue' %>
-              <% end %>
-            </li>
-          <% end %>
-        </ul>
-      <hr>
-    <% end %>
+  <% if @ranking_sessions.blank? %>
+    <p class="m-2">No session courses were found for this application. Return to your
+      <%= link_to 'enrollment', enrollment_path(@current_enrollment), class: 'text-blue-700 underline' %>
+      and select courses for each session you registered for.</p>
+  <% elsif @current_enrollment.course_rankings_editable? %>
+    <%= form_with url: bulk_update_enrollment_course_preferences_path(@current_enrollment),
+                  method: :patch,
+                  local: true,
+                  data: { controller: "course-ranking" },
+                  html: { class: "m-2" } do |form| %>
+      <% @ranking_sessions.each do |sess| %>
+        <div class="mb-6">
+          <h3 class="text-lg font-semibold"><%= sess[:label] %></h3>
+          <p class="text-sm text-gray-700 mb-2">
+            Rank every course you selected for this session. Top of the list = rank 1 (first choice).
+          </p>
+          <ul class="course-ranking-list border border-gray-300 rounded p-0 m-0 list-none bg-white"
+              data-course-ranking-target="list">
+            <% sess[:preferences].each do |cp| %>
+              <li class="course-ranking-item flex flex-wrap items-center gap-2 border-b border-gray-200 px-2 py-3 last:border-b-0"
+                  draggable="true"
+                  data-item>
+                <span class="cursor-grab select-none text-gray-500 pr-1" title="Drag to reorder" aria-hidden="true">⠿</span>
+                <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
+                  <button type="button" class="btn btn-sm btn-blue" data-action="course-ranking#moveUp">Move up</button>
+                  <button type="button" class="btn btn-sm btn-blue" data-action="course-ranking#moveDown">Move down</button>
+                </div>
+                <div class="flex flex-grow flex-col gap-1 sm:flex-row sm:items-center sm:gap-3 min-w-0">
+                  <%= label_tag "rankings_#{cp.id}", "Rank for #{cp.course.title}", class: "text-sm font-medium whitespace-nowrap" %>
+                  <%= select_tag "rankings[#{cp.id}]",
+                                 options_for_select((1..sess[:max_rank]).map { |n| [n, n] }, cp.ranking),
+                                 id: "rankings_#{cp.id}",
+                                 required: true,
+                                 class: "border rounded px-2 py-1 max-w-xs",
+                                 "aria-label": "Rank for #{cp.course.title}" %>
+                  <span class="text-sm flex-grow break-words"><%= cp.course.title %></span>
+                </div>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
 
-    <% if @current_enrollment_session3.present? %>
-      <h3>Session 3</h3>
-        <ul>
-          <% @current_enrollment_session3_courses.each do |sc| %>
-            <li class="m-2"><%= sc.title %> Rank: [ <%= @current_enrollment_course_preferences_all.find_by(course_id: sc.id).ranking %> ]
-              <% if @current_enrollment.application_status == "" || @current_enrollment.application_status == nil %>
-                -- <%= link_to "edit", edit_enrollment_course_preference_path(@current_enrollment, @current_enrollment_course_preferences_all.find_by(course_id: sc.id)), class: 'btn btn-sm btn-blue' %>
-              <% end %>
-            </li>
+      <div class="mt-4">
+        <%= form.submit "Save rankings", class: "btn btn-blue" %>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="m-2">
+      <% @ranking_sessions.each do |sess| %>
+        <h3 class="text-lg font-semibold"><%= sess[:label] %></h3>
+        <ul class="list-disc pl-6 mb-4">
+          <% sess[:preferences].each do |cp| %>
+            <li class="mb-1"><%= cp.course.title %> — rank <strong><%= cp.ranking.presence || "—" %></strong></li>
           <% end %>
         </ul>
-      <hr>
-    <% end %>
-  </div>
+      <% end %>
+      <p class="text-sm text-gray-700">Course rankings are locked after your application has been processed.</p>
+    </div>
+  <% end %>
 </div>
 
-<div class="mt-2">
-  <%= link_to 'Home', root_path, class: "btn btn-blue"  %>
+<div class="mt-2 m-2">
+  <%= link_to "Home", root_path, class: "btn btn-blue" %>
 </div>
