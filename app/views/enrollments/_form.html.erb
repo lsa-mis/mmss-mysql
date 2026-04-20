@@ -210,9 +210,10 @@
 
   <div class="field">
     <%= form.label :high_school_country %>
-    <%= form.country_select :high_school_country,
-                        { priority_countries: ["US"], include_blank: "Select" },
-                        { required: true } %>
+    <%= form.select :high_school_country,
+                    country_options_with_priority,
+                    { include_blank: "Select" },
+                    { required: true } %>
   </div>
 
   <hr>

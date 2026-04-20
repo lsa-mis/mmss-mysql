@@ -143,6 +143,19 @@ module ApplicationHelper
     ]
   end
 
+  def country_options_with_priority(priority_codes: ['US'])
+    priority = priority_codes.filter_map do |code|
+      country = ISO3166::Country[code]
+      [country.iso_short_name, country.alpha2] if country
+    end
+
+    countries = ISO3166::Country.all.map { |country| [country.iso_short_name, country.alpha2] }
+    countries.sort_by!(&:first)
+    countries.reject! { |_name, code| priority_codes.include?(code) }
+
+    priority + countries
+  end
+
   def campnote_types
     [
       %w[Alert alert],

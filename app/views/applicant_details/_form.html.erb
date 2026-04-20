@@ -55,9 +55,10 @@
 
   <div class="field country-select">
     <%= form.label :country%>
-    <%= form.country_select :country,
-                        { priority_countries: ["US"], include_blank: "Select" },
-                        { required: true } %>
+    <%= form.select :country,
+                    country_options_with_priority,
+                    { include_blank: "Select" },
+                    { required: true } %>
   </div>
 
   <div class="field">
@@ -131,7 +132,9 @@
 
   <div class="field country-select">
     <%= form.label :parentcountry, class: 'form-optional' %>
-    <%= form.country_select  :parentcountry, priority_countries: ["US"], include_blank: "Select" %>
+    <%= form.select :parentcountry,
+                    country_options_with_priority,
+                    { include_blank: "Select" } %>
   </div>
 
   <div class="field">
