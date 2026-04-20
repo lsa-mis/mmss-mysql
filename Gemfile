@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '3.3.4'
+ruby '3.4.9'
 
 gem 'activeadmin', '~> 3.5.1'
 gem 'bootsnap', '~> 1.8', '>= 1.8.1', require: false
@@ -25,7 +25,7 @@ gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 gem 'webpacker', '~> 5.4', '>= 5.4.2'
 
 gem 'base64', require: false
-# Match Ruby 3.3.x default gem; a newer logger from rubygems conflicts at boot (Gem::LoadError).
+# Match Ruby 3.4.x default gem; a newer logger from rubygems conflicts at boot (Gem::LoadError).
 gem 'logger', '1.6.0'
 gem 'matrix', '~> 0.4.2', require: false
 gem 'mutex_m', require: false
@@ -65,7 +65,7 @@ group :test do
 end
 
 group :development, :staging do
-  # letter_opener_web loads rexml; not guaranteed on Ruby 3.3+ without an explicit gem
+  # letter_opener_web loads rexml; not guaranteed on Ruby 3.4+ without an explicit gem
   gem 'rexml'
   gem 'letter_opener_web', '~> 1.4'
 end
