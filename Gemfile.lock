@@ -318,6 +318,7 @@ GEM
       net-protocol
     net-ssh (7.0.1)
     nio4r (2.7.5)
+    nkf (0.2.0)
     nokogiri (1.19.2-arm64-darwin)
       racc (~> 1.4)
     nokogiri (1.19.2-x86_64-darwin)
@@ -613,6 +614,7 @@ DEPENDENCIES
   net-imap
   net-pop
   net-smtp
+  nkf
   nokogiri (~> 1.19)
   observer
   pry-byebug (~> 3.12)

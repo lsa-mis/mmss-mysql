@@ -67,6 +67,8 @@ end
 group :development, :staging do
   # letter_opener_web loads rexml; not guaranteed on Ruby 3.4+ without an explicit gem
   gem 'rexml'
+  # letter_opener still requires kconv; Ruby 3.4 provides that via the nkf gem
+  gem 'nkf'
   gem 'letter_opener_web', '~> 1.4'
 end
 
