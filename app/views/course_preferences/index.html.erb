@@ -26,23 +26,23 @@
           <ul class="course-ranking-list border border-gray-300 rounded p-0 m-0 list-none bg-white"
               data-course-ranking-target="list">
             <% sess[:preferences].each do |cp| %>
-              <li class="course-ranking-item flex flex-wrap items-center gap-2 border-b border-gray-200 px-2 py-3 last:border-b-0"
+              <li class="course-ranking-item flex flex-nowrap items-center gap-2 border-b border-gray-200 px-2 py-3 last:border-b-0"
                   draggable="true"
                   data-item>
-                <span class="cursor-grab select-none text-gray-500 pr-1" title="Drag to reorder" aria-hidden="true">⠿</span>
-                <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
+                <span class="shrink-0 cursor-grab select-none text-gray-500 pr-1" title="Drag to reorder" aria-hidden="true">⠿</span>
+                <div class="flex shrink-0 flex-row flex-nowrap items-center gap-2">
                   <button type="button" class="btn btn-sm btn-blue" data-action="course-ranking#moveUp">Move up</button>
                   <button type="button" class="btn btn-sm btn-blue" data-action="course-ranking#moveDown">Move down</button>
                 </div>
-                <div class="flex flex-grow flex-col gap-1 sm:flex-row sm:items-center sm:gap-3 min-w-0">
-                  <%= label_tag "rankings_#{cp.id}", "Rank for #{cp.course.title}", class: "text-sm font-medium whitespace-nowrap" %>
+                <div class="flex min-w-0 flex-1 flex-row flex-nowrap items-center gap-2 sm:gap-3">
+                  <%= label_tag "rankings_#{cp.id}", "Rank", class: "text-sm font-medium shrink-0" %>
                   <%= select_tag "rankings[#{cp.id}]",
                                  options_for_select((1..sess[:max_rank]).map { |n| [n, n] }, cp.ranking),
                                  id: "rankings_#{cp.id}",
                                  required: true,
-                                 class: "border rounded px-2 py-1 max-w-xs",
+                                 class: "shrink-0 border rounded px-2 py-1",
                                  "aria-label": "Rank for #{cp.course.title}" %>
-                  <span class="text-sm flex-grow break-words"><%= cp.course.title %></span>
+                  <span class="min-w-0 flex-1 truncate text-sm" title="<%= cp.course.title %>"><%= cp.course.title %></span>
                 </div>
               </li>
             <% end %>
