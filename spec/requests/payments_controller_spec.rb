@@ -183,8 +183,10 @@ RSpec.describe PaymentsController, type: :request do
         }.to change(Payment, :count).by(1)
 
         expect(response).to redirect_to(all_payments_path)
+        expect(flash[:notice]).to include('successfully recorded')
         follow_redirect!
-        expect(response.body).to include('successfully recorded')
+        expect(response).to redirect_to(root_url)
+        expect(flash[:alert]).to include('Complete your application details')
 
         payment = Payment.find_by(transaction_id: '432051518')
         expect(payment).to be_present
@@ -205,8 +207,10 @@ RSpec.describe PaymentsController, type: :request do
         }.to change(Payment, :count).by(1)
 
         expect(response).to redirect_to(all_payments_path)
+        expect(flash[:notice]).to include('successfully recorded')
         follow_redirect!
-        expect(response.body).to include('successfully recorded')
+        expect(response).to redirect_to(root_url)
+        expect(flash[:alert]).to include('Complete your application details')
       end
     end
 
@@ -223,8 +227,10 @@ RSpec.describe PaymentsController, type: :request do
         }.to change(Payment, :count).by(1)
 
         expect(response).to redirect_to(all_payments_path)
+        expect(flash[:alert]).to include('not successful')
         follow_redirect!
-        expect(response.body).to include('not successful')
+        expect(response).to redirect_to(root_url)
+        expect(flash[:alert]).to include('Complete your application details')
 
         payment = Payment.last
         expect(payment.transaction_status).to eq('0')
