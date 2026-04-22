@@ -328,6 +328,7 @@ GEM
     observer (0.1.2)
     orm_adapter (0.5.0)
     os (1.1.4)
+    ostruct (0.5.5)
     parallel (1.27.0)
     parser (3.3.10.2)
       ast (~> 2.4.1)
@@ -617,6 +618,7 @@ DEPENDENCIES
   nkf
   nokogiri (~> 1.19)
   observer
+  ostruct (~> 0.5.5)
   pry-byebug (~> 3.12)
   pry-rails (~> 0.3.9)
   puma (= 5.6.9)
