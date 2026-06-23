@@ -1,5 +1,5 @@
 <% Campnote.all.each do |cn| %>
-  <% if (cn.opendate..cn.closedate).include? DateTime.now %>
+  <% if cn.opendate.present? && cn.closedate.present? && (cn.opendate..cn.closedate).cover?(Time.current) %>
     <% if cn.notetype == "notice"%>
       <div class="bg-gray-200 border border-yellow-600 mt-4 p-2" >
     <% else %>
@@ -11,6 +11,6 @@
         <div>
           <%= cn.note %>
         </div>
-      </div> 
+      </div>
   <% end %>
 <% end %>
