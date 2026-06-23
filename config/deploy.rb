@@ -16,7 +16,13 @@ set :branch, 'main'
 # Don't change these unless you know what you're doing
 set :pty,             true
 set :deploy_to,       "/home/#{fetch(:user)}/apps/#{fetch(:application)}"
-set :ssh_options,     { forward_agent: true, user: fetch(:user), keys: %w[~/.ssh/id_ed25519.pub] }
+# set :ssh_options,     { forward_agent: true, user: fetch(:user), keys: %w[~/.ssh/id_ed25519.pub] }
+set :ssh_options, {
+  forward_agent: true,
+  user: fetch(:user),
+  keys: %w[~/.ssh/id_ed25519],
+  auth_methods: %w[publickey]
+}
 set :tmp_dir, '/home/deployer/tmp'
 set :keep_releases, 3
 
