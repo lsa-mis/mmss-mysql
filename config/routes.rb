@@ -85,7 +85,11 @@ Rails.application.routes.draw do
   resources :recommendations
 
   resources :enrollments do
-    resources :course_preferences
+      resources :course_preferences do
+        collection do
+          patch :bulk_update
+        end
+      end
   end
 
   resources :enrollments do

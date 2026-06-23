@@ -33,5 +33,35 @@
 require 'rails_helper'
 
 RSpec.describe Travel, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  describe 'associations' do
+    it { is_expected.to belong_to(:enrollment) }
+  end
+
+  describe 'validations' do
+    subject { build(:travel) }
+
+    it { is_expected.to validate_presence_of(:arrival_transport) }
+    it { is_expected.to validate_presence_of(:depart_transport) }
+    it { is_expected.to validate_presence_of(:arrival_session) }
+    it { is_expected.to validate_presence_of(:depart_session) }
+  end
+
+  describe '.ransackable_attributes' do
+    it 'lists attributes allowed for admin search' do
+      attrs = described_class.ransackable_attributes
+      expect(attrs).to include('arrival_transport', 'depart_transport', 'enrollment_id', 'note')
+    end
+
+    it 'accepts optional auth object' do
+      expect { described_class.ransackable_attributes(nil) }.not_to raise_error
+    end
+  end
+
+  describe '.ransackable_associations' do
+    it 'includes enrollment' do
+      expect(described_class.ransackable_associations).to eq(['enrollment'])
+    end
+  end
+
+  it_behaves_like 'a model with timestamps'
 end

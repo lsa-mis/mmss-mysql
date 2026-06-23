@@ -83,8 +83,9 @@ Your recommender will be sent an email giving them directions on how to submit a
 
   <div class="field">
     <%= form.label :country, class: 'form-optional' %>
-    <%= form.country_select :country, priority_countries: ["US"],
-                            include_blank: "*Select*" %>
+    <%= form.select :country,
+                    country_options_with_priority,
+                    { include_blank: "*Select*" } %>
   </div>
 
   <div class="field">

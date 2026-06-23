@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '3.3.4'
+ruby '3.4.9'
 
 gem 'activeadmin', '~> 3.5.1'
 gem 'bootsnap', '~> 1.8', '>= 1.8.1', require: false
@@ -14,6 +14,7 @@ gem 'money-rails', '~> 1.14'
 # gem install mysql2 -v '0.5.4' -- --with-ldflags=-L/usr/local/opt/openssl/lib --with-cppflags=-I/usr/local/opt/openssl/include
 # gem install mysql2 -v '0.5.6' -- --with-mysql-dir=/opt/homebrew/bin/mysql --with-mysql-lib=/opt/homebrew/Cellar/mysql/8.3.0/lib --with-mysql-include=/opt/homebrew/Cellar/mysql/8.3.0/include/mysql
 gem 'mysql2', '~> 0.5.6'
+gem 'ostruct', '~> 0.5.5'
 gem 'puma', '5.6.9'
 gem 'rails', '~> 7.2'
 gem 'sass-rails', '~> 6.0'
@@ -25,6 +26,8 @@ gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 gem 'webpacker', '~> 5.4', '>= 5.4.2'
 
 gem 'base64', require: false
+# Match Ruby 3.4.x default gem; a newer logger from rubygems conflicts at boot (Gem::LoadError).
+gem 'logger', '1.6.0'
 gem 'matrix', '~> 0.4.2', require: false
 gem 'mutex_m', require: false
 gem 'net-imap', require: false
@@ -38,10 +41,14 @@ gem 'sentry-rails', '~> 6.3'
 gem 'sentry-ruby', '~> 6.3' # 5.24+ for Sentry Logging (enable_logs)
 gem 'stackprof'
 
+# Seeds use Faker; staging loads seeds but should not install full :test tooling (Capybara, RSpec, …).
+group :development, :test, :staging do
+  gem 'faker', '~> 2.23'
+end
+
 group :development, :test do
   gem 'capybara', '~> 3.35', '>= 3.35.3'
   gem 'factory_bot_rails', '~> 6.5'
-  gem 'faker', '~> 2.23'
   gem 'pry-byebug', '~> 3.12'
   gem 'pry-rails', '~> 0.3.9'
   gem 'rspec-rails', '~> 7.0'
@@ -59,6 +66,10 @@ group :test do
 end
 
 group :development, :staging do
+  # letter_opener_web loads rexml; not guaranteed on Ruby 3.4+ without an explicit gem
+  gem 'rexml'
+  # letter_opener still requires kconv; Ruby 3.4 provides that via the nkf gem
+  gem 'nkf'
   gem 'letter_opener_web', '~> 1.4'
 end
 

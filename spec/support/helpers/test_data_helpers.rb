@@ -42,6 +42,7 @@ RSpec.configure do |config|
     # Setup basic test data once before the suite runs
     Gender.find_or_create_by(name: 'Female') { |g| g.description = 'Female' }
     Gender.find_or_create_by(name: 'Male') { |g| g.description = 'Male' }
+    Gender.find_or_create_by(name: 'Non-binary') { |g| g.description = 'Non-binary' }
     Demographic.find_or_create_by(name: 'Test Demographic') { |d| d.description = 'Test Description'; d.protected = false }
     Demographic.find_or_create_by(name: 'Other') { |d| d.description = 'Other demographic option'; d.protected = true }
   end

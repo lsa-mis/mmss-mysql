@@ -183,8 +183,10 @@ RSpec.describe PaymentsController, type: :request do
         }.to change(Payment, :count).by(1)
 
         expect(response).to redirect_to(all_payments_path)
+        expect(flash[:notice]).to include('successfully recorded')
         follow_redirect!
-        expect(response.body).to include('successfully recorded')
+        expect(response).to redirect_to(root_url)
+        expect(flash[:alert]).to include('Complete your application details')
 
         payment = Payment.find_by(transaction_id: '432051518')
         expect(payment).to be_present
@@ -205,8 +207,10 @@ RSpec.describe PaymentsController, type: :request do
         }.to change(Payment, :count).by(1)
 
         expect(response).to redirect_to(all_payments_path)
+        expect(flash[:notice]).to include('successfully recorded')
         follow_redirect!
-        expect(response.body).to include('successfully recorded')
+        expect(response).to redirect_to(root_url)
+        expect(flash[:alert]).to include('Complete your application details')
       end
     end
 
@@ -223,8 +227,10 @@ RSpec.describe PaymentsController, type: :request do
         }.to change(Payment, :count).by(1)
 
         expect(response).to redirect_to(all_payments_path)
+        expect(flash[:alert]).to include('not successful')
         follow_redirect!
-        expect(response.body).to include('not successful')
+        expect(response).to redirect_to(root_url)
+        expect(flash[:alert]).to include('Complete your application details')
 
         payment = Payment.last
         expect(payment.transaction_status).to eq('0')
@@ -434,8 +440,21 @@ RSpec.describe PaymentsController, type: :request do
     context 'when signed in' do
       before { sign_in user }
 
-      it 'renders successfully' do
+      it 'redirects to root until rankings and recommendation are complete' do
         get all_payments_path
+
+        expect(response).to redirect_to(root_url)
+        expect(flash[:alert]).to include('Complete your application details')
+      end
+
+      it 'renders successfully once the application is ready for payment' do
+        enrollment.course_preferences.order(:id).each.with_index(1) do |preference, ranking|
+          preference.update!(ranking: ranking)
+        end
+        create(:recommendation, enrollment: enrollment)
+
+        get all_payments_path
+
         expect(response).to have_http_status(:ok)
       end
     end

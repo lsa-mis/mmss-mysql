@@ -46,7 +46,14 @@ class EnrollmentsController < ApplicationController
 
     respond_to do |format|
       if @enrollment.save
-        format.html { redirect_to root_path, notice: 'Application was successfully created.' }
+        if @enrollment.course_rankings_complete?
+          format.html { redirect_to root_path, notice: 'Application was successfully created.' }
+        else
+          format.html do
+            redirect_to enrollment_course_preferences_path(@enrollment),
+                        notice: 'Application was saved. Next, rank the courses you selected for each session (1 = highest interest).'
+          end
+        end
         format.json { render :show, status: :created, location: @enrollment }
       else
         format.html { render :new }
@@ -61,7 +68,14 @@ class EnrollmentsController < ApplicationController
     respond_to do |format|
       if @current_enrollment.update(enrollment_params)
         @current_enrollment.auto_enroll_if_ready!
-        format.html { redirect_to root_path, notice: 'Application was successfully updated.' }
+        if @current_enrollment.course_rankings_complete?
+          format.html { redirect_to root_path, notice: 'Application was successfully updated.' }
+        else
+          format.html do
+            redirect_to enrollment_course_preferences_path(@current_enrollment),
+                        notice: 'Application was updated. When you are ready, rank the courses you selected for each session.'
+          end
+        end
         format.json { render :show, status: :ok, location: @current_enrollment }
       else
         if @current_enrollment.errors.include?(:student_packet) || @current_enrollment.errors.include?(:vaccine_record) || @current_enrollment.errors.include?(:covid_test_record)

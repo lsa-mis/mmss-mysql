@@ -26,6 +26,6 @@ FactoryBot.define do
     association :enrollment
     association :course
 
-    ranking { rand(1..10) }
+    ranking { nil }
   end
 end

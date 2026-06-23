@@ -40,7 +40,7 @@ A Ruby on Rails application for managing summer camp applications, enrollments, 
 
 | Layer            | Technology                                                       |
 | ---------------- | ---------------------------------------------------------------- |
-| **Runtime**      | Ruby 3.3.4                                                       |
+| **Runtime**      | Ruby 3.4.9                                                       |
 | **Framework**    | Rails 7.2.3.1                                                    |
 | **Database**     | MySQL 8 (mysql2 gem), utf8mb4                                    |
 | **Auth**         | Devise (users, admins, faculties)                                |
@@ -56,7 +56,7 @@ A Ruby on Rails application for managing summer camp applications, enrollments, 
 
 ## Prerequisites
 
-- **Ruby** 3.3.4 (recommended: [asdf](https://asdf-vm.com/) or rbenv)
+- **Ruby** 3.4.9 (recommended: [asdf](https://asdf-vm.com/) or rbenv)
 - **MySQL** 8.x (with OpenSSL available for the `mysql2` gem)
 - **Node.js** (for Webpacker; LTS version recommended)
 - **Bundler** 2.x

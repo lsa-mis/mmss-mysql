@@ -3,6 +3,16 @@ default: &default
   encoding: utf8mb4
   collation: utf8mb4_0900_ai_ci
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  # Reap dead connections instead of reusing them (avoids piling up aborted
+  # connections on the server, which can trigger MySQL's max_connect_errors block).
+  reaping_frequency: 10
+  idle_timeout: 300
+  checkout_timeout: 5
+  # mysql2 socket-level timeouts so a stalled remote DB fails fast and cleanly
+  # rather than leaving half-open connections.
+  connect_timeout: 5
+  read_timeout: 5
+  write_timeout: 5
   username: root
   password: <%= ENV['LOCAL_MYSQL_DATABASE_PASSWORD'] %>
 
@@ -29,6 +39,10 @@ staging:
 
 production:
   <<: *default
+  # Puma runs `threads 4,16`, so each worker needs up to 16 connections.
+  # Default of 5 starves the threads and churns connections. Override via
+  # RAILS_MAX_THREADS if you change the Puma thread count.
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 16 } %>
   database: mmssprod
   username: <%= Rails.env.production? ? Rails.application.credentials.dig(:mysql, :prod_user) : ENV['MYSQL_PROD_USER'] %>
   password: <%= Rails.env.production? ? Rails.application.credentials.dig(:mysql, :prod_password) : ENV['MYSQL_PROD_PASSWORD'] %>
