@@ -1,1 +1,3 @@
 defaults
+not op_mob > 0
+not op_mini all
