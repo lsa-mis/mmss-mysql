@@ -146,7 +146,7 @@ class CoursePreferencesController < ApplicationController
         @current_enrollment_course_preferences_all.find { |cp| cp.course_id == course.id }
       end.compact.sort_by { |cp| [cp.ranking || CoursePreference::MAX_RANKING + 1, course_title_for(cp)] }
 
-      max_rank = [[preferences.size, CoursePreference::MAX_RANKING].max, 99].min
+      max_rank = [preferences.size, CoursePreference::MAX_RANKING].min
 
       { label: row[:label], session: row[:session], preferences: preferences, max_rank: max_rank }
     end

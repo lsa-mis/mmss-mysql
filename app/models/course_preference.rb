@@ -37,24 +37,20 @@ class CoursePreference < ApplicationRecord
   validate :ranking_within_session_upper_bound
   validate :ranking_unique_within_enrollment_session
 
-  def self.ransackable_associations(auth_object = nil)
+  def self.ransackable_associations(_auth_object = nil)
     ["course", "enrollment"]
   end
 
-  def self.ransackable_attributes(auth_object = nil)
+  def self.ransackable_attributes(_auth_object = nil)
     ["course_id", "created_at", "enrollment_id", "id", "ranking", "updated_at"]
   end
 
   private
 
   def ranking_upper_bound
-    return MAX_RANKING unless enrollment_id && course
+    return MAX_RANKING unless course && (enrollment || enrollment_id)
 
-    count = CoursePreference.where(enrollment_id: enrollment_id)
-      .joins(:course)
-      .where(courses: { camp_occurrence_id: course.camp_occurrence_id })
-      .count
-    [[count, MAX_RANKING].max, 99].min
+    [session_course_preferences.size, MAX_RANKING].min
   end
 
   def ranking_within_session_upper_bound
@@ -67,11 +63,39 @@ class CoursePreference < ApplicationRecord
   def ranking_unique_within_enrollment_session
     return if ranking.blank? || course.blank?
 
-    scope = CoursePreference.joins(:course)
-      .where(enrollment_id: enrollment_id, ranking: ranking)
-      .where(courses: { camp_occurrence_id: course.camp_occurrence_id })
-    scope = scope.where.not(id: id) if persisted?
+    duplicate_rank = session_course_preferences.any? do |preference|
+      !same_record?(preference) && preference.ranking == ranking
+    end
 
-    errors.add(:ranking, 'must be unique within each camp session') if scope.exists?
+    errors.add(:ranking, 'must be unique within each camp session') if duplicate_rank
+  end
+
+  def session_course_preferences
+    preferences = persisted_session_course_preferences + in_memory_course_preferences + [self]
+
+    preferences.compact
+      .reject(&:marked_for_destruction?)
+      .select { |preference| preference.course&.camp_occurrence_id == course.camp_occurrence_id }
+      .uniq { |preference| preference.id || preference.object_id }
+  end
+
+  def persisted_session_course_preferences
+    return [] unless enrollment_id
+
+    CoursePreference.includes(:course)
+      .joins(:course)
+      .where(enrollment_id: enrollment_id)
+      .where(courses: { camp_occurrence_id: course.camp_occurrence_id })
+      .to_a
+  end
+
+  def in_memory_course_preferences
+    return [] unless enrollment
+
+    enrollment.association(:course_preferences).target
+  end
+
+  def same_record?(preference)
+    preference.equal?(self) || (id.present? && preference.id == id)
   end
 end

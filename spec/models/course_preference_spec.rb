@@ -71,15 +71,15 @@ RSpec.describe CoursePreference, type: :model do
     end
 
     it 'allows ranking to be set to an integer in range' do
-      preference = build(:course_preference, ranking: 5)
+      preference = build(:course_preference, ranking: 1)
       expect(preference).to be_valid
-      expect(preference.ranking).to eq(5)
+      expect(preference.ranking).to eq(1)
     end
 
     it 'allows ranking to be updated' do
-      preference = create(:course_preference, ranking: 3)
-      preference.update(ranking: 7)
-      expect(preference.reload.ranking).to eq(7)
+      preference = create(:course_preference, ranking: nil)
+      preference.update(ranking: 1)
+      expect(preference.reload.ranking).to eq(1)
     end
 
     it 'rejects ranking below 1' do
@@ -123,8 +123,8 @@ RSpec.describe CoursePreference, type: :model do
     end
 
     it 'allows creating preference with specific ranking' do
-      preference = create(:course_preference, ranking: 8)
-      expect(preference.ranking).to eq(8)
+      preference = create(:course_preference, ranking: 1)
+      expect(preference.ranking).to eq(1)
     end
   end
 
@@ -227,7 +227,7 @@ RSpec.describe CoursePreference, type: :model do
 
     it 'can find preferences by enrollment' do
       preference1 = create(:course_preference, enrollment: enrollment1, course: course1, ranking: 1)
-      preference2 = create(:course_preference, enrollment: enrollment1, course: course2, ranking: 2)
+      preference2 = create(:course_preference, enrollment: enrollment1, course: course2, ranking: 1)
       create(:course_preference, enrollment: enrollment2, course: course1, ranking: 1)
 
       enrollment1.reload
@@ -246,7 +246,7 @@ RSpec.describe CoursePreference, type: :model do
 
     it 'can filter preferences by ranking' do
       create(:course_preference, enrollment: enrollment1, course: course1, ranking: 1)
-      create(:course_preference, enrollment: enrollment1, course: course2, ranking: 2)
+      create(:course_preference, enrollment: enrollment1, course: course2, ranking: 1)
       create(:course_preference, enrollment: enrollment1, course: create(:course, camp_occurrence: session1), ranking: nil)
 
       ranked_preferences = CoursePreference.where.not(ranking: nil)
@@ -257,9 +257,9 @@ RSpec.describe CoursePreference, type: :model do
     end
 
     it 'can order preferences by ranking' do
-      pref3 = create(:course_preference, enrollment: enrollment1, course: course1, ranking: 3)
-      pref1 = create(:course_preference, enrollment: enrollment1, course: course2, ranking: 1)
+      pref1 = create(:course_preference, enrollment: enrollment1, course: course1, ranking: 1)
       pref2 = create(:course_preference, enrollment: enrollment1, course: create(:course, camp_occurrence: session1), ranking: 2)
+      pref3 = create(:course_preference, enrollment: enrollment1, course: create(:course, camp_occurrence: session1), ranking: 3)
 
       ordered = enrollment1.course_preferences.order(:ranking).to_a
       expect(ordered.map(&:id)).to match_array([pref1.id, pref2.id, pref3.id])
@@ -302,6 +302,36 @@ RSpec.describe CoursePreference, type: :model do
       expect(preference2).not_to be_valid
       expect(preference2.errors[:ranking]).to include('must be unique within each camp session')
     end
+
+    it 'does not allow gaps above the number of preferences in the session' do
+      course1 = create(:course, camp_occurrence: session)
+      course2 = create(:course, camp_occurrence: session)
+
+      create(:course_preference, enrollment: enrollment, course: course1, ranking: 1)
+      preference2 = build(:course_preference, enrollment: enrollment, course: course2, ranking: 3)
+
+      expect(preference2).not_to be_valid
+      expect(preference2.errors[:ranking]).to include('must be between 1 and 2 for this session')
+    end
+
+    it 'counts unsaved session preferences when validating the upper bound' do
+      courses = create_list(:course, 3, camp_occurrence: session)
+      preferences = courses.each_with_index.map do |course, index|
+        enrollment.course_preferences.build(course: course, ranking: index + 1)
+      end
+
+      expect(preferences).to all(be_valid)
+    end
+
+    it 'checks unsaved session preferences for duplicate ranks' do
+      course1 = create(:course, camp_occurrence: session)
+      course2 = create(:course, camp_occurrence: session)
+      enrollment.course_preferences.build(course: course1, ranking: 1)
+      duplicate = enrollment.course_preferences.build(course: course2, ranking: 1)
+
+      expect(duplicate).not_to be_valid
+      expect(duplicate.errors[:ranking]).to include('must be unique within each camp session')
+    end
   end
 
   describe 'edge cases' do
@@ -332,12 +362,12 @@ RSpec.describe CoursePreference, type: :model do
 
     it 'can update ranking from nil to a value' do
       preference = create(:course_preference, enrollment: enrollment, course: course, ranking: nil)
-      preference.update(ranking: 5)
-      expect(preference.reload.ranking).to eq(5)
+      preference.update(ranking: 1)
+      expect(preference.reload.ranking).to eq(1)
     end
 
     it 'can update ranking from a value to nil' do
-      preference = create(:course_preference, enrollment: enrollment, course: course, ranking: 5)
+      preference = create(:course_preference, enrollment: enrollment, course: course, ranking: 1)
       preference.update(ranking: nil)
       expect(preference.reload.ranking).to be_nil
     end
