@@ -76,7 +76,7 @@ ActiveAdmin.register Enrollment, as: 'Application' do
       f.input :high_school_state, as: :select, collection: us_states
       f.input :high_school_non_us
       f.input :high_school_postalcode
-      f.input :high_school_country
+      f.input :high_school_country, as: :select, collection: country_options_with_priority
       f.input :year_in_school, as: :select, collection: year_in_school
       f.input :anticipated_graduation_year
       f.input :room_mate_request
