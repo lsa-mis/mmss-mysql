@@ -107,9 +107,8 @@ RSpec.describe PaymentsController, type: :request do
         expect(location).to include('Conference')
         expect(location).to include('Fees')
         expect(location).to include('amountDue=10000')  # 100 dollars -> 10000 cents
-        expect(location).to include('redirectUrlParameters=')
-        expect(location).to include('transactionType')
-        expect(location).to include('orderNumber')
+        expected_redirect_params = PaymentsController::NELNET_REDIRECT_URL_PARAMETERS.join(',')
+        expect(location).to include("redirectUrlParameters=#{expected_redirect_params}")
         expect(location).to include('timestamp=')
         expect(location).to include('hash=')
       end
@@ -320,7 +319,7 @@ RSpec.describe PaymentsController, type: :request do
       end
     end
 
-    context 'when no unmatched PaymentRequest matches amount and timestamp' do
+    context 'when no unmatched PaymentRequest matches order number and amount' do
       before { PaymentRequest.delete_all }
 
       it 'does not create a Payment' do
@@ -391,6 +390,23 @@ RSpec.describe PaymentsController, type: :request do
       expect(payment.payment_request).to eq(pr)
     end
 
+    it 'accepts the gateway return timestamp when it differs from the original request timestamp' do
+      post make_payment_path, params: { amount: '100' }
+      pr = PaymentRequest.last
+
+      receipt_params = nelnet_receipt_params_for_payment_request(
+        pr,
+        'timestamp' => (pr.request_timestamp + 120_000).to_s,
+        'transactionId' => 'return-timestamp'
+      )
+      get payment_receipt_path, params: receipt_params
+
+      payment = Payment.find_by(transaction_id: 'return-timestamp')
+      expect(response).to redirect_to(all_payments_path)
+      expect(payment).to be_present
+      expect(pr.reload.payment_id).to eq(payment.id)
+    end
+
     it 'on duplicate return (same transactionId), does not create second Payment but still links PaymentRequest if not yet linked' do
       post make_payment_path, params: { amount: '100' }
       pr = PaymentRequest.last
@@ -419,7 +435,7 @@ RSpec.describe PaymentsController, type: :request do
       second_pr = PaymentRequest.last
       expect(PaymentRequest.unmatched.count).to eq(2)
 
-      # One return from Nelnet (matches oldest outstanding request: amount + timestamp)
+      # One return from Nelnet (matches oldest outstanding request for this user, order, and amount)
       receipt_params = nelnet_receipt_params_for_payment_request(
         first_pr,
         'transactionId' => 'single-return'

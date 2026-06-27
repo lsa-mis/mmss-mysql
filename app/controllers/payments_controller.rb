@@ -6,10 +6,14 @@ require 'time'
 class PaymentsController < ApplicationController
   include ApplicantState
 
-  # Order matches redirectUrlParameters sent to Nelnet in #generate_hash (values concatenated + timestamp + key).
-  NELNET_RECEIPT_SIGNATURE_PARAM_ORDER = %w[
+  NELNET_REDIRECT_URL_PARAMETERS = %w[
     transactionType transactionStatus transactionId transactionTotalAmount transactionDate
     transactionAcountType transactionResultCode transactionResultMessage orderNumber
+  ].freeze
+
+  NELNET_RECEIPT_SIGNATURE_PARAM_ORDER = %w[
+    transactionType transactionStatus transactionId transactionTotalAmount transactionDate
+    transactionAcountType transactionResultCode transactionResultMessage orderNumber orderType
   ].freeze
 
   skip_before_action :verify_authenticity_token, only: [:payment_receipt]
@@ -145,7 +149,7 @@ class PaymentsController < ApplicationController
       'orderDescription' => 'MMSS Conference Fees',
       'amountDue' => amount_to_be_payed * 100,
       'redirectUrl' => redirect_url,
-      'redirectUrlParameters' => NELNET_RECEIPT_SIGNATURE_PARAM_ORDER.join(','),
+      'redirectUrlParameters' => NELNET_REDIRECT_URL_PARAMETERS.join(','),
       'timestamp' => current_epoch_time,
       'key' => nelnet_signing_key
     }
@@ -175,7 +179,7 @@ class PaymentsController < ApplicationController
       raw_params: params.to_unsafe_h.slice(
         'transactionType', 'transactionStatus', 'transactionId', 'transactionTotalAmount',
         'transactionDate', 'transactionAcountType', 'transactionResultCode', 'transactionResultMessage',
-        'orderNumber', 'timestamp', 'hash'
+        'orderNumber', 'orderType', 'timestamp', 'hash'
       ).to_json
     )
   rescue StandardError => e
@@ -272,14 +276,10 @@ class PaymentsController < ApplicationController
       return
     end
 
-    amount_cents = params['transactionTotalAmount'].to_i
-    ts = params['timestamp'].to_i
-
     matched = PaymentRequest.unmatched.exists?(
       user_id: payment_receipt_user.id,
       order_number: params['orderNumber'].to_s,
-      amount_cents: amount_cents,
-      request_timestamp: ts,
+      amount_cents: params['transactionTotalAmount'].to_i,
       camp_year: CampConfiguration.active_camp_year
     )
 
@@ -316,6 +316,7 @@ class PaymentsController < ApplicationController
       :transactionResultCode,
       :transactionResultMessage,
       :orderNumber,
+      :orderType,
       :timestamp,
       :hash,
       :camp_year
