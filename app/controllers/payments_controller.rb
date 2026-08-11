@@ -5,6 +5,7 @@ require 'time'
 
 class PaymentsController < ApplicationController
   include ApplicantState
+  protect_from_forgery with: :exception
 
   NELNET_REDIRECT_URL_PARAMETERS = %w[
     transactionType transactionStatus transactionId transactionTotalAmount transactionDate
@@ -16,7 +17,6 @@ class PaymentsController < ApplicationController
     transactionAcountType transactionResultCode transactionResultMessage orderNumber orderType
   ].freeze
 
-  skip_before_action :verify_authenticity_token, only: %i[payment_receipt]
   devise_group :logged_in, contains: %i[user admin]
   prepend_before_action :log_nelnet_callback, only: %i[payment_receipt]
   before_action :authenticate_logged_in!
