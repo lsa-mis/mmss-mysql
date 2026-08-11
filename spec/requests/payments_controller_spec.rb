@@ -18,14 +18,18 @@ RSpec.describe PaymentsController, type: :request do
   let(:order_number) { "#{user.email.partition('@').first}-#{user.id}" }
 
   # Stub Nelnet credentials so production is never used (QA selector + fake prod URL).
+  let(:nelnet_payment_url) { 'https://auth-interstitial-qa-authorize.auth.it.umich.edu/nelnetApi/payment/' }
+  let(:nelnet_redirect_url) { 'https://auth-interstitial-qa-authorize.auth.it.umich.edu/nelnetApi/redirect/' }
   let(:nelnet_credentials) do
     OpenStruct.new(
       NELNET_SERVICE: {
         SERVICE_SELECTOR: 'QA',
         DEVELOPMENT_KEY: 'dev-key',
-        DEVELOPMENT_URL: 'https://auth-interstitial.it.umich.edu/',
+        DEVELOPMENT_URL: nelnet_payment_url,
+        DEVELOPMENT_REDIRECT_URL: nelnet_redirect_url,
         PRODUCTION_KEY: 'prod-key',
-        PRODUCTION_URL: 'https://prod.example.com/pay'  # fake; never used in tests
+        PRODUCTION_URL: 'https://prod.example.com/nelnetApi/payment/',  # fake; never used in tests
+        PRODUCTION_REDIRECT_URL: 'https://prod.example.com/nelnetApi/redirect/'
       }
     )
   end
@@ -98,7 +102,7 @@ RSpec.describe PaymentsController, type: :request do
 
         expect(response).to have_http_status(:found)
         location = response.headers['Location']
-        expect(location).to start_with('https://auth-interstitial.it.umich.edu/?')
+        expect(location).to start_with("#{nelnet_payment_url}?")
         expect(location).to include("orderNumber=#{CGI.escape(order_number)}")
         expect(location).to include('orderType=')
         expect(location).to include('MMSS')
@@ -107,6 +111,7 @@ RSpec.describe PaymentsController, type: :request do
         expect(location).to include('Conference')
         expect(location).to include('Fees')
         expect(location).to include('amountDue=10000')  # 100 dollars -> 10000 cents
+        expect(location).to include("redirectUrl=#{nelnet_redirect_url}")
         expected_redirect_params = PaymentsController::NELNET_REDIRECT_URL_PARAMETERS.join(',')
         expect(location).to include("redirectUrlParameters=#{expected_redirect_params}")
         expect(location).to include('timestamp=')
@@ -141,7 +146,8 @@ RSpec.describe PaymentsController, type: :request do
 
         expect(response).to have_http_status(:found)
         location = response.headers['Location']
-        expect(location).to include('https://auth-interstitial.it.umich.edu/?')
+        expect(location).to start_with("#{nelnet_payment_url}?")
+        expect(location).to include("redirectUrl=#{nelnet_redirect_url}")
         expect(location).to include('orderNumber=')
         expect(location).to include('amountDue=12300')
         expect(location).to include('hash=')

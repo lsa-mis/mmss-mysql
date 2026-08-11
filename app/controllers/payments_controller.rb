@@ -5,6 +5,7 @@ require 'time'
 
 class PaymentsController < ApplicationController
   include ApplicantState
+  protect_from_forgery with: :exception
 
   NELNET_REDIRECT_URL_PARAMETERS = %w[
     transactionType transactionStatus transactionId transactionTotalAmount transactionDate
@@ -16,19 +17,18 @@ class PaymentsController < ApplicationController
     transactionAcountType transactionResultCode transactionResultMessage orderNumber orderType
   ].freeze
 
-  skip_before_action :verify_authenticity_token, only: [:payment_receipt]
-  devise_group :logged_in, contains: [:user, :admin]
-  prepend_before_action :log_nelnet_callback, only: [:payment_receipt]
+  devise_group :logged_in, contains: %i[user admin]
+  prepend_before_action :log_nelnet_callback, only: %i[payment_receipt]
   before_action :authenticate_logged_in!
-  skip_before_action :authenticate_logged_in!, only: [:payment_receipt]
-  before_action :authenticate_admin!, only: [:index, :destroy]
+  skip_before_action :authenticate_logged_in!, only: %i[payment_receipt]
+  before_action :authenticate_admin!, only: %i[index destroy]
 
   before_action :set_current_enrollment
-  skip_before_action :set_current_enrollment, only: [:payment_receipt]
-  before_action :ensure_payment_portal_ready!, only: [:payment_show]
-  before_action :identify_user_for_payment_receipt!, only: [:payment_receipt]
-  before_action :validate_nelnet_receipt_signature!, only: [:payment_receipt]
-  before_action :verify_payment_request_for_new_transaction!, only: [:payment_receipt]
+  skip_before_action :set_current_enrollment, only: %i[payment_receipt]
+  before_action :ensure_payment_portal_ready!, only: %i[payment_show]
+  before_action :identify_user_for_payment_receipt!, only: %i[payment_receipt]
+  before_action :validate_nelnet_receipt_signature!, only: %i[payment_receipt]
+  before_action :verify_payment_request_for_new_transaction!, only: %i[payment_receipt]
 
   def index
     redirect_to root_url
@@ -100,7 +100,7 @@ class PaymentsController < ApplicationController
 
   def payment_show
     @registration_activities = registration_activities
-    @has_any_session = session_registrations.pluck(:description).include?("Any Session")
+    @has_any_session = session_registrations.pluck(:description).include?('Any Session')
     @current_application_status = current_application_status
     @finaids = finaids
     @finaids_ttl = finaids_ttl
@@ -130,19 +130,24 @@ class PaymentsController < ApplicationController
   def generate_hash(amount = current_camp_fee / 100)
     user_account = current_user.email.partition('@').first + '-' + current_user.id.to_s
     amount_to_be_payed = amount.to_i
-    if Rails.env.development? || Rails.env.staging? || Rails.application.credentials.NELNET_SERVICE[:SERVICE_SELECTOR] == "QA"
+    if Rails.env.development? || Rails.env.staging? || Rails.application.credentials.NELNET_SERVICE[:SERVICE_SELECTOR] == 'QA'
       url_to_use = 'test_URL'
     else
       url_to_use = 'prod_URL'
     end
 
-    connection_hash = {
-      'test_URL' => Rails.application.credentials.NELNET_SERVICE[:DEVELOPMENT_URL],
-      'prod_URL' => Rails.application.credentials.NELNET_SERVICE[:PRODUCTION_URL]
+    nelnet = Rails.application.credentials.NELNET_SERVICE
+    payment_urls = {
+      'test_URL' => nelnet[:DEVELOPMENT_URL],
+      'prod_URL' => nelnet[:PRODUCTION_URL]
+    }
+    redirect_urls = {
+      'test_URL' => nelnet[:DEVELOPMENT_REDIRECT_URL],
+      'prod_URL' => nelnet[:PRODUCTION_REDIRECT_URL]
     }
 
-    redirect_url = connection_hash[url_to_use]
-    current_epoch_time = DateTime.now.strftime("%Q").to_i
+    redirect_url = redirect_urls[url_to_use]
+    current_epoch_time = DateTime.now.strftime('%Q').to_i
     initial_hash = {
       'orderNumber' => user_account,
       'orderType' => 'MMSS Univ of Michigan',
@@ -160,7 +165,7 @@ class PaymentsController < ApplicationController
 
     # Final URL
     url_for_payment = initial_hash.map { |k, v| "#{k}=#{v}&" unless k == 'key' }.join('')
-    final_url = connection_hash[url_to_use] + '?' + url_for_payment + 'hash=' + encoded_hash
+    final_url = payment_urls[url_to_use] + '?' + url_for_payment + 'hash=' + encoded_hash
 
     {
       url: final_url,
@@ -259,7 +264,6 @@ class PaymentsController < ApplicationController
       Rails.logger.warn('[PaymentsController] Rejected payment_receipt: invalid Nelnet hash')
       redirect_to new_user_session_path,
                   alert: 'Unable to verify payment. Please sign in; contact support if your account was charged.'
-      return
     end
   end
 
@@ -283,12 +287,11 @@ class PaymentsController < ApplicationController
       camp_year: CampConfiguration.active_camp_year
     )
 
-    unless matched
-      Rails.logger.warn('[PaymentsController] Rejected payment_receipt: no matching PaymentRequest')
-      redirect_to new_user_session_path,
-                  alert: 'Unable to verify payment. Please sign in; contact support if your account was charged.'
-      return
-    end
+    return if matched
+
+    Rails.logger.warn('[PaymentsController] Rejected payment_receipt: no matching PaymentRequest')
+    redirect_to new_user_session_path,
+                alert: 'Unable to verify payment. Please sign in; contact support if your account was charged.'
   end
 
   # Return-url digest mirrors the outbound redirectUrlParameters order, then timestamp, then the Nelnet key (see #generate_hash).
@@ -297,7 +300,7 @@ class PaymentsController < ApplicationController
   end
 
   def nelnet_signing_key
-    if Rails.env.development? || Rails.env.staging? || Rails.application.credentials.NELNET_SERVICE[:SERVICE_SELECTOR] == "QA"
+    if Rails.env.development? || Rails.env.staging? || Rails.application.credentials.NELNET_SERVICE[:SERVICE_SELECTOR] == 'QA'
       Rails.application.credentials.NELNET_SERVICE[:DEVELOPMENT_KEY]
     else
       Rails.application.credentials.NELNET_SERVICE[:PRODUCTION_KEY]
