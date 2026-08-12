@@ -552,4 +552,48 @@ RSpec.describe PaymentsController, type: :request do
       end
     end
   end
+
+  # ---------------------------------------------------------------------------
+  # CSRF: payment_receipt must not skip authenticity verification (CodeQL fix).
+  # GET callbacks from Nelnet remain allowed; unauthenticated POSTs without a
+  # token are rejected via ApplicationController's InvalidAuthenticityToken handler.
+  # ---------------------------------------------------------------------------
+  describe 'payment_receipt CSRF protection', :aggregate_failures do
+    around do |example|
+      previous = ActionController::Base.allow_forgery_protection
+      ActionController::Base.allow_forgery_protection = true
+      example.run
+    ensure
+      ActionController::Base.allow_forgery_protection = previous
+    end
+
+    before do
+      allow(Rails.application).to receive(:credentials).and_return(nelnet_credentials)
+      create(:payment_request, user: user, order_number: order_number, amount_cents: 10_000,
+                             request_timestamp: 1_771_827_677_567, camp_year: camp_config.camp_year)
+      allow_any_instance_of(Payment).to receive(:set_status).and_return(nil)
+    end
+
+    it 'still accepts GET Nelnet redirects without a CSRF token' do
+      params = nelnet_receipt_params('transactionId' => 'csrf-get-1')
+
+      expect {
+        get payment_receipt_path, params: params
+      }.to change(Payment, :count).by(1)
+
+      expect(response).to have_http_status(:found)
+      expect(flash[:notice]).to include('successfully recorded')
+    end
+
+    it 'rejects POST without an authenticity token' do
+      params = nelnet_receipt_params('transactionId' => 'csrf-post-1')
+
+      expect {
+        post payment_receipt_path, params: params
+      }.not_to change(Payment, :count)
+
+      expect(response).to redirect_to(new_user_session_path)
+      expect(flash[:alert]).to include('session expired')
+    end
+  end
 end
