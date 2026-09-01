@@ -433,7 +433,7 @@ ActiveAdmin.register_page 'Reports' do
             formatted_row[balance_cents_index] = sprintf('%.2f', (balance_value || 0).to_f / 100)
           end
 
-          csv << formatted_row
+          csv << csv_safe_row(formatted_row)
         end
       end
 
@@ -586,7 +586,7 @@ ActiveAdmin.register_page 'Reports' do
         csv << Array(title.titleize)
         csv << ["Total number of records: #{records.count}"]
         csv << records.columns.map { |e| e.titleize.upcase }
-        records.rows.each { |row| csv << row }
+        records.rows.each { |row| csv << csv_safe_row(row) }
       end
     end
 
@@ -610,7 +610,7 @@ ActiveAdmin.register_page 'Reports' do
           country = ISO3166::Country[c]
           row[0] = country ? "#{country.name} - #{c}" : c
         end
-        csv << row
+        csv << csv_safe_row(row)
       end
     end
 
@@ -628,7 +628,7 @@ ActiveAdmin.register_page 'Reports' do
           country = ISO3166::Country[c]
           row[0] = country ? "#{country.name} - #{c}" : c
         end
-        csv << row
+        csv << csv_safe_row(row)
       end
     end
 
@@ -645,7 +645,7 @@ ActiveAdmin.register_page 'Reports' do
         course = row[1]
         row[0] = session == prev_session ? '' : session
         row[1] = course == prev_course ? '' : course
-        csv << row
+        csv << csv_safe_row(row)
         [session, course] # Return new previous values
       end
     end
@@ -656,6 +656,14 @@ ActiveAdmin.register_page 'Reports' do
       records.rows.each do |row|
         prev_session, prev_course = block.call(prev_session, prev_course, row)
       end
+    end
+
+    def csv_safe_cell(value)
+      CsvSafety.cell(value)
+    end
+
+    def csv_safe_row(row)
+      CsvSafety.row(row)
     end
   end
 end
