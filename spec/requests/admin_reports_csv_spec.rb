@@ -10,16 +10,18 @@ RSpec.describe 'Admin report CSV formula neutralization', type: :request do
 
   describe 'GET /admin/reports/finaid_with_app_and_offer_status' do
     it 'prefixes formula-like applicant names and emails in the CSV export' do
-      user = create(:user, email: '=cmd@example.com')
-      create(
+      user = create(:user, email: 'formula.student@example.com')
+      detail = create(
         :applicant_detail,
         user: user,
-        firstname: '=1+2',
-        lastname: '+Doe',
-        parentemail: '@SUM(A1)@example.com',
-        phone: '-1+1',
-        parentphone: '555-0100'
+        firstname: 'Temp',
+        lastname: 'Temp'
       )
+      # Bypass format validators so we can regress spreadsheet formula payloads
+      # that could be present from legacy imports or loosened validation paths.
+      detail.update_columns(firstname: '=1+2', lastname: '+Doe')
+      user.update_columns(email: '=cmd@example.com')
+
       enrollment = create(
         :enrollment,
         user: user,
@@ -27,7 +29,7 @@ RSpec.describe 'Admin report CSV formula neutralization', type: :request do
         application_status: 'application complete',
         offer_status: 'accepted'
       )
-      create(:financial_aid, enrollment: enrollment, status: 'awarded', amount_cents: 5000)
+      create(:financial_aid, enrollment: enrollment, status: 'pending', amount_cents: 5000)
 
       get admin_reports_finaid_with_app_and_offer_status_path
 
@@ -43,8 +45,7 @@ RSpec.describe 'Admin report CSV formula neutralization', type: :request do
         :applicant_detail,
         user: user,
         firstname: 'Ada',
-        lastname: 'Lovelace',
-        parentphone: '555-0100'
+        lastname: 'Lovelace'
       )
       enrollment = create(
         :enrollment,
@@ -67,11 +68,13 @@ RSpec.describe 'Admin report CSV formula neutralization', type: :request do
   describe 'GET /admin/reports/enrolled_with_addresses' do
     it 'prefixes formula-like address and parent fields in the CSV export' do
       user = create(:user, email: 'addr.student@example.com')
-      create(
+      detail = create(
         :applicant_detail,
         user: user,
         firstname: 'Sam',
-        lastname: 'Student',
+        lastname: 'Student'
+      )
+      detail.update_columns(
         address1: '=HYPERLINK("http://evil.example")',
         parentname: '+Parent',
         parentemail: '-evil@example.com',
@@ -87,7 +90,8 @@ RSpec.describe 'Admin report CSV formula neutralization', type: :request do
       get admin_reports_enrolled_with_addresses_path
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("'=HYPERLINK(\"http://evil.example\")")
+      # CSV.generate escapes embedded quotes as "", so assert on the neutralized prefix.
+      expect(response.body).to match(/'=HYPERLINK\(/)
       expect(response.body).to include("'+Parent")
       expect(response.body).to include("'-evil@example.com")
       expect(response.body).to include("'@SUM(A1)")
