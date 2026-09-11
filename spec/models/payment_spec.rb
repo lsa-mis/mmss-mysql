@@ -35,6 +35,13 @@ require 'rails_helper'
 RSpec.describe Payment, type: :model do
   describe 'associations' do
     it { is_expected.to belong_to(:user) }
+
+    it 'optionally has one payment_request' do
+      payment = create(:payment)
+      request = create(:payment_request, user: payment.user, payment: payment)
+
+      expect(payment.payment_request).to eq(request)
+    end
   end
 
   describe 'validations' do
@@ -85,6 +92,30 @@ RSpec.describe Payment, type: :model do
 
     it 'can be converted to dollars' do
       expect(payment.total_amount.to_i / 100.0).to eq(500.00)
+    end
+  end
+
+  describe '#total_amount_dollars' do
+    it 'converts stored cents to a dollar float for admin display' do
+      payment = build(:payment, total_amount: '12345')
+      expect(payment.total_amount_dollars).to eq(123.45)
+    end
+
+    it 'returns nil when total_amount is blank' do
+      payment = build(:payment, total_amount: nil)
+      expect(payment.total_amount_dollars).to be_nil
+    end
+
+    it 'stores dollars as rounded cents when assigned' do
+      payment = build(:payment)
+      payment.total_amount_dollars = '99.999'
+      expect(payment.total_amount).to eq('10000')
+    end
+
+    it 'clears total_amount when assigned a blank dollar value' do
+      payment = build(:payment, total_amount: '5000')
+      payment.total_amount_dollars = '  '
+      expect(payment.total_amount).to be_nil
     end
   end
 
