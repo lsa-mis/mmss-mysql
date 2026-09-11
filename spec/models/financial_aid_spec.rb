@@ -138,5 +138,78 @@ RSpec.describe FinancialAid, type: :model do
     end
   end
 
+  describe 'status change emails and auto-enroll' do
+    let!(:camp_config) { create(:camp_configuration, :active, camp_year: Date.current.year, application_fee_cents: 0) }
+    let(:user) { create(:user, :with_applicant_detail) }
+    let(:enrollment) do
+      create(
+        :enrollment,
+        user: user,
+        campyear: camp_config.camp_year,
+        application_status: 'submitted',
+        application_fee_required: false,
+        camp_doc_form_completed: false
+      )
+    end
+    let!(:accepted_session) do
+      create(:camp_occurrence, camp_configuration: camp_config, cost_cents: 5_000)
+    end
+
+    before do
+      CampConfiguration.update_all(active: false)
+      camp_config.update!(active: true)
+      allow(CampConfiguration).to receive(:active_camp_year).and_return(camp_config.camp_year)
+      allow(CampConfiguration).to receive(:active).and_return(CampConfiguration.where(id: camp_config.id))
+      create(:session_assignment, enrollment: enrollment, camp_occurrence: accepted_session, offer_status: 'accepted')
+      # Mark docs complete only after session cost exists so balance is non-zero and
+      # enrollment callbacks do not auto-enroll before the award under test.
+      enrollment.update!(camp_doc_form_completed: true, application_status: 'submitted')
+    end
+
+    it 'sends awarded email and auto-enrolls when documents are complete and balance reaches zero' do
+      mail_message = instance_double(ActionMailer::MessageDelivery, deliver_now: true)
+      expect(FinaidMailer).to receive(:fin_aid_awarded_email) do |aid, balance|
+        expect(aid).to be_a(FinancialAid)
+        expect(aid.status).to eq('awarded')
+        expect(balance).to eq(0)
+        mail_message
+      end
+
+      expect {
+        create(
+          :financial_aid,
+          enrollment: enrollment,
+          status: 'awarded',
+          amount_cents: 5_000,
+          source: 'Scholarship',
+          payments_deadline: 30.days.from_now
+        )
+      }.to change { enrollment.reload.application_status }.from('submitted').to('enrolled')
+    end
+
+    it 'sends rejected email and does not change enrollment status' do
+      mail_message = instance_double(ActionMailer::MessageDelivery, deliver_now: true)
+      expect(FinaidMailer).to receive(:fin_aid_rejected_email).and_return(mail_message)
+
+      expect {
+        create(
+          :financial_aid,
+          enrollment: enrollment,
+          status: 'rejected',
+          amount_cents: 0,
+          source: nil,
+          payments_deadline: 30.days.from_now
+        )
+      }.not_to change { enrollment.reload.application_status }
+    end
+
+    it 'does not send status emails for pending requests' do
+      expect(FinaidMailer).not_to receive(:fin_aid_awarded_email)
+      expect(FinaidMailer).not_to receive(:fin_aid_rejected_email)
+
+      create(:financial_aid, enrollment: enrollment, status: 'pending')
+    end
+  end
+
   it_behaves_like 'a model with timestamps'
 end
