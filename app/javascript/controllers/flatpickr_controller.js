@@ -1,6 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import flatpickr from "flatpickr"
-import "flatpickr/dist/flatpickr.min.css"
+// flatpickr's stylesheet is bundled via app/assets/tailwind/application.css.
 
 export default class extends Controller {
   static values = {
