@@ -1,7 +1,6 @@
 lock '~> 3.17'
 
 set :default_env, {
-  'NODE_OPTIONS' => '--openssl-legacy-provider',
   'PATH' => '$HOME/.asdf/shims:$HOME/.asdf/bin:$PATH'
 }
 
@@ -29,8 +28,8 @@ set :keep_releases, 3
 # Default value for :linked_files and linked_dirs is []
 set :linked_files,
     %w[config/puma.rb config/nginx.conf config/master.key config/lsa-was-base-c096c776ead3.json mysql/InCommon.CA.crt]
+# capistrano-rails adds public/assets (Sprockets output, including the Tailwind build) to linked_dirs.
 set :linked_dirs, %w[log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system]
-set :linked_dirs, fetch(:linked_dirs, []).push('public/packs', 'node_modules')
 
 namespace :puma do
   desc 'Stop the PUMA service'
