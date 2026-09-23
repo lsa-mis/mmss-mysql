@@ -82,6 +82,5 @@ group :development do
   gem 'ed25519', '~> 1.3'
   gem 'bcrypt_pbkdf', '~> 1.1'
   gem 'listen', '~> 3.7'
-  gem 'spring', '~> 3.0'
   gem 'web-console', '~> 4.1'
 end

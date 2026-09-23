@@ -513,7 +513,6 @@ GEM
       activesupport (>= 5.2.0)
     sort_alphabetical (1.1.0)
       unicode_utils (>= 1.2.2)
-    spring (3.1.1)
     sprockets (4.2.2)
       concurrent-ruby (~> 1.0)
       logger
@@ -644,7 +643,6 @@ DEPENDENCIES
   shoulda-matchers (~> 5.0)
   simplecov (~> 0.21)
   skylight
-  spring (~> 3.0)
   stackprof
   standard
   turbolinks (~> 5.2, >= 5.2.1)
