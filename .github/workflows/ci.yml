@@ -73,9 +73,12 @@ jobs:
           path: |
             public/packs-test
             tmp/cache/webpacker
-          key: packs-test-${{ runner.os }}-${{ hashFiles('yarn.lock', 'package.json', 'config/webpacker.yml', 'config/webpack/**', 'babel.config.js', 'postcss.config.js', 'tailwind.config.js', '.browserslistrc', 'app/javascript/**') }}
+          # .tool-versions (Node version) is part of the restore prefix too: Webpacker's
+          # own staleness digest ignores the Node version, so a Node bump must never
+          # restore packs built by the previous Node.
+          key: packs-test-${{ runner.os }}-${{ hashFiles('.tool-versions') }}-${{ hashFiles('yarn.lock', 'package.json', 'config/webpacker.yml', 'config/webpack/**', 'babel.config.js', 'postcss.config.js', 'tailwind.config.js', '.browserslistrc', 'app/javascript/**') }}
           restore-keys: |
-            packs-test-${{ runner.os }}-
+            packs-test-${{ runner.os }}-${{ hashFiles('.tool-versions') }}-
 
       - name: Compile webpack packs
         # Request specs render layouts through Webpacker, so the test manifest
