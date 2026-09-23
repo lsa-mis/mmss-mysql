@@ -15,7 +15,7 @@ This document outlines the comprehensive testing solution implemented for the MM
 
 ```ruby
 # Gemfile additions:
-gem 'shoulda-matchers', '~> 5.0'  # Matchers for common Rails patterns
+gem 'shoulda-matchers', '~> 8.0'  # Matchers for common Rails patterns
 gem 'database_cleaner-active_record', '~> 2.0'  # Database state management
 gem 'simplecov', '~> 0.21'  # Code coverage tracking
 ```

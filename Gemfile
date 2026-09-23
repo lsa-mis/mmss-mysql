@@ -3,8 +3,8 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '3.4.9'
 
-gem 'activeadmin', '~> 3.5.1'
-gem 'bootsnap', '~> 1.8', '>= 1.8.1', require: false
+gem 'activeadmin', '~> 3.5', '>= 3.5.2'
+gem 'bootsnap', '~> 1.18', require: false
 gem 'country_select', '~> 6.0'
 gem 'devise', '~> 5.0'
 gem 'dump', '~> 1.2', '>= 1.2.2'
@@ -25,8 +25,8 @@ gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 gem 'webpacker', '~> 5.4', '>= 5.4.2'
 
 gem 'base64', require: false
-# Match Ruby 3.4.x default gem; a newer logger from rubygems conflicts at boot (Gem::LoadError).
-gem 'logger', '1.6.0'
+# Bundled gem on Ruby 3.4+; app/admin/reports.rb generates CSV directly.
+gem 'csv'
 gem 'matrix', '~> 0.4.2', require: false
 gem 'mutex_m', require: false
 gem 'net-imap', require: false
@@ -46,13 +46,13 @@ group :development, :test, :staging do
 end
 
 group :development, :test do
-  gem 'capybara', '~> 3.35', '>= 3.35.3'
+  gem 'capybara', '~> 3.40'
   gem 'factory_bot_rails', '~> 6.5'
   gem 'pry-byebug', '~> 3.12'
   gem 'pry-rails', '~> 0.3.9'
-  gem 'rspec-rails', '~> 7.0'
+  gem 'rspec-rails', '~> 8.0'
   gem 'selenium-webdriver', '~> 4.40'
-  gem 'shoulda-matchers', '~> 5.0'
+  gem 'shoulda-matchers', '~> 8.0'
   gem 'standard'
   # webdrivers gem is deprecated - Selenium 4.11+ includes Selenium Manager
   # gem 'webdrivers', '~> 5.3'
@@ -69,17 +69,17 @@ group :development, :staging do
   gem 'rexml'
   # letter_opener still requires kconv; Ruby 3.4 provides that via the nkf gem
   gem 'nkf'
-  gem 'letter_opener_web', '~> 1.4'
+  gem 'letter_opener_web', '~> 3.0'
 end
 
 group :development do
   gem 'annotaterb', '~> 4.25'
-  gem 'better_errors', '~> 2.9', '>= 2.9.1'
+  gem 'better_errors', '~> 2.10'
   gem 'capistrano', '~> 3.16', require: false
   gem 'capistrano-asdf', require: false
   gem 'capistrano-rails', '~> 1.6', '>= 1.6.1', require: false
   gem 'ed25519', '~> 1.3'
   gem 'bcrypt_pbkdf', '~> 1.1'
   gem 'listen', '~> 3.7'
-  gem 'web-console', '~> 4.1'
+  gem 'web-console', '~> 4.2'
 end
