@@ -73,7 +73,7 @@ group :development, :staging do
 end
 
 group :development do
-  gem 'annotate', '~> 3.1', '>= 3.1.1'
+  gem 'annotaterb', '~> 4.25'
   gem 'better_errors', '~> 2.9', '>= 2.9.1'
   gem 'capistrano', '~> 3.16', require: false
   gem 'capistrano-asdf', require: false
