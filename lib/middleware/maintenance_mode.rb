@@ -62,7 +62,20 @@ class MaintenanceMode
 
   def allowed?(request, settings)
     path_allowed?(request.path, settings['allowed_paths']) ||
-      ip_allowed?(request.ip, settings['allowed_ips'])
+      ip_allowed?(client_ip(request), settings['allowed_ips'])
+  end
+
+  # Same source turnout used (Turnout::Request -> Rack::Request#ip).
+  # Rack::Request#ip is trusted-proxy aware: it returns REMOTE_ADDR for direct
+  # connections and only consults X-Forwarded-For when REMOTE_ADDR is a
+  # loopback/private proxy address, taking the right-most address that is not
+  # itself a trusted proxy. Production nginx sets the header with
+  # $proxy_add_x_forwarded_for (config/nginx_prod.conf), which appends the real
+  # client address, so a client-supplied X-Forwarded-For cannot satisfy
+  # allowed_ips. A front proxy that forwards X-Forwarded-For verbatim would
+  # defeat this, so keep that nginx setting.
+  def client_ip(request)
+    request.ip
   end
 
   def path_allowed?(path, allowed_paths)

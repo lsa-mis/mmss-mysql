@@ -47,6 +47,9 @@ RSpec.describe MaintenanceMode do
     it 'renders public/maintenance.html with the reason and the configured status and Retry-After' do
       response = request
 
+      # Goes through the real Rack::Response of the installed Rack (2.2.x today, 3.x after Rails 8.1);
+      # a missing Response API would surface here rather than on the first production request.
+      expect(Rack::Response.method_defined?(:set_header)).to be(true), "Rack #{Rack.release} lacks Response#set_header"
       expect(response.status).to eq(503)
       expect(response.headers['Retry-After']).to eq('3600')
       expect(response.headers['Content-Type']).to eq('text/html')
@@ -65,6 +68,34 @@ RSpec.describe MaintenanceMode do
 
     it 'blocks requests from other IPs' do
       expect(request('/', 'REMOTE_ADDR' => '203.0.113.5').status).to eq(503)
+    end
+
+    describe 'X-Forwarded-For handling' do
+      it 'ignores a forged X-Forwarded-For on a direct (non-proxied) connection' do
+        response = request('/', 'REMOTE_ADDR' => '203.0.113.5', 'HTTP_X_FORWARDED_FOR' => '35.7.0.1')
+
+        expect(response.status).to eq(503)
+      end
+
+      it 'ignores a forged X-Forwarded-For behind nginx ($proxy_add_x_forwarded_for appends the real client)' do
+        response = request('/', 'REMOTE_ADDR' => '127.0.0.1',
+                                'HTTP_X_FORWARDED_FOR' => '35.7.0.1, 203.0.113.5')
+
+        expect(response.status).to eq(503)
+      end
+
+      it 'ignores forged trusted-range hops appended by the client' do
+        response = request('/', 'REMOTE_ADDR' => '127.0.0.1',
+                                'HTTP_X_FORWARDED_FOR' => '35.7.0.1, 10.0.0.9, 203.0.113.5')
+
+        expect(response.status).to eq(503)
+      end
+
+      it 'allows a genuine allowed client forwarded by the local proxy' do
+        response = request('/', 'REMOTE_ADDR' => '127.0.0.1', 'HTTP_X_FORWARDED_FOR' => '35.7.1.1')
+
+        expect(response.status).to eq(200)
+      end
     end
 
     it 'falls back to a built-in page when public/maintenance.html is missing' do
