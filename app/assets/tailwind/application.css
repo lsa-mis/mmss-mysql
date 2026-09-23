@@ -1,0 +1,536 @@
+/*
+ * Theme and preflight live in cascade layers; utilities and the app's own rules
+ * below are intentionally unlayered so the cascade matches the Tailwind 2 build
+ * this stylesheet was ported from (specificity, then source order — e.g. `a.btn`
+ * padding still beats a `pt-8` utility on the same link, and `.section-header`
+ * still wins over utilities on the same element).
+ */
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@plugin "@tailwindcss/forms";
+@tailwind utilities;
+
+/* Third-party styles bundled with the app stylesheet (flatpickr date picker). */
+@import "./flatpickr.css";
+
+/* Explicit sources: the Rails root also holds specs, seeds and ActiveAdmin DSL files
+   that would otherwise be scanned for class names. */
+@source "../../views";
+@source "../../helpers";
+@source "../../javascript";
+
+/*
+ * Design tokens ported from the former tailwind.config.js (Tailwind 2 with the
+ * classic v1 palette and scales). Namespaces are reset so the generated
+ * utilities match the values the templates were written against.
+ */
+@theme {
+  --color-*: initial;
+  --color-transparent: transparent;
+  --color-black: #000;
+  --color-white: #fff;
+
+  --color-gray-100: #f7fafc;
+  --color-gray-200: #edf2f7;
+  --color-gray-300: #e2e8f0;
+  --color-gray-400: #cbd5e0;
+  --color-gray-500: #a0aec0;
+  --color-gray-600: #718096;
+  --color-gray-700: #4a5568;
+  --color-gray-800: #2d3748;
+  --color-gray-900: #1a202c;
+
+  --color-red-100: #fff5f5;
+  --color-red-200: #fed7d7;
+  --color-red-300: #feb2b2;
+  --color-red-400: #fc8181;
+  --color-red-500: #f56565;
+  --color-red-600: #e53e3e;
+  --color-red-700: #d70303;
+  --color-red-800: #9b2c2c;
+  --color-red-900: #742a2a;
+  --color-red-umred: #b51e0a;
+
+  --color-orange-100: #fffaf0;
+  --color-orange-200: #feebc8;
+  --color-orange-300: #fbd38d;
+  --color-orange-400: #f6ad55;
+  --color-orange-500: #ed8936;
+  --color-orange-600: #dd6b20;
+  --color-orange-700: #c05621;
+  --color-orange-800: #9c4221;
+  --color-orange-900: #7b341e;
+
+  --color-yellow-100: #fffff0;
+  --color-yellow-200: #fefcbf;
+  --color-yellow-300: #faf089;
+  --color-yellow-400: #f6e05e;
+  --color-yellow-500: #ecc94b;
+  --color-yellow-600: #d69e2e;
+  --color-yellow-700: #b7791f;
+  --color-yellow-800: #975a16;
+  --color-yellow-900: #744210;
+  --color-yellow-um_yellow: #ffcf01;
+
+  --color-green-100: #f0fff4;
+  --color-green-200: #c6f6d5;
+  --color-green-300: #9ae6b4;
+  --color-green-400: #68d391;
+  --color-green-500: #48bb78;
+  --color-green-600: #38a169;
+  --color-green-700: #2f855a;
+  --color-green-800: #276749;
+  --color-green-900: #22543d;
+  --color-green-umgreen: #00743c;
+
+  --color-teal-100: #e6fffa;
+  --color-teal-200: #b2f5ea;
+  --color-teal-300: #81e6d9;
+  --color-teal-400: #4fd1c5;
+  --color-teal-500: #38b2ac;
+  --color-teal-600: #319795;
+  --color-teal-700: #2c7a7b;
+  --color-teal-800: #285e61;
+  --color-teal-900: #234e52;
+
+  --color-blue-100: #ebf8ff;
+  --color-blue-200: #bee3f8;
+  --color-blue-300: #90cdf4;
+  --color-blue-400: #63b3ed;
+  --color-blue-500: #4299e1;
+  --color-blue-600: #3182ce;
+  --color-blue-700: #2b6cb0;
+  --color-blue-800: #2c5282;
+  --color-blue-900: #2a4365;
+  --color-blue-laitan_blue: #2b73b6;
+  --color-blue-um_blue: #00274c;
+
+  --color-indigo-100: #ebf4ff;
+  --color-indigo-200: #c3dafe;
+  --color-indigo-300: #a3bffa;
+  --color-indigo-400: #7f9cf5;
+  --color-indigo-500: #667eea;
+  --color-indigo-600: #5a67d8;
+  --color-indigo-700: #4c51bf;
+  --color-indigo-800: #434190;
+  --color-indigo-900: #3c366b;
+
+  --color-purple-100: #faf5ff;
+  --color-purple-200: #e9d8fd;
+  --color-purple-300: #d6bcfa;
+  --color-purple-400: #b794f4;
+  --color-purple-500: #9f7aea;
+  --color-purple-600: #805ad5;
+  --color-purple-700: #6b46c1;
+  --color-purple-800: #553c9a;
+  --color-purple-900: #44337a;
+
+  --color-pink-100: #fff5f7;
+  --color-pink-200: #fed7e2;
+  --color-pink-300: #fbb6ce;
+  --color-pink-400: #f687b3;
+  --color-pink-500: #ed64a6;
+  --color-pink-600: #d53f8c;
+  --color-pink-700: #b83280;
+  --color-pink-800: #97266d;
+  --color-pink-900: #702459;
+
+  --breakpoint-*: initial;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-serif: Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-mono: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* Tailwind 2 text-* utilities set only font-size; drop the v4 paired line-heights. */
+  --text-*: initial;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+  --text-6xl: 4rem;
+
+  --font-weight-hairline: 100;
+  --font-weight-thin: 200;
+
+  --radius-*: initial;
+  --radius-sm: 0.125rem;
+  --radius-lg: 0.5rem;
+
+  --shadow-*: initial;
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+@layer base {
+  /* Tailwind 2 defaulted border-color to gray-300; v4 defaults to currentColor. */
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-300, currentcolor);
+  }
+
+  /* Tailwind 2 preflight gave buttons a pointer cursor. */
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  /* Tailwind 2 preflight kept the browser's 1px table-cell padding; v4 zeroes it. */
+  td,
+  th {
+    padding: 1px;
+  }
+}
+
+/* Application styles (unlayered, see header comment). */
+body {
+  @apply bg-white text-gray-800 m-4;
+}
+
+h1 {
+  @apply text-xl;
+}
+
+h2 {
+  @apply text-lg;
+}
+
+h3 {
+  @apply text-base;
+}
+
+h4 {
+  @apply text-sm;
+}
+
+hr {
+  @apply w-2/3 border-blue-900 border-2 mt-2;
+}
+
+select {
+  @apply appearance-none w-1/4 bg-gray-200 border-0 border-gray-400 text-gray-700 py-2 px-4 pr-8 rounded-sm leading-tight m-2;
+}
+
+.section-header {
+  @apply bg-blue-um_blue text-yellow-500 p-1 w-1/2 tracking-wider mt-2;
+}
+
+.display-box {
+  @apply bg-blue-200 border-0 border-blue-500 w-full px-2;
+}
+
+a {
+  &.btn {
+    @apply font-normal py-1 px-2 rounded-sm no-underline;
+
+    &.btn-sm {
+      @apply text-xs py-1 px-1;
+    }
+  }
+
+  &.btn-blue {
+    @apply bg-blue-laitan_blue text-gray-100;
+
+    &:hover {
+      @apply bg-blue-900;
+    }
+  }
+
+  &.btn-red {
+    @apply bg-red-700 text-gray-100;
+
+    &:hover {
+      @apply bg-red-900;
+    }
+  }
+
+  &.btn-green {
+    @apply bg-green-700 text-gray-100;
+
+    &:hover {
+      @apply bg-green-900;
+    }
+  }
+
+  &.btn-teal {
+    @apply bg-teal-700 text-gray-100;
+
+    &:hover {
+      @apply bg-teal-900;
+    }
+  }
+
+  svg {
+    @apply inline align-middle;
+  }
+}
+
+button {
+  &.btn {
+    @apply font-normal py-1 px-2 rounded-sm no-underline;
+  }
+
+  &.btn-sm {
+    @apply text-xs py-1 px-1;
+  }
+
+  &.btn-blue {
+    @apply bg-blue-laitan_blue text-gray-100;
+
+    &:hover {
+      @apply bg-blue-900;
+    }
+  }
+
+  &.btn-red {
+    @apply bg-red-700 text-gray-100;
+
+    &:hover {
+      @apply bg-red-900;
+    }
+  }
+
+  &.btn-green {
+    @apply bg-green-700 text-gray-100;
+
+    &:hover {
+      @apply bg-green-900;
+    }
+  }
+}
+
+input {
+  &.btn {
+    @apply font-normal py-1 px-2 rounded-sm no-underline;
+  }
+
+  &.btn-green {
+    @apply bg-green-700 text-gray-100;
+
+    &:hover {
+      @apply bg-green-900;
+    }
+  }
+}
+
+/* Form styles */
+form {
+  .date_select {
+    margin-left: 20px;
+    width: 210px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+
+    select {
+      flex: 0 1 120px;
+      margin: 5px;
+      width: 100%;
+    }
+
+    label {
+      flex: 0 1 50px;
+      margin: 2px;
+    }
+  }
+
+  .state-select {
+    width: 50rem;
+  }
+
+  .country-select {
+    width: 100rem;
+  }
+
+  .transport-select {
+    width: 150rem;
+  }
+
+  .field {
+    @apply leading-loose pt-2;
+  }
+
+  field {
+    @apply block;
+  }
+
+  label {
+    @apply text-gray-800;
+  }
+
+  /* Checkboxes and radios keep the @tailwindcss/forms base sizing (they only pick up the margin);
+     :where() keeps the selector at element specificity so utility classes still override it. */
+  input:where(:not([type="checkbox"], [type="radio"])) {
+    @apply form-input mt-1 block w-full;
+  }
+
+  input:where([type="checkbox"], [type="radio"]) {
+    @apply mt-1;
+  }
+
+  .btn-blue {
+    @apply bg-blue-laitan_blue text-gray-100;
+  }
+
+  textarea {
+    @apply mt-1 block w-full;
+  }
+}
+
+.form-directions {
+  @apply text-gray-800 text-sm;
+}
+
+.form-optional {
+  @apply text-gray-800;
+
+  &::after {
+    content: " (optional)";
+  }
+}
+
+.important {
+  @apply text-red-700;
+}
+
+.hr-thin {
+  @apply border-0 w-2/3;
+}
+
+#sidebox {
+  @apply mt-4 p-2 flex flex-col border-2 border-yellow-400 bg-yellow-200;
+
+  .sidebox_element {
+    @apply inline-block ml-2 text-blue-800 text-sm;
+
+    a:hover {
+      @apply text-blue-400;
+    }
+  }
+
+  .sidebox_sub_element {
+    @apply inline-block ml-4 text-blue-800 text-sm;
+
+    a:hover {
+      @apply text-blue-400;
+    }
+  }
+}
+
+.flash {
+  @apply text-center -mt-4 mb-8;
+
+  &.notice {
+    @apply text-green-700 text-lg mt-2;
+  }
+
+  &.alert {
+    @apply text-red-700 text-lg mt-2;
+  }
+}
+
+/* Errors */
+#error_explanation {
+  @apply m-4 p-2 rounded-sm bg-yellow-200 border-red-500 border-0;
+
+  h2 {
+    @apply text-red-700 text-lg;
+  }
+
+  h3 {
+    @apply text-base m-4 font-semibold;
+  }
+}
+
+.direction_notes {
+  @apply bg-yellow-100 text-gray-700 p-2 border-2 border-gray-400;
+}
+
+.debug_dump {
+  @apply bg-blue-100 border-4 border-red-800 rounded-lg p-4 text-sm font-mono text-blue-900 mx-auto my-4 max-w-2xl w-auto;
+}
+
+.current-uploaded-docs {
+  @apply bg-yellow-100 border-0 border-blue-500 rounded-lg p-2 text-sm font-mono text-yellow-600 mx-1 my-1 max-w-xl w-auto;
+}
+
+.actions {
+  input[type="submit"] {
+    @apply bg-blue-laitan_blue text-white;
+
+    &:hover {
+      @apply bg-blue-900 cursor-pointer;
+    }
+  }
+}
+
+.session--display {
+  @apply block;
+}
+
+.session--hide {
+  @apply hidden;
+}
+
+.date-error--display {
+  @apply block text-red-700;
+}
+
+.date-error--hide {
+  @apply hidden;
+}
+
+.travel-details--hide {
+  @apply hidden;
+}
+
+.travel-details--show {
+  @apply block;
+}
+
+.student-page-table {
+  @apply table-auto border-collapse border-0;
+
+  th {
+    @apply bg-gray-200 py-3 text-sm font-semibold text-gray-900 border-0 border-gray-300;
+  }
+
+  tr {
+    @apply py-2 pl-4 pr-3 text-sm bg-white;
+  }
+
+  td {
+    @apply py-2 pl-4 pr-3 text-sm font-medium text-gray-900 border-0 border-gray-300;
+  }
+}
+
+.course-ranking-item--dragging {
+  @apply opacity-50;
+}
+
+/* Footer */
+footer {
+  @apply bottom-0 w-full bg-gray-100 p-2 border-t-2 border-blue-um_blue text-sm text-blue-um_blue sm:flex-row;
+
+  .copyright {
+    @apply text-gray-700 text-xs font-light;
+
+    a:hover {
+      @apply no-underline text-blue-800;
+    }
+  }
+}
