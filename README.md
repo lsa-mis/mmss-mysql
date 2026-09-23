@@ -31,7 +31,7 @@ A Ruby on Rails application for managing summer camp applications, enrollments, 
 - **Payments** — Payment flows and receipts (integration with external payment provider)
 - **Admin (ActiveAdmin)** — Full CRUD and reporting: demographics, camp configs, enrollments, reports (complete applications, waitlist, enrolled with addresses, course assignments, demographic reports, etc.)
 - **Faculty interface** — Faculty login and student list/student page views
-- **Maintenance mode** — Turnout-based maintenance page support for deployments
+- **Maintenance mode** — Rack middleware (`lib/middleware/maintenance_mode.rb`) serves `public/maintenance.html` while `tmp/maintenance.yml` exists on the server
 
 ---
 
@@ -200,6 +200,8 @@ bundle exec cap production maintenance:stop
 ```
 
 Before deploy, `deploy:check_revision` ensures local HEAD matches `origin/main`.
+
+`maintenance:start` uploads `config/maintenance_template.yml` to `tmp/maintenance.yml` on the server; while that file exists the `MaintenanceMode` middleware answers every request (except `allowed_paths` / `allowed_ips`) with `public/maintenance.html`, the `response_code` (default 503) and a `Retry-After` header. `maintenance:stop` removes the file. Edit the template's `reason`, `allowed_ips`, etc. before starting.
 
 ### Staging (Hatchbox + DigitalOcean)
 

@@ -21,7 +21,6 @@ gem 'sass-rails', '~> 6.0'
 gem 'sd_notify'
 gem 'skylight'
 gem 'turbolinks', '~> 5.2', '>= 5.2.1'
-gem 'turnout', '~> 2.5'
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 gem 'webpacker', '~> 5.4', '>= 5.4.2'
 
