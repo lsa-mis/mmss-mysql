@@ -285,12 +285,11 @@ Devise.setup do |config|
   # so you need to do it manually. For the users scope, it would be:
   # config.omniauth_path_prefix = '/my_engine/users/auth'
 
-  # ==> Turbolinks configuration
-  # If your app is using Turbolinks, Turbolinks::Controller needs to be included to make redirection work correctly:
-  #
-  # ActiveSupport.on_load(:devise_failure_app) do
-  #   include Turbolinks::Controller
-  # end
+  # ==> Hotwire/Turbo configuration
+  # Turbo Drive only renders form responses that carry an error status and only
+  # follows redirects after non-GET submissions when they use 303 See Other.
+  config.responder.error_status = :unprocessable_entity
+  config.responder.redirect_status = :see_other
 
   # ==> Configuration for :registerable
 

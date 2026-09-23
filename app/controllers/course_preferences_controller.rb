@@ -32,7 +32,7 @@ class CoursePreferencesController < ApplicationController
         format.html { redirect_to enrollment_course_preferences_path(@current_enrollment), notice: 'Course Preference was successfully edited.' }
         format.json { render :show, status: :created, location: @course_preference }
       else
-        format.html { render :new }
+        format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @course_preference.errors, status: :unprocessable_entity }
       end
     end
@@ -90,7 +90,7 @@ class CoursePreferencesController < ApplicationController
       else
         @course_camp = @course_preference.course.camp_occurrence
         @remaining_selections = get_rankings_available(@course_camp)
-        format.html { render :edit }
+        format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @course_preference.errors, status: :unprocessable_entity }
       end
     end

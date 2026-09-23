@@ -72,7 +72,7 @@
       <div class="m-2">Now that you've submitted your application, the next step is to make
         sure you pay the <%= humanized_money_with_symbol(current_camp_fee / 100) %> non-refundable application fee
         <%= button_to "pay #{humanized_money_with_symbol(current_camp_fee / 100)} application fee",
-                    make_payment_path(amount: current_camp_fee / 100), class: 'bg-blue-700 hover:bg-blue-900 text-gray-100 font-normal py-1 px-2 rounded' %>
+                    make_payment_path(amount: current_camp_fee / 100), class: 'bg-blue-700 hover:bg-blue-900 text-gray-100 font-normal py-1 px-2 rounded', form: { data: { turbo: false } } %>
       </div>
       <p class="text-red-700 m-2">
         Payment of your application fee must be completed before you will be

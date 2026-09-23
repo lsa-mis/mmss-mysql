@@ -26,10 +26,10 @@ class ActivitiesController < ApplicationController
     @camp_occurrence = CampOccurrence.find(params[:camp_occurrence_id])
     @camp_configuration = @camp_occurrence.camp_configuration_id
     @activity = @camp_occurrence.activities.create(activity_params)
-    if @activity.errors 
-      render :edit
-    else 
+    if @activity.persisted?
       redirect_to activities_path, notice: 'Activity was successfully created.'
+    else
+      render :edit, status: :unprocessable_entity
     end
   end
 
@@ -41,7 +41,7 @@ class ActivitiesController < ApplicationController
         format.html { redirect_to @activity, notice: 'Activity was successfully updated.' }
         format.json { render :show, status: :ok, location: @activity }
       else
-        format.html { render :edit }
+        format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @activity.errors, status: :unprocessable_entity }
       end
     end
@@ -52,7 +52,7 @@ class ActivitiesController < ApplicationController
   def destroy
     @activity.destroy
     respond_to do |format|
-      format.html { redirect_to activities_url, notice: 'Activity was successfully destroyed.' }
+      format.html { redirect_to activities_url, notice: 'Activity was successfully destroyed.', status: :see_other }
       format.json { head :no_content }
     end
   end

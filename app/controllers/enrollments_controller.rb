@@ -56,7 +56,7 @@ class EnrollmentsController < ApplicationController
         end
         format.json { render :show, status: :created, location: @enrollment }
       else
-        format.html { render :new }
+        format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @enrollment.errors, status: :unprocessable_entity }
       end
     end
@@ -81,7 +81,7 @@ class EnrollmentsController < ApplicationController
         if @current_enrollment.errors.include?(:student_packet) || @current_enrollment.errors.include?(:vaccine_record) || @current_enrollment.errors.include?(:covid_test_record)
           format.html { redirect_to root_path, alert: @current_enrollment.errors.full_messages.to_sentence }
         else
-          format.html { render :edit }
+          format.html { render :edit, status: :unprocessable_entity }
           format.json { render json: @current_enrollment.errors, status: :unprocessable_entity }
         end
       end
@@ -93,7 +93,7 @@ class EnrollmentsController < ApplicationController
   def destroy
     @enrollment.destroy
     respond_to do |format|
-      format.html { redirect_to enrollments_url, notice: 'Enrollment was successfully destroyed.' }
+      format.html { redirect_to enrollments_url, notice: 'Enrollment was successfully destroyed.', status: :see_other }
       format.json { head :no_content }
     end
   end

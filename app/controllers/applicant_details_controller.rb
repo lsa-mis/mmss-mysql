@@ -50,7 +50,7 @@ class ApplicantDetailsController < ApplicationController
           format.html { redirect_to root_path, notice: 'Applicant detail was successfully created.' }
           format.json { render :show, status: :created, location: @applicant_detail }
         else
-          format.html { render :new }
+          format.html { render :new, status: :unprocessable_entity }
           format.json { render json: @applicant_detail.errors, status: :unprocessable_entity }
         end
       end
@@ -65,7 +65,7 @@ class ApplicantDetailsController < ApplicationController
         format.html { redirect_to root_path, notice: 'Applicant detail was successfully updated.' }
         format.json { render :show, status: :ok, location: @applicant_detail }
       else
-        format.html { render :edit }
+        format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @applicant_detail.errors, status: :unprocessable_entity }
       end
     end
@@ -76,7 +76,7 @@ class ApplicantDetailsController < ApplicationController
   def destroy
     @applicant_detail.destroy
     respond_to do |format|
-      format.html { redirect_to applicant_details_url, notice: 'Applicant detail was successfully destroyed.' }
+      format.html { redirect_to applicant_details_url, notice: 'Applicant detail was successfully destroyed.', status: :see_other }
       format.json { head :no_content }
     end
   end

@@ -38,7 +38,7 @@ class TravelsController < ApplicationController
         format.html { redirect_to root_path, notice: 'Travel was successfully created.' }
         format.json { render :show, status: :created, location: @travel }
       else
-        format.html { render :new }
+        format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @travel.errors, status: :unprocessable_entity }
       end
     end
@@ -53,7 +53,7 @@ class TravelsController < ApplicationController
         format.html { redirect_to root_path, notice: 'Travel was successfully updated.' }
         format.json { render :show, status: :ok, location: @travel }
       else
-        format.html { render :edit }
+        format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @travel.errors, status: :unprocessable_entity }
       end
     end
@@ -64,7 +64,7 @@ class TravelsController < ApplicationController
   def destroy
     @travel.destroy
     respond_to do |format|
-      format.html { redirect_to travels_url, notice: 'Travel was successfully destroyed.' }
+      format.html { redirect_to travels_url, notice: 'Travel was successfully destroyed.', status: :see_other }
       format.json { head :no_content }
     end
   end

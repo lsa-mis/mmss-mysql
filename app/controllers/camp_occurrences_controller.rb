@@ -31,7 +31,7 @@ class CampOccurrencesController < ApplicationController
         format.html { redirect_to @camp_configuration, notice: 'Camp Occurrence was successfully updated.' }
         format.json { render :show, status: :ok, location: @camp_occurrence }
       else
-        format.html { render :edit }
+        format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @camp_occurrence.errors, status: :unprocessable_entity }
       end
     end
@@ -42,7 +42,7 @@ class CampOccurrencesController < ApplicationController
   def destroy
     @camp_occurrence.destroy
     respond_to do |format|
-      format.html { redirect_to @camp_configuration, notice: 'Camp Occurrence was successfully destroyed.' }
+      format.html { redirect_to @camp_configuration, notice: 'Camp Occurrence was successfully destroyed.', status: :see_other }
       format.json { head :no_content }
     end
   end

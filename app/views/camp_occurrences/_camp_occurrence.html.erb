@@ -4,7 +4,7 @@
 
 <%= render 'camp_occurrences/form', camp_occurrence: camp_occurrence %>
 
-<p><%= link_to 'Delete occurrence', camp_configuration_camp_occurrence_path(@camp_configuration, camp_occurrence), method: :delete %></p>
+<p><%= link_to 'Delete occurrence', camp_configuration_camp_occurrence_path(@camp_configuration, camp_occurrence), data: { turbo_method: :delete } %></p>
 
 <p>======================</p>
 <br>

@@ -34,7 +34,7 @@ class DemographicsController < ApplicationController
         format.html { redirect_to @demographic, notice: 'Demographic was successfully created.' }
         format.json { render :show, status: :created, location: @demographic }
       else
-        format.html { render :new }
+        format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @demographic.errors, status: :unprocessable_entity }
       end
     end
@@ -48,7 +48,7 @@ class DemographicsController < ApplicationController
         format.html { redirect_to @demographic, notice: 'Demographic was successfully updated.' }
         format.json { render :show, status: :ok, location: @demographic }
       else
-        format.html { render :edit }
+        format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @demographic.errors, status: :unprocessable_entity }
       end
     end
@@ -59,7 +59,7 @@ class DemographicsController < ApplicationController
   def destroy
     @demographic.destroy
     respond_to do |format|
-      format.html { redirect_to demographics_url, notice: 'Demographic was successfully destroyed.' }
+      format.html { redirect_to demographics_url, notice: 'Demographic was successfully destroyed.', status: :see_other }
       format.json { head :no_content }
     end
   end

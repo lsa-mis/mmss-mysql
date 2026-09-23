@@ -45,7 +45,7 @@ class RecuploadsController < InheritedResources::Base
       else
         @student = ApplicantDetail.find(params[:id]).full_name if params[:id]
         @recommendation = Recommendation.find(@recupload.recommendation_id) if @recupload.recommendation_id
-        format.html { render :new }
+        format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @recupload.errors, status: :unprocessable_entity }
       end
     end
@@ -57,7 +57,7 @@ class RecuploadsController < InheritedResources::Base
   def destroy
     @recupload.destroy
     respond_to do |format|
-      format.html { redirect_to recuploads_url, notice: 'Recommendation was successfully destroyed.' }
+      format.html { redirect_to recuploads_url, notice: 'Recommendation was successfully destroyed.', status: :see_other }
       format.json { head :no_content }
     end
   end

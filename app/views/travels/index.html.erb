@@ -30,7 +30,7 @@
         <td><%= travel.note %></td>
         <td><%= link_to 'Show', travel %></td>
         <td><%= link_to 'Edit', edit_travel_path(travel) %></td>
-        <td><%= link_to 'Destroy', travel, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td><%= link_to 'Destroy', travel, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   </tbody>
