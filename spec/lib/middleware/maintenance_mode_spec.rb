@@ -107,6 +107,20 @@ RSpec.describe MaintenanceMode do
     end
   end
 
+  it 'passes the request through when tmp/maintenance.yml disappears mid-request (maintenance:stop race)' do
+    enable_maintenance('reason' => 'Down')
+    # Simulate `maintenance:stop` deleting the marker after the middleware decided to read it.
+    allow_any_instance_of(Pathname).to receive(:read).and_wrap_original do |original, *args|
+      original.receiver.delete if original.receiver.basename.to_s == 'maintenance.yml'
+      original.call(*args)
+    end
+
+    response = request
+
+    expect(response.status).to eq(200)
+    expect(response.body).to eq('app response')
+  end
+
   it 'applies turnout-compatible defaults when the file is empty' do
     enable_maintenance({})
     maintenance_file.write('')

@@ -36,22 +36,26 @@ class MaintenanceMode
   end
 
   def call(env)
-    return @app.call(env) unless @maintenance_file.exist?
-
     settings = load_settings
-    return @app.call(env) if allowed?(Rack::Request.new(env), settings)
+    return @app.call(env) if settings.nil? || allowed?(Rack::Request.new(env), settings)
 
     maintenance_response(settings)
   end
 
   private
 
+  # Returns nil when maintenance mode is off. Reading once (instead of
+  # exist? + read) means a marker deleted by `maintenance:stop` mid-request is
+  # treated as "maintenance over" rather than raising Errno::ENOENT.
   def load_settings
-    yaml = YAML.safe_load(@maintenance_file.read) || {}
+    contents = @maintenance_file.read
+    yaml = YAML.safe_load(contents) || {}
     settings = DEFAULTS.merge(yaml.transform_keys(&:to_s).compact)
     settings['allowed_paths'] = to_list(settings['allowed_paths'])
     settings['allowed_ips'] = to_list(settings['allowed_ips'])
     settings
+  rescue Errno::ENOENT
+    nil
   end
 
   # Accepts YAML arrays or comma-separated strings, like turnout did.
