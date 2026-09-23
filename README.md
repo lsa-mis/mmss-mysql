@@ -201,7 +201,7 @@ bundle exec cap production maintenance:stop
 
 Before deploy, `deploy:check_revision` ensures local HEAD matches `origin/main`.
 
-`maintenance:start` uploads `config/maintenance_template.yml` to `tmp/maintenance.yml` on the server; while that file exists the `MaintenanceMode` middleware answers every request (except `allowed_paths` / `allowed_ips`) with `public/maintenance.html`, the `response_code` (default 503) and a `Retry-After` header. `maintenance:stop` removes the file. Edit the template's `reason`, `allowed_ips`, etc. before starting.
+`maintenance:start` uploads `config/maintenance_template.yml` to `tmp/maintenance.yml` on the server; while that file exists the `MaintenanceMode` middleware answers every request routed through Rails (except `allowed_paths` / `allowed_ips`) with `public/maintenance.html`; static files that nginx serves directly from `public/` via `try_files` never reach the middleware (same as with turnout), the `response_code` (default 503) and a `Retry-After` header. `maintenance:stop` removes the file. Edit the template's `reason`, `allowed_ips`, etc. before starting.
 
 ### Staging (Hatchbox + DigitalOcean)
 
