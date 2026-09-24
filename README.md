@@ -29,7 +29,7 @@ A Ruby on Rails application for managing summer camp applications, enrollments, 
 - **Financial aid** — Aid requests, amounts, status, and payment deadlines
 - **Recommendations** — Request and upload recommendation letters; email-based workflow
 - **Payments** — Payment flows and receipts (integration with external payment provider)
-- **Admin** — Plain Rails `Admin::` MVC at `/admin` (dashboard, applications, comments; other resources being ported one menu group at a time) with the remaining ActiveAdmin resources and reports served at `/legacy_admin` during the cutover
+- **Admin** — Plain Rails `Admin::` MVC at `/admin` (dashboard, CSV reports, applications, comments; other resources being ported one menu group at a time) with the remaining ActiveAdmin resources served at `/legacy_admin` during the cutover
 - **Faculty interface** — Faculty login and student list/student page views
 - **Maintenance mode** — Rack middleware (`lib/middleware/maintenance_mode.rb`) serves `public/maintenance.html` while `tmp/maintenance.yml` exists on the server
 

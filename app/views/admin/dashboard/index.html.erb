@@ -19,7 +19,7 @@
       <%= admin_panel 'Resources' do %>
         <ul class="text-sm">
           <li><%= link_to 'Admin Documentation', 'https://docs.google.com/document/d/17M9433ybPpvyXc_RwsnydfmSQsWN80Iwg2t0ACItoKo/edit?usp=sharing', target: '_blank', rel: 'noopener' %></li>
-          <li class="mt-1"><%= admin_legacy_link_to 'Reports', legacy_admin_reports_path %></li>
+          <li class="mt-1"><%= link_to 'Reports', admin_reports_path %></li>
         </ul>
       <% end %>
     </div>

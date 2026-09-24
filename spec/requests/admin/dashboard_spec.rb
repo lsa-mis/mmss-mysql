@@ -41,6 +41,7 @@ RSpec.describe 'Admin dashboard', type: :request do
       expect(body).to include('$25.50')
 
       expect(body).to include('Offer Accepted with Balance Due')
+      expect(body).to include(admin_report_path('offer_accepted_with_balance_due'))
       expect(CGI.unescapeHTML(body)).to include("Parent: #{user.applicant_detail.parentname}")
 
       expect(body).to include('Financial Aid Requests')
@@ -51,6 +52,8 @@ RSpec.describe 'Admin dashboard', type: :request do
       expect(body).to include('Dorm check-in moved')
       expect(body).to include('Resources')
       expect(body).to include('Admin Documentation')
+      expect(body).to include(admin_reports_path)
+      expect(body).not_to include('legacy_admin/reports')
     end
   end
 end

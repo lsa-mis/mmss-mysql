@@ -31,7 +31,7 @@ gem 'tailwindcss-rails', '~> 4.4'
 gem 'turbo-rails', '~> 2.0'
 
 gem 'base64', require: false
-# Bundled gem on Ruby 3.4+; app/admin/reports.rb generates CSV directly.
+# Bundled gem on Ruby 3.4+; Admin::CsvExport writes the admin exports and reports.
 gem 'csv'
 gem 'matrix', '~> 0.4.2', require: false
 gem 'mutex_m', require: false
