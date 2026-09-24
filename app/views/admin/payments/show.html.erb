@@ -11,7 +11,7 @@
           <%= admin_resource_link(payment.user, payment.user.email) %>
         <% end %>
         <% a.row 'Applicant' do %>
-          <%= admin_resource_link(@applicant) %>
+          <%= @applicant ? admin_resource_link(@applicant, admin_payment_applicant_label(@applicant)) : admin_empty_value %>
         <% end %>
         <% a.row :transaction_type %>
         <% a.row :transaction_status do |payment| %>

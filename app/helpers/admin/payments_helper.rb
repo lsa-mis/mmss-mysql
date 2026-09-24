@@ -8,6 +8,13 @@ module Admin::PaymentsHelper
     safe_join([tag.span(name, class: 'font-medium'), tag.div(user.email, class: 'text-xs text-slate-500')])
   end
 
+  # "Lastname, Firstname · 2026 application" for the applicant row; falls back to the email when
+  # the user has no applicant detail (Enrollment#display_name would raise).
+  def admin_payment_applicant_label(enrollment)
+    name = enrollment.applicant_detail&.full_name || enrollment.user.email
+    "#{name} · #{enrollment.campyear} application"
+  end
+
   # Nelnet status code with its meaning: "1" is the only successful status.
   def admin_payment_status_badge(status)
     return admin_empty_value if status.blank?

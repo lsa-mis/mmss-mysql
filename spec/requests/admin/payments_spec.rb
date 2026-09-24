@@ -155,6 +155,36 @@ RSpec.describe 'Admin payments', type: :request do
 
       expect(response.body).to include('Not matched to a Nelnet payment request')
     end
+
+    it 'renders for a user without applicant details (index, show and edit fall back to the email)' do
+      bare_user = create(:user)
+      bare_enrollment = create(:enrollment, user: bare_user)
+      bare_payment = create(:payment, user: bare_user, transaction_status: '2', transaction_id: 'TXN-BARE')
+
+      get admin_payment_path(bare_payment)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(bare_user.email)
+      expect(response.body).to include(admin_application_path(bare_enrollment))
+
+      get edit_admin_payment_path(bare_payment)
+      expect(response).to have_http_status(:ok)
+
+      get admin_payments_path
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('TXN-BARE')
+
+      get admin_payments_path(format: :csv)
+      expect(CSV.parse(response.body, headers: true).find { |r| r['Transaction id'] == 'TXN-BARE' }['email']).to eq(bare_user.email)
+    end
+
+    it 'shows no applicant link when the user never applied' do
+      bare_payment = create(:payment, user: create(:user), transaction_status: '2', transaction_id: 'TXN-NOAPP')
+
+      get admin_payment_path(bare_payment)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('Applicant')
+    end
   end
 
   describe 'GET /admin/payments/new' do
@@ -224,6 +254,19 @@ RSpec.describe 'Admin payments', type: :request do
       expect(created.user_account).to be_nil
       expect(created.result_code).to be_nil
       expect(created.timestamp).to be_nil
+    end
+
+    it 'keeps the application context when a prefilled submission fails' do
+      post admin_payments_path, params: { enrollment_id: enrollment.id,
+                                          payment: valid_params.merge(transaction_id: payment.transaction_id) }
+
+      expect(response).to have_http_status(:unprocessable_content)
+      body = response.body
+      expect(body).to include('Back to application')
+      expect(body).to include(admin_application_path(enrollment))
+      expect(body).to include(%(type="hidden" value="#{user.id}" name="payment[user_id]"))
+      expect(body).to include(%(name="enrollment_id" value="#{enrollment.id}"))
+      expect(body).not_to include('<option value="">Select an applicant</option>')
     end
 
     it 're-renders the form when the applicant id does not exist' do

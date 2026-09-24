@@ -17,6 +17,7 @@
         <span class="text-slate-500"><%= enrollment.user.email %></span>
       </p>
       <%= f.input :user_id, as: :hidden %>
+      <%= hidden_field_tag :enrollment_id, enrollment.id, id: nil %>
     <% else %>
       <%= f.input :user_id, as: :select, label: 'Applicant', include_blank: 'Select an applicant', required: true,
                             collection: admin_payment_user_options(payment) %>

@@ -50,7 +50,7 @@ class Admin::PaymentsController < Admin::BaseController
   # applicant (payments belong to the user) and the form shows the name instead of the select.
   def new
     @payment = Payment.new(manual_payment_defaults)
-    @enrollment = Enrollment.find_by(id: params[:enrollment_id]) if params[:enrollment_id].present?
+    @enrollment = prefilled_enrollment
     @payment.user_id = @enrollment.user_id if @enrollment
   end
 
@@ -60,6 +60,8 @@ class Admin::PaymentsController < Admin::BaseController
     if @payment.save
       redirect_to admin_payment_path(@payment), notice: 'Payment was successfully created.', status: :see_other
     else
+      # The form carries enrollment_id along so a failed prefilled submission keeps its context.
+      @enrollment = prefilled_enrollment
       render :new, status: :unprocessable_content
     end
   end
@@ -78,6 +80,11 @@ class Admin::PaymentsController < Admin::BaseController
 
   def set_payment
     @payment = Payment.includes(user: :applicant_detail).find(params[:id])
+  end
+
+  # ?enrollment_id= (from the application's "Add Manual Payment" action); unknown ids are ignored.
+  def prefilled_enrollment
+    Enrollment.find_by(id: params[:enrollment_id]) if params[:enrollment_id].present?
   end
 
   def base_relation
