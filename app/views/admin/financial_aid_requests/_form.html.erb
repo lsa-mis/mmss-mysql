@@ -1,0 +1,40 @@
+<%# locals: financial_aid %>
+<%= admin_form_with model: financial_aid,
+                    url: (financial_aid.persisted? ? admin_financial_aid_request_path(financial_aid) : admin_financial_aid_requests_path),
+                    multipart: true, class: 'grid gap-5' do |f| %>
+  <%= f.errors_summary %>
+
+  <%= f.fieldset 'Financial aid request', description: 'Awarding or rejecting a request emails the applicant; an awarded amount is subtracted from the balance due.' do %>
+    <% if financial_aid.new_record? && financial_aid.enrollment %>
+      <p class="text-sm">
+        <span class="font-semibold">Application:</span>
+        <%= admin_financial_aid_applicant(financial_aid.enrollment, with_email: false) %>
+        <span class="text-slate-500"><%= financial_aid.enrollment.user.email %></span>
+      </p>
+      <%= f.input :enrollment_id, as: :hidden %>
+    <% else %>
+      <%= f.input :enrollment_id, as: :select, label: 'Enrollment', include_blank: 'Select an applicant', required: true,
+                                  collection: Admin::ApplicantOptions.enrollments(include: financial_aid.enrollment) %>
+    <% end %>
+    <div class="grid gap-4 md:grid-cols-2">
+      <%= f.input :amount, as: :number, label: 'Amount ($)', step: 0.01, min: 0 %>
+      <%= f.input :source, hint: 'Required when awarding an amount.' %>
+      <%= f.input :adjusted_gross_income, as: :number, label: 'Adjusted Gross Income (AGI)', min: 0, required: true %>
+      <%= f.input :status, as: :select, collection: admin_financial_aid_status_options(financial_aid), include_blank: false %>
+      <%= f.input :payments_deadline, hint: 'Required unless the request stays pending.' %>
+    </div>
+    <%= f.input :note, as: :textarea, rows: 4, required: true %>
+  <% end %>
+
+  <%= f.fieldset 'Supporting document', description: 'Admin use only. PDF, JPEG or PNG up to 20 MB.' do %>
+    <% if financial_aid.taxform.attached? %>
+      <div>
+        <span class="admin-label">Current document</span>
+        <p class="mt-1 text-sm"><%= admin_attachment_link(financial_aid.taxform) %></p>
+      </div>
+    <% end %>
+    <%= f.input :taxform, as: :file, label: 'Supporting Document (Admin Use Only)', accept: 'application/pdf,image/png,image/jpeg' %>
+  <% end %>
+
+  <%= f.actions cancel: (financial_aid.persisted? ? admin_financial_aid_request_path(financial_aid) : admin_financial_aid_requests_path) %>
+<% end %>

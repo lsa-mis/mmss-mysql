@@ -35,6 +35,27 @@ require 'rails_helper'
 RSpec.describe Payment, type: :model do
   describe 'associations' do
     it { is_expected.to belong_to(:user) }
+    it { is_expected.to have_one(:payment_request).dependent(:restrict_with_error) }
+  end
+
+  describe '#destroy' do
+    let(:user) { create(:user) }
+
+    it 'refuses to destroy a payment matched to a Nelnet payment request' do
+      payment = create(:payment, user: user, transaction_status: '2')
+      create(:payment_request, user: user, payment: payment)
+
+      expect(payment.destroy).to be(false)
+      expect(payment.errors[:base]).to be_present
+      expect(Payment.exists?(payment.id)).to be(true)
+    end
+
+    it 'destroys an unmatched payment' do
+      payment = create(:payment, user: user, transaction_status: '2')
+
+      expect(payment.destroy).to be_truthy
+      expect(Payment.exists?(payment.id)).to be(false)
+    end
   end
 
   describe 'validations' do

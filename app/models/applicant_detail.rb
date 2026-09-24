@@ -49,6 +49,8 @@
 #  fk_rails_...  (user_id => users.id)
 #
 class ApplicantDetail < ApplicationRecord
+  include AdminCommentable
+
   belongs_to :user, required: true, inverse_of: :applicant_detail
   belongs_to :demographic, optional: true
 
@@ -115,6 +117,8 @@ class ApplicantDetail < ApplicationRecord
     errors.add(:base, "Parent/Guardian email should be different than the applicant's email")
   end
 
+  # Still needed by the legacy ActiveAdmin Applications filters (`applicant_detail_lastname_start`);
+  # remove with app/admin/enrollments.rb.
   def self.ransackable_associations(_auth_object = nil)
     %w[demographic user]
   end

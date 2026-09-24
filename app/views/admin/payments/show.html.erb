@@ -1,0 +1,48 @@
+<% admin_page_title "Payment ##{@payment.id}", subtitle: "#{@payment.user.applicant_detail&.full_name || @payment.user.email} · #{admin_money_from_cents(@payment.total_amount)}" %>
+<% admin_page_actions do %>
+  <%= link_to 'Edit', edit_admin_payment_path(@payment), class: 'admin-btn-primary' %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-3">
+  <div class="grid gap-5 xl:col-span-2">
+    <%= admin_panel 'Payment', body_class: '' do %>
+      <%= admin_attributes @payment do |a| %>
+        <% a.row 'User' do |payment| %>
+          <%= admin_resource_link(payment.user, payment.user.email) %>
+        <% end %>
+        <% a.row 'Applicant' do %>
+          <%= admin_resource_link(@applicant) %>
+        <% end %>
+        <% a.row :transaction_type %>
+        <% a.row :transaction_status do |payment| %>
+          <%= admin_payment_status_badge(payment.transaction_status) %>
+        <% end %>
+        <% a.row 'Transaction id' do |payment| %><%= payment.transaction_id %><% end %>
+        <% a.row 'Total amount' do |payment| %>
+          <%= admin_money_from_cents(payment.total_amount) %>
+        <% end %>
+        <% a.row :transaction_date, :account_type, :result_code, :result_message, :user_account, :timestamp, :transaction_hash,
+                 :camp_year, :created_at, :updated_at %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="grid gap-5 self-start">
+    <%= admin_panel 'Payment request', body_class: '' do %>
+      <% if @payment.payment_request %>
+        <%= admin_attributes @payment.payment_request do |a| %>
+          <% a.row 'Request' do |request| %>
+            <%= admin_resource_link(request, "Payment request ##{request.id}") %>
+          <% end %>
+          <% a.row :order_number %>
+          <% a.row 'Amount' do |request| %>
+            <%= admin_money_from_cents(request.amount_cents) %>
+          <% end %>
+          <% a.row :camp_year, :created_at %>
+        <% end %>
+      <% else %>
+        <%= admin_empty_state 'Not matched to a Nelnet payment request (manual payment or pre-tracking receipt).' %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

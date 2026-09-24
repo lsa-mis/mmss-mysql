@@ -25,6 +25,7 @@
 #
 class FinancialAid < ApplicationRecord
   include ApplicantState
+  include AdminCommentable
 
   after_commit :send_status_watch_email, if: :persisted?
 
@@ -91,13 +92,4 @@ class FinancialAid < ApplicationRecord
       errors.add(:amount_cents, "you need to set an amount")
     end
   end
-
-  def self.ransackable_associations(auth_object = nil)
-    ["enrollment", "taxform_attachment", "taxform_blob"]
-  end
-
-  def self.ransackable_attributes(auth_object = nil)
-    ["adjusted_gross_income", "amount_cents", "created_at", "enrollment_id", "id", "note", "payments_deadline", "source", "status", "updated_at"]
-  end
-
 end

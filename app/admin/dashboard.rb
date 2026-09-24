@@ -18,12 +18,12 @@ ActiveAdmin.register_page 'Dashboard' do
             end
           end
 
-          panel link_to("Recent Payments for #{current_camp_year} Camp", legacy_admin_payments_path) do
+          panel link_to("Recent Payments for #{current_camp_year} Camp", admin_payments_path, data: { turbo: false }) do
             if Payment.current_camp_payments.any?
               ul do
                 Payment.current_camp_payments.order(created_at: :desc).limit(10).map do |payment|
                   li link_to(
-                    "#{payment.user.applicant_detail.full_name_and_email} - #{humanized_money_with_symbol(payment.total_amount.to_f / 100)}", legacy_admin_payment_path(payment.id)
+                    "#{payment.user.applicant_detail.full_name_and_email} - #{humanized_money_with_symbol(payment.total_amount.to_f / 100)}", admin_payment_path(payment.id), data: { turbo: false }
                   )
                 end
               end
@@ -67,7 +67,7 @@ ActiveAdmin.register_page 'Dashboard' do
             end
           end
 
-          panel link_to('Financial Aid Requests', legacy_admin_financial_aid_requests_path) do
+          panel link_to('Financial Aid Requests', admin_financial_aid_requests_path, data: { turbo: false }) do
             div do
               render('/admin/pending_finaid_requests', model: 'dashboard')
             end

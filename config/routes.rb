@@ -42,6 +42,14 @@ Rails.application.routes.draw do
       end
     end
 
+    # Money: financial_aid_requests = FinancialAid (the ActiveAdmin resource name). Applicant details
+    # and payments had no destroy in ActiveAdmin either (payments are financial records).
+    resources :applicant_details, except: :destroy
+    resources :financial_aid_requests, controller: 'financial_aid_requests' do
+      collection { post :batch }
+    end
+    resources :payments, except: :destroy
+
     # Recommendations are ported in a later PR; only the admin-only "resend request" action lives here
     # (it used to be a public GET on RecommendationsController).
     resources :recommendations, only: [] do

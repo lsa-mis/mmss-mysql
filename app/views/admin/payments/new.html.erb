@@ -1,0 +1,10 @@
+<% admin_page_title 'New Payment', subtitle: (@enrollment ? "Manual payment for #{@enrollment.applicant_detail&.full_name || @enrollment.user.email}" : 'Manual payment') %>
+<% admin_page_actions do %>
+  <% if @enrollment %>
+    <%= link_to 'Back to application', admin_application_path(@enrollment), class: 'admin-btn-secondary' %>
+  <% else %>
+    <%= link_to 'Back to payments', admin_payments_path, class: 'admin-btn-secondary' %>
+  <% end %>
+<% end %>
+
+<%= render 'admin/payments/form', payment: @payment, enrollment: @enrollment %>

@@ -1,0 +1,40 @@
+<% admin_page_title 'Payments', subtitle: "#{number_with_delimiter(@pagy.count)} #{'payment'.pluralize(@pagy.count)}" %>
+<% admin_page_actions do %>
+  <%= admin_csv_link %>
+  <%= link_to 'New Payment', new_admin_payment_path, class: 'admin-btn-primary' %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-4">
+  <div class="grid gap-4 xl:col-span-3">
+    <%= admin_table @payments, pagy: @pagy,
+                    actions: ->(payment) { [admin_payment_path(payment), edit_admin_payment_path(payment), nil] } do |t| %>
+      <% t.column 'User', sort: 'user' do |payment| %>
+        <%= admin_payment_user(payment) %>
+      <% end %>
+      <% t.column 'Type', sort: 'transaction_type' do |payment| %>
+        <%= payment.transaction_type %>
+      <% end %>
+      <% t.column 'Status', sort: 'transaction_status' do |payment| %>
+        <%= admin_payment_status_badge(payment.transaction_status) %>
+      <% end %>
+      <% t.column 'Transaction id', sort: 'transaction_id' do |payment| %>
+        <%= payment.transaction_id %>
+      <% end %>
+      <% t.column 'Total Amount', sort: 'total_amount' do |payment| %>
+        <%= admin_money_from_cents(payment.total_amount) %>
+      <% end %>
+      <% t.column :transaction_date, sort: true %>
+      <% t.column :account_type, sort: true %>
+      <% t.column :result_code, sort: true %>
+      <% t.column :result_message %>
+      <% t.column :user_account %>
+      <% t.column :payer_identity %>
+      <% t.column :timestamp %>
+      <% t.column :camp_year, sort: true %>
+    <% end %>
+  </div>
+
+  <div class="xl:col-span-1">
+    <%= admin_filter_form @filter, url: admin_payments_path %>
+  </div>
+</div>

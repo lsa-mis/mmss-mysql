@@ -43,7 +43,9 @@ class Payment < ApplicationRecord
   validates :camp_year, presence: true
 
   belongs_to :user
-  has_one :payment_request, dependent: :nullify
+  # A payment matched to a Nelnet payment request is part of the payment audit trail and cannot be
+  # destroyed (`destroy` returns false with an error on :base). The admin exposes no destroy at all.
+  has_one :payment_request, dependent: :restrict_with_error
 
   # Virtual attribute for dollar amounts in admin forms
   def total_amount_dollars
@@ -87,14 +89,5 @@ class Payment < ApplicationRecord
     elsif balance_due == 0 && @current_enrollment.camp_doc_form_completed
       @current_enrollment.auto_enroll_if_ready!
     end
-  end
-
-  def self.ransackable_associations(auth_object = nil)
-    ['user']
-  end
-
-  def self.ransackable_attributes(auth_object = nil)
-    %w[account_type camp_year created_at id payer_identity result_code result_message timestamp
-       total_amount transaction_date transaction_hash transaction_id transaction_status transaction_type updated_at user_account user_id]
   end
 end
