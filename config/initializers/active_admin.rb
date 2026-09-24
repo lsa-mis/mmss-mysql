@@ -40,6 +40,11 @@ ActiveAdmin.setup do |config|
   # Default:
   # config.default_namespace = :admin
   #
+  # ActiveAdmin is being replaced by the plain-MVC Admin:: namespace at /admin.
+  # During the cutover it lives at /legacy_admin (helpers: legacy_admin_*_path,
+  # controllers: LegacyAdmin::*) so both admins can run side by side.
+  config.default_namespace = :legacy_admin
+  #
   # You can customize the settings for each namespace by using
   # a namespace block. For example, to change the site title
   # within a namespace:

@@ -1,0 +1,28 @@
+<%# locals: filter, url, title %>
+<%= form_with url: url, method: :get, class: 'admin-card', data: { turbo_frame: '_top' } do |f| %>
+  <div class="admin-card-header">
+    <h2 class="admin-card-title"><%= title %></h2>
+    <% if filter.active? %>
+      <span class="admin-badge-blue"><%= pluralize(filter.values.size, 'active filter') %></span>
+    <% end %>
+  </div>
+  <div class="admin-card-body grid gap-3">
+    <% %w[scope sort direction limit].each do |key| %>
+      <% if params[key].present? %>
+        <%= hidden_field_tag key, params[key], id: nil %>
+      <% end %>
+    <% end %>
+
+    <% filter.fields.each do |field| %>
+      <div>
+        <label for="<%= admin_filter_field_id(field) %>" class="admin-label"><%= field.label %></label>
+        <%= admin_filter_field(f, filter, field) %>
+      </div>
+    <% end %>
+
+    <div class="flex items-center gap-2 pt-1">
+      <%= f.button 'Filter', type: :submit, class: 'admin-btn-primary' %>
+      <%= link_to 'Clear', url_for(params.permit(:scope, :sort, :direction, :limit).to_h), class: 'admin-btn-secondary' %>
+    </div>
+  </div>
+<% end %>

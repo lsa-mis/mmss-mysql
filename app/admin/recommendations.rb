@@ -45,7 +45,7 @@ ActiveAdmin.register Recommendation do
     selectable_column
     actions
     column :enrollment_id, sortable: :enrollment_id do |ei|
-      link_to ei.enrollment.display_name, admin_application_path(ei.enrollment_id)
+      link_to ei.enrollment.display_name, legacy_admin_application_path(ei.enrollment_id)
     end
     column :email
     column :lastname
@@ -69,7 +69,7 @@ ActiveAdmin.register Recommendation do
       end
       row :id
       row  :enrollment_id do |ei|
-        link_to ei.enrollment.display_name, admin_application_path(ei.enrollment_id)
+        link_to ei.enrollment.display_name, legacy_admin_application_path(ei.enrollment_id)
       end
       row :firstname
       row :lastname

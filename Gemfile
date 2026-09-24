@@ -15,6 +15,8 @@ gem 'money-rails', '~> 1.14'
 # gem install mysql2 -v '0.5.6' -- --with-mysql-dir=/opt/homebrew/bin/mysql --with-mysql-lib=/opt/homebrew/Cellar/mysql/8.3.0/lib --with-mysql-include=/opt/homebrew/Cellar/mysql/8.3.0/include/mysql
 gem 'mysql2', '~> 0.5.6'
 gem 'ostruct', '~> 0.5.5'
+# Pagination for the Admin:: namespace (Kaminari only comes in transitively via ActiveAdmin).
+gem 'pagy', '~> 43.6'
 gem 'puma', '~> 8.0'
 gem 'rails', '~> 8.1.3'
 # Sprockets + sassc remain only for ActiveAdmin's bundled assets; Propshaft replaces them once ActiveAdmin is gone.

@@ -88,7 +88,8 @@ class RecommendationsController < ApplicationController
     @recommendation = Recommendation.find_by(id: params[:recommendation_id])
     RecommendationMailer.with(recommendation: @recommendation).request_email.deliver_now
     respond_to do |format|
-      format.html { redirect_to admin_recommendation_path(@recommendation), notice: 'Request was sent!' }
+      # Recommendations are still served by ActiveAdmin; switch to admin_recommendation_path once ported.
+      format.html { redirect_to legacy_admin_recommendation_path(@recommendation), notice: 'Request was sent!' }
     end
   end
 

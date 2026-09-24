@@ -41,6 +41,8 @@
 #  fk_rails_...  (user_id => users.id)
 #
 class Enrollment < ApplicationRecord
+  include AdminCommentable
+
   class InvalidStatusTransition < StandardError; end
 
   STATUS_TRANSITIONS = {

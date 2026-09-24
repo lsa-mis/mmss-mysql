@@ -21,26 +21,42 @@ Rails.application.routes.draw do
   # resources :payments
   root to: 'static_pages#index'
 
-  devise_for :admins, ActiveAdmin::Devise.config
-  get '/admin/reports/all_complete_apps', to: 'admin/reports#all_complete_apps', as: :admin_reports_all_complete_apps
-  get '/admin/reports/registered_but_not_applied', to: 'admin/reports#registered_but_not_applied', as: :admin_reports_registered_but_not_applied
-  get '/admin/reports/enrolled_with_addresses', to: 'admin/reports#enrolled_with_addresses', as: :admin_reports_enrolled_with_addresses
-  get '/admin/reports/pending_course_assignments_with_students', to: 'admin/reports#pending_course_assignments_with_students', as: :admin_reports_pending_course_assignments_with_students
-  get '/admin/reports/accepted_course_assignments_with_students', to: 'admin/reports#accepted_course_assignments_with_students', as: :admin_reports_accepted_course_assignments_with_students
-  get '/admin/reports/enrolled_student_demographic_report', to: 'admin/reports#enrolled_student_demographic_report', as: :admin_reports_enrolled_student_demographic_report
-  get '/admin/reports/complete_apps_demographic_report', to: 'admin/reports#complete_apps_demographic_report', as: :admin_reports_complete_apps_demographic_report
-  get '/admin/reports/enrolled_events_per_session', to: 'admin/reports#events_per_session_for_enrolled', as: :admin_reports_enrolled_events_per_session
-  get '/admin/reports/complete_applications_with_course_preferences', to: 'admin/reports#complete_applications_with_course_preferences', as: :admin_reports_complete_applications_with_course_preferences
-  get '/admin/reports/waitlisted_applications_with_course_preferences', to: 'admin/reports#waitlisted_applications_with_course_preferences', as: :admin_reports_waitlisted_applications_with_course_preferences
-  get '/admin/reports/enrolled_with_sessions_and_courses', to: 'admin/reports#enrolled_with_sessions_and_courses', as: :admin_reports_enrolled_with_sessions_and_courses
-  get '/admin/reports/enrolled_with_sessions_and_tshirt', to: 'admin/reports#enrolled_with_sessions_and_tshirt', as: :admin_reports_enrolled_with_sessions_and_tshirt
-  get '/admin/reports/course_assignments', to: 'admin/reports#course_assignments', as: :admin_reports_course_assignments
-  get '/admin/reports/enrolled_with_covid_verification', to: 'admin/reports#enrolled_with_covid_verification', as: :admin_reports_enrolled_with_covid_verification
-  get '/admin/reports/enrolled_with_addresses_and_more', to: 'admin/reports#enrolled_with_addresses_and_more', as: :admin_reports_enrolled_with_addresses_and_more
-  get '/admin/reports/enrolled_for_more_than_one_session', to: 'admin/reports#enrolled_for_more_than_one_session', as: :admin_reports_enrolled_for_more_than_one_session
-  get '/admin/reports/dorm_by_gender_by_session', to: 'admin/reports#dorm_by_gender_by_session', as: :admin_reports_dorm_by_gender_by_session
-  get '/admin/reports/finaid_with_app_and_offer_status', to: 'admin/reports#finaid_with_app_and_offer_status', as: :admin_reports_finaid_with_app_and_offer_status
-  get '/admin/reports/offer_accepted_with_balance_due', to: 'admin/reports#offer_accepted_with_balance_due', as: :admin_reports_offer_accepted_with_balance_due
+  # Admin authentication (Devise `Admin` model) is served by the new admin at /admin/login etc.
+  # Route helper names (new_admin_session_path, destroy_admin_session_path) are unchanged.
+  devise_for :admins, path: 'admin',
+                      path_names: { sign_in: 'login', sign_out: 'logout' },
+                      controllers: { sessions: 'admins/sessions', passwords: 'admins/passwords', unlocks: 'admins/unlocks' }
+
+  # New plain-MVC admin. Resources are ported here from app/admin one menu group at a time.
+  namespace :admin do
+    root to: 'dashboard#index'
+
+    resources :applications do
+      collection { post :batch }
+    end
+
+    resources :comments, only: %i[index create destroy]
+
+    # Cutover aid: bookmarks and links to resources that are not ported yet keep working.
+    # Remove together with ActiveAdmin.
+    get '*path', to: redirect('/legacy_admin/%{path}'), format: false
+  end
+
+  # Legacy ActiveAdmin admin, mounted at /legacy_admin until every resource is ported (see
+  # config/initializers/active_admin.rb). Report routes are explicit ActiveAdmin page actions.
+  %w[
+    all_complete_apps registered_but_not_applied enrolled_with_addresses
+    pending_course_assignments_with_students accepted_course_assignments_with_students
+    enrolled_student_demographic_report complete_apps_demographic_report
+    complete_applications_with_course_preferences waitlisted_applications_with_course_preferences
+    enrolled_with_sessions_and_courses enrolled_with_sessions_and_tshirt course_assignments
+    enrolled_with_covid_verification enrolled_with_addresses_and_more enrolled_for_more_than_one_session
+    dorm_by_gender_by_session finaid_with_app_and_offer_status offer_accepted_with_balance_due
+  ].each do |report|
+    get "/legacy_admin/reports/#{report}", to: "legacy_admin/reports##{report}", as: :"legacy_admin_reports_#{report}"
+  end
+  get '/legacy_admin/reports/enrolled_events_per_session', to: 'legacy_admin/reports#events_per_session_for_enrolled',
+                                                           as: :legacy_admin_reports_enrolled_events_per_session
 
   ActiveAdmin.routes(self)
   # authenticated :admin do

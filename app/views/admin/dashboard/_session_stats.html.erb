@@ -1,0 +1,27 @@
+<%# locals: stats %>
+<%= admin_panel 'Session Stats', body_class: 'admin-card-body grid gap-4' do %>
+  <% if stats.empty? %>
+    <p class="text-sm text-slate-500">No active sessions.</p>
+  <% end %>
+  <% stats.each do |stat| %>
+    <div>
+      <h3 class="text-sm font-semibold text-slate-800"><%= stat[:session].description %></h3>
+      <dl class="mt-1 grid grid-cols-3 gap-2 text-center">
+        <% unless stat[:session].description == 'Any Session' %>
+          <div class="rounded-md bg-green-50 px-2 py-1.5">
+            <dt class="text-[11px] uppercase tracking-wide text-green-700">Enrolled</dt>
+            <dd class="text-lg font-semibold text-green-900"><%= stat[:enrolled] %></dd>
+          </div>
+          <div class="rounded-md bg-blue-50 px-2 py-1.5">
+            <dt class="text-[11px] uppercase tracking-wide text-blue-700">Assigned</dt>
+            <dd class="text-lg font-semibold text-blue-900"><%= stat[:assigned] %></dd>
+          </div>
+        <% end %>
+        <div class="rounded-md bg-slate-100 px-2 py-1.5">
+          <dt class="text-[11px] uppercase tracking-wide text-slate-600">Applied</dt>
+          <dd class="text-lg font-semibold text-slate-900"><%= stat[:applied] %></dd>
+        </div>
+      </dl>
+    </div>
+  <% end %>
+<% end %>

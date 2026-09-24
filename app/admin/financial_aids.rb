@@ -48,7 +48,7 @@ ActiveAdmin.register FinancialAid, as: "Financial Aid Request" do
     selectable_column
     actions
     column :id, sortable: :id do |f|
-      link_to f.id, admin_financial_aid_request_path(f)
+      link_to f.id, legacy_admin_financial_aid_request_path(f)
     end
     column 'Enrollment' do |e|
       e.enrollment

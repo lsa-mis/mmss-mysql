@@ -1,0 +1,15 @@
+<% content_for :title, 'Admin sign in' %>
+<h1 class="mb-4 text-lg font-semibold text-slate-900">Admin sign in</h1>
+
+<%= admin_form_with model: resource, scope: resource_name, url: session_path(resource_name), class: 'grid gap-4' do |f| %>
+  <%= f.input :email, as: :email, autofocus: true, autocomplete: 'email', required: true %>
+  <%= f.input :password, as: :password, autocomplete: 'current-password', required: true %>
+
+  <% if devise_mapping.rememberable? %>
+    <%= f.input :remember_me, as: :boolean %>
+  <% end %>
+
+  <%= f.button 'Sign in', class: 'admin-btn-primary w-full justify-center' %>
+<% end %>
+
+<%= render 'admins/shared/links' %>

@@ -1,0 +1,27 @@
+<% admin_page_title 'Dashboard', subtitle: (@active_camp ? "#{@active_camp.camp_year} camp" : 'No active camp') %>
+
+<% unless @active_camp %>
+  <%= admin_panel 'Notifications' do %>
+    <p class="text-sm text-slate-700">No active camps. <%= link_to 'Configure a camp', legacy_admin_camp_configurations_path, data: { turbo: false } %> to get started.</p>
+  <% end %>
+<% else %>
+  <div class="grid gap-5 xl:grid-cols-3">
+    <div class="grid gap-5 xl:col-span-2">
+      <%= render 'admin/dashboard/recent_applications', applications: @recent_applications, camp_year: @active_camp.camp_year %>
+      <%= render 'admin/dashboard/recent_payments', payments: @recent_payments, camp_year: @active_camp.camp_year %>
+      <%= render 'admin/dashboard/balance_due', balance_due: @balance_due %>
+      <%= render 'admin/dashboard/pending_financial_aids', financial_aids: @pending_financial_aids %>
+    </div>
+
+    <div class="grid gap-5 self-start">
+      <%= render 'admin/dashboard/session_stats', stats: @session_stats %>
+      <%= render 'admin/dashboard/camp_notes', notes: @camp_notes %>
+      <%= admin_panel 'Resources' do %>
+        <ul class="text-sm">
+          <li><%= link_to 'Admin Documentation', 'https://docs.google.com/document/d/17M9433ybPpvyXc_RwsnydfmSQsWN80Iwg2t0ACItoKo/edit?usp=sharing', target: '_blank', rel: 'noopener' %></li>
+          <li class="mt-1"><%= link_to 'Reports', legacy_admin_reports_path, data: { turbo: false } %></li>
+        </ul>
+      <% end %>
+    </div>
+  </div>
+<% end %>

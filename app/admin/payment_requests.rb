@@ -26,7 +26,7 @@ ActiveAdmin.register PaymentRequest do
     end
     column 'Matched payment' do |pr|
       if pr.payment_id?
-        link_to "Payment ##{pr.payment_id}", admin_payment_path(pr.payment)
+        link_to "Payment ##{pr.payment_id}", legacy_admin_payment_path(pr.payment)
       else
         status_tag('Unmatched', class: 'no')
       end
@@ -57,7 +57,7 @@ ActiveAdmin.register PaymentRequest do
       end
       row :payment do |pr|
         if pr.payment_id?
-          link_to "Payment ##{pr.payment_id}", admin_payment_path(pr.payment)
+          link_to "Payment ##{pr.payment_id}", legacy_admin_payment_path(pr.payment)
         else
           '—'
         end

@@ -7,30 +7,30 @@ ActiveAdmin.register_page 'Dashboard' do
     columns do
       if CampConfiguration.active.present?
         column do
-          panel link_to("Recent Applications for #{current_camp_year} Camp", admin_applications_path) do
+          panel link_to("Recent Applications for #{current_camp_year} Camp", legacy_admin_applications_path) do
             if Enrollment.current_camp_year_applications.any?
               ul do
                 Enrollment.current_camp_year_applications.order(created_at: :desc).limit(10).map do |enroll|
                   li link_to(enroll.applicant_detail.full_name + ', ' + enroll.user.email,
-                             admin_application_path(enroll))
+                             legacy_admin_application_path(enroll))
                 end
               end
             end
           end
 
-          panel link_to("Recent Payments for #{current_camp_year} Camp", admin_payments_path) do
+          panel link_to("Recent Payments for #{current_camp_year} Camp", legacy_admin_payments_path) do
             if Payment.current_camp_payments.any?
               ul do
                 Payment.current_camp_payments.order(created_at: :desc).limit(10).map do |payment|
                   li link_to(
-                    "#{payment.user.applicant_detail.full_name_and_email} - #{humanized_money_with_symbol(payment.total_amount.to_f / 100)}", admin_payment_path(payment.id)
+                    "#{payment.user.applicant_detail.full_name_and_email} - #{humanized_money_with_symbol(payment.total_amount.to_f / 100)}", legacy_admin_payment_path(payment.id)
                   )
                 end
               end
             end
           end
 
-          panel link_to("Offer Accepted with Balance Due", admin_reports_offer_accepted_with_balance_due_path) do
+          panel link_to("Offer Accepted with Balance Due", legacy_admin_reports_offer_accepted_with_balance_due_path) do
             offer_accepted_enrollments = Enrollment.current_camp_year_applications.where(application_status: 'offer accepted')
               .includes(:user, :applicant_detail)
               .order('applicant_details.lastname, applicant_details.firstname')
@@ -51,7 +51,7 @@ ActiveAdmin.register_page 'Dashboard' do
                   li do
                     link_to(
                       "#{applicant_detail.full_name} - DOB: #{birthdate_str} - Parent: #{applicant_detail.parentname} - Balance: #{humanized_money_with_symbol(balance_due / 100)}",
-                      admin_application_path(enroll)
+                      legacy_admin_application_path(enroll)
                     )
                   end
                 end
@@ -59,7 +59,7 @@ ActiveAdmin.register_page 'Dashboard' do
 
               if enrollments_with_balance.count > 20
                 div do
-                  text_node link_to("View full report (#{enrollments_with_balance.count} total)...", admin_reports_offer_accepted_with_balance_due_path)
+                  text_node link_to("View full report (#{enrollments_with_balance.count} total)...", legacy_admin_reports_offer_accepted_with_balance_due_path)
                 end
               end
             else
@@ -67,7 +67,7 @@ ActiveAdmin.register_page 'Dashboard' do
             end
           end
 
-          panel link_to('Financial Aid Requests', admin_financial_aid_requests_path) do
+          panel link_to('Financial Aid Requests', legacy_admin_financial_aid_requests_path) do
             div do
               render('/admin/pending_finaid_requests', model: 'dashboard')
             end

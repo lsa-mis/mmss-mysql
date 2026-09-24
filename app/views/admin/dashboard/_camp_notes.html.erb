@@ -1,0 +1,15 @@
+<%# locals: notes %>
+<%= admin_panel 'Active Camp Note', actions: link_to('Campnotes →', legacy_admin_campnotes_path, data: { turbo: false }) do %>
+  <% if notes.empty? %>
+    <p class="text-sm text-slate-500">No camp note is currently active.</p>
+  <% end %>
+  <% notes.each do |note| %>
+    <div class="<%= class_names('rounded-md border p-3 text-sm', note.notetype == 'notice' ? 'border-slate-200 bg-slate-50 text-slate-800' : 'border-red-200 bg-amber-50 text-slate-900') %>">
+      <div class="mb-1 flex items-center gap-2 text-xs text-slate-500">
+        <%= admin_status_badge(note.notetype) %>
+        <span><%= note.opendate.strftime('%a, %b %-d, %Y at %-l:%M %p') %> → <%= note.closedate.strftime('%a, %b %-d, %Y at %-l:%M %p') %></span>
+      </div>
+      <p class="admin-prose"><%= note.note %></p>
+    </div>
+  <% end %>
+<% end %>

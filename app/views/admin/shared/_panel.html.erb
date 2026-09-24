@@ -1,0 +1,16 @@
+<%# locals: title, actions, html_class, body_class, body %>
+<section class="<%= class_names('admin-card', html_class) %>">
+  <% if title || actions %>
+    <header class="admin-card-header">
+      <% if title %>
+        <h2 class="admin-card-title"><%= title %></h2>
+      <% end %>
+      <% if actions %>
+        <div class="flex flex-wrap items-center gap-2 text-sm"><%= actions %></div>
+      <% end %>
+    </header>
+  <% end %>
+  <div class="<%= body_class %>">
+    <%= body %>
+  </div>
+</section>

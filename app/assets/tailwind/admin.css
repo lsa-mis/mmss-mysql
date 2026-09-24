@@ -1,0 +1,219 @@
+/*
+ * Admin stylesheet (Tailwind 4). Built by `bin/rails tailwindcss:build:admin` into
+ * app/assets/builds/admin.css and linked only from the admin layouts, so the applicant
+ * stylesheet's global element rules never leak into the admin UI.
+ */
+@import "tailwindcss" source(none);
+@plugin "@tailwindcss/forms";
+
+/* Only admin templates and the Ruby helpers that emit admin markup are scanned for classes. */
+@source "../../views/admin";
+@source "../../views/admins";
+@source "../../views/layouts/admin.html.erb";
+@source "../../views/layouts/admin_auth.html.erb";
+@source "../../helpers/admin";
+@source "../../lib/admin";
+@source "../../controllers/admin";
+@source "../../javascript/controllers";
+
+@theme {
+  /* University of Michigan brand colours used for the shell and accents. */
+  --color-um-blue: #00274c;
+  --color-um-blue-light: #0d3b66;
+  --color-um-maize: #ffcf01;
+  --color-um-maize-dark: #d4a900;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+}
+
+@layer base {
+  html {
+    @apply h-full bg-slate-100 text-slate-800 antialiased;
+  }
+
+  body {
+    @apply min-h-full;
+  }
+
+  a {
+    @apply text-blue-700 hover:text-blue-900;
+  }
+}
+
+/*
+ * Reusable single-class pieces are `@utility` so other rules can `@apply` them
+ * (Tailwind 4 only allows @apply of built-in utilities and @utility definitions).
+ */
+@utility admin-btn {
+  @apply inline-flex items-center justify-center gap-1.5 rounded-md border px-3 py-1.5 text-sm font-medium shadow-xs
+    transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-um-maize focus-visible:ring-offset-2
+    disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+@utility admin-card {
+  @apply rounded-lg border border-slate-200 bg-white shadow-xs;
+}
+
+@utility admin-badge {
+  @apply inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap;
+}
+
+@layer components {
+  /* Buttons */
+  .admin-btn-primary {
+    @apply admin-btn border-um-blue bg-um-blue text-white hover:bg-um-blue-light hover:text-white;
+  }
+
+  .admin-btn-secondary {
+    @apply admin-btn border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-900;
+  }
+
+  .admin-btn-danger {
+    @apply admin-btn border-red-700 bg-red-700 text-white hover:bg-red-800 hover:text-white;
+  }
+
+  .admin-btn-sm {
+    @apply px-2 py-1 text-xs;
+  }
+
+  .admin-btn-link {
+    @apply inline-flex items-center gap-1 text-sm font-medium text-blue-700 hover:text-blue-900 hover:underline;
+  }
+
+  /* Cards / panels */
+  .admin-card-header {
+    @apply flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 px-4 py-3;
+  }
+
+  .admin-card-title {
+    @apply text-sm font-semibold tracking-wide text-slate-700 uppercase;
+  }
+
+  .admin-card-body {
+    @apply px-4 py-3;
+  }
+
+  /* Tables */
+  .admin-table {
+    @apply min-w-full divide-y divide-slate-200 text-sm;
+  }
+
+  .admin-table thead th {
+    @apply bg-slate-50 px-3 py-2 text-left text-xs font-semibold tracking-wide text-slate-600 uppercase whitespace-nowrap;
+  }
+
+  .admin-table tbody {
+    @apply divide-y divide-slate-100 bg-white;
+  }
+
+  .admin-table tbody tr:hover {
+    @apply bg-slate-50;
+  }
+
+  .admin-table tbody td {
+    @apply px-3 py-2 align-top text-slate-700;
+  }
+
+  /* Attribute lists (show pages) */
+  .admin-attributes {
+    @apply divide-y divide-slate-100;
+  }
+
+  .admin-attributes > div {
+    @apply grid grid-cols-1 gap-1 px-4 py-2.5 sm:grid-cols-3 sm:gap-4;
+  }
+
+  .admin-attributes dt {
+    @apply text-sm font-medium text-slate-500;
+  }
+
+  .admin-attributes dd {
+    @apply text-sm text-slate-800 sm:col-span-2 wrap-break-word;
+  }
+
+  /* Forms */
+  .admin-label {
+    @apply block text-sm font-medium text-slate-700;
+  }
+
+  .admin-input {
+    @apply mt-1 block w-full rounded-md border-slate-300 text-sm shadow-xs
+      focus:border-um-blue focus:ring-um-blue disabled:bg-slate-100 disabled:text-slate-500;
+  }
+
+  .admin-input-error {
+    @apply border-red-500 focus:border-red-500 focus:ring-red-500;
+  }
+
+  .admin-checkbox {
+    @apply h-4 w-4 rounded border-slate-300 text-um-blue focus:ring-um-blue;
+  }
+
+  .admin-hint {
+    @apply mt-1 text-xs text-slate-500;
+  }
+
+  .admin-error {
+    @apply mt-1 text-xs text-red-600;
+  }
+
+  .admin-fieldset {
+    @apply admin-card;
+  }
+
+  .admin-fieldset > legend {
+    @apply sr-only;
+  }
+
+  /* Badges */
+  .admin-badge-gray {
+    @apply admin-badge bg-slate-100 text-slate-700;
+  }
+
+  .admin-badge-green {
+    @apply admin-badge bg-green-100 text-green-800;
+  }
+
+  .admin-badge-yellow {
+    @apply admin-badge bg-amber-100 text-amber-800;
+  }
+
+  .admin-badge-red {
+    @apply admin-badge bg-red-100 text-red-800;
+  }
+
+  .admin-badge-blue {
+    @apply admin-badge bg-blue-100 text-blue-800;
+  }
+
+  /* Sidebar navigation */
+  .admin-nav-group {
+    @apply px-3 pt-4 pb-1 text-[11px] font-semibold tracking-wider text-slate-400 uppercase;
+  }
+
+  .admin-nav-link {
+    @apply flex items-center gap-2 rounded-md px-3 py-1.5 text-sm text-slate-200 hover:bg-white/10 hover:text-white;
+  }
+
+  .admin-nav-link-active {
+    @apply bg-white/15 font-medium text-white;
+  }
+
+  /* Scope tabs */
+  .admin-tab {
+    @apply inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100 hover:text-slate-900;
+  }
+
+  .admin-tab-active {
+    @apply bg-um-blue text-white hover:bg-um-blue hover:text-white;
+  }
+
+  .admin-tab-count {
+    @apply rounded-full bg-black/10 px-1.5 text-xs;
+  }
+
+  /* Prose-ish content blocks (letters, notes) */
+  .admin-prose {
+    @apply text-sm leading-6 text-slate-700 whitespace-pre-line;
+  }
+}

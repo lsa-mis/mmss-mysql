@@ -18,11 +18,11 @@ ActiveAdmin.register Demographic do
     column :updated_at
     actions defaults: false do |demographic|
       if demographic.protected?
-        item 'View', admin_demographic_path(demographic), class: 'member_link'
+        item 'View', legacy_admin_demographic_path(demographic), class: 'member_link'
       else
-        item 'View', admin_demographic_path(demographic), class: 'member_link'
-        item 'Edit', edit_admin_demographic_path(demographic), class: 'member_link'
-        item 'Delete', admin_demographic_path(demographic),
+        item 'View', legacy_admin_demographic_path(demographic), class: 'member_link'
+        item 'Edit', edit_legacy_admin_demographic_path(demographic), class: 'member_link'
+        item 'Delete', legacy_admin_demographic_path(demographic),
              method: :delete,
              class: 'member_link',
              data: { confirm: 'Are you sure?' }
@@ -60,7 +60,7 @@ ActiveAdmin.register Demographic do
       # Prevent updates to protected records
       if resource.protected?
         flash[:error] = 'Cannot modify protected demographic records'
-        redirect_to admin_demographic_path(resource)
+        redirect_to legacy_admin_demographic_path(resource)
       else
         super
       end
@@ -70,7 +70,7 @@ ActiveAdmin.register Demographic do
       # Prevent deletion of protected records
       if resource.protected?
         flash[:error] = 'Cannot delete protected demographic records'
-        redirect_to admin_demographic_path(resource)
+        redirect_to legacy_admin_demographic_path(resource)
       else
         super
       end
