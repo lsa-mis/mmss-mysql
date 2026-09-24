@@ -65,7 +65,7 @@ ActiveAdmin.register Recommendation do
   show do
     attributes_table do
       row "mail link", :id do |recid|
-        link_to 'Resend request', send_request_email_path(recommendation_id: recid), { class: "btn" }
+        link_to 'Resend request', send_request_email_admin_recommendation_path(recid), { class: "btn", method: :post }
       end
       row :id
       row  :enrollment_id do |ei|

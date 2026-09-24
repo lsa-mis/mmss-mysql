@@ -43,6 +43,12 @@ Rails.application.routes.draw do
       end
     end
 
+    # Recommendations are ported in a later PR; only the admin-only "resend request" action lives here
+    # (it used to be a public GET on RecommendationsController).
+    resources :recommendations, only: [] do
+      member { post :send_request_email }
+    end
+
     resources :comments, only: %i[index create destroy]
 
     # Cutover aid: bookmarks and links to resources that are not ported yet keep working.
@@ -156,7 +162,6 @@ Rails.application.routes.draw do
   get 'recupload_success', to: 'recuploads#success'
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
 
-  get 'send_request_email', to: 'recommendations#send_request_email', as: :send_request_email
 
 
 end
