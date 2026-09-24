@@ -53,7 +53,7 @@ RSpec.describe FinancialAid, type: :model do
     end
 
     it 'refuses negative, non-numeric, non-finite and over-precise input' do
-      ['-50', 'abc', 'Infinity', 'NaN', '1e3', '12.345'].each do |bad|
+      ['-50', 'abc', 'Infinity', 'NaN', '1e3', '12.345', '1,2,3', '12,34.5'].each do |bad|
         aid = build(:financial_aid, amount: bad)
         expect(aid).not_to be_valid, "#{bad.inspect} was accepted"
         expect(aid.errors[:amount].size).to eq(1), "#{bad.inspect}: #{aid.errors[:amount].inspect}"
