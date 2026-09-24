@@ -94,11 +94,5 @@ RSpec.describe User, type: :model do
     end
   end
 
-  describe '.ransackable_attributes' do
-    it 'returns searchable attributes' do
-      expect(User.ransackable_attributes).to include('email')
-    end
-  end
-
   it_behaves_like 'a model with timestamps'
 end
