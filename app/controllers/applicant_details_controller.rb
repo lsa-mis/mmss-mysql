@@ -1,19 +1,12 @@
 # frozen_string_literal: true
 
 ##
-# Controller handling applicant details management.
-# Provides CRUD operations for applicant information and requires authentication.
+# Applicant-facing applicant details (one record per account). The admin listing lives in
+# Admin::ApplicantDetailsController; applicant details are never destroyed.
 class ApplicantDetailsController < ApplicationController
   devise_group :logged_in, contains: %i[user admin]
   before_action :authenticate_logged_in!
-  before_action :authenticate_admin!, only: %i[index destroy]
-  before_action :set_applicant_detail, only: %i[show edit update destroy]
-
-  # GET /applicant_details
-  # GET /applicant_details.json
-  def index
-    @applicant_details = ApplicantDetail.all
-  end
+  before_action :set_applicant_detail, only: %i[show edit update]
 
   # GET /applicant_details/1
   # GET /applicant_details/1.json
@@ -68,16 +61,6 @@ class ApplicantDetailsController < ApplicationController
         format.html { render :edit, status: :unprocessable_content }
         format.json { render json: @applicant_detail.errors, status: :unprocessable_content }
       end
-    end
-  end
-
-  # DELETE /applicant_details/1
-  # DELETE /applicant_details/1.json
-  def destroy
-    @applicant_detail.destroy
-    respond_to do |format|
-      format.html { redirect_to applicant_details_url, notice: 'Applicant detail was successfully destroyed.', status: :see_other }
-      format.json { head :no_content }
     end
   end
 

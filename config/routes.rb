@@ -125,17 +125,19 @@ Rails.application.routes.draw do
   devise_for :users, controllers: {
     registrations: 'users/registrations'
   }
-  resources :applicant_details
+  # Applicant-facing; the admin listing lives under /admin/applicant_details (no destroy anywhere).
+  resources :applicant_details, except: %i[index destroy]
 
   resources :enrollments do
     resources :travels
   end
 
+  # Applicant-facing request form; admin listing/deletion lives under /admin/financial_aid_requests.
   resources :enrollments do
-      resources :financial_aids
+      resources :financial_aids, except: %i[index destroy]
   end
 
-  resources :financial_aids
+  resources :financial_aids, except: %i[index destroy]
 
   resources :enrollments do
     resources :recommendations
@@ -174,7 +176,6 @@ Rails.application.routes.draw do
   get 'static_pages/contact'
   get 'static_pages/privacy'
 
-  get 'payments', to: 'payments#index'
   get 'payment_receipt', to: 'payments#payment_receipt'
   post 'payment_receipt', to: 'payments#payment_receipt'
   get 'payment_show', to: 'payments#payment_show', as: 'all_payments'
