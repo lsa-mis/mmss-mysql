@@ -1,3 +1,4 @@
-
-//= link application.css
-//= link U-M_Logo.svg
+//= link_tree ../images
+//= link_tree ../builds
+//= link_tree ../../javascript .js
+//= link_tree ../../../vendor/javascript .js

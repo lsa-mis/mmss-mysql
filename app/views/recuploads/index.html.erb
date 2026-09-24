@@ -22,7 +22,7 @@
         <td><%= recupload.recommendation_id %></td>
         <td><%= link_to 'Show', recupload %></td>
         <td><%= link_to 'Edit', edit_recupload_path(recupload) %></td>
-        <td><%= link_to 'Destroy', recupload, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td><%= link_to 'Destroy', recupload, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   </tbody>

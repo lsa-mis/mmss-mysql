@@ -28,7 +28,7 @@
         <td><%= camp_configuration.active %></td>
         <td><%= link_to 'Show', camp_configuration %></td>
         <td><%= link_to 'Edit', edit_camp_configuration_path(camp_configuration) %></td>
-        <td><%= link_to 'Destroy', camp_configuration, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td><%= link_to 'Destroy', camp_configuration, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   </tbody>

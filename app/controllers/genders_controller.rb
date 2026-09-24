@@ -31,10 +31,10 @@ class GendersController < ApplicationController
 
     respond_to do |format|
       if @gender.save
-        format.html { redirect_to @gender, notice: 'Gender was successfully created.' }
+        format.html { redirect_to @gender, notice: 'Gender was successfully created.', status: :see_other }
         format.json { render :show, status: :created, location: @gender }
       else
-        format.html { render :new }
+        format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @gender.errors, status: :unprocessable_entity }
       end
     end
@@ -45,10 +45,10 @@ class GendersController < ApplicationController
   def update
     respond_to do |format|
       if @gender.update(gender_params)
-        format.html { redirect_to @gender, notice: 'Gender was successfully updated.' }
+        format.html { redirect_to @gender, notice: 'Gender was successfully updated.', status: :see_other }
         format.json { render :show, status: :ok, location: @gender }
       else
-        format.html { render :edit }
+        format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @gender.errors, status: :unprocessable_entity }
       end
     end
@@ -59,7 +59,7 @@ class GendersController < ApplicationController
   def destroy
     @gender.destroy
     respond_to do |format|
-      format.html { redirect_to genders_url, notice: 'Gender was successfully destroyed.' }
+      format.html { redirect_to genders_url, notice: 'Gender was successfully destroyed.', status: :see_other }
       format.json { head :no_content }
     end
   end

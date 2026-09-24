@@ -13,7 +13,7 @@ Rails.application.configure do
   config.consider_all_requests_local = true
 
   # Enable mailer previews
-  config.action_mailer.preview_path = "#{Rails.root}/test/mailers/previews"
+  config.action_mailer.preview_paths = ["#{Rails.root}/test/mailers/previews"]
   config.action_mailer.show_previews = true
 
   # Enable/disable caching. By default caching is disabled.

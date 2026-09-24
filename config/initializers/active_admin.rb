@@ -1,6 +1,7 @@
 ActiveAdmin.setup do |config|
-  config.use_webpacker = true
-  # rails g active_admin:webpacker
+  # ActiveAdmin serves its own jQuery/Sprockets bundle (vendor/assets/*/active_admin.*);
+  # the rest of the app uses importmap + Tailwind (see config/importmap.rb).
+  config.use_webpacker = false
 
   
   # == Site Title

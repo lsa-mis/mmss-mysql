@@ -3,8 +3,8 @@ name: CI
 on:
   push:
     branches: [staging, main]
+  # Any base branch, so stacked PRs (targeting another feature branch) get a check too.
   pull_request:
-    branches: [staging, main]
   workflow_dispatch:
 
 concurrency:
@@ -16,9 +16,6 @@ permissions:
 
 env:
   RAILS_ENV: test
-  NODE_ENV: test
-  # webpack 4 needs the legacy OpenSSL provider on Node >= 17 (see bin/webpack).
-  NODE_OPTIONS: --openssl-legacy-provider
   # Merged over the `test` entry in config/database.yml; points at the service container.
   DATABASE_URL: mysql2://root:root@127.0.0.1:3306/mmss-mysql_test
   # Rails only requires the default + test groups under RAILS_ENV=test.
@@ -58,32 +55,10 @@ jobs:
           # Reads .ruby-version (3.4.9); installs and caches the bundle.
           bundler-cache: true
 
-      - name: Set up Node
-        uses: actions/setup-node@v6
-        with:
-          node-version-file: .tool-versions
-          cache: yarn
-
-      - name: Install JavaScript dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Cache compiled webpack packs
-        uses: actions/cache@v5
-        with:
-          path: |
-            public/packs-test
-            tmp/cache/webpacker
-          # .tool-versions (Node version) is part of the restore prefix too: Webpacker's
-          # own staleness digest ignores the Node version, so a Node bump must never
-          # restore packs built by the previous Node.
-          key: packs-test-${{ runner.os }}-${{ hashFiles('.tool-versions') }}-${{ hashFiles('yarn.lock', 'package.json', 'config/webpacker.yml', 'config/webpack/**', 'babel.config.js', 'postcss.config.js', 'tailwind.config.js', '.browserslistrc', 'app/javascript/**') }}
-          restore-keys: |
-            packs-test-${{ runner.os }}-${{ hashFiles('.tool-versions') }}-
-
-      - name: Compile webpack packs
-        # Request specs render layouts through Webpacker, so the test manifest
-        # must exist before RSpec runs. Webpacker skips this when the cache is fresh.
-        run: bin/rails webpacker:compile
+      - name: Build Tailwind CSS
+        # Request specs render the layouts, which link app/assets/builds/tailwind.css.
+        # tailwindcss-rails compiles with the tailwindcss-ruby standalone binary; no Node needed.
+        run: bin/rails tailwindcss:build
 
       - name: Set up database
         run: bin/rails db:create db:schema:load

@@ -70,7 +70,7 @@
         <td><%= applicant_detail.parentemail %></td>
         <td><%= link_to 'Show', applicant_detail %></td>
         <td><%= link_to 'Edit', edit_applicant_detail_path(applicant_detail) %></td>
-        <td><%= link_to 'Destroy', applicant_detail, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td><%= link_to 'Destroy', applicant_detail, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   </tbody>

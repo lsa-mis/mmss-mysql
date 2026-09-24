@@ -44,7 +44,7 @@
         <td><%= recommendation.date_submitted %></td>
         <td><%= link_to 'Show', enrollment_recommendation_path(@enrollment, recommendation) %></td>
         <td><%= link_to 'Edit', edit_enrollment_recommendation_path(@enrollment, recommendation) %></td>
-        <td><%= link_to 'Destroy', enrollment_recommendation_path(@enrollment, recommendation), method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td><%= link_to 'Destroy', enrollment_recommendation_path(@enrollment, recommendation), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   </tbody>

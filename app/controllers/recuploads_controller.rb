@@ -38,14 +38,14 @@ class RecuploadsController < InheritedResources::Base
 
     respond_to do |format|
       if @recupload.save
-        format.html { redirect_to recupload_success_path, notice: 'Recommendation was successfully uploaded.' }
+        format.html { redirect_to recupload_success_path, notice: 'Recommendation was successfully uploaded.', status: :see_other }
         format.json { render :show, status: :created, location: @recupload }
         RecuploadMailer.with(recupload: @recupload).received_email.deliver_now
         RecuploadMailer.with(recupload: @recupload).applicant_received_email.deliver_now
       else
         @student = ApplicantDetail.find(params[:id]).full_name if params[:id]
         @recommendation = Recommendation.find(@recupload.recommendation_id) if @recupload.recommendation_id
-        format.html { render :new }
+        format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @recupload.errors, status: :unprocessable_entity }
       end
     end
@@ -57,7 +57,7 @@ class RecuploadsController < InheritedResources::Base
   def destroy
     @recupload.destroy
     respond_to do |format|
-      format.html { redirect_to recuploads_url, notice: 'Recommendation was successfully destroyed.' }
+      format.html { redirect_to recuploads_url, notice: 'Recommendation was successfully destroyed.', status: :see_other }
       format.json { head :no_content }
     end
   end

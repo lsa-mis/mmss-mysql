@@ -18,6 +18,11 @@ module Mmss
     # Maintenance page driven by tmp/maintenance.yml (cap maintenance:start/stop).
     config.middleware.use MaintenanceMode
 
+    # sassc-rails would otherwise register libsass as the Sprockets CSS compressor,
+    # and libsass cannot parse the modern CSS emitted by Tailwind 4 (range media
+    # queries, nesting). The Tailwind build is already minified outside development.
+    config.assets.css_compressor = nil
+
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration can go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded after loading

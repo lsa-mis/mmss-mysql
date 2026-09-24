@@ -17,12 +17,17 @@ gem 'mysql2', '~> 0.5.6'
 gem 'ostruct', '~> 0.5.5'
 gem 'puma', '5.6.9'
 gem 'rails', '~> 7.2'
+# Sprockets + sassc remain only for ActiveAdmin's bundled assets; Propshaft replaces them once ActiveAdmin is gone.
 gem 'sass-rails', '~> 6.0'
 gem 'sd_notify'
 gem 'skylight'
-gem 'turbolinks', '~> 5.2', '>= 5.2.1'
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
-gem 'webpacker', '~> 5.4', '>= 5.4.2'
+
+# Node-free front end: import maps for JS, Hotwire (Turbo Drive + Stimulus), Tailwind 4 via the standalone CLI.
+gem 'importmap-rails', '~> 2.2'
+gem 'stimulus-rails', '~> 1.3'
+gem 'tailwindcss-rails', '~> 4.4'
+gem 'turbo-rails', '~> 2.0'
 
 gem 'base64', require: false
 # Bundled gem on Ruby 3.4+; app/admin/reports.rb generates CSV directly.

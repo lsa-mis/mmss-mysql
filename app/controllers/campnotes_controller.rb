@@ -31,10 +31,10 @@ class CampnotesController < ApplicationController
 
     respond_to do |format|
       if @campnote.save
-        format.html { redirect_to @campnote, notice: 'Campnote was successfully created.' }
+        format.html { redirect_to @campnote, notice: 'Campnote was successfully created.', status: :see_other }
         format.json { render :show, status: :created, location: @campnote }
       else
-        format.html { render :new }
+        format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @campnote.errors, status: :unprocessable_entity }
       end
     end
@@ -45,10 +45,10 @@ class CampnotesController < ApplicationController
   def update
     respond_to do |format|
       if @campnote.update(campnote_params)
-        format.html { redirect_to @campnote, notice: 'Campnote was successfully updated.' }
+        format.html { redirect_to @campnote, notice: 'Campnote was successfully updated.', status: :see_other }
         format.json { render :show, status: :ok, location: @campnote }
       else
-        format.html { render :edit }
+        format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @campnote.errors, status: :unprocessable_entity }
       end
     end
@@ -59,7 +59,7 @@ class CampnotesController < ApplicationController
   def destroy
     @campnote.destroy
     respond_to do |format|
-      format.html { redirect_to campnotes_url, notice: 'Campnote was successfully destroyed.' }
+      format.html { redirect_to campnotes_url, notice: 'Campnote was successfully destroyed.', status: :see_other }
       format.json { head :no_content }
     end
   end

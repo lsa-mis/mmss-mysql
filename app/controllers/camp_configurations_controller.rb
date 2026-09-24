@@ -31,10 +31,10 @@ class CampConfigurationsController < ApplicationController
 
     respond_to do |format|
       if @camp_configuration.save
-        format.html { redirect_to @camp_configuration, notice: 'Camp configuration was successfully created.' }
+        format.html { redirect_to @camp_configuration, notice: 'Camp configuration was successfully created.', status: :see_other }
         format.json { render :show, status: :created, location: @camp_configuration }
       else
-        format.html { render :new }
+        format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @camp_configuration.errors, status: :unprocessable_entity }
       end
     end
@@ -45,10 +45,10 @@ class CampConfigurationsController < ApplicationController
   def update
     respond_to do |format|
       if @camp_configuration.update(camp_configuration_params)
-        format.html { redirect_to @camp_configuration, notice: 'Camp configuration was successfully updated.' }
+        format.html { redirect_to @camp_configuration, notice: 'Camp configuration was successfully updated.', status: :see_other }
         format.json { render :show, status: :ok, location: @camp_configuration }
       else
-        format.html { render :edit }
+        format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @camp_configuration.errors, status: :unprocessable_entity }
       end
     end
@@ -59,7 +59,7 @@ class CampConfigurationsController < ApplicationController
   def destroy
     @camp_configuration.destroy
     respond_to do |format|
-      format.html { redirect_to camp_configurations_url, notice: 'Camp configuration was successfully destroyed.' }
+      format.html { redirect_to camp_configurations_url, notice: 'Camp configuration was successfully destroyed.', status: :see_other }
       format.json { head :no_content }
     end
   end

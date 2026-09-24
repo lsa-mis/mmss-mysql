@@ -1,4 +1,4 @@
-<%= form_with(model: recupload, local: true, data: { controller: "required-stars" }) do |form| %>
+<%= form_with(model: recupload, data: { controller: "required-stars submit-toggle" }) do |form| %>
   <%= hidden_field_tag :id, params[:id] if params[:id] %>
   <%= hidden_field_tag :hash, params[:hash] if params[:hash] %>
   <%= hidden_field_tag :yr, params[:yr] if params[:yr] %>
@@ -36,7 +36,7 @@
 
   <div class="field">
     <%= form.label :letter %>
-    <%= form.text_area :letter %>
+    <%= form.text_area :letter, data: { submit_toggle_target: "field", action: "input->submit-toggle#update change->submit-toggle#update" } %>
   </div>
 
   <div class="display-box mt-4">
@@ -46,8 +46,9 @@
       <%= form.file_field :recletter,
           data: {
             controller: "filesize-check",
-            action: "filesize-check#validateFileSize",
-            filesize_check_max_file_size_value: 20 * 1024 * 1024
+            action: "filesize-check#validateFileSize submit-toggle#update",
+            filesize_check_max_file_size_value: 20 * 1024 * 1024,
+            submit_toggle_target: "field"
           } %>
     </div>
     <p class="direction_notes">Maximum size is 20Mb and valid file formats are PDF, JPG, PNG</p>
@@ -61,8 +62,6 @@
   </div>
 
   <div class="actions">
-    <%= form.submit "Create Recommendation" %>
+    <%= form.submit "Create Recommendation", data: { submit_toggle_target: "submit" } %>
   </div>
 <% end %>
-
-<%= javascript_pack_tag 'rec_file_select' %>

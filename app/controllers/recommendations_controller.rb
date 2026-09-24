@@ -45,7 +45,7 @@ class RecommendationsController < ApplicationController
 
     respond_to do |format|
       if @recommendation.save
-        format.html { redirect_to root_path, notice: 'Recommendation was successfully created and the email was sent.' }
+        format.html { redirect_to root_path, notice: 'Recommendation was successfully created and the email was sent.', status: :see_other }
         format.json { render :show, status: :created, location: @recommendation }
         RecommendationMailer.with(recommendation: @recommendation).request_email.deliver_now
         unless @current_enrollment.application_fee_required
@@ -53,7 +53,7 @@ class RecommendationsController < ApplicationController
           @current_enrollment.transition_application_status!('submitted')
         end
       else
-        format.html { render :new }
+        format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @recommendation.errors, status: :unprocessable_entity }
       end
     end
@@ -64,10 +64,10 @@ class RecommendationsController < ApplicationController
   def update
     respond_to do |format|
       if @recommendation.update(recommendation_params)
-        format.html { redirect_to @recommendation, notice: 'Recommendation was successfully updated.' }
+        format.html { redirect_to @recommendation, notice: 'Recommendation was successfully updated.', status: :see_other }
         format.json { render :show, status: :ok, location: @recommendation }
       else
-        format.html { render :edit }
+        format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @recommendation.errors, status: :unprocessable_entity }
       end
     end
@@ -79,7 +79,7 @@ class RecommendationsController < ApplicationController
     @enrollment = Enrollment.find_by(id: params[:enrollment_id])
     @recommendation.destroy
     respond_to do |format|
-      format.html { redirect_to enrollment_recommendations_url(@enrollment), notice: 'Recommendation was successfully destroyed.' }
+      format.html { redirect_to enrollment_recommendations_url(@enrollment), notice: 'Recommendation was successfully destroyed.', status: :see_other }
       format.json { head :no_content }
     end
   end
