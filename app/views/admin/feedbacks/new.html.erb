@@ -1,0 +1,6 @@
+<% admin_page_title 'New Feedback' %>
+<% admin_page_actions do %>
+  <%= link_to 'Back to feedbacks', admin_feedbacks_path, class: 'admin-btn-secondary' %>
+<% end %>
+
+<%= render 'admin/feedbacks/form', feedback: @feedback %>

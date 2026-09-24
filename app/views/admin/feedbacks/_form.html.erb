@@ -1,0 +1,16 @@
+<%# locals: feedback %>
+<%= admin_form_with model: feedback,
+                    url: (feedback.persisted? ? admin_feedback_path(feedback) : admin_feedbacks_path),
+                    class: 'grid gap-5 max-w-2xl' do |f| %>
+  <%= f.errors_summary %>
+
+  <%= f.fieldset 'Feedback' do %>
+    <%= f.input :user_id, as: :select, label: 'User', include_blank: 'Select a user', required: true,
+                          collection: User.order(:email).pluck(:email, :id) %>
+    <%= f.input :genre, as: :select, required: true, collection: Feedback::GENRES.map { |value, label| [label, value] } %>
+    <%= f.input :message, as: :textarea, rows: 4, required: true, maxlength: Feedback::MESSAGE_MAX_LENGTH,
+                          hint: "Up to #{Feedback::MESSAGE_MAX_LENGTH} characters." %>
+  <% end %>
+
+  <%= f.actions cancel: (feedback.persisted? ? admin_feedback_path(feedback) : admin_feedbacks_path) %>
+<% end %>

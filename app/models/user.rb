@@ -38,8 +38,4 @@ class User < ApplicationRecord
   def display_name
     email # or whatever column you want
   end
-
-  def self.ransackable_attributes(auth_object = nil)
-    %w[email]
-  end
 end

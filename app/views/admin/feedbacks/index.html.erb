@@ -1,0 +1,32 @@
+<% admin_page_title 'Feedbacks', subtitle: "#{number_with_delimiter(@pagy.count)} #{'feedback'.pluralize(@pagy.count)}" %>
+<% admin_page_actions do %>
+  <%= admin_csv_link %>
+  <%= link_to 'New Feedback', new_admin_feedback_path, class: 'admin-btn-primary' %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-4">
+  <div class="xl:col-span-3">
+    <%= admin_table @feedbacks, pagy: @pagy,
+                    batch_actions: Admin::FeedbacksController::BATCH_ACTIONS, batch_url: batch_admin_feedbacks_path,
+                    actions: ->(feedback) { [admin_feedback_path(feedback), edit_admin_feedback_path(feedback), admin_feedback_path(feedback)] } do |t| %>
+      <% t.column :id, sort: true do |feedback| %>
+        <%= link_to feedback.id, admin_feedback_path(feedback), class: 'font-medium' %>
+      <% end %>
+      <% t.column :genre, sort: true do |feedback| %>
+        <%= admin_status_badge(feedback.genre_label) %>
+      <% end %>
+      <% t.column :message, sort: true do |feedback| %>
+        <span class="block max-w-md truncate" title="<%= feedback.message %>"><%= feedback.message %></span>
+      <% end %>
+      <% t.column 'User', sort: 'user' do |feedback| %>
+        <%= admin_resource_link(feedback.user) %>
+      <% end %>
+      <% t.column :created_at, sort: true %>
+      <% t.column :updated_at, sort: true %>
+    <% end %>
+  </div>
+
+  <div class="xl:col-span-1">
+    <%= admin_filter_form @filter, url: admin_feedbacks_path %>
+  </div>
+</div>

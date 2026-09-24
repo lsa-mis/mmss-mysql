@@ -1,0 +1,40 @@
+<% admin_page_title "Admin ##{@admin.id}", subtitle: @admin.email %>
+<% admin_page_actions do %>
+  <% if @admin.access_locked? %>
+    <%= button_to 'Unlock account', unlock_admin_admin_path(@admin), method: :post, class: 'admin-btn-secondary',
+                  form: { data: { turbo_confirm: 'Unlock this admin account?' } } %>
+  <% end %>
+  <%= link_to 'Edit', edit_admin_admin_path(@admin), class: 'admin-btn-primary' %>
+  <% unless @admin == current_admin %>
+    <%= button_to 'Delete', admin_admin_path(@admin), method: :delete, class: 'admin-btn-danger',
+                  form: { data: { turbo_confirm: 'Delete this admin account? This cannot be undone.' } } %>
+  <% end %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-3">
+  <div class="grid gap-5 xl:col-span-2">
+    <%= admin_panel 'Admin', body_class: '' do %>
+      <%= admin_attributes @admin do |a| %>
+        <% a.row :id, :email %>
+        <% a.row 'Account status' do |admin| %>
+          <% if admin.access_locked? %>
+            <span class="admin-badge-red">locked</span>
+            <span class="ml-2 text-sm text-slate-500">since <%= admin_datetime(admin.locked_at) %></span>
+          <% else %>
+            <span class="admin-badge-green">active</span>
+          <% end %>
+        <% end %>
+        <% a.row :failed_attempts %>
+        <% a.row :created_at, :updated_at %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="grid gap-5 self-start">
+    <%= admin_panel 'Sign-in activity', body_class: '' do %>
+      <%= admin_attributes @admin do |a| %>
+        <% a.row :sign_in_count, :current_sign_in_at, :current_sign_in_ip, :last_sign_in_at, :last_sign_in_ip, :remember_created_at %>
+      <% end %>
+    <% end %>
+  </div>
+</div>
