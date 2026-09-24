@@ -55,8 +55,13 @@ class FinancialAidsController < ApplicationController
   end
 
   private
+    # Every action works on the applicant's current application; without one (no application
+    # this camp year, or an admin-only session) there is nothing to request aid for.
     def set_current_enrollment
-      @current_enrollment = current_user.enrollments.current_camp_year_applications.last
+      @current_enrollment = current_user&.enrollments&.current_camp_year_applications&.last
+      return if @current_enrollment
+
+      redirect_to root_path, alert: 'No current application found for this camp year.', status: :see_other
     end
 
     # Use callbacks to share common setup or constraints between actions.

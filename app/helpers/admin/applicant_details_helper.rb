@@ -20,7 +20,7 @@ module Admin::ApplicantDetailsHelper
   # Users who can still get an applicant detail (no record yet), plus the record's own user.
   def admin_applicant_detail_user_options(applicant_detail)
     options = User.where.missing(:applicant_detail).order(:email).pluck(:email, :id)
-    if applicant_detail.user_id && options.none? { |_email, id| id == applicant_detail.user_id }
+    if applicant_detail.user && options.none? { |_email, id| id == applicant_detail.user_id }
       options << [applicant_detail.user.email, applicant_detail.user_id]
     end
     options

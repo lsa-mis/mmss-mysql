@@ -212,6 +212,13 @@ RSpec.describe 'Admin applicant details', type: :request do
       expect(response.body).to include('Applicant detail was successfully created.')
     end
 
+    it 're-renders the form when the user id does not exist' do
+      post admin_applicant_details_path, params: { applicant_detail: valid_params.merge(user_id: 999_999) }
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include('User must exist')
+    end
+
     it 're-renders the form with errors when invalid' do
       post admin_applicant_details_path, params: { applicant_detail: valid_params.merge(phone: 'nope') }
 

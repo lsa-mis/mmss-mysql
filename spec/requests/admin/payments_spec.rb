@@ -219,6 +219,13 @@ RSpec.describe 'Admin payments', type: :request do
       expect(created.timestamp).to be_nil
     end
 
+    it 're-renders the form when the applicant id does not exist' do
+      post admin_payments_path, params: { payment: valid_params.merge(user_id: 999_999) }
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include('User must exist')
+    end
+
     it 're-renders the form with errors when invalid' do
       post admin_payments_path, params: { payment: valid_params.merge(transaction_id: payment.transaction_id) }
 
