@@ -83,8 +83,11 @@ class RecommendationsController < ApplicationController
     end
   end
 
+  # Nested routes constrain the lookup to the routed (owned) enrollment; top-level routes to any
+  # of the user's enrollments.
   def set_recommendation
-    @recommendation = Recommendation.where(enrollment_id: current_user.enrollments.select(:id)).find(params[:id])
+    enrollment_ids = params[:enrollment_id].present? ? owned_enrollment.id : current_user.enrollments.select(:id)
+    @recommendation = Recommendation.where(enrollment_id: enrollment_ids).find(params[:id])
   end
 
   # enrollment_id comes from the route (owned by current_user), never from the form.

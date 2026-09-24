@@ -42,8 +42,8 @@ class PaymentRequest < ApplicationRecord
   scope :unmatched, -> { where(payment_id: nil) }
   scope :for_camp_year, ->(year) { where(camp_year: year) }
 
-  # Epoch milliseconds sent to Nelnet, as a local time (nil when missing).
+  # Epoch milliseconds sent to Nelnet, as a local time with the millisecond part kept (nil when missing).
   def requested_at
-    Time.zone.at(request_timestamp / 1000) if request_timestamp.present?
+    Time.zone.at(request_timestamp / 1000.0) if request_timestamp.present?
   end
 end

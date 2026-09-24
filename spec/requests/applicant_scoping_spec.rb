@@ -117,6 +117,22 @@ RSpec.describe 'Applicant-facing controllers scope records to the signed-in user
       expect(recommendation_b.reload.organization).to eq('Private School')
     end
 
+    it "constrains nested routes to the routed enrollment, even between the user's own enrollments" do
+      create(:camp_configuration, camp_year: 2019, active: false)
+      old_enrollment = create(:enrollment, user: user_a, campyear: 2019)
+      old_recommendation = create(:recommendation, enrollment: old_enrollment)
+
+      get enrollment_recommendation_path(old_enrollment, old_recommendation)
+      expect(response).to have_http_status(:ok)
+
+      get enrollment_recommendation_path(enrollment_a, old_recommendation)
+      expect(response).to have_http_status(:not_found)
+
+      patch enrollment_recommendation_path(enrollment_a, old_recommendation), params: { recommendation: { organization: 'tampered' } }
+      expect(response).to have_http_status(:not_found)
+      expect(old_recommendation.reload.organization).not_to eq('tampered')
+    end
+
     it "cannot create a recommendation for another applicant's enrollment" do
       recommendation_b.destroy!
 
