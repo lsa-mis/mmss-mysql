@@ -3,8 +3,8 @@ name: CI
 on:
   push:
     branches: [staging, main]
+  # Any base branch, so stacked PRs (targeting another feature branch) get a check too.
   pull_request:
-    branches: [staging, main]
   workflow_dispatch:
 
 concurrency:
