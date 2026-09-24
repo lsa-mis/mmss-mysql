@@ -21,9 +21,14 @@ Sentry.init do |config|
   # Logging configuration
   config.breadcrumbs_logger = [:active_support_logger, :http_logger]
 
-  # Add user context data (PII). Deprecated in favour of the granular `config.data_collection.*`
-  # settings (sentry-ruby 7.0); still honoured until sentry-ruby 8.
-  config.send_default_pii = true
+  # Data collection (replaces send_default_pii = true in sentry-ruby 7.0): keep user context,
+  # query strings, request bodies, SQL and job data; cookies (session tokens) are not sent.
+  config.data_collection.user_info = true
+  config.data_collection.url_query_params = true
+  config.data_collection.http_bodies = nil # all body types
+  config.data_collection.database_query_data = true
+  config.data_collection.queues = true
+  config.data_collection.cookies = false
 
   # Performance monitoring: traces_sampler is the single source of truth (overrides traces_sample_rate)
   config.traces_sampler = lambda do |context|
