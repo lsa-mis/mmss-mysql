@@ -28,7 +28,7 @@ RSpec.describe 'Admin::BaseController authentication', type: :request do
       expect(response.body).to include('MMSS Admin')
       expect(response.body).to include(admin.email)
       expect(response.body).to include(destroy_admin_session_path)
-      expect(response.body).to include('stylesheets/admin')
+      expect(response.body).to include('/assets/admin-')
       expect(response.body).not_to include('active_admin')
     end
 

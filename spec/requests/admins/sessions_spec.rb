@@ -10,7 +10,7 @@ RSpec.describe 'Admin sign in', type: :request do
 
     expect(response).to have_http_status(:ok)
     expect(response.body).to include('Admin sign in')
-    expect(response.body).to include('stylesheets/admin')
+    expect(response.body).to include('/assets/admin-')
     expect(response.body).to include('name="admin[email]"')
     expect(response.body).to include('Forgot your password?')
   end
@@ -27,7 +27,7 @@ RSpec.describe 'Admin sign in', type: :request do
     post admin_session_path, params: { admin: { email: admin.email, password: 'wrong' } }
 
     expect(response).to have_http_status(:unprocessable_content)
-    expect(response.body).to include('Invalid Email or password')
+    expect(response.body).to include('Invalid email or password')
   end
 
   it 'signs out with DELETE /admin/logout' do

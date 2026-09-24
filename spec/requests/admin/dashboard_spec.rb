@@ -21,7 +21,9 @@ RSpec.describe 'Admin dashboard', type: :request do
   context 'with an active camp' do
     let(:user) { create(:user, :with_applicant_detail) }
     let!(:enrollment) { create(:enrollment, :accepted, user: user) }
-    let!(:payment) { create(:payment, user: user, camp_year: enrollment.campyear, total_amount: '12345') }
+    # A successful first payment moves the application to `submitted` (Payment#set_status), which
+    # would drop it from the balance-due panel; a declined payment still appears in "Recent Payments".
+    let!(:payment) { create(:payment, user: user, camp_year: enrollment.campyear, total_amount: '2550', transaction_status: '2') }
     let!(:financial_aid) { create(:financial_aid, :pending, enrollment: enrollment) }
     let!(:campnote) { create(:campnote, opendate: 1.day.ago, closedate: 1.day.from_now, notetype: 'alert', note: 'Dorm check-in moved') }
 
@@ -36,7 +38,7 @@ RSpec.describe 'Admin dashboard', type: :request do
       expect(body).to include(admin_application_path(enrollment))
 
       expect(body).to include("Recent Payments for #{enrollment.campyear} Camp")
-      expect(body).to include('$123.45')
+      expect(body).to include('$25.50')
 
       expect(body).to include('Offer Accepted with Balance Due')
       expect(body).to include("Parent: #{user.applicant_detail.parentname}")

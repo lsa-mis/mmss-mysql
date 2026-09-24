@@ -98,7 +98,7 @@ class Admin::Filter
       next scope unless field.params.any? { |param| values.key?(param) }
 
       scope = scope.joins(field.joins) if field.joins
-      public_send(:"apply_#{field.type}", scope, field)
+      send(:"apply_#{field.type}", scope, field)
     end
   end
 

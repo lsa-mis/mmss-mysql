@@ -32,7 +32,7 @@ module Admin::BatchActionable
     end
 
     records = relation.where(id: ids)
-    notice = public_send(:"batch_#{action}", records)
+    notice = send(:"batch_#{action}", records)
     redirect_to redirect_to_path, notice: notice, status: :see_other
   end
 

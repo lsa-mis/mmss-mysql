@@ -29,7 +29,7 @@ A Ruby on Rails application for managing summer camp applications, enrollments, 
 - **Financial aid** — Aid requests, amounts, status, and payment deadlines
 - **Recommendations** — Request and upload recommendation letters; email-based workflow
 - **Payments** — Payment flows and receipts (integration with external payment provider)
-- **Admin (ActiveAdmin)** — Full CRUD and reporting: demographics, camp configs, enrollments, reports (complete applications, waitlist, enrolled with addresses, course assignments, demographic reports, etc.)
+- **Admin** — Plain Rails `Admin::` MVC at `/admin` (dashboard, applications, comments; other resources being ported one menu group at a time) with the remaining ActiveAdmin resources and reports served at `/legacy_admin` during the cutover
 - **Faculty interface** — Faculty login and student list/student page views
 - **Maintenance mode** — Rack middleware (`lib/middleware/maintenance_mode.rb`) serves `public/maintenance.html` while `tmp/maintenance.yml` exists on the server
 
@@ -44,9 +44,9 @@ A Ruby on Rails application for managing summer camp applications, enrollments, 
 | **Framework**    | Rails 8.1.3.1 (`config.load_defaults 8.1`)                       |
 | **Database**     | MySQL 8 (mysql2 gem), utf8mb4                                    |
 | **Auth**         | Devise (users, admins, faculties)                                |
-| **Admin**        | ActiveAdmin 3.x                                                  |
+| **Admin**        | `Admin::` namespace (Tailwind 4 layout, Pagy, hand-rolled filters); ActiveAdmin 3.x at `/legacy_admin` until fully ported |
 | **Server**       | Puma 8 (systemd notify built in)                                 |
-| **Frontend**     | importmap-rails, Hotwire (Turbo Drive + Stimulus), Tailwind CSS 4 (tailwindcss-rails), Flatpickr; Sprockets only for ActiveAdmin |
+| **Frontend**     | importmap-rails, Hotwire (Turbo Drive + Stimulus), Tailwind CSS 4 (tailwindcss-rails; `application.css` + `admin.css` bundles), Flatpickr; Sprockets only for ActiveAdmin |
 | **File storage** | Active Storage (local disk / Google Cloud Storage in production) |
 | **Monitoring**   | Skylight, Sentry                                                 |
 | **Deployment**   | Capistrano 3, asdf                                               |
@@ -157,7 +157,7 @@ Configured for Google Cloud Storage (GCS). A GCS keyfile is expected. Bucket and
    Default: [http://localhost:3000](http://localhost:3000)
 3. **Useful URLs (development)**
   - Root: `/`
-  - Admin: `/admin` (Devise admin login)
+  - Admin: `/admin` (login at `/admin/login`); legacy ActiveAdmin: `/legacy_admin`
   - Faculty: `/faculty`, `/faculty_login`
   - Letter opener (development and staging): `/letter_opener` (on staging, protect with HTTP basic auth env vars or network rules)
 

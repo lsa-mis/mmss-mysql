@@ -39,7 +39,9 @@ Rails.application.routes.draw do
 
     # Cutover aid: bookmarks and links to resources that are not ported yet keep working.
     # Remove together with ActiveAdmin.
-    get '*path', to: redirect('/legacy_admin/%{path}'), format: false
+    get '*path', format: false, to: redirect { |path_params, request|
+      "/legacy_admin/#{path_params[:path]}#{"?#{request.query_string}" if request.query_string.present?}"
+    }
   end
 
   # Legacy ActiveAdmin admin, mounted at /legacy_admin until every resource is ported (see
