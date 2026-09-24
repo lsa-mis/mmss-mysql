@@ -1,7 +1,6 @@
 <% admin_page_title 'Feedbacks', subtitle: "#{number_with_delimiter(@pagy.count)} #{'feedback'.pluralize(@pagy.count)}" %>
 <% admin_page_actions do %>
   <%= admin_csv_link %>
-  <%= link_to 'New Feedback', new_admin_feedback_path, class: 'admin-btn-primary' %>
 <% end %>
 
 <div class="grid gap-5 xl:grid-cols-4">

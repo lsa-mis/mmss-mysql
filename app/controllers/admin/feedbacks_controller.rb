@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-# Feedback submitted by applicants from the public site.
+# Feedback submitted by applicants from the public site. No new/create: feedback is written by
+# applicants (the ActiveAdmin form never permitted user_id, so it could not save either).
 class Admin::FeedbacksController < Admin::BaseController
   before_action :set_feedback, only: %i[show edit update destroy]
 
@@ -28,20 +29,6 @@ class Admin::FeedbacksController < Admin::BaseController
 
   def show; end
 
-  def new
-    @feedback = Feedback.new
-  end
-
-  def create
-    @feedback = Feedback.new(feedback_params)
-
-    if @feedback.save
-      redirect_to admin_feedback_path(@feedback), notice: 'Feedback was successfully created.', status: :see_other
-    else
-      render :new, status: :unprocessable_content
-    end
-  end
-
   def edit; end
 
   def update
@@ -68,7 +55,7 @@ class Admin::FeedbacksController < Admin::BaseController
   end
 
   def feedback_params
-    params.require(:feedback).permit(:user_id, :genre, :message)
+    params.require(:feedback).permit(:genre, :message)
   end
 
   def csv_export

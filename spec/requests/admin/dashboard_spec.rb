@@ -34,7 +34,7 @@ RSpec.describe 'Admin dashboard', type: :request do
       body = response.body
 
       expect(body).to include("Recent Applications for #{enrollment.campyear} Camp")
-      expect(body).to include(user.applicant_detail.full_name)
+      expect(CGI.unescapeHTML(body)).to include(user.applicant_detail.full_name)
       expect(body).to include(admin_application_path(enrollment))
 
       expect(body).to include("Recent Payments for #{enrollment.campyear} Camp")

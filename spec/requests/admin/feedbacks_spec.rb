@@ -67,6 +67,18 @@ RSpec.describe 'Admin feedbacks', type: :request do
       expect(response).to have_http_status(:ok)
     end
 
+    it 'never turns URL options smuggled into the query string into off-site links' do
+      get admin_feedbacks_path, params: { host: 'evil.example', protocol: 'https', port: 8443, script_name: '/x', only_path: 'false',
+                              sort: 'genre', direction: 'asc', q: { message: 'submit' } }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).not_to include('evil.example')
+      expect(response.body).not_to include('https://')
+      expect(response.body).to include('href="/admin/feedbacks?')
+      expect(response.body).to include('direction=desc')
+      expect(response.body).to include('q%5Bmessage%5D=submit')
+    end
+
     it 'exports CSV' do
       get admin_feedbacks_path(format: :csv)
 
@@ -93,44 +105,44 @@ RSpec.describe 'Admin feedbacks', type: :request do
     end
   end
 
-  describe 'GET /admin/feedbacks/new' do
-    it 'renders the form with user, genre and message inputs' do
-      get new_admin_feedback_path
-
-      expect(response).to have_http_status(:ok)
-      expect(response.body).to include('name="feedback[user_id]"')
-      expect(response.body).to include('name="feedback[genre]"')
-      expect(response.body).to include('name="feedback[message]"')
-      expect(response.body).to include('Layout Issue')
-    end
+  it 'has no new/create (feedback is written by applicants on the public site)' do
+    expect(Rails.application.routes.url_helpers).not_to respond_to(:new_admin_feedback_path)
+    expect { post admin_feedbacks_path, params: { feedback: { genre: 'suggestion', message: 'x' } } }.not_to change(Feedback, :count)
+    expect(response).to have_http_status(:not_found)
+    get admin_feedbacks_path
+    expect(response.body).not_to include('New Feedback')
   end
 
-  describe 'POST /admin/feedbacks' do
-    it 'creates feedback' do
-      expect do
-        post admin_feedbacks_path, params: { feedback: { user_id: user.id, genre: 'suggestion', message: 'More sessions please' } }
-      end.to change(Feedback, :count).by(1)
+  describe 'GET /admin/feedbacks/:id/edit' do
+    it 'renders the form with genre and message inputs only' do
+      get edit_admin_feedback_path(feedback)
 
-      expect(response).to redirect_to(admin_feedback_path(Feedback.last))
-    end
-
-    it 're-renders with errors when invalid' do
-      post admin_feedbacks_path, params: { feedback: { user_id: user.id, genre: '', message: '' } }
-
-      expect(response).to have_http_status(:unprocessable_content)
-      expect(CGI.unescapeHTML(response.body)).to include("Genre can't be blank")
-      expect(CGI.unescapeHTML(response.body)).to include("Message can't be blank")
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('name="feedback[genre]"')
+      expect(response.body).to include('name="feedback[message]"')
+      expect(response.body).not_to include('name="feedback[user_id]"')
+      expect(response.body).to include('Layout Issue')
+      expect(response.body).to include("Submitted by #{user.email}")
     end
   end
 
   describe 'PATCH /admin/feedbacks/:id' do
-    it 'updates the feedback' do
-      patch admin_feedback_path(feedback), params: { feedback: { genre: 'layout_issue', message: 'Button overlaps footer' } }
+    it 'updates the feedback and ignores user_id' do
+      patch admin_feedback_path(feedback), params: { feedback: { genre: 'layout_issue', message: 'Button overlaps footer', user_id: create(:user).id } }
 
       expect(response).to redirect_to(admin_feedback_path(feedback))
       feedback.reload
       expect(feedback.genre).to eq('layout_issue')
       expect(feedback.message).to eq('Button overlaps footer')
+      expect(feedback.user).to eq(user)
+    end
+
+    it 're-renders with errors when blank' do
+      patch admin_feedback_path(feedback), params: { feedback: { genre: '', message: '' } }
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(CGI.unescapeHTML(response.body)).to include("Genre can't be blank")
+      expect(CGI.unescapeHTML(response.body)).to include("Message can't be blank")
     end
 
     it 're-renders with errors when the message is too long' do

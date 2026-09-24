@@ -45,6 +45,18 @@ RSpec.describe 'Admin users', type: :request do
       expect(response).to have_http_status(:ok)
     end
 
+    it 'never turns URL options smuggled into the query string into off-site links' do
+      get admin_users_path, params: { host: 'evil.example', protocol: 'https', port: 8443, script_name: '/x', only_path: 'false',
+                              sort: 'email', direction: 'asc', q: { email: 'zoe' } }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).not_to include('evil.example')
+      expect(response.body).not_to include('https://')
+      expect(response.body).to include('href="/admin/users?')
+      expect(response.body).to include('direction=desc')
+      expect(response.body).to include('q%5Bemail%5D=zoe')
+    end
+
     it 'paginates with a configurable page size' do
       get admin_users_path, params: { limit: 1 }
 

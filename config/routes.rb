@@ -56,7 +56,8 @@ Rails.application.routes.draw do
     resources :faculties, only: %i[index show destroy] do
       collection { post :batch }
     end
-    resources :feedbacks do
+    # Feedback is submitted by applicants on the public site; admins only review/edit/delete it.
+    resources :feedbacks, except: %i[new create] do
       collection { post :batch }
     end
 
