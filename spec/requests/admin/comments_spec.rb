@@ -70,4 +70,14 @@ RSpec.describe 'Admin comments', type: :request do
     expect(response.body).to include('first note')
     expect(response.body).to include('Enrollment')
   end
+
+  it 'links records still served by ActiveAdmin with Turbo Drive disabled' do
+    activity = create(:activity)
+    Admin::Comment.create!(body: 'legacy record note', author: admin, resource: activity, namespace: 'legacy_admin')
+
+    get admin_comments_path
+
+    expect(response.body).to include(%(data-turbo="false" href="#{legacy_admin_activity_path(activity)}"))
+    expect(response.body).to include(%(href="#{admin_application_path(enrollment)}")) if enrollment.admin_comments.any?
+  end
 end

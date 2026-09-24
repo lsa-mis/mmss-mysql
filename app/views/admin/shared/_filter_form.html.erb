@@ -7,11 +7,7 @@
     <% end %>
   </div>
   <div class="admin-card-body grid gap-3">
-    <% %w[scope sort direction limit].each do |key| %>
-      <% if params[key].present? %>
-        <%= hidden_field_tag key, params[key], id: nil %>
-      <% end %>
-    <% end %>
+    <%= admin_index_hidden_fields(except: %i[q page]) %>
 
     <% filter.fields.each do |field| %>
       <div>
@@ -22,7 +18,7 @@
 
     <div class="flex items-center gap-2 pt-1">
       <%= f.button 'Filter', type: :submit, class: 'admin-btn-primary' %>
-      <%= link_to 'Clear', url_for(params.permit(:scope, :sort, :direction, :limit).to_h), class: 'admin-btn-secondary' %>
+      <%= link_to 'Clear', admin_index_path(q: nil, page: nil), class: 'admin-btn-secondary' %>
     </div>
   </div>
 <% end %>

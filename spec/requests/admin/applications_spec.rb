@@ -26,6 +26,20 @@ RSpec.describe 'Admin applications', type: :request do
       expect(body).to include(edit_admin_application_path(enrollment))
       expect(body).to include('Download CSV')
       expect(body).to include('Balance Due')
+      expect(body).not_to include('New Application')
+    end
+
+    it 'never turns URL options smuggled into the query string into off-site links' do
+      get admin_applications_path, params: { host: 'evil.example', protocol: 'https', port: 8443, script_name: '/x',
+                                             only_path: 'false', sort: 'updated_at', scope: 'all', q: { lastname: 'Zim' } }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).not_to include('evil.example')
+      expect(response.body).not_to include('https://')
+      expect(response.body).to include('href="/admin/applications?')
+      expect(response.body).to include('direction=asc')
+      expect(response.body).to include('q%5Blastname%5D=Zim')
+      expect(response.body).to include('scope=withdrawn')
     end
 
     it 'filters by applicant last name (starts with)' do
@@ -134,6 +148,7 @@ RSpec.describe 'Admin applications', type: :request do
       expect(response).to have_http_status(:ok)
       body = response.body
       expect(body).to include('name="enrollment[high_school_country]"')
+      expect(body).to include('enctype="multipart/form-data"')
       expect(body).to include('enrollment[session_assignments_attributes]')
       expect(body).to include('enrollment[course_assignments_attributes]')
       expect(body).to include('NEW_RECORD')
@@ -151,6 +166,21 @@ RSpec.describe 'Admin applications', type: :request do
       expect(enrollment.partner_program).to eq('Partner X')
       follow_redirect!
       expect(response.body).to include('Application was successfully updated.')
+    end
+
+    it 'keeps a status that is not in the standard list (e.g. waitlisted) when the form is submitted unchanged' do
+      waitlisted = create(:enrollment, :waitlisted, user: create(:user, :with_applicant_detail))
+      create(:session_assignment, enrollment: waitlisted, camp_occurrence: CampOccurrence.active.first)
+      create(:course_assignment, enrollment: waitlisted, course: Course.first)
+
+      get edit_admin_application_path(waitlisted)
+      expect(response.body).to include('<option selected="selected" value="waitlisted">waitlisted</option>')
+
+      patch admin_application_path(waitlisted), params: { enrollment: { application_status: 'waitlisted', notes: 'still waiting' } }
+
+      expect(response).to redirect_to(admin_application_path(waitlisted))
+      expect(waitlisted.reload.application_status).to eq('waitlisted')
+      expect(waitlisted.notes).to eq('still waiting')
     end
 
     it 're-renders the form with errors when invalid' do
@@ -176,26 +206,109 @@ RSpec.describe 'Admin applications', type: :request do
       expect(flash[:notice]).to include('Enrollment has been withdrawn')
       expect(flash[:notice]).to include("Course: #{course.title}")
     end
+
+    it 'keeps course assignments when the withdrawal cannot be saved' do
+      enrolled = create(:enrollment, :enrolled, user: create(:user, :with_applicant_detail))
+      create(:course_assignment, enrollment: enrolled, course: Course.first)
+
+      patch admin_application_path(enrolled), params: { withdraw_enrollment: '1', enrollment: { high_school_name: '' } }
+
+      expect(response).to have_http_status(:unprocessable_content)
+      enrolled.reload
+      expect(enrolled.application_status).to eq('enrolled')
+      expect(enrolled.course_assignments.count).to eq(1)
+    end
   end
 
-  describe 'POST /admin/applications' do
-    it 'creates an application for a user' do
-      new_user = create(:user, :with_applicant_detail)
-      transcript = Rack::Test::UploadedFile.new(Rails.root.join('spec/files/test.pdf'), 'application/pdf')
-      attributes = enrollment.attributes.slice(
-        'international', 'high_school_name', 'high_school_address1', 'high_school_city', 'high_school_state',
-        'high_school_postalcode', 'high_school_country', 'year_in_school', 'anticipated_graduation_year', 'personal_statement', 'campyear'
-      ).merge('user_id' => new_user.id, 'transcript' => transcript)
+  describe 'member actions' do
+    let(:course) { Course.first }
 
-      # Admin-created applications still need the applicant's own session/course registrations.
-      allow_any_instance_of(Enrollment).to receive(:session_registration_ids).and_return([1])
-      allow_any_instance_of(Enrollment).to receive(:course_registration_ids).and_return([1])
+    it 'places an application on the wait list' do
+      post waitlist_admin_application_path(enrollment)
 
+      expect(response).to redirect_to(admin_application_path(enrollment))
+      expect(enrollment.reload.application_status).to eq('waitlisted')
+      expect(flash[:notice]).to include('placed on waitlist')
+    end
+
+    it 'removes an application from the wait list' do
+      enrollment.update_columns(application_status: 'waitlisted')
+
+      post remove_from_waitlist_admin_application_path(enrollment)
+
+      expect(response).to redirect_to(admin_application_path(enrollment))
+      expect(enrollment.reload.application_status).to eq('application complete')
+    end
+
+    it 'withdraws an enrolled application and releases its course assignments' do
+      enrolled = create(:enrollment, :enrolled, user: create(:user, :with_applicant_detail))
+      create(:course_assignment, enrollment: enrolled, course: course)
+
+      post withdraw_admin_application_path(enrolled)
+
+      expect(response).to redirect_to(admin_application_path(enrolled))
+      enrolled.reload
+      expect(enrolled.application_status).to eq('withdrawn')
+      expect(enrolled.application_status_updated_on).to eq(Date.current)
+      expect(enrolled.course_assignments).to be_empty
+      expect(flash[:notice]).to include("Course: #{course.title}")
+      expect(flash[:notice]).to include("Session: #{course.camp_occurrence.description}")
+    end
+
+    it 'reports a plain notice when there was nothing to release' do
+      enrolled = create(:enrollment, :enrolled, user: create(:user, :with_applicant_detail))
+
+      post withdraw_admin_application_path(enrolled)
+
+      expect(flash[:notice]).to eq('Enrollment has been withdrawn.')
+    end
+
+    it 'emails the financial aid request link' do
       expect do
-        post admin_applications_path, params: { enrollment: attributes }
-      end.to change(Enrollment, :count).by(1)
+        post send_finaid_request_email_admin_application_path(enrollment)
+      end.to change { ActionMailer::Base.deliveries.size }.by(1)
 
-      expect(response).to redirect_to(admin_application_path(Enrollment.last))
+      expect(response).to redirect_to(admin_application_path(enrollment))
+      expect(flash[:notice]).to include('was sent')
+    end
+
+    it 'does not perform mutations on GET (routes are POST only)' do
+      get "/admin/applications/#{enrollment.id}/waitlist"
+
+      expect(response).not_to have_http_status(:ok)
+      expect(enrollment.reload.application_status).to eq('application complete')
+    end
+
+    context 'as a signed-in applicant (not an admin)' do
+      before do
+        sign_out admin
+        sign_in user
+      end
+
+      it 'refuses every member action and leaves the enrollment untouched' do
+        [waitlist_admin_application_path(enrollment), remove_from_waitlist_admin_application_path(enrollment),
+         withdraw_admin_application_path(enrollment), send_finaid_request_email_admin_application_path(enrollment)].each do |path|
+          post path
+          expect(response).to redirect_to(new_admin_session_path)
+        end
+
+        expect(enrollment.reload.application_status).to eq('application complete')
+        expect(ActionMailer::Base.deliveries).to be_empty
+      end
+
+      it 'has no public routes left for these mutations' do
+        post "/waitlisted/#{enrollment.id}"
+        expect(response).to have_http_status(:not_found)
+        post "/withdraw/#{enrollment.id}"
+        expect(response).to have_http_status(:not_found)
+        post "/remove_from_waitlist/#{enrollment.id}"
+        expect(response).to have_http_status(:not_found)
+        get "/send_finaid_request_email?enrollment_id=#{enrollment.id}"
+        expect(response).to have_http_status(:not_found)
+
+        expect(enrollment.reload.application_status).to eq('application complete')
+        expect(ActionMailer::Base.deliveries).to be_empty
+      end
     end
   end
 

@@ -98,69 +98,7 @@ class EnrollmentsController < ApplicationController
     end
   end
 
-  def add_to_waitlist
-    @enrollment = Enrollment.find(params[:id])
-    @enrollment.transition_application_status!('waitlisted')
-    respond_to do |format|
-      format.html { redirect_to admin_applications_path, notice: 'Application was placed on waitlist.', status: :see_other }
-      format.json { head :no_content }
-    end
-  end
-
-  def remove_from_waitlist
-    @enrollment = Enrollment.find(params[:id])
-    @enrollment.transition_application_status!('application complete')
-    respond_to do |format|
-      format.html { redirect_to admin_applications_path, notice: 'Application was removed from waitlist. Send an email to an applicant with further instructions.', status: :see_other }
-      format.json { head :no_content }
-    end
-  end
-
-  def withdraw
-    @enrollment = Enrollment.find(params[:id])
-
-    # Collect course assignment information before deletion
-    deleted_course_assignments = @enrollment.course_assignments.includes(:course).map do |ca|
-      {
-        course_title: ca.course.title,
-        session_description: ca.course.camp_occurrence.description
-      }
-    end
-
-    # Delete all course assignments
-    @enrollment.course_assignments.destroy_all
-
-    # Update enrollment status
-    @enrollment.transition_application_status!('withdrawn')
-
-    # Build notice message with deleted course assignment details
-    notice_message = build_withdraw_notice(deleted_course_assignments)
-
-    respond_to do |format|
-      format.html { redirect_to admin_application_path(@enrollment), notice: notice_message, status: :see_other }
-      format.json { head :no_content }
-    end
-  end
-
-  def send_finaid_request_email
-    @enrollment = Enrollment.find_by(id: params[:enrollment_id])
-    FinaidMailer.with(enrollment: @enrollment).fin_aid_request_email.deliver_now
-    respond_to do |format|
-      format.html { redirect_to admin_application_path(@enrollment), notice: 'Request was sent!' }
-    end
-  end
-
   private
-
-  def build_withdraw_notice(deleted_course_assignments)
-    return 'Enrollment has been withdrawn.' if deleted_course_assignments.blank?
-
-    assignment_details = deleted_course_assignments.map do |ca|
-      "Course: #{ca[:course_title]}, Session: #{ca[:session_description]}"
-    end.join('; ')
-
-    "Enrollment has been withdrawn. Deleted course assignment(s): #{assignment_details}"
-  end
 
     # Use callbacks to share common setup or constraints between actions.
     def set_current_enrollment

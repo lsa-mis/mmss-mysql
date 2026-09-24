@@ -3,14 +3,14 @@
 <% admin_page_actions do %>
   <% case @application.application_status %>
   <% when 'application complete' %>
-    <%= button_to 'Place on Wait List', waitlisted_path(@application), method: :post, class: 'admin-btn-secondary',
+    <%= button_to 'Place on Wait List', waitlist_admin_application_path(@application), method: :post, class: 'admin-btn-secondary',
                   form: { data: { turbo_confirm: 'Are you sure you want to wait list this application?' } } %>
-    <%= link_to 'Reject Applicant', new_legacy_admin_rejection_path(enrollment_id: @application.id), class: 'admin-btn-secondary', data: { turbo: false } %>
+    <%= admin_legacy_link_to 'Reject Applicant', new_legacy_admin_rejection_path(enrollment_id: @application.id), class: 'admin-btn-secondary' %>
   <% when 'waitlisted' %>
-    <%= button_to 'Remove from Wait List', remove_from_waitlist_path(@application), method: :post, class: 'admin-btn-secondary',
+    <%= button_to 'Remove from Wait List', remove_from_waitlist_admin_application_path(@application), method: :post, class: 'admin-btn-secondary',
                   form: { data: { turbo_confirm: 'Are you sure you want to remove this application from wait list?' } } %>
   <% when 'enrolled' %>
-    <%= button_to 'Withdraw Enrollment', withdraw_enrollment_path(@application), method: :post, class: 'admin-btn-danger',
+    <%= button_to 'Withdraw Enrollment', withdraw_admin_application_path(@application), method: :post, class: 'admin-btn-danger',
                   form: { data: { turbo_confirm: 'Are you sure you want to withdraw this enrollment? This will delete all associated course assignments.' } } %>
   <% end %>
   <%= link_to 'Edit', edit_admin_application_path(@application), class: 'admin-btn-primary' %>
@@ -24,7 +24,7 @@
       <%= admin_attributes @application do |a| %>
         <% a.row 'Applicant' do |app| %>
           <% if app.applicant_detail %>
-            <%= link_to app.applicant_detail.full_name.titleize, legacy_admin_applicant_detail_path(app.applicant_detail), data: { turbo: false } %>
+            <%= admin_legacy_link_to app.applicant_detail.full_name.titleize, legacy_admin_applicant_detail_path(app.applicant_detail) %>
           <% end %>
           <span class="text-slate-500"><%= app.user.email %></span>
         <% end %>
@@ -48,7 +48,7 @@
         <tbody>
           <% @application.session_assignments.includes(:camp_occurrence).each do |assignment| %>
             <tr>
-              <td><%= link_to assignment.id, legacy_admin_session_assignment_path(assignment), data: { turbo: false } %></td>
+              <td><%= admin_legacy_link_to assignment.id, legacy_admin_session_assignment_path(assignment) %></td>
               <td><%= assignment.camp_occurrence.description %></td>
               <td><%= admin_status_badge(assignment.offer_status) %></td>
             </tr>
@@ -69,7 +69,7 @@
         <tbody>
           <% @application.course_assignments.includes(course: :camp_occurrence).each do |assignment| %>
             <tr>
-              <td><%= link_to assignment.id, legacy_admin_course_assignment_path(assignment), data: { turbo: false } %></td>
+              <td><%= admin_legacy_link_to assignment.id, legacy_admin_course_assignment_path(assignment) %></td>
               <td><%= assignment.course.title %></td>
               <td><%= assignment.course.camp_occurrence.description %></td>
               <td><%= admin_boolean(assignment.wait_list) %></td>
@@ -122,9 +122,10 @@
     <%= admin_panel "Finances — Balance Due: #{admin_money_from_cents(@payment_state.balance_due)} · Total Cost: #{admin_money_from_cents(@payment_state.total_cost)}",
                     body_class: '',
                     actions: safe_join([
-                      link_to('Send Financial Aid Request Link', send_finaid_request_email_path(enrollment_id: @application.id), class: 'admin-btn-link', data: { turbo_confirm: 'Email the financial aid request link to this applicant?' }),
-                      link_to('Add Financial Aid Request', new_legacy_admin_financial_aid_request_path(enrollment_id: @application.id), class: 'admin-btn-link', data: { turbo: false }),
-                      link_to('Add Manual Payment', new_legacy_admin_payment_path(enrollment_id: @application.id), class: 'admin-btn-link', data: { turbo: false })
+                      button_to('Send Financial Aid Request Link', send_finaid_request_email_admin_application_path(@application), method: :post, class: 'admin-btn-link',
+                                form: { data: { turbo_confirm: 'Email the financial aid request link to this applicant?' } }),
+                      admin_legacy_link_to('Add Financial Aid Request', new_legacy_admin_financial_aid_request_path(enrollment_id: @application.id), class: 'admin-btn-link'),
+                      admin_legacy_link_to('Add Manual Payment', new_legacy_admin_payment_path(enrollment_id: @application.id), class: 'admin-btn-link')
                     ]) do %>
       <% unless @application.application_fee_required %>
         <p class="border-b border-amber-200 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-900">
@@ -137,7 +138,7 @@
         <tbody>
           <% @application.user.payments.current_camp_payments.each do |payment| %>
             <tr>
-              <td><%= link_to payment.id, legacy_admin_payment_path(payment), data: { turbo: false } %></td>
+              <td><%= admin_legacy_link_to payment.id, legacy_admin_payment_path(payment) %></td>
               <td><%= payment.account_type.to_s.titleize %></td>
               <td><%= (Date.parse(payment.transaction_date) rescue payment.transaction_date) %></td>
               <td><%= transaction_status_message(payment.transaction_status) %></td>
@@ -156,7 +157,7 @@
           <tbody>
             <% @application.financial_aids.each do |financial_aid| %>
               <tr>
-                <td><%= link_to 'view', legacy_admin_financial_aid_request_path(financial_aid), data: { turbo: false } %></td>
+                <td><%= admin_legacy_link_to 'view', legacy_admin_financial_aid_request_path(financial_aid) %></td>
                 <td><%= humanized_money_with_symbol(financial_aid.amount) %></td>
                 <td><%= admin_status_badge(financial_aid.status) %></td>
               </tr>
@@ -172,13 +173,13 @@
           <thead><tr><th>ID</th><th>First name</th><th>Last name</th><th>Organization</th><th>Letter</th></tr></thead>
           <tbody>
             <tr>
-              <td><%= link_to recommendation.id, legacy_admin_recommendation_path(recommendation), data: { turbo: false } %></td>
+              <td><%= admin_legacy_link_to recommendation.id, legacy_admin_recommendation_path(recommendation) %></td>
               <td><%= recommendation.firstname %></td>
               <td><%= recommendation.lastname %></td>
               <td><%= recommendation.organization %></td>
               <td>
                 <% if recommendation.recupload.present? %>
-                  <%= link_to 'view', legacy_admin_recupload_path(recommendation.recupload), data: { turbo: false } %>
+                  <%= admin_legacy_link_to 'view', legacy_admin_recupload_path(recommendation.recupload) %>
                 <% else %>
                   <span class="text-slate-500">— waiting for response</span>
                 <% end %>

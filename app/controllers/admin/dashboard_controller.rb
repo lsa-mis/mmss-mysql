@@ -14,7 +14,9 @@ class Admin::DashboardController < Admin::BaseController
     @recent_payments = Payment.current_camp_payments
                               .includes(user: :applicant_detail)
                               .order(created_at: :desc).limit(RECENT_LIMIT)
-    @balance_due = balance_due_enrollments
+    balance_due_query = Admin::BalanceDueQuery.new(@active_camp)
+    @balance_due = balance_due_query.enrollments(limit: BALANCE_DUE_LIMIT)
+    @balance_due_total = balance_due_query.count
     @pending_financial_aids = FinancialAid.where(enrollment: Enrollment.current_camp_year_applications, status: 'pending')
                                           .includes(enrollment: %i[user applicant_detail])
     @sessions = CampOccurrence.active.to_a
@@ -23,19 +25,6 @@ class Admin::DashboardController < Admin::BaseController
   end
 
   private
-
-  # "Offer accepted" applications that still owe money, ordered by name. Balances are computed
-  # per enrollment by PaymentState (as the ActiveAdmin dashboard did).
-  def balance_due_enrollments
-    Enrollment.current_camp_year_applications
-              .where(application_status: 'offer accepted')
-              .includes(:user, :applicant_detail)
-              .order('applicant_details.lastname, applicant_details.firstname')
-              .filter_map do |enrollment|
-                balance = PaymentState.new(enrollment).balance_due
-                [enrollment, balance] if balance.positive?
-              end
-  end
 
   def session_stats(sessions)
     enrolled_ids = Enrollment.enrolled.pluck(:id)
