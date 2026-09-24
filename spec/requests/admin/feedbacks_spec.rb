@@ -123,6 +123,20 @@ RSpec.describe 'Admin feedbacks', type: :request do
       expect(response.body).not_to include('name="feedback[user_id]"')
       expect(response.body).to include('Layout Issue')
       expect(response.body).to include("Submitted by #{user.email}")
+      expect(response.body).to include('<option selected="selected" value="page_error">Error on Page</option>')
+    end
+
+    it 'keeps a persisted genre outside GENRES selectable so editing does not blank it' do
+      feedback.update_column(:genre, 'legacy_genre')
+
+      get edit_admin_feedback_path(feedback)
+
+      expect(response.body).to include('<option selected="selected" value="legacy_genre">legacy_genre</option>')
+
+      patch admin_feedback_path(feedback), params: { feedback: { genre: 'legacy_genre', message: 'Still legacy' } }
+
+      expect(response).to redirect_to(admin_feedback_path(feedback))
+      expect(feedback.reload.genre).to eq('legacy_genre')
     end
   end
 
