@@ -14,7 +14,7 @@
         <% end %>
         <% a.row :title, :available_spaces %>
         <% a.row('Open Spaces', &:remaining_spaces) %>
-        <% a.row 'Wait List' do |course| %><%= CourseAssignment.wait_list_number(course.id) %><% end %>
+        <% a.row('Wait List', &:wait_list_count) %>
         <% a.row :faculty_uniqname, :faculty_name %>
         <% a.row :status do |course| %><%= admin_status_badge(course.status) %><% end %>
         <% a.row :created_at, :updated_at %>
@@ -47,7 +47,7 @@
     <%= admin_panel 'Seats' do %>
       <%= admin_stat 'Available spaces', @course.available_spaces %>
       <%= admin_stat 'Open spaces', @course.remaining_spaces %>
-      <%= admin_stat 'Wait list', CourseAssignment.wait_list_number(@course.id) %>
+      <%= admin_stat 'Wait list', @course.wait_list_count %>
       <%= admin_stat 'Preferences', @course.course_preferences.count %>
     <% end %>
   </div>

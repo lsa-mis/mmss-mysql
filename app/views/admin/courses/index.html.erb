@@ -19,9 +19,7 @@
       <% end %>
       <% t.column :available_spaces, sort: true %>
       <% t.column 'Open Spaces', &:remaining_spaces %>
-      <% t.column 'Wait List' do |course| %>
-        <%= CourseAssignment.wait_list_number(course.id) %>
-      <% end %>
+      <% t.column 'Wait List', &:wait_list_count %>
       <% t.column :faculty_uniqname, sort: true %>
       <% t.column :faculty_name, sort: true %>
       <% t.column :status, sort: true do |course| %>

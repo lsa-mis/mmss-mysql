@@ -27,7 +27,7 @@ class Admin::CoursesController < Admin::BaseController
     column :title
     column :available_spaces
     column('Open spaces', &:remaining_spaces)
-    column('Wait list') { |course| CourseAssignment.wait_list_number(course.id) }
+    column('Wait list', &:wait_list_count)
     column :status
     column :faculty_uniqname
     column :faculty_name
@@ -40,7 +40,7 @@ class Admin::CoursesController < Admin::BaseController
     relation = @filter.apply(Course.joins(:camp_occurrence).includes(:camp_occurrence))
     @scope_counts = scope_counts(relation, SCOPES)
     relation = apply_scope(relation, SCOPES)
-    relation = apply_sort(relation, allowed: SORTS, default: :title)
+    relation = apply_sort(relation, allowed: SORTS, default: :title).with_seat_counts
 
     respond_to do |format|
       format.html { @pagy, @courses = paginate(relation) }
