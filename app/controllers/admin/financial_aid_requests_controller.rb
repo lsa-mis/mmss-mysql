@@ -91,7 +91,7 @@ class Admin::FinancialAidRequestsController < Admin::BaseController
 
   def base_relation
     FinancialAid.left_joins(enrollment: :applicant_detail)
-                .preload(:taxform_attachment, enrollment: %i[user applicant_detail])
+                .preload({ taxform_attachment: :blob }, enrollment: %i[user applicant_detail])
   end
 
   def financial_aid_params
