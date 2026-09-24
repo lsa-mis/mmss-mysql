@@ -1,0 +1,54 @@
+<% admin_page_title @course.title, subtitle: "Course ##{@course.id} · #{@course.camp_occurrence.description}" %>
+<% admin_page_actions do %>
+  <%= link_to 'Edit', edit_admin_course_path(@course), class: 'admin-btn-primary' %>
+  <%= button_to 'Delete', admin_course_path(@course), method: :delete, class: 'admin-btn-danger',
+                form: { data: { turbo_confirm: 'Delete this course? Its course assignments and preferences will be deleted too.' } } %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-3">
+  <div class="grid gap-5 xl:col-span-2">
+    <%= admin_panel 'Course', body_class: '' do %>
+      <%= admin_attributes @course do |a| %>
+        <% a.row 'Session' do |course| %>
+          <%= link_to course.camp_occurrence.display_name, admin_session_configuration_path(course.camp_occurrence) %>
+        <% end %>
+        <% a.row :title, :available_spaces %>
+        <% a.row('Open Spaces', &:remaining_spaces) %>
+        <% a.row 'Wait List' do |course| %><%= CourseAssignment.wait_list_number(course.id) %><% end %>
+        <% a.row :faculty_uniqname, :faculty_name %>
+        <% a.row :status do |course| %><%= admin_status_badge(course.status) %><% end %>
+        <% a.row :created_at, :updated_at %>
+      <% end %>
+    <% end %>
+
+    <%= admin_panel "List of students (#{@course_assignments.size})", body_class: '' do %>
+      <table class="admin-table">
+        <thead><tr><th>Name</th><th>Email</th><th>Waiting list</th></tr></thead>
+        <tbody>
+          <% @course_assignments.each do |assignment| %>
+            <% student = assignment.enrollment %>
+            <tr>
+              <td><%= link_to student.applicant_detail&.full_name || student.user.email, admin_application_path(student) %></td>
+              <td><%= student.user.email %></td>
+              <td><%= admin_boolean(assignment.wait_list) %></td>
+            </tr>
+          <% end %>
+          <% if @course_assignments.empty? %>
+            <tr><td colspan="3"><%= admin_empty_state 'No students assigned to this course.' %></td></tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% end %>
+
+    <%= render 'admin/comments/comments', resource: @course %>
+  </div>
+
+  <div class="grid gap-5 self-start">
+    <%= admin_panel 'Seats' do %>
+      <%= admin_stat 'Available spaces', @course.available_spaces %>
+      <%= admin_stat 'Open spaces', @course.remaining_spaces %>
+      <%= admin_stat 'Wait list', CourseAssignment.wait_list_number(@course.id) %>
+      <%= admin_stat 'Preferences', @course.course_preferences.count %>
+    <% end %>
+  </div>
+</div>

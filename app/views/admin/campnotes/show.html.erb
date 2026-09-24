@@ -1,0 +1,28 @@
+<% admin_page_title "Campnote ##{@campnote.id}", subtitle: "#{@campnote.notetype.to_s.titleize} · #{admin_campnote_visible?(@campnote) ? 'visible now' : 'not currently visible'}" %>
+<% admin_page_actions do %>
+  <%= link_to 'Edit', edit_admin_campnote_path(@campnote), class: 'admin-btn-primary' %>
+  <%= button_to 'Delete', admin_campnote_path(@campnote), method: :delete, class: 'admin-btn-danger',
+                form: { data: { turbo_confirm: 'Delete this campnote?' } } %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-3">
+  <div class="grid gap-5 xl:col-span-2">
+    <%= admin_panel 'Campnote', body_class: '' do %>
+      <%= admin_attributes @campnote do |a| %>
+        <% a.row :id %>
+        <% a.row :note do |note| %><p class="admin-prose"><%= note.note %></p><% end %>
+        <% a.row('Open date', &:opendate) %>
+        <% a.row('Close date', &:closedate) %>
+        <% a.row 'Note type' do |note| %><%= admin_campnote_type_badge(note.notetype) %><% end %>
+        <% a.row :created_at, :updated_at %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="grid gap-5 self-start">
+    <%= admin_panel 'Preview' do %>
+      <p class="mb-2 text-xs text-slate-500">How the note appears in the site navigation while it is open.</p>
+      <%= render 'admin/campnotes/preview', note: @campnote %>
+    <% end %>
+  </div>
+</div>

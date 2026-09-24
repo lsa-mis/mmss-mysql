@@ -86,9 +86,4 @@ class CampConfiguration < ApplicationRecord
       new_camp_configuration.active = ''
     end
   end
-
-  def self.ransackable_attributes(auth_object = nil)
-    %w[active application_close application_fee_cents application_fee_required application_materials_due
-       application_open camp_year camper_acceptance_due created_at id offer_letter priority reject_letter student_packet_url updated_at waitlist_letter]
-  end
 end

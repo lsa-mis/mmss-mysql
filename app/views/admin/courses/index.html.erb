@@ -1,0 +1,38 @@
+<% admin_page_title 'Courses', subtitle: "#{number_with_delimiter(@pagy.count)} #{'course'.pluralize(@pagy.count)} · #{current_scope.label}" %>
+<% admin_page_actions do %>
+  <%= admin_csv_link %>
+  <%= link_to 'New Course', new_admin_course_path, class: 'admin-btn-primary' %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-4">
+  <div class="grid gap-4 xl:col-span-3">
+    <%= admin_scope_tabs Admin::CoursesController::SCOPES, counts: @scope_counts %>
+
+    <%= admin_table @courses, pagy: @pagy,
+                    batch_actions: Admin::CoursesController::BATCH_ACTIONS, batch_url: batch_admin_courses_path,
+                    actions: ->(course) { [admin_course_path(course), edit_admin_course_path(course), admin_course_path(course)] } do |t| %>
+      <% t.column 'Session', sort: 'session' do |course| %>
+        <%= link_to course.camp_occurrence.description, admin_session_configuration_path(course.camp_occurrence) %>
+      <% end %>
+      <% t.column :title, sort: true do |course| %>
+        <%= link_to course.title, admin_course_path(course), class: 'font-medium' %>
+      <% end %>
+      <% t.column :available_spaces, sort: true %>
+      <% t.column 'Open Spaces', &:remaining_spaces %>
+      <% t.column 'Wait List' do |course| %>
+        <%= CourseAssignment.wait_list_number(course.id) %>
+      <% end %>
+      <% t.column :faculty_uniqname, sort: true %>
+      <% t.column :faculty_name, sort: true %>
+      <% t.column :status, sort: true do |course| %>
+        <%= admin_status_badge(course.status) %>
+      <% end %>
+      <% t.column :created_at, sort: true %>
+      <% t.column :updated_at, sort: true %>
+    <% end %>
+  </div>
+
+  <div class="xl:col-span-1">
+    <%= admin_filter_form @filter, url: admin_courses_path %>
+  </div>
+</div>

@@ -23,6 +23,8 @@
 #  fk_rails_...  (camp_occurrence_id => camp_occurrences.id)
 #
 class Course < ApplicationRecord
+  include AdminCommentable
+
   belongs_to :camp_occurrence
   has_many :course_preferences, dependent: :destroy
   has_many :course_assignments, dependent: :destroy
@@ -46,13 +48,5 @@ class Course < ApplicationRecord
     return 0 if base_spaces.nil?
 
     [base_spaces - course_assignments.confirmed.count, 0].max
-  end
-
-  def self.ransackable_associations(_auth_object = nil)
-    ["camp_occurrence", "course_assignments", "course_preferences", "enrolled_users"]
-  end
-
-  def self.ransackable_attributes(_auth_object = nil)
-    ["available_spaces", "camp_occurrence_id", "created_at", "faculty_name", "faculty_uniqname", "id", "status", "title", "updated_at"]
   end
 end

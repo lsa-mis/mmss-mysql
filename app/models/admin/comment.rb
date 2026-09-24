@@ -31,7 +31,10 @@ class Admin::Comment < ApplicationRecord
   # porting a resource whose ActiveAdmin show page rendered `active_admin_comments`. Lambdas keep
   # autoloading lazy, and looking classes up here means user input is never constantized.
   COMMENTABLE_MODELS = {
-    'Enrollment' => -> { Enrollment }
+    'Enrollment' => -> { Enrollment },
+    'CampOccurrence' => -> { CampOccurrence },
+    'Activity' => -> { Activity },
+    'Course' => -> { Course }
   }.freeze
 
   def self.commentable_class(type)

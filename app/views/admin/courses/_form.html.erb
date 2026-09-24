@@ -1,0 +1,24 @@
+<%# locals: course %>
+<%= admin_form_with model: course,
+                    url: (course.persisted? ? admin_course_path(course) : admin_courses_path),
+                    class: 'grid gap-5' do |f| %>
+  <%= f.errors_summary %>
+
+  <%# Active sessions only (as in ActiveAdmin), plus the course's own session so editing an old course keeps it. %>
+  <% sessions = CampOccurrence.active.reorder(begin_date: :desc).no_any_session.to_a %>
+  <% sessions << course.camp_occurrence if course.camp_occurrence && sessions.exclude?(course.camp_occurrence) %>
+
+  <%= f.fieldset 'Course' do %>
+    <%= f.input :camp_occurrence_id, as: :select, label: 'Session', include_blank: 'Select a session', required: true,
+                                     collection: sessions.map { |s| [s.display_name, s.id] } %>
+    <%= f.input :title, required: true %>
+    <%= f.input :available_spaces, as: :number, min: 0, required: true %>
+    <div class="grid gap-4 md:grid-cols-2">
+      <%= f.input :faculty_uniqname, hint: 'Uniqname only, without the domain.' %>
+      <%= f.input :faculty_name %>
+    </div>
+    <%= f.input :status, as: :select, collection: course_status, include_blank: false %>
+  <% end %>
+
+  <%= f.actions cancel: (course.persisted? ? admin_course_path(course) : admin_courses_path) %>
+<% end %>

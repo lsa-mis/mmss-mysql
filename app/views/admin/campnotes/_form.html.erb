@@ -1,0 +1,17 @@
+<%# locals: campnote %>
+<%= admin_form_with model: campnote,
+                    url: (campnote.persisted? ? admin_campnote_path(campnote) : admin_campnotes_path),
+                    class: 'grid gap-5' do |f| %>
+  <%= f.errors_summary %>
+
+  <%= f.fieldset 'Campnote', description: 'Shown in the site navigation between the open and close dates. Only one note can be open at a time.' do %>
+    <%= f.input :note, as: :textarea, rows: 3, required: true, maxlength: 255 %>
+    <div class="grid gap-4 md:grid-cols-2">
+      <%= f.input :opendate, label: 'Open date', required: true %>
+      <%= f.input :closedate, label: 'Close date', required: true %>
+    </div>
+    <%= f.input :notetype, as: :select, label: 'Note type', collection: campnote_types, include_blank: 'Select a type', required: true %>
+  <% end %>
+
+  <%= f.actions cancel: (campnote.persisted? ? admin_campnote_path(campnote) : admin_campnotes_path) %>
+<% end %>

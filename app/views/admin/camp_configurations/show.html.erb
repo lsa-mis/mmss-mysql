@@ -1,0 +1,55 @@
+<% admin_page_title "Camp Configuration #{@camp_configuration.camp_year}", subtitle: (@camp_configuration.active? ? 'Active camp' : 'Inactive camp') %>
+<% admin_page_actions do %>
+  <%= link_to 'Edit', edit_admin_camp_configuration_path(@camp_configuration), class: 'admin-btn-primary' %>
+  <%= button_to 'Delete', admin_camp_configuration_path(@camp_configuration), method: :delete, class: 'admin-btn-danger',
+                form: { data: { turbo_confirm: 'Delete this camp configuration? Its sessions, activities and courses will be deleted too.' } } %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-3">
+  <div class="grid gap-5 xl:col-span-2">
+    <%= admin_panel 'Camp', body_class: '' do %>
+      <%= admin_attributes @camp_configuration do |a| %>
+        <% a.row :camp_year, :application_open, :application_close, :priority, :application_materials_due, :camper_acceptance_due, :active %>
+        <% a.row 'Application fee' do |camp| %><%= humanized_money_with_symbol(camp.application_fee) %><% end %>
+        <% a.row :application_fee_required %>
+        <% a.row 'Student Packet URL for campers who accept their offer' do |camp| %>
+          <% if camp.student_packet_url.present? %>
+            <%= link_to camp.student_packet_url, camp.student_packet_url, target: '_blank', rel: 'noopener', class: 'admin-btn-link break-all' %>
+          <% end %>
+        <% end %>
+        <% a.row :created_at, :updated_at %>
+      <% end %>
+    <% end %>
+
+    <%= admin_panel 'Offer Letter Text' do %>
+      <div class="admin-prose whitespace-pre-line"><%= @camp_configuration.offer_letter.presence || admin_empty_value %></div>
+    <% end %>
+
+    <%= admin_panel 'Rejection Letter Text' do %>
+      <div class="admin-prose whitespace-pre-line"><%= @camp_configuration.reject_letter.presence || admin_empty_value %></div>
+    <% end %>
+
+    <%= admin_panel 'Wait list Letter Text' do %>
+      <div class="admin-prose whitespace-pre-line"><%= @camp_configuration.waitlist_letter.presence || admin_empty_value %></div>
+    <% end %>
+  </div>
+
+  <div class="grid gap-5 self-start">
+    <%= admin_panel 'Sessions', body_class: '', actions: link_to('Session configurations →', admin_session_configurations_path(q: { camp_configuration_id: @camp_configuration.id }), class: 'admin-btn-link') do %>
+      <% sessions = @camp_configuration.camp_occurrences.order(:begin_date) %>
+      <% if sessions.empty? %>
+        <%= admin_empty_state 'No sessions configured for this camp.' %>
+      <% else %>
+        <ul class="divide-y divide-slate-100">
+          <% sessions.each do |session| %>
+            <li class="flex items-center justify-between gap-3 px-4 py-2 text-sm">
+              <%= link_to session.description, admin_session_configuration_path(session) %>
+              <span class="text-xs text-slate-500"><%= admin_date(session.begin_date) %> – <%= admin_date(session.end_date) %></span>
+              <%= admin_boolean(session.active) %>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+    <% end %>
+  </div>
+</div>

@@ -43,7 +43,7 @@ ActiveAdmin.register Faculty do
 
     panel "Courses for current camp" do
       table_for Course.current_camp.where(faculty_uniqname: faculty.email.split('@').first) do
-        column("course") { |item| link_to(item.display_name, legacy_admin_course_path(item)) }
+        column("course") { |item| link_to(item.display_name, admin_course_path(item)) }
         column(:available_spaces)
         column(:status)
       end

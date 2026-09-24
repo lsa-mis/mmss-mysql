@@ -1,0 +1,24 @@
+<%# locals: demographic %>
+<% if demographic.protected? %>
+  <%= admin_panel 'Protected Record', body_class: '' do %>
+    <p class="border-b border-amber-200 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-900">
+      This demographic record is protected and cannot be modified.
+    </p>
+    <%= admin_attributes demographic do |a| %>
+      <% a.row :name, :description, :protected %>
+    <% end %>
+  <% end %>
+<% else %>
+  <%= admin_form_with model: demographic,
+                      url: (demographic.persisted? ? admin_demographic_path(demographic) : admin_demographics_path),
+                      class: 'grid gap-5' do |f| %>
+    <%= f.errors_summary %>
+
+    <%= f.fieldset 'Demographic' do %>
+      <%= f.input :name, required: true, hint: 'Letters and spaces only; the name is title-cased when saved.' %>
+      <%= f.input :description, required: true %>
+    <% end %>
+
+    <%= f.actions cancel: (demographic.persisted? ? admin_demographic_path(demographic) : admin_demographics_path) %>
+  <% end %>
+<% end %>

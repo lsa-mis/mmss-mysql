@@ -1,0 +1,31 @@
+<% admin_page_title @session_configuration.description, subtitle: "Session Configuration ##{@session_configuration.id} · #{@session_configuration.camp_configuration.camp_year} camp" %>
+<% admin_page_actions do %>
+  <%= link_to 'Edit', edit_admin_session_configuration_path(@session_configuration), class: 'admin-btn-primary' %>
+  <%= button_to 'Delete', admin_session_configuration_path(@session_configuration), method: :delete, class: 'admin-btn-danger',
+                form: { data: { turbo_confirm: 'Delete this session? Its activities, courses and assignments will be deleted too.' } } %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-3">
+  <div class="grid gap-5 xl:col-span-2">
+    <%= admin_panel 'Session', body_class: '' do %>
+      <%= admin_attributes @session_configuration do |a| %>
+        <% a.row 'Camp Year' do |session| %>
+          <%= link_to session.camp_configuration.camp_year, admin_camp_configuration_path(session.camp_configuration) %>
+        <% end %>
+        <% a.row :description %>
+        <% a.row 'Cost' do |session| %><%= humanized_money_with_symbol(session.cost) %><% end %>
+        <% a.row :begin_date, :end_date, :active, :created_at, :updated_at %>
+      <% end %>
+    <% end %>
+
+    <%= render 'admin/comments/comments', resource: @session_configuration %>
+  </div>
+
+  <div class="grid gap-5 self-start">
+    <%= admin_panel 'Related' do %>
+      <%= admin_stat 'Courses', link_to(@session_configuration.courses.count, admin_courses_path(scope: 'all', q: { camp_occurrence_id: @session_configuration.id })) %>
+      <%= admin_stat 'Activities', link_to(@session_configuration.activities.count, admin_activities_path(q: { camp_occurrence_id: @session_configuration.id })) %>
+      <%= admin_stat 'Session assignments', @session_configuration.session_assignments.count %>
+    <% end %>
+  </div>
+</div>
