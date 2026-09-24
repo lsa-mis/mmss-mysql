@@ -1,31 +1,26 @@
 # frozen_string_literal: true
 
-# Applicants enter their own travel details (nested under their enrollment). Listing and
-# deleting travel records is admin-only and lives in Admin::TravelsController.
+# Applicants enter their own travel details (nested under their enrollment). Every lookup is
+# scoped to the signed-in user's enrollments, so a foreign enrollment or travel id is a 404.
+# Listing and deleting travel records is admin-only and lives in Admin::TravelsController.
 class TravelsController < ApplicationController
-  devise_group :logged_in, contains: [:user, :admin]
-  before_action :authenticate_logged_in!
+  before_action :authenticate_user!
   before_action :set_current_enrollment
-  before_action :set_list_of_sessions, only: [:new, :edit, :create, :update]
+  before_action :set_travel, only: %i[show edit update]
+  before_action :set_list_of_sessions, only: %i[new edit create update]
 
-  # GET /travels/1
-  # GET /travels/1.json
-  def show
-    @travel = @current_enrollment.travels.find(params[:id])
-  end
+  # GET /enrollments/:enrollment_id/travels/1
+  def show; end
 
-  # GET /travels/new
+  # GET /enrollments/:enrollment_id/travels/new
   def new
     @travel = @current_enrollment.travels.new
   end
 
-  # GET /travels/1/edit
-  def edit
-    @travel = @current_enrollment.travels.find(params[:id])
-  end
+  # GET /enrollments/:enrollment_id/travels/1/edit
+  def edit; end
 
-  # POST /travels
-  # POST /travels.json
+  # POST /enrollments/:enrollment_id/travels
   def create
     @travel = @current_enrollment.travels.new(travel_params)
     respond_to do |format|
@@ -39,10 +34,8 @@ class TravelsController < ApplicationController
     end
   end
 
-  # PATCH/PUT /travels/1
-  # PATCH/PUT /travels/1.json
+  # PATCH/PUT /enrollments/:enrollment_id/travels/1
   def update
-    @travel = @current_enrollment.travels.find(params[:id])
     respond_to do |format|
       if @travel.update(travel_params)
         format.html { redirect_to root_path, notice: 'Travel was successfully updated.', status: :see_other }
@@ -56,18 +49,22 @@ class TravelsController < ApplicationController
 
   private
 
-    def set_current_enrollment
-      @current_enrollment = Enrollment.find(params[:enrollment_id])
-    end
+  def set_current_enrollment
+    @current_enrollment = current_user.enrollments.find(params[:enrollment_id])
+  end
 
-    def set_list_of_sessions
-      @sessions = @current_enrollment.session_assignments.map { |s| s.camp_occurrence.description_with_month_and_day }
-    end
+  def set_travel
+    @travel = @current_enrollment.travels.find(params[:id])
+  end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def travel_params
-      params.require(:travel).permit(:enrollment_id, :arrival_session, :depart_session, 
-              :arrival_transport, :arrival_carrier, :arrival_route_num, :arrival_date, :arrival_time, 
-              :depart_transport, :depart_carrier, :depart_route_num, :depart_date, :depart_time, :note)
-    end
+  def set_list_of_sessions
+    @sessions = @current_enrollment.session_assignments.map { |s| s.camp_occurrence.description_with_month_and_day }
+  end
+
+  # enrollment_id comes from the route (and is owned by current_user), never from the form.
+  def travel_params
+    params.require(:travel).permit(:arrival_session, :depart_session,
+                                   :arrival_transport, :arrival_carrier, :arrival_route_num, :arrival_date, :arrival_time,
+                                   :depart_transport, :depart_carrier, :depart_route_num, :depart_date, :depart_time, :note)
+  end
 end

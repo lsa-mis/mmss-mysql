@@ -85,7 +85,8 @@ class FinancialAidsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def financial_aid_params
-      permitted = [:enrollment_id, :note, :adjusted_gross_income]
+      # The enrollment is always the applicant's current one (set_current_enrollment); never take it from the form.
+      permitted = [:note, :adjusted_gross_income]
 
       # Only allow admin-only fields if user is an admin
       if admin_signed_in?

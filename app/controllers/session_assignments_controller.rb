@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
+# Applicants accept or decline their own session offers (links in the progress sidebox). The
+# assignment lookup is scoped to the signed-in user's enrollments, so a foreign id is a 404.
 class SessionAssignmentsController < ApplicationController
-  devise_group :logged_in, contains: [:user, :admin]
-  before_action :authenticate_logged_in!
-
+  before_action :authenticate_user!
   before_action :set_session_assignment
 
   def accept_session_offer
@@ -32,10 +32,6 @@ class SessionAssignmentsController < ApplicationController
 
   private
     def set_session_assignment
-      @session_assignment = SessionAssignment.find(params[:id])
-    end
-
-    def session_assignment_params
-      params.require(:session_assignment).permit(:enrollment_id, :camp_occurrence_id)
+      @session_assignment = SessionAssignment.where(enrollment_id: current_user.enrollments.select(:id)).find(params[:id])
     end
 end
