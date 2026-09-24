@@ -46,7 +46,7 @@ A Ruby on Rails application for managing summer camp applications, enrollments, 
 | **Auth**         | Devise (users, admins, faculties)                                |
 | **Admin**        | ActiveAdmin 3.x                                                  |
 | **Server**       | Puma 5.6                                                         |
-| **Frontend**     | Webpacker 5, Turbolinks, Stimulus, Tailwind CSS, Flatpickr       |
+| **Frontend**     | importmap-rails, Hotwire (Turbo Drive + Stimulus), Tailwind CSS 4 (tailwindcss-rails), Flatpickr; Sprockets only for ActiveAdmin |
 | **File storage** | Active Storage (local disk / Google Cloud Storage in production) |
 | **Monitoring**   | Skylight, Sentry                                                 |
 | **Deployment**   | Capistrano 3, asdf                                               |
@@ -58,7 +58,6 @@ A Ruby on Rails application for managing summer camp applications, enrollments, 
 
 - **Ruby** 3.4.9 (recommended: [asdf](https://asdf-vm.com/) or rbenv)
 - **MySQL** 8.x (with OpenSSL available for the `mysql2` gem)
-- **Node.js** (for Webpacker; LTS version recommended)
 - **Bundler** 2.x
 - **Git**
 
@@ -84,19 +83,19 @@ gem install mysql2 -v '0.5.6' -- --with-mysql-dir=/opt/homebrew/opt/mysql --with
   ```bash
    bundle install
   ```
-3. **Install JavaScript dependencies**
-  ```bash
-   yarn install
-   # or: npm install
-  ```
-4. **Create and configure the database** (see [Configuration](#configuration))
+3. **Create and configure the database** (see [Configuration](#configuration))
   ```bash
    # Set LOCAL_MYSQL_DATABASE_PASSWORD (see below), then:
    bin/rails db:create
    bin/rails db:schema:load
    # Optionally: bin/rails db:seed
   ```
-5. **Prepare Rails credentials and config** (see [Configuration](#configuration))
+4. **Prepare Rails credentials and config** (see [Configuration](#configuration))
+
+No Node.js or Yarn is required: JavaScript is served through import maps
+(`config/importmap.rb`, `app/javascript/`, vendored packages in
+`vendor/javascript/`) and Tailwind is compiled by the `tailwindcss-ruby`
+standalone binary that ships with the `tailwindcss-rails` gem.
 
 ---
 
@@ -146,16 +145,17 @@ Configured for Google Cloud Storage (GCS). A GCS keyfile is expected. Bucket and
 ## Running the Application
 
 1. **Start MySQL** (if not running as a service).
-2. **Start the Rails server**
+2. **Start the Rails server and the Tailwind watcher**
   ```bash
-   bin/rails server
+   bin/dev
   ```
+   `bin/dev` runs `Procfile.dev` through foreman (installed on first use):
+   `bin/rails server` on port 3000 plus `bin/rails tailwindcss:watch`, which
+   rebuilds `app/assets/builds/tailwind.css` whenever `app/assets/tailwind/`
+   or the views change. Without the watcher, run `bin/rails tailwindcss:build`
+   once after editing styles and start `bin/rails server` on its own.
    Default: [http://localhost:3000](http://localhost:3000)
-3. **Start Webpack dev server** (for asset compilation in development)
-  ```bash
-   bin/webpack-dev-server
-  ```
-4. **Useful URLs (development)**
+3. **Useful URLs (development)**
   - Root: `/`
   - Admin: `/admin` (Devise admin login)
   - Faculty: `/faculty`, `/faculty_login`
@@ -169,10 +169,13 @@ Configured for Google Cloud Storage (GCS). A GCS keyfile is expected. Bucket and
   ```bash
   bundle exec rspec
   ```
-  Ensure the test database exists and is migrated:
+  Ensure the test database exists and is migrated, and that the Tailwind
+  build exists (request and system specs render the layouts):
   ```bash
   RAILS_ENV=test bin/rails db:create db:schema:load
+  RAILS_ENV=test bin/rails tailwindcss:build
   ```
+  System specs (`spec/system`) drive headless Chrome through Selenium.
 - **Code style (Standard Ruby)**
   ```bash
   bundle exec standardrb
@@ -201,6 +204,10 @@ bundle exec cap production maintenance:stop
 
 Before deploy, `deploy:check_revision` ensures local HEAD matches `origin/main`.
 
+Assets are compiled on the server by capistrano-rails (`bin/rails assets:precompile`),
+which runs `tailwindcss:build` and then Sprockets; no Node.js, Yarn or `NODE_OPTIONS`
+are needed on the host. Compiled assets live in the linked `public/assets` directory.
+
 `maintenance:start` uploads `config/maintenance_template.yml` to `tmp/maintenance.yml` on the server; while that file exists the `MaintenanceMode` middleware answers every request (except `allowed_paths` / `allowed_ips`) with `public/maintenance.html`, the `response_code` (default 503) and a `Retry-After` header. `maintenance:stop` removes the file. Edit the template's `reason`, `allowed_ips`, etc. before starting.
 
 ### Staging (Hatchbox + DigitalOcean)
@@ -220,11 +227,10 @@ Use a **separate Hatchbox app** (or equivalent) with the `**staging` git branch*
 | `STAGING_MAILER_PROTOCOL`                                                     | Usually `https`                                                                                                                                                                |
 | `STAGING_ALLOWED_HOSTS`                                                       | Comma-separated hosts if `ActionDispatch::HostAuthorization` blocks the real hostname                                                                                          |
 | `LETTER_OPENER_WEB_HTTP_BASIC_USER` / `LETTER_OPENER_WEB_HTTP_BASIC_PASSWORD` | Optional HTTP basic auth for `/letter_opener`                                                                                                                                  |
-| `NODE_OPTIONS`                                                                | If asset precompile fails on OpenSSL, use `--openssl-legacy-provider` (same as production builds)                                                                              |
 | `RAILS_SERVE_STATIC_FILES`                                                    | Set if the app serves static files without nginx in front                                                                                                                      |
 
 
-The root `[Procfile](Procfile)` runs Puma with `[config/puma.default.rb](config/puma.default.rb)` (binds to `$PORT`). For local **web + webpack**, use `foreman start -f Procfile.dev`.
+The root `[Procfile](Procfile)` runs Puma with `[config/puma.default.rb](config/puma.default.rb)` (binds to `$PORT`). For local development use `bin/dev` (Rails server + Tailwind watcher from `Procfile.dev`).
 
 ---
 
@@ -234,8 +240,11 @@ The root `[Procfile](Procfile)` runs Puma with `[config/puma.default.rb](config/
 | Path                        | Purpose                                                                                 |
 | --------------------------- | --------------------------------------------------------------------------------------- |
 | `app/`                      | Models, controllers, views, mailers, helpers, ActiveAdmin config                        |
+| `app/javascript/`           | Import-map entry point (`application.js`) and Stimulus controllers                      |
+| `app/assets/tailwind/`      | Tailwind 4 CSS-first config and app styles, built to `app/assets/builds/tailwind.css`   |
+| `config/importmap.rb`       | JavaScript import map pins; `bin/importmap pin <pkg>` vendors into `vendor/javascript/` |
 | `config/`                   | Application, routes, environments, initializers, deploy                                 |
-| `Procfile` / `Procfile.dev` | Puma on `$PORT` for PaaS; local Rails + webpack watcher                                 |
+| `Procfile` / `Procfile.dev` | Puma on `$PORT` for PaaS; local Rails server + Tailwind watcher (`bin/dev`)             |
 | `config/puma.default.rb`    | Portable Puma (Hatchbox / DO); production Capistrano still uses linked `config/puma.rb` |
 | `db/`                       | Schema, migrations, seeds                                                               |
 | `lib/capistrano/tasks/`     | Custom Capistrano tasks                                                                 |
