@@ -1,3 +1,4 @@
-# Local development: `bin/dev` runs the Rails server and the Tailwind watcher together.
+# Local development: `bin/dev` runs the Rails server and the Tailwind watchers together.
 web: bin/rails server -p 3000
 css: bin/rails tailwindcss:watch
+css_admin: bin/rails tailwindcss:watch:admin

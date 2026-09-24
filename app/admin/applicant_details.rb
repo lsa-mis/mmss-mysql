@@ -74,7 +74,7 @@ ActiveAdmin.register ApplicantDetail do
     column('email') do |app|
       if app.user.enrollments.exists?
         div(title: 'Link to Latest Application') do
-          link_to app.applicant_email, admin_application_path(app.user.enrollments.last)
+          link_to app.applicant_email, legacy_admin_application_path(app.user.enrollments.last)
         end
       else
         app.applicant_email
@@ -113,7 +113,7 @@ ActiveAdmin.register ApplicantDetail do
         column('email') do |app|
           if app.user.enrollments.exists?
             div(title: 'Link to Application') do
-              link_to app.applicant_email, admin_application_path(app.user.enrollments.last)
+              link_to app.applicant_email, legacy_admin_application_path(app.user.enrollments.last)
             end
           else
             app.applicant_email

@@ -33,7 +33,7 @@ ActiveAdmin.register CourseAssignment do
   index do
     selectable_column
     actions
-    column('Enrollment') { |ca| link_to ca.enrollment.display_name, admin_application_path(ca.enrollment_id) }
+    column('Enrollment') { |ca| link_to ca.enrollment.display_name, legacy_admin_application_path(ca.enrollment_id) }
     column 'Course', &:course
     column :wait_list
     column :created_at
@@ -42,7 +42,7 @@ ActiveAdmin.register CourseAssignment do
 
   show do
     attributes_table do
-      row('Enrollment') { |ca| link_to ca.enrollment.display_name, admin_application_path(ca.enrollment_id) }
+      row('Enrollment') { |ca| link_to ca.enrollment.display_name, legacy_admin_application_path(ca.enrollment_id) }
       row 'Course', &:course
       row :wait_list
       row :created_at

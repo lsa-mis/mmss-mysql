@@ -29,7 +29,7 @@ ActiveAdmin.register Recupload do
     selectable_column
     actions
     column :recommendation_id, sortable: :recommendation_id do |ri|
-      link_to ri.recommendation_id, admin_recommendation_path(ri.recommendation_id)
+      link_to ri.recommendation_id, legacy_admin_recommendation_path(ri.recommendation_id)
     end
     column 'Applicant' do |app|
       app.recommendation.enrollment.display_name
@@ -47,7 +47,7 @@ ActiveAdmin.register Recupload do
     attributes_table do
       row :id
       row :recommendation_id do |ri|
-        link_to ri.recommendation_id, admin_recommendation_path(ri.recommendation_id)
+        link_to ri.recommendation_id, legacy_admin_recommendation_path(ri.recommendation_id)
       end
       row :applicant_name do |ri|
         ri.recommendation.enrollment

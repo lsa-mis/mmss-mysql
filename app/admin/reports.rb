@@ -7,38 +7,38 @@ ActiveAdmin.register_page 'Reports' do
     columns do
       panel 'queries' do
         ul do
-          li link_to 'report - All Complete Applications', admin_reports_all_complete_apps_path
-          li link_to 'report - Registered but not Applied', admin_reports_registered_but_not_applied_path
+          li link_to 'report - All Complete Applications', legacy_admin_reports_all_complete_apps_path
+          li link_to 'report - Registered but not Applied', legacy_admin_reports_registered_but_not_applied_path
           li link_to 'report - Pending Course Assignments with Students',
-                     admin_reports_pending_course_assignments_with_students_path
+                     legacy_admin_reports_pending_course_assignments_with_students_path
           li link_to 'report - Accepted Course Assignments with Students',
-                     admin_reports_accepted_course_assignments_with_students_path
+                     legacy_admin_reports_accepted_course_assignments_with_students_path
           li link_to 'report - Complete Application with Course Preferences',
-                     admin_reports_complete_applications_with_course_preferences_path
+                     legacy_admin_reports_complete_applications_with_course_preferences_path
           li link_to 'report - Waitlisted Application with Course Preferences',
-                     admin_reports_waitlisted_applications_with_course_preferences_path
-          li link_to 'report - Finaid with App and Offer Status', admin_reports_finaid_with_app_and_offer_status_path
+                     legacy_admin_reports_waitlisted_applications_with_course_preferences_path
+          li link_to 'report - Finaid with App and Offer Status', legacy_admin_reports_finaid_with_app_and_offer_status_path
           li link_to 'report - Complete Applications Demographic Report',
-                     admin_reports_complete_apps_demographic_report_path
-          li link_to 'report - Offer Accepted with Balance Due', admin_reports_offer_accepted_with_balance_due_path
+                     legacy_admin_reports_complete_apps_demographic_report_path
+          li link_to 'report - Offer Accepted with Balance Due', legacy_admin_reports_offer_accepted_with_balance_due_path
         end
         text_node '----- ENROLLED USERS -----'.html_safe
         ul do
           li link_to 'report - Enrolled with Addresses and Parents Information',
-                     admin_reports_enrolled_with_addresses_path
+                     legacy_admin_reports_enrolled_with_addresses_path
           li link_to 'report - Enrolled Students Demographic Report',
-                     admin_reports_enrolled_student_demographic_report_path
-          li link_to 'report - Events per Session', admin_reports_enrolled_events_per_session_path
+                     legacy_admin_reports_enrolled_student_demographic_report_path
+          li link_to 'report - Events per Session', legacy_admin_reports_enrolled_events_per_session_path
           li link_to 'report - Enrolled Students with Sessions and Courses',
-                     admin_reports_enrolled_with_sessions_and_courses_path
+                     legacy_admin_reports_enrolled_with_sessions_and_courses_path
           li link_to 'report - Enrolled Students with Sessions and T-Shirt size',
-                     admin_reports_enrolled_with_sessions_and_tshirt_path
-          li link_to 'report - Course Assignments', admin_reports_course_assignments_path
+                     legacy_admin_reports_enrolled_with_sessions_and_tshirt_path
+          li link_to 'report - Course Assignments', legacy_admin_reports_course_assignments_path
           li link_to 'report - Enrolled with Addresses, Birthdate, Gender, Graduation Year',
-                     admin_reports_enrolled_with_addresses_and_more_path
+                     legacy_admin_reports_enrolled_with_addresses_and_more_path
           li link_to 'report - Enrolled for More than One Session',
-                     admin_reports_enrolled_for_more_than_one_session_path
-          li link_to 'report - Enrolled with Dormitories', admin_reports_dorm_by_gender_by_session_path
+                     legacy_admin_reports_enrolled_for_more_than_one_session_path
+          li link_to 'report - Enrolled with Dormitories', legacy_admin_reports_dorm_by_gender_by_session_path
         end
       end
     end

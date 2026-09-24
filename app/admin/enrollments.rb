@@ -39,25 +39,25 @@ ActiveAdmin.register Enrollment, as: 'Application' do
 
   action_item :set_waitlisted, only: :show do
     if ['application complete'].include? application.application_status
-      text_node link_to('Place on Wait List', waitlisted_path(application),
+      text_node link_to('Place on Wait List', waitlist_admin_application_path(application),
                         data: { confirm: 'Are you sure you want to wait list this application?' }, method: :post)
     end
   end
   action_item :remove_from_waitlist, only: :show do
     if ['waitlisted'].include? application.application_status
-      text_node link_to('Remove from Wait List', remove_from_waitlist_path(application),
+      text_node link_to('Remove from Wait List', remove_from_waitlist_admin_application_path(application),
                         data: { confirm: 'Are you sure you want to remove this application from wait list?' }, method: :post)
     end
   end
   action_item :set_rejected, only: :show do
     if ['application complete'].include? application.application_status
       text_node link_to('Reject Applicant',
-                        new_admin_rejection_path(enrollment_id: application))
+                        new_legacy_admin_rejection_path(enrollment_id: application))
     end
   end
   action_item :withdraw_enrollment, only: :show do
     if ['enrolled'].include? application.application_status
-      text_node link_to('Withdraw Enrollment', withdraw_enrollment_path(application),
+      text_node link_to('Withdraw Enrollment', withdraw_admin_application_path(application),
                         data: { confirm: 'Are you sure you want to withdraw this enrollment? This will delete all associated course assignments.' }, method: :post)
     end
   end
@@ -166,7 +166,7 @@ ActiveAdmin.register Enrollment, as: 'Application' do
     actions
     column :updated_at
     column 'Applicant' do |application|
-      link_to application.display_name, admin_user_path(application.user_id)
+      link_to application.display_name, legacy_admin_user_path(application.user_id)
     end
     column 'Transcript' do |enroll|
       link_to enroll.transcript.filename, url_for(enroll.transcript) if enroll.transcript.attached?
@@ -194,7 +194,7 @@ ActiveAdmin.register Enrollment, as: 'Application' do
   show do
     attributes_table do
       row :user_id do |user|
-        link_to(user.applicant_detail.full_name.titleize, admin_applicant_detail_path(user.applicant_detail))
+        link_to(user.applicant_detail.full_name.titleize, legacy_admin_applicant_detail_path(user.applicant_detail))
       end
       row :uniqname if application.application_status == 'enrolled'
       row :personal_statement
@@ -211,7 +211,7 @@ ActiveAdmin.register Enrollment, as: 'Application' do
 
     panel 'Session Assignment' do
       table_for application.session_assignments do
-        column(:id) { |item| link_to(item.id, admin_session_assignment_path(item)) }
+        column(:id) { |item| link_to(item.id, legacy_admin_session_assignment_path(item)) }
         column('Session') { |item| item.camp_occurrence.description }
         column(:offer_status)
       end
@@ -225,7 +225,7 @@ ActiveAdmin.register Enrollment, as: 'Application' do
 
     panel 'Course Assignment' do
       table_for application.course_assignments do
-        column(:id) { |item| link_to(item.id, admin_course_assignment_path(item)) }
+        column(:id) { |item| link_to(item.id, legacy_admin_course_assignment_path(item)) }
         column(:course_id) { |item| item.course.title }
         column 'Session' do |item|
           item.course.camp_occurrence.description
@@ -276,7 +276,7 @@ ActiveAdmin.register Enrollment, as: 'Application' do
           text_node '<strong>!! This application was submitted after the Application Fee Requirement was turned off !!</strong>'.html_safe
         end
         table_for application.user.payments.current_camp_payments do
-          column(:id) { |aid| link_to(aid.id, admin_payment_path(aid.id)) }
+          column(:id) { |aid| link_to(aid.id, legacy_admin_payment_path(aid.id)) }
           column(:account_type) { |atype| atype.account_type.titleize }
           column(:transaction_date) { |td| Date.parse(td.transaction_date) }
           column(:transaction_status) { |ts| transaction_status_message(ts.transaction_status) }
@@ -285,18 +285,18 @@ ActiveAdmin.register Enrollment, as: 'Application' do
       end
 
       text_node link_to('[Send Financial Aid Request Link to Applicant]',
-                        send_finaid_request_email_path(enrollment_id: application))
+                        send_finaid_request_email_admin_application_path(application), method: :post)
       text_node ' --- '
       text_node link_to('[Add Financial Aid Request]',
-                        new_admin_financial_aid_request_path(enrollment_id: application))
+                        new_legacy_admin_financial_aid_request_path(enrollment_id: application))
       text_node ' --- '
-      text_node link_to('[Add Manual Payment]', new_admin_payment_path(enrollment_id: application))
+      text_node link_to('[Add Manual Payment]', new_legacy_admin_payment_path(enrollment_id: application))
 
       if application.financial_aids.present?
         panel 'Financial Aid Request' do
           table_for FinancialAid.where(enrollment_id: application) do
             column 'Request' do |item|
-              link_to('view', admin_financial_aid_request_path(item)) if item.present?
+              link_to('view', legacy_admin_financial_aid_request_path(item)) if item.present?
             end
             column 'Amount' do |item|
               humanized_money_with_symbol(item.amount) if item.present?
@@ -312,13 +312,13 @@ ActiveAdmin.register Enrollment, as: 'Application' do
     panel 'Recommendation' do
       if application.recommendation.present?
         table_for application.recommendation do
-          column(:id) { |recc| link_to(recc.id, admin_recommendation_path(recc.id)) }
+          column(:id) { |recc| link_to(recc.id, legacy_admin_recommendation_path(recc.id)) }
           column :firstname
           column :lastname
           column :organization
           column 'Letter' do |item|
             if item.recupload.present?
-              link_to('view', admin_recupload_path(item.recupload))
+              link_to('view', legacy_admin_recupload_path(item.recupload))
             else
               '- waiting for response'
             end

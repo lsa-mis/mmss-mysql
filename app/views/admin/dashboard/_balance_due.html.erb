@@ -1,0 +1,25 @@
+<%# locals: balance_due, total %>
+<%= admin_panel 'Offer Accepted with Balance Due',
+                actions: admin_legacy_link_to('CSV report ↓', legacy_admin_reports_offer_accepted_with_balance_due_path),
+                body_class: 'divide-y divide-slate-100' do %>
+  <% if balance_due.empty? %>
+    <%= admin_empty_state 'No offer accepted applications with balance due.' %>
+  <% end %>
+  <% balance_due.each do |enrollment| %>
+    <% detail = enrollment.applicant_detail %>
+    <div class="flex flex-wrap items-center justify-between gap-2 px-4 py-2 text-sm">
+      <div>
+        <%= link_to detail&.full_name || enrollment.user.email, admin_application_path(enrollment) %>
+        <span class="ml-2 text-xs text-slate-500">
+          DOB: <%= detail&.birthdate&.strftime('%Y-%m-%d') || '—' %> · Parent: <%= detail&.parentname || '—' %>
+        </span>
+      </div>
+      <span class="font-medium text-red-700"><%= admin_money_from_cents(enrollment.balance_due_cents) %></span>
+    </div>
+  <% end %>
+  <% if total > balance_due.size %>
+    <div class="px-4 py-2 text-sm">
+      <%= admin_legacy_link_to "View full report (#{total} total)…", legacy_admin_reports_offer_accepted_with_balance_due_path %>
+    </div>
+  <% end %>
+<% end %>

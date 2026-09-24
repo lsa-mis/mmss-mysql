@@ -6,7 +6,7 @@ class RecommendationsController < ApplicationController
   before_action :authenticate_admin!, only: %i[index destroy]
 
   before_action :set_recommendation, only: %i[show edit update destroy]
-  before_action :set_current_enrollment, except: [:send_request_email]
+  before_action :set_current_enrollment
 
   # GET /recommendations
   # GET /recommendations.json
@@ -81,14 +81,6 @@ class RecommendationsController < ApplicationController
     respond_to do |format|
       format.html { redirect_to enrollment_recommendations_url(@enrollment), notice: 'Recommendation was successfully destroyed.', status: :see_other }
       format.json { head :no_content }
-    end
-  end
-
-  def send_request_email
-    @recommendation = Recommendation.find_by(id: params[:recommendation_id])
-    RecommendationMailer.with(recommendation: @recommendation).request_email.deliver_now
-    respond_to do |format|
-      format.html { redirect_to admin_recommendation_path(@recommendation), notice: 'Request was sent!' }
     end
   end
 

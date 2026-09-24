@@ -31,7 +31,7 @@ ActiveAdmin.register SessionActivity, as: 'Session Selection' do
   index do
     selectable_column
     actions
-    column ("Enrollment") { |ss| link_to ss.enrollment.display_name, admin_application_path(ss.enrollment_id) }
+    column ("Enrollment") { |ss| link_to ss.enrollment.display_name, legacy_admin_application_path(ss.enrollment_id) }
     column ("Session") { |ss| ss.camp_occurrence }
     column :created_at
     column :updated_at
@@ -39,7 +39,7 @@ ActiveAdmin.register SessionActivity, as: 'Session Selection' do
 
   show do
     attributes_table do
-      row ("Enrollment") { |ss| link_to ss.enrollment.user.email, admin_application_path(ss.enrollment_id) }
+      row ("Enrollment") { |ss| link_to ss.enrollment.user.email, legacy_admin_application_path(ss.enrollment_id) }
       row ("Session") { |ss| ss.camp_occurrence }
       row :created_at
       row :updated_at

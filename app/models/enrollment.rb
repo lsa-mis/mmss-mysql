@@ -41,6 +41,8 @@
 #  fk_rails_...  (user_id => users.id)
 #
 class Enrollment < ApplicationRecord
+  include AdminCommentable
+
   class InvalidStatusTransition < StandardError; end
 
   STATUS_TRANSITIONS = {
@@ -208,6 +210,21 @@ class Enrollment < ApplicationRecord
     return unless payment.balance_due.zero?
 
     transition_application_status!('enrolled', force: true)
+  end
+
+  # Withdraws the enrollment: course assignments are released (they hold seats) and the status
+  # becomes `withdrawn`, atomically. Returns the released assignments as "Course: …, Session: …"
+  # strings for the flash. Raises ActiveRecord::RecordInvalid (and rolls back) when the status
+  # change is not allowed, leaving the assignments untouched.
+  def withdraw!(extra_attrs: {})
+    transaction do
+      released = course_assignments.includes(course: :camp_occurrence).map do |assignment|
+        "Course: #{assignment.course.title}, Session: #{assignment.course.camp_occurrence.description}"
+      end
+      course_assignments.destroy_all
+      transition_application_status!('withdrawn', extra_attrs: extra_attrs.except(:course_assignments_attributes))
+      released
+    end
   end
 
   def transition_application_status!(target_status, update_timestamp: true, extra_attrs: {}, force: false)

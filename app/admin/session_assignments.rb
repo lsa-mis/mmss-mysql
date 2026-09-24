@@ -24,7 +24,7 @@ ActiveAdmin.register SessionAssignment do
   index do
     selectable_column
     actions
-    column('Enrollment') { |sa| link_to sa.enrollment.display_name, admin_application_path(sa.enrollment_id) }
+    column('Enrollment') { |sa| link_to sa.enrollment.display_name, legacy_admin_application_path(sa.enrollment_id) }
     column 'Session', &:camp_occurrence
     column :created_at
     column :updated_at

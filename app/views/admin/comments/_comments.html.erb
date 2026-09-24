@@ -1,0 +1,31 @@
+<%# locals: resource %>
+<% comments = resource.admin_comments.includes(:author).order(:created_at) %>
+<%= admin_panel "Comments (#{comments.size})", body_class: 'divide-y divide-slate-100' do %>
+  <% if comments.empty? %>
+    <%= admin_empty_state 'No comments yet.' %>
+  <% end %>
+  <% comments.each do |comment| %>
+    <article class="flex gap-3 px-4 py-3" id="<%= dom_id(comment) %>">
+      <div class="min-w-0 flex-1">
+        <div class="flex flex-wrap items-baseline gap-x-2 text-xs text-slate-500">
+          <span class="font-medium text-slate-700"><%= comment.author&.email || 'Unknown author' %></span>
+          <time datetime="<%= comment.created_at.iso8601 %>"><%= admin_datetime(comment.created_at) %></time>
+        </div>
+        <p class="admin-prose mt-1"><%= comment.body %></p>
+      </div>
+      <%= button_to 'Delete', admin_comment_path(comment), method: :delete, class: 'admin-btn-link self-start text-red-700 hover:text-red-900',
+                    form: { data: { turbo_confirm: 'Delete this comment?' } } %>
+    </article>
+  <% end %>
+
+  <div class="px-4 py-3">
+    <%= admin_form_with model: Admin::Comment.new, url: admin_comments_path, class: 'grid gap-3' do |f| %>
+      <%= hidden_field_tag :resource_type, resource.class.name %>
+      <%= hidden_field_tag :resource_id, resource.id %>
+      <%= f.input :body, as: :textarea, label: 'Add a comment', rows: 3, required: true, placeholder: 'Visible to all admins' %>
+      <div>
+        <%= f.button 'Add comment', class: 'admin-btn-primary' %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

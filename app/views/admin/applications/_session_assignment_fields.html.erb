@@ -1,0 +1,14 @@
+<%# locals: f, application %>
+<div class="flex flex-wrap items-end gap-3 rounded-md border border-slate-200 bg-slate-50 p-3"
+     data-nested-form-target="row" data-persisted="<%= f.object.persisted? %>">
+  <%= f.hidden_field :_destroy, value: '0' %>
+  <div class="min-w-48 flex-1">
+    <%= f.input :camp_occurrence_id, as: :select, label: 'Session', include_blank: 'Select a session',
+                                     collection: admin_application_session_options(application) %>
+  </div>
+  <div class="w-40">
+    <span class="admin-label">Offer status</span>
+    <p class="mt-1 py-1.5 text-sm"><%= admin_status_badge(f.object.offer_status) %></p>
+  </div>
+  <button type="button" class="admin-btn-secondary admin-btn-sm text-red-700" data-action="nested-form#remove">Remove</button>
+</div>

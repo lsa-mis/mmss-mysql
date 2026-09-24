@@ -101,7 +101,7 @@ ActiveAdmin.register Course do
         if students.present?
           table_for students do
             column "Name" do |student|
-              link_to("#{student.applicant_detail.full_name}", admin_application_path(student))
+              link_to("#{student.applicant_detail.full_name}", legacy_admin_application_path(student))
             end
             column "Name" do |student|
               student.user.email

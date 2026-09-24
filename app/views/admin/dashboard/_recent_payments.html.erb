@@ -1,0 +1,12 @@
+<%# locals: payments, camp_year %>
+<%= admin_panel "Recent Payments for #{camp_year} Camp", actions: admin_legacy_link_to('All payments →', legacy_admin_payments_path), body_class: 'divide-y divide-slate-100' do %>
+  <% if payments.empty? %>
+    <%= admin_empty_state 'No payments yet for this camp year.' %>
+  <% end %>
+  <% payments.each do |payment| %>
+    <div class="flex flex-wrap items-center justify-between gap-2 px-4 py-2 text-sm">
+      <%= admin_legacy_link_to payment.user.applicant_detail&.full_name_and_email || payment.user.email, legacy_admin_payment_path(payment) %>
+      <span class="font-medium text-slate-900"><%= admin_money_from_cents(payment.total_amount) %></span>
+    </div>
+  <% end %>
+<% end %>

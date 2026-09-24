@@ -33,7 +33,7 @@ ActiveAdmin.register Travel do
     selectable_column
     actions
     column "Applicant" do |travel|
-      link_to travel.enrollment.display_name, admin_application_path(travel.enrollment)
+      link_to travel.enrollment.display_name, legacy_admin_application_path(travel.enrollment)
     end
     column :arrival_session
     column :depart_session
@@ -69,7 +69,7 @@ ActiveAdmin.register Travel do
   show do
     attributes_table do
       row "Applicant" do |travel|
-        link_to travel.enrollment.display_name, admin_application_path(travel.enrollment)
+        link_to travel.enrollment.display_name, legacy_admin_application_path(travel.enrollment)
       end
       row :arrival_session
       row :depart_session

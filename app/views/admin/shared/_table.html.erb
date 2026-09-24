@@ -1,0 +1,74 @@
+<%# locals: records, columns, pagy, actions, batch_actions, batch_url, empty_message %>
+<% batch = batch_actions.present? && batch_url.present? %>
+<div class="admin-card overflow-hidden" <% if batch %>data-controller="batch-select"<% end %>>
+  <% if batch %>
+    <%= form_with url: batch_url, method: :post, id: 'batch-actions-form', data: { turbo_confirm: 'Apply this action to the selected records?' } do |f| %>
+      <div class="flex flex-wrap items-center gap-2 border-b border-slate-200 bg-slate-50 px-4 py-2">
+        <label for="batch_action" class="text-xs font-medium text-slate-600">With selected:</label>
+        <%= f.select :batch_action, options_for_select(batch_actions.map { |name, label| [label, name] }),
+                     {}, class: 'admin-input mt-0 w-auto py-1 text-xs', id: 'batch_action' %>
+        <%= f.button 'Apply', type: :submit, class: 'admin-btn-secondary admin-btn-sm', disabled: true,
+                              data: { batch_select_target: 'submit' } %>
+        <span class="text-xs text-slate-500" data-batch-select-target="count"></span>
+      </div>
+    <% end %>
+  <% end %>
+
+  <div class="overflow-x-auto">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <% if batch %>
+            <th class="w-8">
+              <input type="checkbox" class="admin-checkbox" aria-label="Select all" data-action="batch-select#toggleAll" data-batch-select-target="all">
+            </th>
+          <% end %>
+          <% if actions %>
+            <th>Actions</th>
+          <% end %>
+          <% columns.each do |column| %>
+            <th class="<%= column.html_class %>">
+              <% if column.sortable? %>
+                <%= admin_sortable_header(column.label, column.sort_key) %>
+              <% else %>
+                <%= column.label %>
+              <% end %>
+            </th>
+          <% end %>
+        </tr>
+      </thead>
+      <tbody>
+        <% if records.blank? %>
+          <tr>
+            <td colspan="<%= columns.size + (batch ? 1 : 0) + (actions ? 1 : 0) %>">
+              <%= admin_empty_state(empty_message) %>
+            </td>
+          </tr>
+        <% end %>
+        <% records.each do |record| %>
+          <tr id="<%= dom_id(record) %>">
+            <% if batch %>
+              <td>
+                <input type="checkbox" name="ids[]" value="<%= record.id %>" form="batch-actions-form" class="admin-checkbox"
+                       aria-label="Select record <%= record.id %>" data-action="batch-select#toggle" data-batch-select-target="row">
+              </td>
+            <% end %>
+            <% if actions %>
+              <td class="whitespace-nowrap">
+                <% show_path, edit_path, delete_path = actions.call(record) %>
+                <%= admin_row_actions(show_path, edit_path, delete_path) %>
+              </td>
+            <% end %>
+            <% columns.each do |column| %>
+              <td class="<%= column.html_class %>"><%= admin_table_cell(record, column) %></td>
+            <% end %>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <% if pagy %>
+    <%= admin_pagination(pagy) %>
+  <% end %>
+</div>

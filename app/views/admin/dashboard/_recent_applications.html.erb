@@ -1,0 +1,15 @@
+<%# locals: applications, camp_year %>
+<%= admin_panel "Recent Applications for #{camp_year} Camp", actions: link_to('All applications →', admin_applications_path), body_class: 'divide-y divide-slate-100' do %>
+  <% if applications.empty? %>
+    <%= admin_empty_state 'No applications yet for this camp year.' %>
+  <% end %>
+  <% applications.each do |application| %>
+    <div class="flex flex-wrap items-center justify-between gap-2 px-4 py-2 text-sm">
+      <%= link_to "#{application.applicant_detail&.full_name || 'Unknown applicant'}, #{application.user.email}", admin_application_path(application) %>
+      <span class="flex items-center gap-2 text-xs text-slate-500">
+        <%= admin_status_badge(application.application_status) if application.application_status.present? %>
+        <%= admin_datetime(application.created_at) %>
+      </span>
+    </div>
+  <% end %>
+<% end %>

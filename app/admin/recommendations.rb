@@ -45,7 +45,7 @@ ActiveAdmin.register Recommendation do
     selectable_column
     actions
     column :enrollment_id, sortable: :enrollment_id do |ei|
-      link_to ei.enrollment.display_name, admin_application_path(ei.enrollment_id)
+      link_to ei.enrollment.display_name, legacy_admin_application_path(ei.enrollment_id)
     end
     column :email
     column :lastname
@@ -65,11 +65,11 @@ ActiveAdmin.register Recommendation do
   show do
     attributes_table do
       row "mail link", :id do |recid|
-        link_to 'Resend request', send_request_email_path(recommendation_id: recid), { class: "btn" }
+        link_to 'Resend request', send_request_email_admin_recommendation_path(recid), { class: "btn", method: :post }
       end
       row :id
       row  :enrollment_id do |ei|
-        link_to ei.enrollment.display_name, admin_application_path(ei.enrollment_id)
+        link_to ei.enrollment.display_name, legacy_admin_application_path(ei.enrollment_id)
       end
       row :firstname
       row :lastname
