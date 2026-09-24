@@ -31,7 +31,7 @@ class GendersController < ApplicationController
 
     respond_to do |format|
       if @gender.save
-        format.html { redirect_to @gender, notice: 'Gender was successfully created.' }
+        format.html { redirect_to @gender, notice: 'Gender was successfully created.', status: :see_other }
         format.json { render :show, status: :created, location: @gender }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -45,7 +45,7 @@ class GendersController < ApplicationController
   def update
     respond_to do |format|
       if @gender.update(gender_params)
-        format.html { redirect_to @gender, notice: 'Gender was successfully updated.' }
+        format.html { redirect_to @gender, notice: 'Gender was successfully updated.', status: :see_other }
         format.json { render :show, status: :ok, location: @gender }
       else
         format.html { render :edit, status: :unprocessable_entity }

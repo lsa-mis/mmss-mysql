@@ -41,13 +41,13 @@ class ApplicantDetailsController < ApplicationController
   def create
     if current_user.applicant_detail.present?
       flash[:notice] = 'Applicant Details exist. Click Edit, if you want to change something.'
-      redirect_to(applicant_detail_path(current_user))
+      redirect_to(applicant_detail_path(current_user), status: :see_other)
     else
       @applicant_detail = current_user.create_applicant_detail(applicant_detail_params)
 
       respond_to do |format|
         if @applicant_detail.save
-          format.html { redirect_to root_path, notice: 'Applicant detail was successfully created.' }
+          format.html { redirect_to root_path, notice: 'Applicant detail was successfully created.', status: :see_other }
           format.json { render :show, status: :created, location: @applicant_detail }
         else
           format.html { render :new, status: :unprocessable_entity }
@@ -62,7 +62,7 @@ class ApplicantDetailsController < ApplicationController
   def update
     respond_to do |format|
       if @applicant_detail.update(applicant_detail_params)
-        format.html { redirect_to root_path, notice: 'Applicant detail was successfully updated.' }
+        format.html { redirect_to root_path, notice: 'Applicant detail was successfully updated.', status: :see_other }
         format.json { render :show, status: :ok, location: @applicant_detail }
       else
         format.html { render :edit, status: :unprocessable_entity }

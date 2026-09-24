@@ -31,7 +31,7 @@ class CampConfigurationsController < ApplicationController
 
     respond_to do |format|
       if @camp_configuration.save
-        format.html { redirect_to @camp_configuration, notice: 'Camp configuration was successfully created.' }
+        format.html { redirect_to @camp_configuration, notice: 'Camp configuration was successfully created.', status: :see_other }
         format.json { render :show, status: :created, location: @camp_configuration }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -45,7 +45,7 @@ class CampConfigurationsController < ApplicationController
   def update
     respond_to do |format|
       if @camp_configuration.update(camp_configuration_params)
-        format.html { redirect_to @camp_configuration, notice: 'Camp configuration was successfully updated.' }
+        format.html { redirect_to @camp_configuration, notice: 'Camp configuration was successfully updated.', status: :see_other }
         format.json { render :show, status: :ok, location: @camp_configuration }
       else
         format.html { render :edit, status: :unprocessable_entity }

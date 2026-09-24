@@ -11,12 +11,12 @@ class Faculties::SessionsController < Devise::SessionsController
         sign_in faculty
         # Set session creation time for accurate expiry calculation
         session[:session_created_at] = Time.current.to_i
-        redirect_to faculty_path
+        redirect_to faculty_path, status: :see_other
       else
-        redirect_to root_path, :alert => "You don't have any courses, please contact the administrator"
+        redirect_to root_path, :alert => "You don't have any courses, please contact the administrator", status: :see_other
       end
     else
-      redirect_to new_faculty_session_path, :alert => "Please sign up first!"
+      redirect_to new_faculty_session_path, :alert => "Please sign up first!", status: :see_other
     end
   end
 
@@ -35,7 +35,7 @@ class Faculties::SessionsController < Devise::SessionsController
       # support returning empty response on GET request
       respond_to do |format|
         format.all { head :no_content }
-        format.any(*navigational_formats) { redirect_to faculty_login_path }
+        format.any(*navigational_formats) { redirect_to faculty_login_path, status: :see_other }
       end
     end
 

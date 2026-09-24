@@ -40,7 +40,7 @@ class FinancialAidsController < ApplicationController
 
     respond_to do |format|
       if @financial_aid.save
-        format.html { redirect_to all_payments_path, notice: 'Financial aid was successfully created.' }
+        format.html { redirect_to all_payments_path, notice: 'Financial aid was successfully created.', status: :see_other }
         format.json { render :show, status: :created, location: @financial_aid }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -54,7 +54,7 @@ class FinancialAidsController < ApplicationController
   def update
     respond_to do |format|
       if @financial_aid.update(financial_aid_params)
-        format.html { redirect_to payments_path, notice: 'Financial aid was successfully updated.' }
+        format.html { redirect_to payments_path, notice: 'Financial aid was successfully updated.', status: :see_other }
         format.json { render :show, status: :ok, location: @financial_aid }
       else
         format.html { render :edit, status: :unprocessable_entity }

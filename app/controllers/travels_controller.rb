@@ -35,7 +35,7 @@ class TravelsController < ApplicationController
     @travel = @current_enrollment.travels.new(travel_params)
     respond_to do |format|
       if @travel.save
-        format.html { redirect_to root_path, notice: 'Travel was successfully created.' }
+        format.html { redirect_to root_path, notice: 'Travel was successfully created.', status: :see_other }
         format.json { render :show, status: :created, location: @travel }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -50,7 +50,7 @@ class TravelsController < ApplicationController
     @travel = @current_enrollment.travels.find(params[:id])
     respond_to do |format|
       if @travel.update(travel_params)
-        format.html { redirect_to root_path, notice: 'Travel was successfully updated.' }
+        format.html { redirect_to root_path, notice: 'Travel was successfully updated.', status: :see_other }
         format.json { render :show, status: :ok, location: @travel }
       else
         format.html { render :edit, status: :unprocessable_entity }

@@ -20,7 +20,7 @@ class CampOccurrencesController < ApplicationController
   def create
     @camp_configuration = CampConfiguration.find(params[:camp_configuration_id])
     @camp_occurrence = @camp_configuration.camp_occurrences.create(camp_occurrence_params)
-    redirect_to camp_configuration_path(@camp_configuration)
+    redirect_to camp_configuration_path(@camp_configuration), status: :see_other
   end
 
   # PATCH/PUT /occurrences/1
@@ -28,7 +28,7 @@ class CampOccurrencesController < ApplicationController
   def update
     respond_to do |format|
       if @camp_occurrence.update(camp_occurrence_params)
-        format.html { redirect_to @camp_configuration, notice: 'Camp Occurrence was successfully updated.' }
+        format.html { redirect_to @camp_configuration, notice: 'Camp Occurrence was successfully updated.', status: :see_other }
         format.json { render :show, status: :ok, location: @camp_occurrence }
       else
         format.html { render :edit, status: :unprocessable_entity }

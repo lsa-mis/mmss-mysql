@@ -38,7 +38,7 @@ class RecuploadsController < InheritedResources::Base
 
     respond_to do |format|
       if @recupload.save
-        format.html { redirect_to recupload_success_path, notice: 'Recommendation was successfully uploaded.' }
+        format.html { redirect_to recupload_success_path, notice: 'Recommendation was successfully uploaded.', status: :see_other }
         format.json { render :show, status: :created, location: @recupload }
         RecuploadMailer.with(recupload: @recupload).received_email.deliver_now
         RecuploadMailer.with(recupload: @recupload).applicant_received_email.deliver_now

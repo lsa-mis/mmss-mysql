@@ -27,7 +27,7 @@ class ActivitiesController < ApplicationController
     @camp_configuration = @camp_occurrence.camp_configuration_id
     @activity = @camp_occurrence.activities.create(activity_params)
     if @activity.persisted?
-      redirect_to activities_path, notice: 'Activity was successfully created.'
+      redirect_to activities_path, notice: 'Activity was successfully created.', status: :see_other
     else
       render :edit, status: :unprocessable_entity
     end
@@ -38,7 +38,7 @@ class ActivitiesController < ApplicationController
   def update
     respond_to do |format|
       if @activity.update(activity_params)
-        format.html { redirect_to @activity, notice: 'Activity was successfully updated.' }
+        format.html { redirect_to @activity, notice: 'Activity was successfully updated.', status: :see_other }
         format.json { render :show, status: :ok, location: @activity }
       else
         format.html { render :edit, status: :unprocessable_entity }
