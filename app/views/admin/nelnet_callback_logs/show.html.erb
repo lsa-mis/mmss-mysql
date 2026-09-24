@@ -1,0 +1,34 @@
+<% admin_page_title "Nelnet Callback Log ##{@nelnet_callback_log.id}", subtitle: @nelnet_callback_log.transaction_id.presence %>
+<% admin_page_actions do %>
+  <%= link_to 'Back to callback logs', admin_nelnet_callback_logs_path, class: 'admin-btn-secondary' %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-3">
+  <div class="grid gap-5 xl:col-span-2">
+    <%= admin_panel 'Callback', body_class: '' do %>
+      <%= admin_attributes @nelnet_callback_log do |a| %>
+        <% a.row :id %>
+        <% a.row('Transaction ID', &:transaction_id) %>
+        <% a.row :order_number %>
+        <% a.row :transaction_status do |log| %>
+          <% if log.transaction_status.present? %>
+            <%= transaction_status_message(log.transaction_status) %> <span class="text-slate-500">(<%= log.transaction_status %>)</span>
+          <% end %>
+        <% end %>
+        <% a.row :transaction_total_amount do |log| %>
+          <%= log.transaction_total_amount %>
+          <% if log.transaction_total_amount.present? %><span class="text-slate-500">(<%= admin_money_from_cents(log.transaction_total_amount) %>)</span><% end %>
+        <% end %>
+        <% a.row :created_at, :updated_at %>
+      <% end %>
+    <% end %>
+
+    <%= admin_panel 'Raw params (JSON)', body_class: '' do %>
+      <% if @nelnet_callback_log.raw_params.present? %>
+        <pre class="overflow-x-auto px-4 py-3 text-xs leading-5 text-slate-800"><%= @nelnet_callback_log.pretty_raw_params %></pre>
+      <% else %>
+        <%= admin_empty_state 'No parameters were recorded.' %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

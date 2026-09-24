@@ -1,0 +1,28 @@
+<% admin_page_title 'Course Assignments', subtitle: "#{number_with_delimiter(@pagy.count)} #{'course assignment'.pluralize(@pagy.count)}" %>
+<% admin_page_actions do %>
+  <%= admin_csv_link %>
+  <%= link_to 'New Course Assignment', new_admin_course_assignment_path, class: 'admin-btn-primary' %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-4">
+  <div class="grid gap-4 xl:col-span-3">
+    <%= admin_table @course_assignments, pagy: @pagy,
+                    batch_actions: Admin::CourseAssignmentsController::BATCH_ACTIONS, batch_url: batch_admin_course_assignments_path,
+                    actions: ->(assignment) { [admin_course_assignment_path(assignment), edit_admin_course_assignment_path(assignment), admin_course_assignment_path(assignment)] } do |t| %>
+      <% t.column 'Enrollment', sort: 'enrollment' do |assignment| %>
+        <%= admin_applicant_link(assignment.enrollment, with_email: true) %>
+      <% end %>
+      <% t.column 'Course', sort: 'course' do |assignment| %>
+        <%= admin_resource_link(assignment.course, assignment.course.title) %>
+        <div class="text-xs text-slate-500"><%= assignment.course.camp_occurrence.description %></div>
+      <% end %>
+      <% t.column :wait_list, sort: true %>
+      <% t.column :created_at, sort: true %>
+      <% t.column :updated_at, sort: true %>
+    <% end %>
+  </div>
+
+  <div class="xl:col-span-1">
+    <%= admin_filter_form @filter, url: admin_course_assignments_path %>
+  </div>
+</div>

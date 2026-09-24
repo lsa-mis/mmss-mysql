@@ -1,20 +1,10 @@
 # frozen_string_literal: true
 
-class RecuploadsController < InheritedResources::Base
-  # devise_group :logged_in, contains: [:user, :admin]
-  # before_action :authenticate_logged_in!
-  # before_action :authenticate_admin!, only: [:index, :destroy]
-
-  before_action :authenticate_admin!, except: %i[success error new create]
-  before_action :set_recupload, only: %i[show edit update destroy]
+# Recommenders upload their letter through the link in the request email (no login). Everything
+# else about recuploads (listing, viewing, editing, deleting) is admin-only and lives in
+# Admin::RecuploadsController.
+class RecuploadsController < ApplicationController
   before_action :get_recommendation, only: %i[new create]
-
-  def index
-    redirect_to root_path unless admin_signed_in?
-  end
-
-  def show
-  end
 
   def error
   end
@@ -30,43 +20,25 @@ class RecuploadsController < InheritedResources::Base
     end
   end
 
-  def edit
-  end
-
   def create
-    @recupload = Recupload.new(recupload_params)
+    # Always attach to the recommendation the emailed link resolved to, never to a
+    # caller-supplied recommendation_id.
+    @recupload = @recommendation.build_recupload(recupload_params)
 
     respond_to do |format|
       if @recupload.save
         format.html { redirect_to recupload_success_path, notice: 'Recommendation was successfully uploaded.', status: :see_other }
-        format.json { render :show, status: :created, location: @recupload }
+        format.json { render json: { id: @recupload.id }, status: :created }
         RecuploadMailer.with(recupload: @recupload).received_email.deliver_now
         RecuploadMailer.with(recupload: @recupload).applicant_received_email.deliver_now
       else
-        @student = ApplicantDetail.find(params[:id]).full_name if params[:id]
-        @recommendation = Recommendation.find(@recupload.recommendation_id) if @recupload.recommendation_id
         format.html { render :new, status: :unprocessable_content }
         format.json { render json: @recupload.errors, status: :unprocessable_content }
       end
     end
   end
 
-  def update
-  end
-
-  def destroy
-    @recupload.destroy
-    respond_to do |format|
-      format.html { redirect_to recuploads_url, notice: 'Recommendation was successfully destroyed.', status: :see_other }
-      format.json { head :no_content }
-    end
-  end
-
   private
-
-  def set_recupload
-    @recupload = Recupload.find(params[:id])
-  end
 
   def get_recommendation
     hash_val = params['hash']
@@ -105,6 +77,6 @@ class RecuploadsController < InheritedResources::Base
   end
 
   def recupload_params
-    params.require(:recupload).permit(:letter, :authorname, :studentname, :recommendation_id, :rechash, :recletter)
+    params.require(:recupload).permit(:letter, :authorname, :studentname, :recletter)
   end
 end

@@ -1,0 +1,6 @@
+<% admin_page_title "Edit Travel ##{@travel.id}", subtitle: admin_applicant_name(@travel.enrollment) %>
+<% admin_page_actions do %>
+  <%= link_to 'View travel', admin_travel_path(@travel), class: 'admin-btn-secondary' %>
+<% end %>
+
+<%= render 'admin/travels/form', travel: @travel %>

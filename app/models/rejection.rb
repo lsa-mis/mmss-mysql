@@ -19,7 +19,9 @@
 #  fk_rails_...  (enrollment_id => enrollments.id)
 #
 class Rejection < ApplicationRecord
-  after_commit :set_rejection_status, if: :persisted?
+  # Recording a rejection releases the applicant's assignments and rejects the application.
+  # Create only: editing the reason later must not touch the enrollment again.
+  after_create_commit :set_rejection_status
   belongs_to :enrollment
 
   validates :reason, presence: true
@@ -43,13 +45,4 @@ class Rejection < ApplicationRecord
       extra_attrs: { offer_status: '' }
     )
   end
-
-  def self.ransackable_associations(auth_object = nil)
-    ["enrollment"]
-  end
-
-  def self.ransackable_attributes(auth_object = nil)
-    ["created_at", "enrollment_id", "id", "reason", "updated_at"]
-  end
-
 end

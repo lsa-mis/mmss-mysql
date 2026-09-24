@@ -34,7 +34,12 @@ class Admin::Comment < ApplicationRecord
     'Enrollment' => -> { Enrollment },
     'CampOccurrence' => -> { CampOccurrence },
     'Activity' => -> { Activity },
-    'Course' => -> { Course }
+    'Course' => -> { Course },
+    'CourseAssignment' => -> { CourseAssignment },
+    'SessionActivity' => -> { SessionActivity },
+    'SessionAssignment' => -> { SessionAssignment },
+    'Recommendation' => -> { Recommendation },
+    'Recupload' => -> { Recupload }
   }.freeze
 
   def self.commentable_class(type)

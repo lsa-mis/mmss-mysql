@@ -1,0 +1,33 @@
+<% admin_page_title 'Course Preferences', subtitle: "#{number_with_delimiter(@pagy.count)} #{'course preference'.pluralize(@pagy.count)}" %>
+<% admin_page_actions do %>
+  <%= admin_csv_link %>
+  <%= link_to 'New Course Preference', new_admin_course_preference_path, class: 'admin-btn-primary' %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-4">
+  <div class="grid gap-4 xl:col-span-3">
+    <%= admin_table @course_preferences, pagy: @pagy,
+                    batch_actions: Admin::CoursePreferencesController::BATCH_ACTIONS, batch_url: batch_admin_course_preferences_path,
+                    actions: ->(preference) { [admin_course_preference_path(preference), edit_admin_course_preference_path(preference), admin_course_preference_path(preference)] } do |t| %>
+      <% t.column :id, sort: true do |preference| %>
+        <%= link_to preference.id, admin_course_preference_path(preference), class: 'font-medium' %>
+      <% end %>
+      <% t.column 'Enrollment', sort: 'enrollment' do |preference| %>
+        <%= admin_applicant_link(preference.enrollment, with_email: true) %>
+      <% end %>
+      <% t.column 'Session', sort: 'session' do |preference| %>
+        <%= preference.course.camp_occurrence.description %>
+      <% end %>
+      <% t.column 'Course', sort: 'course' do |preference| %>
+        <%= preference.course.title %>
+      <% end %>
+      <% t.column :ranking, sort: true %>
+      <% t.column :created_at, sort: true %>
+      <% t.column :updated_at, sort: true %>
+    <% end %>
+  </div>
+
+  <div class="xl:col-span-1">
+    <%= admin_filter_form @filter, url: admin_course_preferences_path %>
+  </div>
+</div>

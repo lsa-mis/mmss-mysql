@@ -33,6 +33,8 @@
 #  fk_rails_...  (enrollment_id => enrollments.id)
 #
 class Recommendation < ApplicationRecord
+  include AdminCommentable
+
   belongs_to :enrollment
   has_one :recupload, dependent: :destroy
 
