@@ -21,6 +21,8 @@
 #  fk_rails_...  (recommendation_id => recommendations.id)
 #
 class Recupload < ApplicationRecord
+  include AdminCommentable
+
   belongs_to :recommendation
   after_create :update_enrollment_status
 

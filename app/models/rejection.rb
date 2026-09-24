@@ -43,13 +43,4 @@ class Rejection < ApplicationRecord
       extra_attrs: { offer_status: '' }
     )
   end
-
-  def self.ransackable_associations(auth_object = nil)
-    ["enrollment"]
-  end
-
-  def self.ransackable_attributes(auth_object = nil)
-    ["created_at", "enrollment_id", "id", "reason", "updated_at"]
-  end
-
 end

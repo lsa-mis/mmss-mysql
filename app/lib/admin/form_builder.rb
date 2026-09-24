@@ -15,8 +15,8 @@
 #   <% end %>
 class Admin::FormBuilder < ActionView::Helpers::FormBuilder
   # Renders a labelled field. The input type is inferred from the model column unless `as:` is
-  # given (:text, :textarea, :select, :boolean, :date, :datetime, :number, :email, :password,
-  # :file, :hidden). Remaining keyword arguments become HTML attributes of the input.
+  # given (:text, :textarea, :select, :boolean, :date, :datetime, :time, :number, :email,
+  # :password, :file, :hidden). Remaining keyword arguments become HTML attributes of the input.
   def input(attribute, as: nil, label: nil, hint: nil, collection: nil, include_blank: nil,
             required: nil, wrapper_class: nil, **input_html)
     type = as || infer_type(attribute)
@@ -106,6 +106,7 @@ class Admin::FormBuilder < ActionView::Helpers::FormBuilder
     when :boolean then :boolean
     when :date then :date
     when :datetime then :datetime
+    when :time then :time
     when :integer, :decimal, :float then :number
     else :text
     end
@@ -130,6 +131,7 @@ class Admin::FormBuilder < ActionView::Helpers::FormBuilder
     when :boolean then check_box(attribute, **html)
     when :date then date_field(attribute, **html)
     when :datetime then datetime_field(attribute, **html)
+    when :time then time_field(attribute, **html)
     when :number then number_field(attribute, **html)
     when :email then email_field(attribute, **html)
     when :password then password_field(attribute, **html)

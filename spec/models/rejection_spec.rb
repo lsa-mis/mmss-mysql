@@ -238,31 +238,6 @@ RSpec.describe Rejection, type: :model do
     end
   end
 
-  describe 'ransackable methods' do
-    describe '.ransackable_associations' do
-      it 'returns the correct associations' do
-        expect(Rejection.ransackable_associations).to eq(['enrollment'])
-      end
-
-      it 'accepts an auth_object parameter' do
-        expect { Rejection.ransackable_associations(nil) }.not_to raise_error
-        expect { Rejection.ransackable_associations(double) }.not_to raise_error
-      end
-    end
-
-    describe '.ransackable_attributes' do
-      it 'returns the correct attributes' do
-        expected_attributes = ['created_at', 'enrollment_id', 'id', 'reason', 'updated_at']
-        expect(Rejection.ransackable_attributes).to match_array(expected_attributes)
-      end
-
-      it 'accepts an auth_object parameter' do
-        expect { Rejection.ransackable_attributes(nil) }.not_to raise_error
-        expect { Rejection.ransackable_attributes(double) }.not_to raise_error
-      end
-    end
-  end
-
   describe 'database columns' do
     it { is_expected.to have_db_column(:id).of_type(:integer) }
     it { is_expected.to have_db_column(:enrollment_id).of_type(:integer) }

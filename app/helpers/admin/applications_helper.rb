@@ -1,6 +1,22 @@
 # frozen_string_literal: true
 
 module Admin::ApplicationsHelper
+  # "Lastname, Firstname" of the applicant, falling back to the account email.
+  def admin_applicant_name(enrollment)
+    enrollment.applicant_detail&.full_name || enrollment.user.email
+  end
+
+  # Applicant name linking to the application's admin show page (the "Enrollment"/"Applicant"
+  # column shared by the Applicant Info resources).
+  def admin_applicant_link(enrollment, with_email: false)
+    return admin_empty_value if enrollment.nil?
+
+    link = link_to(admin_applicant_name(enrollment), admin_application_path(enrollment), class: 'font-medium')
+    return link unless with_email
+
+    safe_join([link, tag.div(enrollment.user.email, class: 'text-xs text-slate-500')])
+  end
+
   # Sessions the applicant registered for (the only valid session assignments).
   def admin_application_session_options(application)
     sessions = application.session_registrations.to_a
