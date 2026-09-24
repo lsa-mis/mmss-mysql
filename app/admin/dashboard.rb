@@ -46,11 +46,11 @@ ActiveAdmin.register_page 'Dashboard' do
                   payment_state = PaymentState.new(enroll)
                   balance_due = payment_state.balance_due
                   applicant_detail = enroll.applicant_detail
-                  birthdate_str = applicant_detail.birthdate.strftime('%Y-%m-%d')
+                  birthdate_str = applicant_detail&.birthdate&.strftime('%Y-%m-%d')
 
                   li do
                     link_to(
-                      "#{applicant_detail.full_name} - DOB: #{birthdate_str} - Parent: #{applicant_detail.parentname} - Balance: #{humanized_money_with_symbol(balance_due / 100)}",
+                      "#{applicant_detail&.full_name || enroll.user.email} - DOB: #{birthdate_str} - Parent: #{applicant_detail&.parentname} - Balance: #{humanized_money_with_symbol(balance_due / 100)}",
                       legacy_admin_application_path(enroll)
                     )
                   end
