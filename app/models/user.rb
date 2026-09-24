@@ -24,12 +24,15 @@
 #  index_users_on_reset_password_token  (reset_password_token) UNIQUE
 #
 class User < ApplicationRecord
-  has_one :applicant_detail, dependent: :destroy, inverse_of: :user
-  has_many :enrollments, dependent: :destroy
   # Payments and payment requests are financial records (payment_requests.user_id is NOT NULL),
   # so an account that has any cannot be deleted; `destroy` returns false with an error on :base.
+  # Declared first: `dependent:` callbacks run in declaration order, so the restriction must be
+  # checked before any dependent-destroy association starts deleting application data.
   has_many :payments, dependent: :restrict_with_error
   has_many :payment_requests, dependent: :restrict_with_error
+
+  has_one :applicant_detail, dependent: :destroy, inverse_of: :user
+  has_many :enrollments, dependent: :destroy
   has_many :feedbacks, dependent: :destroy
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
