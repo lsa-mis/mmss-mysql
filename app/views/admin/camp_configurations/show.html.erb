@@ -13,8 +13,11 @@
         <% a.row 'Application fee' do |camp| %><%= humanized_money_with_symbol(camp.application_fee) %><% end %>
         <% a.row :application_fee_required %>
         <% a.row 'Student Packet URL for campers who accept their offer' do |camp| %>
-          <% if camp.student_packet_url.present? %>
+          <%# Only http(s) values become links; anything else (legacy data) is shown as text. %>
+          <% if camp.student_packet_url.to_s.match?(%r{\Ahttps?://}i) %>
             <%= link_to camp.student_packet_url, camp.student_packet_url, target: '_blank', rel: 'noopener', class: 'admin-btn-link break-all' %>
+          <% elsif camp.student_packet_url.present? %>
+            <span class="break-all"><%= camp.student_packet_url %></span>
           <% end %>
         <% end %>
         <% a.row :created_at, :updated_at %>

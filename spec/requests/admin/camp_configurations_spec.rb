@@ -80,6 +80,17 @@ RSpec.describe 'Admin camp configurations', type: :request do
       expect(body).to include(admin_session_configuration_path(session))
       expect(body).not_to include('Add a comment')
     end
+
+    it 'only links the student packet URL when it is a web URL' do
+      camp.update!(student_packet_url: 'https://example.com/packet.pdf')
+      get admin_camp_configuration_path(camp)
+      expect(response.body).to include('href="https://example.com/packet.pdf"')
+
+      camp.update_columns(student_packet_url: 'javascript:alert(1)')
+      get admin_camp_configuration_path(camp)
+      expect(response.body).not_to include('href="javascript:')
+      expect(response.body).to include('javascript:alert(1)')
+    end
   end
 
   describe 'GET /admin/camp_configurations/new' do
@@ -133,6 +144,14 @@ RSpec.describe 'Admin camp configurations', type: :request do
       camp.reload
       expect(camp.student_packet_url).to eq('https://example.com/packet')
       expect(camp.application_fee_required).to be(false)
+    end
+
+    it 'rejects a student packet URL that is not http(s)' do
+      patch admin_camp_configuration_path(camp), params: { camp_configuration: { student_packet_url: 'javascript:alert(1)' } }
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include('must start with http:// or https://')
+      expect(camp.reload.student_packet_url).to be_nil
     end
 
     it 'rejects a second active camp' do

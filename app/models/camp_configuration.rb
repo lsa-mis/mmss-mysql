@@ -36,6 +36,9 @@ class CampConfiguration < ApplicationRecord
   validates :camper_acceptance_due, presence: true
   validate :only_one_active_camp
   validates :offer_letter, :reject_letter, :waitlist_letter, presence: true
+  # Rendered as a clickable link in the admin and mailed to campers, so only web URLs are allowed.
+  validates :student_packet_url, format: { with: %r{\Ahttps?://\S+\z}i, message: 'must start with http:// or https://' },
+                                 allow_blank: true
 
   monetize :application_fee_cents
 
