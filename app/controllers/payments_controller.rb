@@ -95,7 +95,7 @@ class PaymentsController < ApplicationController
       camp_year: CampConfiguration.active_camp_year,
       request_timestamp: result[:request_timestamp]
     )
-    redirect_to result[:url]
+    redirect_to result[:url], allow_other_host: true
   end
 
   def payment_show
