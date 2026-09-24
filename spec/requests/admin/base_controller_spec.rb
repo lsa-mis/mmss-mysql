@@ -30,6 +30,7 @@ RSpec.describe 'Admin::BaseController authentication', type: :request do
       expect(response.body).to include(destroy_admin_session_path)
       expect(response.body).to include('/assets/admin-')
       expect(response.body).not_to include('active_admin')
+      expect(response.body).to include(%(data-turbo="false" href="#{legacy_admin_root_path}"))
     end
 
     it 'shows the four menu groups in the sidebar' do

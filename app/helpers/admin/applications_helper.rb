@@ -21,9 +21,12 @@ module Admin::ApplicationsHelper
     end
   end
 
+  # The persisted status is always selectable (e.g. `waitlisted`, `rejected`, `withdrawn` are set
+  # by other flows), otherwise the select would submit blank and clear it.
   def admin_application_status_options(application)
     options = Admin::ApplicationsController::STATUS_OPTIONS.dup
-    options << 'withdrawn' if application.application_status == 'withdrawn'
+    current = application.application_status
+    options << current if current.present? && options.exclude?(current)
     options
   end
 end

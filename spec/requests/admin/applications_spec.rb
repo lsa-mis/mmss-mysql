@@ -168,6 +168,21 @@ RSpec.describe 'Admin applications', type: :request do
       expect(response.body).to include('Application was successfully updated.')
     end
 
+    it 'keeps a status that is not in the standard list (e.g. waitlisted) when the form is submitted unchanged' do
+      waitlisted = create(:enrollment, :waitlisted, user: create(:user, :with_applicant_detail))
+      create(:session_assignment, enrollment: waitlisted, camp_occurrence: CampOccurrence.active.first)
+      create(:course_assignment, enrollment: waitlisted, course: Course.first)
+
+      get edit_admin_application_path(waitlisted)
+      expect(response.body).to include('<option selected="selected" value="waitlisted">waitlisted</option>')
+
+      patch admin_application_path(waitlisted), params: { enrollment: { application_status: 'waitlisted', notes: 'still waiting' } }
+
+      expect(response).to redirect_to(admin_application_path(waitlisted))
+      expect(waitlisted.reload.application_status).to eq('waitlisted')
+      expect(waitlisted.notes).to eq('still waiting')
+    end
+
     it 're-renders the form with errors when invalid' do
       patch admin_application_path(enrollment), params: { enrollment: { high_school_name: '' } }
 
