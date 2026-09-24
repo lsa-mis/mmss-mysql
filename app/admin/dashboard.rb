@@ -30,7 +30,7 @@ ActiveAdmin.register_page 'Dashboard' do
             end
           end
 
-          panel link_to("Offer Accepted with Balance Due", legacy_admin_reports_offer_accepted_with_balance_due_path) do
+          panel link_to("Offer Accepted with Balance Due", admin_report_path(Admin::Reports::OfferAcceptedWithBalanceDue.key), data: { turbo: false }) do
             offer_accepted_enrollments = Enrollment.current_camp_year_applications.where(application_status: 'offer accepted')
               .includes(:user, :applicant_detail)
               .order('applicant_details.lastname, applicant_details.firstname')
@@ -59,7 +59,7 @@ ActiveAdmin.register_page 'Dashboard' do
 
               if enrollments_with_balance.count > 20
                 div do
-                  text_node link_to("View full report (#{enrollments_with_balance.count} total)...", legacy_admin_reports_offer_accepted_with_balance_due_path)
+                  text_node link_to("View full report (#{enrollments_with_balance.count} total)...", admin_report_path(Admin::Reports::OfferAcceptedWithBalanceDue.key), data: { turbo: false })
                 end
               end
             else

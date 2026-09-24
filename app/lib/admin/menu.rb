@@ -14,7 +14,7 @@ class Admin::Menu
   GROUPS = [
     Group.new(label: nil, items: [
       Item.new(label: 'Dashboard', route: :admin_root_path, match: :exact),
-      Item.new(label: 'Reports', route: :legacy_admin_reports_path, legacy: true)
+      Item.new(label: 'Reports', route: :admin_reports_path)
     ]),
     Group.new(label: 'Applicant Info', items: [
       Item.new(label: 'Applications', route: :admin_applications_path),

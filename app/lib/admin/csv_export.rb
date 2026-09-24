@@ -14,8 +14,10 @@ require 'csv'
 #
 #      EXPORT.generate(records) # => CSV string, header row first
 #
-# 2. Raw-SQL reports (the app/admin/reports.rb formatters): a title row, a total-count row,
-#    upper-cased titleized headers and one row per result, with an optional per-row transform.
+# 2. Raw-SQL reports (Admin::Reports::*): a title row, a total-count row, upper-cased titleized
+#    headers and one row per result, with an optional per-row transform. Cells are formatted like
+#    the column exports (Money → "$1,234.50", dates → ISO 8601) and strings go through the
+#    formula guard.
 #
 #      Admin::CsvExport.report(ActiveRecord::Base.connection.exec_query(sql), title: 'all_complete_apps')
 #      Admin::CsvExport.report(result, title: 'enrolled_with_addresses') { |row| row.map { |v| ... } }
@@ -41,7 +43,22 @@ class Admin::CsvExport
       csv << [title.to_s.titleize]
       csv << ["Total number of records: #{rows.size}"] if total_row
       csv << columns
-      rows.each { |row| csv << (block_given? ? yield(row) : row).map { |cell| sanitize_cell(cell) } }
+      rows.each { |row| csv << (block_given? ? yield(row) : row).map { |cell| format_cell(cell) } }
+    end
+  end
+
+  # One cell of CSV output. Non-string values are rendered by us (so they never need the formula
+  # guard): times/dates in ISO order, Money with its symbol, BigDecimal in plain notation (its
+  # `to_s` is scientific: `0.12345e3`).
+  def self.format_cell(value)
+    case value
+    when nil then nil
+    when ActiveSupport::TimeWithZone, Time, DateTime then value.strftime('%Y-%m-%d %H:%M:%S')
+    when Date then value.iso8601
+    when Money then value.format
+    when BigDecimal then value.to_s('F')
+    when Numeric, true, false then value.to_s
+    else sanitize_cell(value.to_s)
     end
   end
 
@@ -77,21 +94,8 @@ class Admin::CsvExport
     CSV.generate(headers: false) do |csv|
       csv << headers
       records.each do |record|
-        csv << columns.map { |column| format_value(column.block.call(record)) }
+        csv << columns.map { |column| self.class.format_cell(column.block.call(record)) }
       end
-    end
-  end
-
-  private
-
-  def format_value(value)
-    case value
-    when nil then nil
-    when ActiveSupport::TimeWithZone, Time, DateTime then value.strftime('%Y-%m-%d %H:%M:%S')
-    when Date then value.iso8601
-    when Money then value.format
-    when Numeric, true, false then value.to_s
-    else self.class.sanitize_cell(value.to_s)
     end
   end
 end

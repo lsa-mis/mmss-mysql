@@ -1,6 +1,6 @@
 <%# locals: balance_due, total %>
 <%= admin_panel 'Offer Accepted with Balance Due',
-                actions: admin_legacy_link_to('CSV report ↓', legacy_admin_reports_offer_accepted_with_balance_due_path),
+                actions: link_to('CSV report ↓', admin_report_path(Admin::Reports::OfferAcceptedWithBalanceDue.key), data: { turbo: false }),
                 body_class: 'divide-y divide-slate-100' do %>
   <% if balance_due.empty? %>
     <%= admin_empty_state 'No offer accepted applications with balance due.' %>
@@ -19,7 +19,7 @@
   <% end %>
   <% if total > balance_due.size %>
     <div class="px-4 py-2 text-sm">
-      <%= admin_legacy_link_to "View full report (#{total} total)…", legacy_admin_reports_offer_accepted_with_balance_due_path %>
+      <%= link_to "View full report (#{total} total)…", admin_report_path(Admin::Reports::OfferAcceptedWithBalanceDue.key), data: { turbo: false } %>
     </div>
   <% end %>
 <% end %>

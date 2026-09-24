@@ -78,6 +78,16 @@ RSpec.describe Admin::CsvExport do
       ])
     end
 
+    it 'formats report cells like column exports (Money, dates, BigDecimal) without guarding them' do
+      result = ActiveRecord::Result.new(%w[name balance ratio born],
+                                        [['Ada', Money.new(-2500, 'USD'), BigDecimal('1234.5'), Date.new(2008, 5, 12)]])
+
+      rows = CSV.parse(described_class.report(result, title: 'balances'))
+
+      expect(rows.last).to eq(['Ada', Money.new(-2500, 'USD').format, '1234.5', '2008-05-12'])
+      expect(rows.last[1]).not_to start_with("'")
+    end
+
     it 'accepts custom headers and a row transform' do
       result = ActiveRecord::Result.new(%w[name balance_cents], [['Ada', 12_345]])
 

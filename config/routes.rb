@@ -88,6 +88,11 @@ Rails.application.routes.draw do
 
     resources :comments, only: %i[index create destroy]
 
+    # CSV reports: /admin/reports lists them, /admin/reports/<key> downloads one. Any id reaches the
+    # controller (no constraint, no format suffix) so unknown/malformed keys get the controller's
+    # redirect instead of falling through to the legacy catch-all below.
+    resources :reports, only: %i[index show], format: false, constraints: { id: %r{[^/]+} }
+
     # Camp Setup
     resources :camp_configurations do
       collection { post :batch }
@@ -135,21 +140,7 @@ Rails.application.routes.draw do
   end
 
   # Legacy ActiveAdmin admin, mounted at /legacy_admin until every resource is ported (see
-  # config/initializers/active_admin.rb). Report routes are explicit ActiveAdmin page actions.
-  %w[
-    all_complete_apps registered_but_not_applied enrolled_with_addresses
-    pending_course_assignments_with_students accepted_course_assignments_with_students
-    enrolled_student_demographic_report complete_apps_demographic_report
-    complete_applications_with_course_preferences waitlisted_applications_with_course_preferences
-    enrolled_with_sessions_and_courses enrolled_with_sessions_and_tshirt course_assignments
-    enrolled_with_covid_verification enrolled_with_addresses_and_more enrolled_for_more_than_one_session
-    dorm_by_gender_by_session finaid_with_app_and_offer_status offer_accepted_with_balance_due
-  ].each do |report|
-    get "/legacy_admin/reports/#{report}", to: "legacy_admin/reports##{report}", as: :"legacy_admin_reports_#{report}"
-  end
-  get '/legacy_admin/reports/enrolled_events_per_session', to: 'legacy_admin/reports#events_per_session_for_enrolled',
-                                                           as: :legacy_admin_reports_enrolled_events_per_session
-
+  # config/initializers/active_admin.rb).
   ActiveAdmin.routes(self)
 
   devise_for :users, controllers: {

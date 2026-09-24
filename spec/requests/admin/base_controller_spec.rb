@@ -54,13 +54,15 @@ RSpec.describe 'Admin::BaseController authentication', type: :request do
       expect(response.body).to include('active_admin')
     end
 
-    it 'redirects unported /admin paths to /legacy_admin (keeping the query string)' do
+    # Every menu resource is ported now; the catch-all still covers old bookmarks of any unmatched
+    # /admin path (e.g. ActiveAdmin's /admin/applications/:id/edit variants) until the cutover PR.
+    it 'redirects unmatched /admin paths to /legacy_admin (keeping the query string)' do
       sign_in create(:admin)
 
-      get '/admin/reports?order=id_desc'
+      get '/admin/legacy_only_page?order=id_desc'
 
       expect(response).to have_http_status(:moved_permanently)
-      expect(response).to redirect_to('/legacy_admin/reports?order=id_desc')
+      expect(response).to redirect_to('/legacy_admin/legacy_only_page?order=id_desc')
     end
 
     it 'keeps the admin_* helpers used elsewhere in the app' do
@@ -71,8 +73,9 @@ RSpec.describe 'Admin::BaseController authentication', type: :request do
       expect(new_admin_session_path).to eq('/admin/login')
       expect(destroy_admin_session_path).to eq('/admin/logout')
       expect(admin_recommendation_path(1)).to eq('/admin/recommendations/1')
-      expect(legacy_admin_reports_path).to eq('/legacy_admin/reports')
-      expect(legacy_admin_reports_offer_accepted_with_balance_due_path).to eq('/legacy_admin/reports/offer_accepted_with_balance_due')
+      expect(admin_financial_aid_request_path(1)).to eq('/admin/financial_aid_requests/1')
+      expect(admin_reports_path).to eq('/admin/reports')
+      expect(admin_report_path('offer_accepted_with_balance_due')).to eq('/admin/reports/offer_accepted_with_balance_due')
     end
   end
 
