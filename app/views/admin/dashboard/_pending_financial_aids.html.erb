@@ -5,7 +5,7 @@
   <% end %>
   <% financial_aids.each do |financial_aid| %>
     <div class="flex flex-wrap items-center justify-between gap-2 px-4 py-2 text-sm">
-      <%= link_to financial_aid.enrollment.display_name, admin_financial_aid_request_path(financial_aid) %>
+      <%= link_to "#{admin_applicant_name(financial_aid.enrollment)} - #{financial_aid.enrollment.user.email}", admin_financial_aid_request_path(financial_aid) %>
       <span class="flex items-center gap-2">
         <span class="font-medium text-slate-900"><%= humanized_money_with_symbol(financial_aid.amount) %></span>
         <%= admin_status_badge(financial_aid.status) %>
