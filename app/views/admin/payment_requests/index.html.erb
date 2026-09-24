@@ -1,0 +1,40 @@
+<% admin_page_title 'Payment Requests', subtitle: "#{number_with_delimiter(@pagy.count)} #{'payment request'.pluralize(@pagy.count)} · #{current_scope.label}" %>
+<% admin_page_actions do %>
+  <%= admin_csv_link %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-4">
+  <div class="grid gap-4 xl:col-span-3">
+    <%= admin_scope_tabs Admin::PaymentRequestsController::SCOPES, counts: @scope_counts %>
+
+    <%= admin_table @payment_requests, pagy: @pagy,
+                    actions: ->(request) { [admin_payment_request_path(request), nil, nil] } do |t| %>
+      <% t.column :id, sort: true do |request| %>
+        <%= link_to request.id, admin_payment_request_path(request), class: 'font-medium' %>
+      <% end %>
+      <% t.column 'User', sort: 'user' do |request| %>
+        <%= request.user&.email %>
+      <% end %>
+      <% t.column :order_number, sort: true %>
+      <% t.column 'Amount', sort: 'amount' do |request| %>
+        <%= admin_money_from_cents(request.amount_cents) %>
+      <% end %>
+      <% t.column :camp_year, sort: true %>
+      <% t.column 'Request timestamp', sort: 'request_timestamp' do |request| %>
+        <%= admin_datetime(request.requested_at) %>
+      <% end %>
+      <% t.column 'Matched payment', sort: 'payment' do |request| %>
+        <% if request.payment_id? %>
+          <%= admin_resource_link(request.payment, "Payment ##{request.payment_id}") %>
+        <% else %>
+          <span class="admin-badge-red">Unmatched</span>
+        <% end %>
+      <% end %>
+      <% t.column :created_at, sort: true %>
+    <% end %>
+  </div>
+
+  <div class="xl:col-span-1">
+    <%= admin_filter_form @filter, url: admin_payment_requests_path %>
+  </div>
+</div>

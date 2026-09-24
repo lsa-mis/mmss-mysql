@@ -1,0 +1,23 @@
+<%# locals: rejection %>
+<%= admin_form_with model: rejection,
+                    url: (rejection.persisted? ? admin_rejection_path(rejection) : admin_rejections_path),
+                    class: 'grid gap-5' do |f| %>
+  <%= f.errors_summary %>
+
+  <%= f.fieldset 'Rejection', description: 'Saving removes the applicant\'s course and session assignments, sets the application to rejected and emails the rejection letter.' do %>
+    <% if rejection.new_record? && rejection.enrollment %>
+      <p class="text-sm">
+        <span class="font-semibold">Application:</span>
+        <%= admin_applicant_link(rejection.enrollment) %>
+        <span class="text-slate-500"><%= rejection.enrollment.user.email %></span>
+      </p>
+      <%= f.input :enrollment_id, as: :hidden %>
+    <% else %>
+      <%= f.input :enrollment_id, as: :select, label: 'Enrollment', include_blank: 'Select an applicant', required: true,
+                                  collection: Admin::EnrollmentOptions.current_camp(include: rejection.enrollment) %>
+    <% end %>
+    <%= f.input :reason, as: :textarea, rows: 6, required: true %>
+  <% end %>
+
+  <%= f.actions cancel: (rejection.persisted? ? admin_rejection_path(rejection) : admin_rejections_path) %>
+<% end %>

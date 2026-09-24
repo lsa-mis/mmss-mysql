@@ -1,0 +1,25 @@
+<% admin_page_title "Applicant Activity ##{@applicant_activity.id}", subtitle: "#{admin_applicant_name(@applicant_activity.enrollment)} · #{@applicant_activity.activity.description}" %>
+<% admin_page_actions do %>
+  <%= link_to 'Edit', edit_admin_applicant_activity_path(@applicant_activity), class: 'admin-btn-primary' %>
+  <%= button_to 'Delete', admin_applicant_activity_path(@applicant_activity), method: :delete, class: 'admin-btn-danger',
+                form: { data: { turbo_confirm: 'Delete this applicant activity?' } } %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-3">
+  <div class="grid gap-5 xl:col-span-2">
+    <%= admin_panel 'Applicant Activity', body_class: '' do %>
+      <%= admin_attributes @applicant_activity do |a| %>
+        <% a.row :id %>
+        <% a.row 'Enrollment' do |record| %>
+          <%= admin_applicant_link(record.enrollment) %>
+          <span class="text-slate-500"><%= record.enrollment.user.email %></span>
+        <% end %>
+        <% a.row 'Activity' do |record| %>
+          <%= admin_resource_link(record.activity, record.activity.description) %>
+        <% end %>
+        <% a.row('Session') { |record| record.activity.camp_occurrence.display_name } %>
+        <% a.row :created_at, :updated_at %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

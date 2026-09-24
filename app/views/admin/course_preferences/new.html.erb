@@ -1,0 +1,6 @@
+<% admin_page_title 'New Course Preference' %>
+<% admin_page_actions do %>
+  <%= link_to 'Back to course preferences', admin_course_preferences_path, class: 'admin-btn-secondary' %>
+<% end %>
+
+<%= render 'admin/course_preferences/form', course_preference: @course_preference %>
