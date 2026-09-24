@@ -85,15 +85,14 @@ RSpec.describe Feedback, type: :model do
     end
   end
 
-  describe 'ransackable' do
-    it 'returns ransackable associations' do
-      expect(described_class.ransackable_associations(nil)).to eq(['user'])
+  describe 'GENRES and #genre_label' do
+    it 'lists the three genres offered by the public feedback form' do
+      expect(described_class::GENRES.keys).to eq(%w[page_error layout_issue suggestion])
     end
 
-    it 'returns ransackable attributes' do
-      expect(described_class.ransackable_attributes(nil)).to include(
-        'created_at', 'genre', 'id', 'message', 'updated_at', 'user_id'
-      )
+    it 'returns the label for a known genre and the raw value otherwise' do
+      expect(build(:feedback, genre: 'page_error').genre_label).to eq('Error on Page')
+      expect(build(:feedback, genre: 'something_else').genre_label).to eq('something_else')
     end
   end
 

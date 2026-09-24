@@ -51,6 +51,22 @@ Rails.application.routes.draw do
 
     resources :comments, only: %i[index create destroy]
 
+    # Logins Info
+    resources :admins do
+      collection { post :batch }
+      member { post :unlock }
+    end
+    resources :users do
+      collection { post :batch }
+    end
+    resources :faculties, only: %i[index show destroy] do
+      collection { post :batch }
+    end
+    # Feedback is submitted by applicants on the public site; admins only review/edit/delete it.
+    resources :feedbacks, except: %i[new create] do
+      collection { post :batch }
+    end
+
     # Cutover aid: bookmarks and links to resources that are not ported yet keep working.
     # Remove together with ActiveAdmin.
     get '*path', format: false, to: redirect { |path_params, request|

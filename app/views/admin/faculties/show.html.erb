@@ -1,0 +1,43 @@
+<% admin_page_title "Faculty ##{@faculty.id}", subtitle: @faculty.email %>
+<% admin_page_actions do %>
+  <%= button_to 'Delete', admin_faculty_path(@faculty), method: :delete, class: 'admin-btn-danger',
+                form: { data: { turbo_confirm: 'Delete this faculty account? This cannot be undone.' } } %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-3">
+  <div class="grid gap-5 xl:col-span-2">
+    <%= admin_panel 'Faculty', body_class: '' do %>
+      <%= admin_attributes @faculty do |a| %>
+        <% a.row :id, :email %>
+        <% a.row 'Uniqname' do |faculty| %><code><%= faculty.uniqname %></code><% end %>
+        <% a.row :current_sign_in_at, :last_sign_in_at, :created_at, :updated_at %>
+      <% end %>
+    <% end %>
+
+    <%= admin_panel 'Courses for current camp', body_class: '' do %>
+      <table class="admin-table">
+        <thead><tr><th>Course</th><th>Available spaces</th><th>Status</th></tr></thead>
+        <tbody>
+          <% @courses.each do |course| %>
+            <tr>
+              <td><%= admin_resource_link(course) %></td>
+              <td><%= course.available_spaces %></td>
+              <td><%= admin_status_badge(course.status) %></td>
+            </tr>
+          <% end %>
+          <% if @courses.empty? %>
+            <tr><td colspan="3"><%= admin_empty_state "No courses assigned to #{@faculty.uniqname} for the current camp." %></td></tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% end %>
+  </div>
+
+  <div class="grid gap-5 self-start">
+    <%= admin_panel 'Sign-in activity', body_class: '' do %>
+      <%= admin_attributes @faculty do |a| %>
+        <% a.row :sign_in_count, :current_sign_in_ip, :last_sign_in_ip, :remember_created_at %>
+      <% end %>
+    <% end %>
+  </div>
+</div>
