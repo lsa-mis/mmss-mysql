@@ -36,22 +36,26 @@ class MaintenanceMode
   end
 
   def call(env)
-    return @app.call(env) unless @maintenance_file.exist?
-
     settings = load_settings
-    return @app.call(env) if allowed?(Rack::Request.new(env), settings)
+    return @app.call(env) if settings.nil? || allowed?(Rack::Request.new(env), settings)
 
     maintenance_response(settings)
   end
 
   private
 
+  # Returns nil when maintenance mode is off. Reading once (instead of
+  # exist? + read) means a marker deleted by `maintenance:stop` mid-request is
+  # treated as "maintenance over" rather than raising Errno::ENOENT.
   def load_settings
-    yaml = YAML.safe_load(@maintenance_file.read) || {}
+    contents = @maintenance_file.read
+    yaml = YAML.safe_load(contents) || {}
     settings = DEFAULTS.merge(yaml.transform_keys(&:to_s).compact)
     settings['allowed_paths'] = to_list(settings['allowed_paths'])
     settings['allowed_ips'] = to_list(settings['allowed_ips'])
     settings
+  rescue Errno::ENOENT
+    nil
   end
 
   # Accepts YAML arrays or comma-separated strings, like turnout did.
@@ -62,7 +66,20 @@ class MaintenanceMode
 
   def allowed?(request, settings)
     path_allowed?(request.path, settings['allowed_paths']) ||
-      ip_allowed?(request.ip, settings['allowed_ips'])
+      ip_allowed?(client_ip(request), settings['allowed_ips'])
+  end
+
+  # Same source turnout used (Turnout::Request -> Rack::Request#ip).
+  # Rack::Request#ip is trusted-proxy aware: it returns REMOTE_ADDR for direct
+  # connections and only consults X-Forwarded-For when REMOTE_ADDR is a
+  # loopback/private proxy address, taking the right-most address that is not
+  # itself a trusted proxy. Production nginx sets the header with
+  # $proxy_add_x_forwarded_for (config/nginx_prod.conf), which appends the real
+  # client address, so a client-supplied X-Forwarded-For cannot satisfy
+  # allowed_ips. A front proxy that forwards X-Forwarded-For verbatim would
+  # defeat this, so keep that nginx setting.
+  def client_ip(request)
+    request.ip
   end
 
   def path_allowed?(path, allowed_paths)
