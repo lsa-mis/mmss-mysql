@@ -18,6 +18,13 @@ class Campnote < ApplicationRecord
   validates :opendate, :closedate, presence: true, availability: true
   validate :end_date_after_start_date
 
+  # Notes whose open/close window covers now. Rows with a NULL date never match (same as the
+  # previous Ruby `present?` checks).
+  scope :currently_open, lambda {
+    now = Time.current
+    where.not(opendate: nil).where.not(closedate: nil).where('opendate <= ? AND closedate >= ?', now, now)
+  }
+
   private
 
   def end_date_after_start_date

@@ -37,7 +37,7 @@
       <% t.column :partner_program, sort: true %>
       <% t.column :application_fee_required, sort: true %>
       <% t.column 'Balance Due' do |app| %>
-        <%= admin_money_from_cents(PaymentState.new(app).balance_due) %>
+        <%= admin_money_from_cents(app.balance_due_cents) %>
       <% end %>
       <% t.column 'Camp Year', sort: 'campyear' do |app| %>
         <%= app.campyear %>

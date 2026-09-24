@@ -74,9 +74,11 @@ class Admin::Filter
 
   def initialize(params)
     raw = params.respond_to?(:to_unsafe_h) ? params.to_unsafe_h : (params || {})
+    # Only scalar values are meaningful (`q[lastname][]=x` or `q[lastname][a]=x` are discarded).
     @values = raw.to_h.stringify_keys
                  .slice(*permitted_params)
-                 .transform_values { |value| value.is_a?(String) ? value.strip : value }
+                 .select { |_key, value| value.is_a?(String) || value.is_a?(Numeric) }
+                 .transform_values { |value| value.to_s.strip }
                  .compact_blank
   end
 
