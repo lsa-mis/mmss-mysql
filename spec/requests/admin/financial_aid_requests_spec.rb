@@ -193,13 +193,20 @@ RSpec.describe 'Admin financial aid requests', type: :request do
       expect(body).to include('enctype="multipart/form-data"')
     end
 
+    it 'renders the plain form when ?enrollment_id= does not exist' do
+      get new_admin_financial_aid_request_path(enrollment_id: 999_999)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('<option value="">Select an applicant</option>')
+    end
+
     it 'prefills the applicant from ?enrollment_id= and hides the select' do
       get new_admin_financial_aid_request_path(enrollment_id: enrollment.id)
 
       expect(response).to have_http_status(:ok)
       body = response.body
       expect(body).to include(%(type="hidden" value="#{enrollment.id}" name="financial_aid[enrollment_id]"))
-      expect(body).not_to include('<select class="admin-input" name="financial_aid[enrollment_id]"')
+      expect(body).not_to include('<option value="">Select an applicant</option>')
       expect(body).to include('Back to application')
     end
   end

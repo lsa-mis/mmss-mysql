@@ -93,15 +93,16 @@ class Admin::PaymentsController < Admin::BaseController
     }
   end
 
-  # Type, status, date and camp year are only settable when the payment is recorded (the edit
-  # form shows them read-only, as ActiveAdmin did).
+  # The payer, type, status, date and camp year are only settable when the payment is recorded
+  # (the edit form shows them read-only). Re-homing a payment would detach it from the payer's
+  # Nelnet payment request and re-run the status callback against the other applicant.
   def payment_params_for_create
     params.require(:payment).permit(:user_id, :total_amount_dollars, :transaction_id, :account_type, :result_message,
                                     :transaction_type, :transaction_status, :transaction_date, :camp_year)
   end
 
   def payment_params_for_update
-    params.require(:payment).permit(:user_id, :total_amount_dollars, :transaction_id, :account_type, :result_message)
+    params.require(:payment).permit(:total_amount_dollars, :transaction_id, :account_type, :result_message)
   end
 
   # The ActiveAdmin resource had no custom CSV, so every column was exported; the Nelnet signature

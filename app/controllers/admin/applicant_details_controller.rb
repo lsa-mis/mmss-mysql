@@ -45,7 +45,8 @@ class Admin::ApplicantDetailsController < Admin::BaseController
   end
 
   def new
-    @applicant_detail = ApplicantDetail.new(user_id: params[:user_id].presence)
+    # ?user_id= prefills the user picker (e.g. from a user's admin page); unknown ids are ignored.
+    @applicant_detail = ApplicantDetail.new(user: User.find_by(id: params[:user_id].presence))
   end
 
   def create

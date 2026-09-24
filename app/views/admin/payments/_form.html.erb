@@ -4,7 +4,13 @@
   <%= f.errors_summary %>
 
   <%= f.fieldset 'Manual payment', description: 'Records a payment received outside the Nelnet portal (check, wire, waiver). A successful payment updates the application status the same way an online payment does.' do %>
-    <% if payment.new_record? && enrollment %>
+    <% if payment.persisted? %>
+      <div>
+        <span class="admin-label">Applicant</span>
+        <p class="mt-1 text-sm"><%= admin_payment_user(payment) %></p>
+        <p class="admin-hint">The payer is fixed once the payment is recorded.</p>
+      </div>
+    <% elsif enrollment %>
       <p class="text-sm">
         <span class="font-semibold">Application:</span>
         <%= link_to enrollment.applicant_detail&.full_name || enrollment.user.email, admin_application_path(enrollment), class: 'font-medium' %>
@@ -15,7 +21,8 @@
       <%= f.input :user_id, as: :select, label: 'Applicant', include_blank: 'Select an applicant', required: true,
                             collection: admin_payment_user_options(payment) %>
     <% end %>
-    <%= f.input :total_amount_dollars, as: :number, label: 'Total amount ($)', step: 0.01, min: 0, required: true %>
+    <%= f.input :total_amount_dollars, as: :text, label: 'Total amount ($)', required: true, inputmode: 'decimal',
+                                       hint: 'Dollars with up to two decimals, e.g. 150.25.' %>
     <%= f.input :transaction_id, label: 'Transaction id', required: true, hint: 'Receipt / check number; must be unique.' %>
     <%= f.input :account_type, hint: 'e.g. check, wire, waiver' %>
     <%= f.input :result_message %>

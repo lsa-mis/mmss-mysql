@@ -36,7 +36,11 @@ class Payment < ApplicationRecord
   after_commit :set_status, if: :persisted?
 
   validates :transaction_id, presence: true, uniqueness: true
-  validates :total_amount, presence: true
+  # total_amount is a whole number of cents stored as a string (what Nelnet sends and what the
+  # balance arithmetic casts); anything else — negative, fractional, non-numeric — is refused.
+  validates :total_amount, presence: true, unless: :invalid_dollar_input?
+  validates :total_amount, format: { with: /\A\d+\z/, message: 'must be a whole number of cents' }, allow_blank: true
+  validate :total_amount_dollars_is_money
   validates :transaction_type, presence: true
   validates :transaction_status, presence: true
   validates :transaction_date, presence: true
@@ -47,24 +51,51 @@ class Payment < ApplicationRecord
   # destroyed (`destroy` returns false with an error on :base). The admin exposes no destroy at all.
   has_one :payment_request, dependent: :restrict_with_error
 
-  # Virtual attribute for dollar amounts in admin forms
+  # Virtual attribute for dollar amounts in the admin manual-payment form. Only a plain
+  # non-negative decimal with up to two places ("150", "150.25", "$1,500.00") is accepted;
+  # anything else leaves total_amount untouched and fails validation instead of being coerced
+  # (`to_f` would have turned "abc" into $0 and let "-5" through).
+  DOLLARS_FORMAT = /\A\d+(\.\d{1,2})?\z/
+
   def total_amount_dollars
+    return @total_amount_dollars_input if invalid_dollar_input?
     return nil if total_amount.blank?
-    (total_amount.to_f / 100).round(2)
+
+    (BigDecimal(total_amount) / 100).round(2).to_f
   end
 
   def total_amount_dollars=(value)
-    if value.blank? || value.to_s.strip.empty?
+    @total_amount_dollars_input = value
+    input = value.to_s.strip
+    if input.empty?
       self.total_amount = nil
-    else
-      self.total_amount = (value.to_f * 100).round.to_s
+    elsif (cents = self.class.dollars_to_cents(input))
+      self.total_amount = cents.to_s
     end
+  end
+
+  def self.dollars_to_cents(input)
+    normalized = input.to_s.strip.delete(',').delete_prefix('$')
+    return nil unless normalized.match?(DOLLARS_FORMAT)
+
+    (BigDecimal(normalized) * 100).to_i
   end
 
   scope :current_camp_payments, -> { where('camp_year = ? ', CampConfiguration.active_camp_year) }
   scope :status1_current_camp_payments, -> { current_camp_payments.where('transaction_status = ?', '1') }
 
   private
+
+  def invalid_dollar_input?
+    input = @total_amount_dollars_input.to_s.strip
+    input.present? && self.class.dollars_to_cents(input).nil?
+  end
+
+  def total_amount_dollars_is_money
+    return unless invalid_dollar_input?
+
+    errors.add(:total_amount_dollars, 'must be a non-negative dollar amount with at most two decimals (e.g. 150.25)')
+  end
 
   def set_status
     return unless transaction_status == '1'

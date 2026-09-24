@@ -171,6 +171,13 @@ RSpec.describe 'Admin payments', type: :request do
       expect(body).to match(/value="\d{12}"[^>]*name="payment\[transaction_date\]"/)
     end
 
+    it 'renders the plain form when ?enrollment_id= does not exist' do
+      get new_admin_payment_path(enrollment_id: 999_999)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('name="payment[user_id]"')
+    end
+
     it 'prefills the applicant from ?enrollment_id= and hides the select' do
       get new_admin_payment_path(enrollment_id: enrollment.id)
 
@@ -226,6 +233,30 @@ RSpec.describe 'Admin payments', type: :request do
       expect(response.body).to include('User must exist')
     end
 
+    it 'accepts formatted dollar input and stores whole cents' do
+      post admin_payments_path, params: { payment: valid_params.merge(total_amount_dollars: '$1,500.5') }
+
+      expect(Payment.find_by(transaction_id: 'CHECK-42').total_amount).to eq('150050')
+    end
+
+    it 'refuses negative, non-numeric and non-finite amounts instead of saving $0' do
+      ['-150', 'abc', 'Infinity', 'NaN', '1e3'].each do |bad|
+        post admin_payments_path, params: { payment: valid_params.merge(total_amount_dollars: bad) }
+
+        expect(response).to have_http_status(:unprocessable_content), "#{bad.inspect} was accepted"
+        expect(response.body).to include('must be a non-negative dollar amount')
+      end
+      expect(Payment.where(transaction_id: 'CHECK-42')).to be_empty
+    end
+
+    it 'reports a blank amount as missing' do
+      post admin_payments_path, params: { payment: valid_params.merge(total_amount_dollars: '') }
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(CGI.unescapeHTML(response.body)).to include("Total amount can't be blank")
+      expect(response.body).not_to include('must be a non-negative dollar amount')
+    end
+
     it 're-renders the form with errors when invalid' do
       post admin_payments_path, params: { payment: valid_params.merge(transaction_id: payment.transaction_id) }
 
@@ -236,13 +267,16 @@ RSpec.describe 'Admin payments', type: :request do
   end
 
   describe 'GET /admin/payments/:id/edit' do
-    it 'shows type, status, date and camp year read-only' do
+    it 'shows the payer, type, status, date and camp year read-only' do
       get edit_admin_payment_path(payment)
 
       expect(response).to have_http_status(:ok)
       body = response.body
       expect(body).to include('name="payment[total_amount_dollars]"')
       expect(body).to include('value="250.5"')
+      expect(body).not_to include('name="payment[user_id]"')
+      expect(body).to include('The payer is fixed once the payment is recorded.')
+      expect(body).to include('Zimmerman, Ada')
       expect(body).not_to include('name="payment[transaction_type]"')
       expect(body).not_to include('name="payment[transaction_status]"')
       expect(body).not_to include('name="payment[camp_year]"')
@@ -251,17 +285,33 @@ RSpec.describe 'Admin payments', type: :request do
   end
 
   describe 'PATCH /admin/payments/:id' do
-    it 'updates the editable fields and leaves type/status/date/camp year alone' do
+    it 'updates the editable fields and leaves payer/type/status/date/camp year alone' do
+      other_user = create(:user)
+      create(:payment_request, user: user, payment: payment, camp_year: enrollment.campyear)
+
       patch admin_payment_path(payment), params: { payment: { total_amount_dollars: '300', result_message: 'Corrected',
-                                                              transaction_status: '1', camp_year: 1990, transaction_type: '9' } }
+                                                              user_id: other_user.id, transaction_status: '1', camp_year: 1990,
+                                                              transaction_type: '9' } }
 
       expect(response).to redirect_to(admin_payment_path(payment))
       payment.reload
       expect(payment.total_amount).to eq('30000')
       expect(payment.result_message).to eq('Corrected')
+      expect(payment.user).to eq(user)
+      expect(payment.payment_request.user).to eq(user)
       expect(payment.transaction_status).to eq('2')
       expect(payment.transaction_type).to eq('1')
       expect(payment.camp_year).to eq(enrollment.campyear)
+    end
+
+    it 'rejects malformed and negative amounts without coercing them' do
+      ['abc', '-5', 'Infinity', '1e3', '12.345'].each do |bad|
+        patch admin_payment_path(payment), params: { payment: { total_amount_dollars: bad } }
+
+        expect(response).to have_http_status(:unprocessable_content), "#{bad.inspect} was accepted"
+        expect(response.body).to include('must be a non-negative dollar amount')
+        expect(payment.reload.total_amount).to eq('25050')
+      end
     end
 
     it 're-renders the form with errors when invalid' do

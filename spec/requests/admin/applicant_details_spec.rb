@@ -191,6 +191,26 @@ RSpec.describe 'Admin applicant details', type: :request do
     end
   end
 
+  describe 'GET /admin/applicant_details/new with ?user_id=' do
+    it 'preselects an existing user' do
+      orphan = create(:user)
+
+      get new_admin_applicant_detail_path(user_id: orphan.id)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(%(<option selected="selected" value="#{orphan.id}">#{orphan.email}</option>))
+    end
+
+    it 'renders the form when the id is unknown or malformed' do
+      get new_admin_applicant_detail_path(user_id: 999_999)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('name="applicant_detail[user_id]"')
+
+      get new_admin_applicant_detail_path(user_id: 'abc')
+      expect(response).to have_http_status(:ok)
+    end
+  end
+
   describe 'POST /admin/applicant_details' do
     let(:orphan) { create(:user) }
     let(:valid_params) do

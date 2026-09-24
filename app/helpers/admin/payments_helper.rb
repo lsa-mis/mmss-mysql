@@ -17,11 +17,11 @@ module Admin::PaymentsHelper
                                                                   title: transaction_status_message(status))
   end
 
-  # Applicant picker for a manual payment: current-camp applications keyed by user id, keeping the
-  # payment's persisted user selectable on edit.
+  # Applicant picker for a new manual payment: current-camp applications keyed by user id. The
+  # payer cannot be changed after creation, so the picker only appears on `new`; a user chosen
+  # on a failed submit stays selectable even when they have no current-camp application.
   def admin_payment_user_options(payment)
-    include = payment.persisted? ? payment.user&.enrollments&.order(:id)&.last : nil
-    options = Admin::EnrollmentOptions.current_camp_users(include: include)
+    options = Admin::EnrollmentOptions.current_camp_users
     if payment.user && options.none? { |_label, id| id == payment.user_id }
       options << [payment.user.email, payment.user_id]
     end
