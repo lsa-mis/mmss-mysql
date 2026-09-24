@@ -21,7 +21,6 @@ class PaymentsController < ApplicationController
   prepend_before_action :log_nelnet_callback, only: %i[payment_receipt]
   before_action :authenticate_logged_in!
   skip_before_action :authenticate_logged_in!, only: %i[payment_receipt]
-  before_action :authenticate_admin!, only: %i[index]
 
   before_action :set_current_enrollment
   skip_before_action :set_current_enrollment, only: %i[payment_receipt]
@@ -29,10 +28,6 @@ class PaymentsController < ApplicationController
   before_action :identify_user_for_payment_receipt!, only: %i[payment_receipt]
   before_action :validate_nelnet_receipt_signature!, only: %i[payment_receipt]
   before_action :verify_payment_request_for_new_transaction!, only: %i[payment_receipt]
-
-  def index
-    redirect_to root_url
-  end
 
   def payment_receipt
     tid = params['transactionId'].to_s

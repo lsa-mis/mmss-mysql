@@ -1,0 +1,52 @@
+<% admin_page_title @applicant_detail.full_name, subtitle: @applicant_detail.user.email %>
+<% admin_page_actions do %>
+  <%= link_to 'Edit', edit_admin_applicant_detail_path(@applicant_detail), class: 'admin-btn-primary' %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-3">
+  <div class="grid gap-5 xl:col-span-2">
+    <%= admin_panel 'Applications', body_class: '' do %>
+      <table class="admin-table">
+        <thead><tr><th>Camp year</th><th>Application status</th><th>Offer status</th><th>Email</th></tr></thead>
+        <tbody>
+          <% @applications.each do |application| %>
+            <tr>
+              <td><%= link_to "#{application.campyear} — Application ##{application.id}", admin_application_path(application), class: 'font-medium' %></td>
+              <td><%= admin_status_badge(application.application_status) %></td>
+              <td><%= admin_status_badge(application.offer_status) %></td>
+              <td><%= @applicant_detail.user.email %></td>
+            </tr>
+          <% end %>
+          <% if @applications.empty? %>
+            <tr><td colspan="4"><%= admin_empty_state 'No applications yet.' %></td></tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% end %>
+
+    <%= admin_panel 'Parent / guardian', body_class: '' do %>
+      <%= admin_attributes @applicant_detail do |a| %>
+        <% a.row :parentname, :parentaddress1, :parentaddress2, :parentcity, :parentstate, :parentstate_non_us, :parentzip,
+                 :parentcountry, :parentphone, :parentworkphone, :parentemail %>
+      <% end %>
+    <% end %>
+
+    <%= render 'admin/comments/comments', resource: @applicant_detail %>
+  </div>
+
+  <div class="grid gap-5 self-start">
+    <%= admin_panel 'Details', body_class: '' do %>
+      <%= admin_attributes @applicant_detail do |a| %>
+        <% a.row :id %>
+        <% a.row 'User' do |detail| %>
+          <%= admin_resource_link(detail.user, detail.user.email) %>
+        <% end %>
+        <% a.row :firstname, :middlename, :lastname %>
+        <% a.row :gender do |detail| %><%= admin_applicant_gender_name(detail) %><% end %>
+        <% a.row :demographic do |detail| %><%= detail.formatted_demographic %><% end %>
+        <% a.row :us_citizen, :birthdate, :diet_restrictions, :shirt_size, :address1, :address2, :city, :state, :state_non_us,
+                 :postalcode, :country, :phone, :created_at, :updated_at %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

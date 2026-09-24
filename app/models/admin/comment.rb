@@ -39,7 +39,9 @@ class Admin::Comment < ApplicationRecord
     'SessionActivity' => -> { SessionActivity },
     'SessionAssignment' => -> { SessionAssignment },
     'Recommendation' => -> { Recommendation },
-    'Recupload' => -> { Recupload }
+    'Recupload' => -> { Recupload },
+    'ApplicantDetail' => -> { ApplicantDetail },
+    'FinancialAid' => -> { FinancialAid }
   }.freeze
 
   def self.commentable_class(type)

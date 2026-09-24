@@ -25,6 +25,7 @@
 #
 class FinancialAid < ApplicationRecord
   include ApplicantState
+  include AdminCommentable
 
   after_commit :send_status_watch_email, if: :persisted?
 
@@ -32,7 +33,21 @@ class FinancialAid < ApplicationRecord
 
   has_one_attached :taxform
 
-  monetize :amount_cents
+  # Awards are never negative (a negative award would inflate the balance due). money-rails
+  # already rejects non-numeric input; blank means "no amount yet" rather than an error, and the
+  # raw input must be a plain dollar amount (no exponents / third decimal, which Money would
+  # otherwise quietly reinterpret).
+  monetize :amount_cents, numericality: { greater_than_or_equal_to: 0 }
+  validate :amount_is_plain_money
+
+  AMOUNT_FORMAT = /\A\$?\d+(\.\d{1,2})?\z/
+
+  module BlankAmountIsZero
+    def amount=(value)
+      super(value.is_a?(String) && value.strip.empty? ? 0 : value)
+    end
+  end
+  prepend BlankAmountIsZero
 
   validates :note, presence: :true
   validates :status, presence: true
@@ -45,6 +60,15 @@ class FinancialAid < ApplicationRecord
 
 
   private
+
+  def amount_is_plain_money
+    raw = instance_variable_get(:@amount_money_before_type_cast)
+    return unless raw.is_a?(String)
+    return if raw.strip.delete(',').match?(AMOUNT_FORMAT)
+    return if errors[:amount].any? # money-rails already reported it (not a number / negative)
+
+    errors.add(:amount, 'must be a non-negative dollar amount with at most two decimals (e.g. 150.25)')
+  end
 
   def source_required_when_awarded
     if status == 'awarded' && amount_cents > 0
@@ -91,13 +115,4 @@ class FinancialAid < ApplicationRecord
       errors.add(:amount_cents, "you need to set an amount")
     end
   end
-
-  def self.ransackable_associations(auth_object = nil)
-    ["enrollment", "taxform_attachment", "taxform_blob"]
-  end
-
-  def self.ransackable_attributes(auth_object = nil)
-    ["adjusted_gross_income", "amount_cents", "created_at", "enrollment_id", "id", "note", "payments_deadline", "source", "status", "updated_at"]
-  end
-
 end

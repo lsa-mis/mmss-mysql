@@ -11,19 +11,19 @@ ActiveAdmin.register_page 'Dashboard' do
             if Enrollment.current_camp_year_applications.any?
               ul do
                 Enrollment.current_camp_year_applications.order(created_at: :desc).limit(10).map do |enroll|
-                  li link_to(enroll.applicant_detail.full_name + ', ' + enroll.user.email,
+                  li link_to([enroll.applicant_detail&.full_name, enroll.user.email].compact.join(', '),
                              legacy_admin_application_path(enroll))
                 end
               end
             end
           end
 
-          panel link_to("Recent Payments for #{current_camp_year} Camp", legacy_admin_payments_path) do
+          panel link_to("Recent Payments for #{current_camp_year} Camp", admin_payments_path, data: { turbo: false }) do
             if Payment.current_camp_payments.any?
               ul do
                 Payment.current_camp_payments.order(created_at: :desc).limit(10).map do |payment|
                   li link_to(
-                    "#{payment.user.applicant_detail.full_name_and_email} - #{humanized_money_with_symbol(payment.total_amount.to_f / 100)}", legacy_admin_payment_path(payment.id)
+                    "#{payment.user.applicant_detail&.full_name_and_email || payment.user.email} - #{humanized_money_with_symbol(payment.total_amount.to_f / 100)}", admin_payment_path(payment.id), data: { turbo: false }
                   )
                 end
               end
@@ -46,11 +46,11 @@ ActiveAdmin.register_page 'Dashboard' do
                   payment_state = PaymentState.new(enroll)
                   balance_due = payment_state.balance_due
                   applicant_detail = enroll.applicant_detail
-                  birthdate_str = applicant_detail.birthdate.strftime('%Y-%m-%d')
+                  birthdate_str = applicant_detail&.birthdate&.strftime('%Y-%m-%d')
 
                   li do
                     link_to(
-                      "#{applicant_detail.full_name} - DOB: #{birthdate_str} - Parent: #{applicant_detail.parentname} - Balance: #{humanized_money_with_symbol(balance_due / 100)}",
+                      "#{applicant_detail&.full_name || enroll.user.email} - DOB: #{birthdate_str} - Parent: #{applicant_detail&.parentname} - Balance: #{humanized_money_with_symbol(balance_due / 100)}",
                       legacy_admin_application_path(enroll)
                     )
                   end
@@ -67,7 +67,7 @@ ActiveAdmin.register_page 'Dashboard' do
             end
           end
 
-          panel link_to('Financial Aid Requests', legacy_admin_financial_aid_requests_path) do
+          panel link_to('Financial Aid Requests', admin_financial_aid_requests_path, data: { turbo: false }) do
             div do
               render('/admin/pending_finaid_requests', model: 'dashboard')
             end

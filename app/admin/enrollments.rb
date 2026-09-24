@@ -195,7 +195,7 @@ ActiveAdmin.register Enrollment, as: 'Application' do
   show do
     attributes_table do
       row :user_id do |user|
-        link_to(user.applicant_detail.full_name.titleize, legacy_admin_applicant_detail_path(user.applicant_detail))
+        link_to(user.applicant_detail.full_name.titleize, admin_applicant_detail_path(user.applicant_detail), data: { turbo: false })
       end
       row :uniqname if application.application_status == 'enrolled'
       row :personal_statement
@@ -277,7 +277,7 @@ ActiveAdmin.register Enrollment, as: 'Application' do
           text_node '<strong>!! This application was submitted after the Application Fee Requirement was turned off !!</strong>'.html_safe
         end
         table_for application.user.payments.current_camp_payments do
-          column(:id) { |aid| link_to(aid.id, legacy_admin_payment_path(aid.id)) }
+          column(:id) { |aid| link_to(aid.id, admin_payment_path(aid.id), data: { turbo: false }) }
           column(:account_type) { |atype| atype.account_type.titleize }
           column(:transaction_date) { |td| Date.parse(td.transaction_date) }
           column(:transaction_status) { |ts| transaction_status_message(ts.transaction_status) }
@@ -289,15 +289,15 @@ ActiveAdmin.register Enrollment, as: 'Application' do
                         send_finaid_request_email_admin_application_path(application), method: :post)
       text_node ' --- '
       text_node link_to('[Add Financial Aid Request]',
-                        new_legacy_admin_financial_aid_request_path(enrollment_id: application))
+                        new_admin_financial_aid_request_path(enrollment_id: application), data: { turbo: false })
       text_node ' --- '
-      text_node link_to('[Add Manual Payment]', new_legacy_admin_payment_path(enrollment_id: application))
+      text_node link_to('[Add Manual Payment]', new_admin_payment_path(enrollment_id: application), data: { turbo: false })
 
       if application.financial_aids.present?
         panel 'Financial Aid Request' do
           table_for FinancialAid.where(enrollment_id: application) do
             column 'Request' do |item|
-              link_to('view', legacy_admin_financial_aid_request_path(item)) if item.present?
+              link_to('view', admin_financial_aid_request_path(item), data: { turbo: false }) if item.present?
             end
             column 'Amount' do |item|
               humanized_money_with_symbol(item.amount) if item.present?
