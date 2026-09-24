@@ -52,7 +52,7 @@ ActiveAdmin.register Enrollment, as: 'Application' do
   action_item :set_rejected, only: :show do
     if ['application complete'].include? application.application_status
       text_node link_to('Reject Applicant',
-                        new_legacy_admin_rejection_path(enrollment_id: application))
+                        new_admin_rejection_path(enrollment_id: application), data: { turbo: false })
     end
   end
   action_item :withdraw_enrollment, only: :show do
@@ -211,7 +211,7 @@ ActiveAdmin.register Enrollment, as: 'Application' do
 
     panel 'Session Assignment' do
       table_for application.session_assignments do
-        column(:id) { |item| link_to(item.id, legacy_admin_session_assignment_path(item)) }
+        column(:id) { |item| link_to(item.id, admin_session_assignment_path(item), data: { turbo: false }) }
         column('Session') { |item| item.camp_occurrence.description }
         column(:offer_status)
       end
@@ -225,7 +225,7 @@ ActiveAdmin.register Enrollment, as: 'Application' do
 
     panel 'Course Assignment' do
       table_for application.course_assignments do
-        column(:id) { |item| link_to(item.id, legacy_admin_course_assignment_path(item)) }
+        column(:id) { |item| link_to(item.id, admin_course_assignment_path(item), data: { turbo: false }) }
         column(:course_id) { |item| item.course.title }
         column 'Session' do |item|
           item.course.camp_occurrence.description
@@ -312,13 +312,13 @@ ActiveAdmin.register Enrollment, as: 'Application' do
     panel 'Recommendation' do
       if application.recommendation.present?
         table_for application.recommendation do
-          column(:id) { |recc| link_to(recc.id, legacy_admin_recommendation_path(recc.id)) }
+          column(:id) { |recc| link_to(recc.id, admin_recommendation_path(recc.id), data: { turbo: false }) }
           column :firstname
           column :lastname
           column :organization
           column 'Letter' do |item|
             if item.recupload.present?
-              link_to('view', legacy_admin_recupload_path(item.recupload))
+              link_to('view', admin_recupload_path(item.recupload), data: { turbo: false })
             else
               '- waiting for response'
             end

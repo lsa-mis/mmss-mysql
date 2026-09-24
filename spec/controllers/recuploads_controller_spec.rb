@@ -3,7 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe RecuploadsController, type: :controller do
-  let(:admin) { create(:admin) }
   let(:user) { create(:user, :with_applicant_detail) }
   let(:enrollment) { create(:enrollment, user: user) }
   let(:recommendation) { create(:recommendation, enrollment: enrollment) }
@@ -19,37 +18,6 @@ RSpec.describe RecuploadsController, type: :controller do
       hash: valid_hash,
       id: enrollment.user.applicant_detail.id
     }
-  end
-
-  describe 'GET #index' do
-    context 'when admin is signed in' do
-      before { sign_in admin }
-
-      it 'renders the index page' do
-        get :index
-        # The controller redirects unless admin_signed_in? is false
-        # Since we're signed in, it should NOT redirect, so we expect 200
-        expect(response).to have_http_status(:ok)
-      end
-    end
-
-    context 'when admin is not signed in' do
-      it 'redirects to admin sign in' do
-        get :index
-        expect(response).to redirect_to(new_admin_session_path)
-      end
-    end
-  end
-
-  describe 'GET #show' do
-    let(:recupload) { create(:recupload, recommendation: recommendation) }
-
-    before { sign_in admin }
-
-    it 'assigns the requested recupload' do
-      get :show, params: { id: recupload.id }
-      expect(assigns(:recupload)).to eq(recupload)
-    end
   end
 
   describe 'GET #new' do
@@ -165,29 +133,6 @@ RSpec.describe RecuploadsController, type: :controller do
     end
   end
 
-  describe 'DELETE #destroy' do
-    let!(:recupload) { create(:recupload, recommendation: recommendation) }
-
-    before { sign_in admin }
-
-    it 'destroys the requested recupload' do
-      expect {
-        delete :destroy, params: { id: recupload.id }
-      }.to change(Recupload, :count).by(-1)
-    end
-
-    it 'redirects to recuploads index' do
-      delete :destroy, params: { id: recupload.id }
-      expect(response).to redirect_to(recuploads_url)
-      expect(flash[:notice]).to eq('Recommendation was successfully destroyed.')
-    end
-
-    it 'responds with no content for JSON' do
-      delete :destroy, params: { id: recupload.id, format: :json }
-      expect(response).to have_http_status(:no_content)
-    end
-  end
-
   describe '#get_recommendation' do
     context 'with valid hash containing pattern' do
       it 'finds the correct recommendation' do
@@ -250,21 +195,6 @@ RSpec.describe RecuploadsController, type: :controller do
   end
 
   describe 'authentication' do
-    context 'for actions requiring admin authentication' do
-      %w[index show edit destroy].each do |action|
-        it "requires admin authentication for #{action}" do
-          case action
-          when 'index'
-            get action.to_sym
-          when 'show', 'edit', 'destroy'
-            recupload = create(:recupload, recommendation: recommendation)
-            get action.to_sym, params: { id: recupload.id }
-          end
-          expect(response).to redirect_to(new_admin_session_path)
-        end
-      end
-    end
-
     context 'for actions not requiring admin authentication' do
       %w[success error new create].each do |action|
         it "allows access to #{action} without admin authentication" do

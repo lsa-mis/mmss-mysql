@@ -1,19 +1,13 @@
 # frozen_string_literal: true
 
+# Applicants request a recommendation for their own application. Listing, deleting and the
+# "resend request" mail are admin-only and live in Admin::RecommendationsController.
 class RecommendationsController < ApplicationController
   devise_group :logged_in, contains: %i[user admin]
   before_action :authenticate_logged_in!
-  before_action :authenticate_admin!, only: %i[index destroy]
 
-  before_action :set_recommendation, only: %i[show edit update destroy]
+  before_action :set_recommendation, only: %i[show edit update]
   before_action :set_current_enrollment
-
-  # GET /recommendations
-  # GET /recommendations.json
-  def index
-    @enrollment = Enrollment.find(params[:enrollment_id])
-    @recommendations = Recommendation.all
-  end
 
   # GET /recommendations/1
   # GET /recommendations/1.json
@@ -70,17 +64,6 @@ class RecommendationsController < ApplicationController
         format.html { render :edit, status: :unprocessable_content }
         format.json { render json: @recommendation.errors, status: :unprocessable_content }
       end
-    end
-  end
-
-  # DELETE /recommendations/1
-  # DELETE /recommendations/1.json
-  def destroy
-    @enrollment = Enrollment.find_by(id: params[:enrollment_id])
-    @recommendation.destroy
-    respond_to do |format|
-      format.html { redirect_to enrollment_recommendations_url(@enrollment), notice: 'Recommendation was successfully destroyed.', status: :see_other }
-      format.json { head :no_content }
     end
   end
 

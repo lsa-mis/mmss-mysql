@@ -5,7 +5,7 @@
   <% when 'application complete' %>
     <%= button_to 'Place on Wait List', waitlist_admin_application_path(@application), method: :post, class: 'admin-btn-secondary',
                   form: { data: { turbo_confirm: 'Are you sure you want to wait list this application?' } } %>
-    <%= admin_legacy_link_to 'Reject Applicant', new_legacy_admin_rejection_path(enrollment_id: @application.id), class: 'admin-btn-secondary' %>
+    <%= link_to 'Reject Applicant', new_admin_rejection_path(enrollment_id: @application.id), class: 'admin-btn-secondary' %>
   <% when 'waitlisted' %>
     <%= button_to 'Remove from Wait List', remove_from_waitlist_admin_application_path(@application), method: :post, class: 'admin-btn-secondary',
                   form: { data: { turbo_confirm: 'Are you sure you want to remove this application from wait list?' } } %>
@@ -48,7 +48,7 @@
         <tbody>
           <% @application.session_assignments.includes(:camp_occurrence).each do |assignment| %>
             <tr>
-              <td><%= admin_legacy_link_to assignment.id, legacy_admin_session_assignment_path(assignment) %></td>
+              <td><%= link_to assignment.id, admin_session_assignment_path(assignment) %></td>
               <td><%= assignment.camp_occurrence.description %></td>
               <td><%= admin_status_badge(assignment.offer_status) %></td>
             </tr>
@@ -69,7 +69,7 @@
         <tbody>
           <% @application.course_assignments.includes(course: :camp_occurrence).each do |assignment| %>
             <tr>
-              <td><%= admin_legacy_link_to assignment.id, legacy_admin_course_assignment_path(assignment) %></td>
+              <td><%= link_to assignment.id, admin_course_assignment_path(assignment) %></td>
               <td><%= assignment.course.title %></td>
               <td><%= assignment.course.camp_occurrence.description %></td>
               <td><%= admin_boolean(assignment.wait_list) %></td>
@@ -173,13 +173,13 @@
           <thead><tr><th>ID</th><th>First name</th><th>Last name</th><th>Organization</th><th>Letter</th></tr></thead>
           <tbody>
             <tr>
-              <td><%= admin_legacy_link_to recommendation.id, legacy_admin_recommendation_path(recommendation) %></td>
+              <td><%= link_to recommendation.id, admin_recommendation_path(recommendation) %></td>
               <td><%= recommendation.firstname %></td>
               <td><%= recommendation.lastname %></td>
               <td><%= recommendation.organization %></td>
               <td>
                 <% if recommendation.recupload.present? %>
-                  <%= admin_legacy_link_to 'view', legacy_admin_recupload_path(recommendation.recupload) %>
+                  <%= link_to 'view', admin_recupload_path(recommendation.recupload) %>
                 <% else %>
                   <span class="text-slate-500">— waiting for response</span>
                 <% end %>

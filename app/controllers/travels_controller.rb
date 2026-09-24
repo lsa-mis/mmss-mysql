@@ -1,17 +1,12 @@
 # frozen_string_literal: true
 
+# Applicants enter their own travel details (nested under their enrollment). Listing and
+# deleting travel records is admin-only and lives in Admin::TravelsController.
 class TravelsController < ApplicationController
   devise_group :logged_in, contains: [:user, :admin]
   before_action :authenticate_logged_in!
-  before_action :authenticate_admin!, only: [:index, :destroy]
   before_action :set_current_enrollment
   before_action :set_list_of_sessions, only: [:new, :edit, :create, :update]
-  
-  # GET /travels
-  # GET /travels.json
-  def index
-    @travels = Travel.all
-  end
 
   # GET /travels/1
   # GET /travels/1.json
@@ -56,16 +51,6 @@ class TravelsController < ApplicationController
         format.html { render :edit, status: :unprocessable_content }
         format.json { render json: @travel.errors, status: :unprocessable_content }
       end
-    end
-  end
-
-  # DELETE /travels/1
-  # DELETE /travels/1.json
-  def destroy
-    @travel.destroy
-    respond_to do |format|
-      format.html { redirect_to travels_url, notice: 'Travel was successfully destroyed.', status: :see_other }
-      format.json { head :no_content }
     end
   end
 
