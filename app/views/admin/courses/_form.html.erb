@@ -17,7 +17,7 @@
       <%= f.input :faculty_uniqname, hint: 'Uniqname only, without the domain.' %>
       <%= f.input :faculty_name %>
     </div>
-    <%= f.input :status, as: :select, collection: course_status, include_blank: false %>
+    <%= f.input :status, as: :select, collection: admin_course_status_options(course), include_blank: false %>
   <% end %>
 
   <%= f.actions cancel: (course.persisted? ? admin_course_path(course) : admin_courses_path) %>

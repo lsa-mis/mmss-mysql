@@ -9,7 +9,7 @@
     <div class="grid gap-5 xl:col-span-2">
       <%= render 'admin/dashboard/recent_applications', applications: @recent_applications, camp_year: @active_camp.camp_year %>
       <%= render 'admin/dashboard/recent_payments', payments: @recent_payments, camp_year: @active_camp.camp_year %>
-      <%= render 'admin/dashboard/balance_due', balance_due: @balance_due %>
+      <%= render 'admin/dashboard/balance_due', balance_due: @balance_due, total: @balance_due_total %>
       <%= render 'admin/dashboard/pending_financial_aids', financial_aids: @pending_financial_aids %>
     </div>
 
@@ -19,7 +19,7 @@
       <%= admin_panel 'Resources' do %>
         <ul class="text-sm">
           <li><%= link_to 'Admin Documentation', 'https://docs.google.com/document/d/17M9433ybPpvyXc_RwsnydfmSQsWN80Iwg2t0ACItoKo/edit?usp=sharing', target: '_blank', rel: 'noopener' %></li>
-          <li class="mt-1"><%= link_to 'Reports', legacy_admin_reports_path, data: { turbo: false } %></li>
+          <li class="mt-1"><%= admin_legacy_link_to 'Reports', legacy_admin_reports_path %></li>
         </ul>
       <% end %>
     </div>

@@ -69,6 +69,19 @@ RSpec.describe 'Admin courses', type: :request do
       expect(response.body).to include(topo_row)
     end
 
+    it 'never turns URL options smuggled into the query string into off-site links' do
+      get admin_courses_path, params: { host: 'evil.example', protocol: 'https', port: 8443, script_name: '/x',
+                                        only_path: 'false', sort: 'title', scope: 'all', q: { title: 'Number' } }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).not_to include('evil.example')
+      expect(response.body).not_to include('https://')
+      expect(response.body).to include('href="/admin/courses?')
+      expect(response.body).to include('direction=desc')
+      expect(response.body).to include('q%5Btitle%5D=Number')
+      expect(response.body).to include('scope=current_camp')
+    end
+
     it 'sorts by session through the join and ignores unknown keys' do
       get admin_courses_path, params: { sort: 'session', direction: 'desc' }
       expect(response).to have_http_status(:ok)
@@ -129,6 +142,14 @@ RSpec.describe 'Admin courses', type: :request do
       expect(response.body).to include('Retired Session')
       expect(response.body).to include('Session Alpha')
       expect(response.body).to include('name="course[status]"')
+    end
+
+    it 'keeps a non-standard persisted status selectable' do
+      course.update_columns(status: 'waitlist only')
+
+      get edit_admin_course_path(course)
+
+      expect(response.body).to include('<option selected="selected" value="waitlist only">waitlist only</option>')
     end
   end
 

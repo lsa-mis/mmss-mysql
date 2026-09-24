@@ -10,7 +10,7 @@
       <%= f.input :opendate, label: 'Open date', required: true %>
       <%= f.input :closedate, label: 'Close date', required: true %>
     </div>
-    <%= f.input :notetype, as: :select, label: 'Note type', collection: campnote_types, include_blank: 'Select a type', required: true %>
+    <%= f.input :notetype, as: :select, label: 'Note type', collection: admin_campnote_type_options(campnote), include_blank: 'Select a type', required: true %>
   <% end %>
 
   <%= f.actions cancel: (campnote.persisted? ? admin_campnote_path(campnote) : admin_campnotes_path) %>

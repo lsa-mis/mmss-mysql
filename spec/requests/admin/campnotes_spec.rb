@@ -73,6 +73,18 @@ RSpec.describe 'Admin campnotes', type: :request do
     end
   end
 
+  describe 'GET /admin/campnotes/:id/edit' do
+    it 'keeps a non-standard persisted note type selectable' do
+      note.update_columns(notetype: 'general')
+
+      get edit_admin_campnote_path(note)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('<option selected="selected" value="general">General</option>')
+      expect(response.body).to include('value="alert">Alert</option>')
+    end
+  end
+
   describe 'POST /admin/campnotes' do
     it 'creates a note' do
       params = { note: 'Priority deadline is Friday', notetype: 'alert', opendate: '2033-04-01T08:00', closedate: '2033-04-05T18:00' }
