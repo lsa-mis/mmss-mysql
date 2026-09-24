@@ -2,9 +2,13 @@
 
 # Applications = Enrollment records (the ActiveAdmin resource was registered `as: 'Application'`).
 # Reference implementation for porting resources: filters, scopes, sorting, pagination, CSV,
-# batch actions, comments and a custom update flow (withdrawal).
+# batch actions, comments, admin-only member actions and a custom update flow (withdrawal).
+#
+# There is deliberately no new/create: applicants create their own enrollment through the public
+# flow (session/course registrations, transcript), and the ActiveAdmin form never satisfied the
+# model validations either.
 class Admin::ApplicationsController < Admin::BaseController
-  before_action :set_application, only: %i[show edit update destroy]
+  before_action :set_application, except: %i[index batch]
 
   SCOPES = [
     Admin::Scope.new(:current_camp_year_applications, label: 'Current years Applications', default: true),
@@ -62,20 +66,6 @@ class Admin::ApplicationsController < Admin::BaseController
                                    .includes(:camp_occurrence).order(:camp_occurrence_id)
   end
 
-  def new
-    @application = Enrollment.new(campyear: CampConfiguration.active_camp_year)
-  end
-
-  def create
-    @application = Enrollment.new(application_params)
-
-    if @application.save
-      redirect_to admin_application_path(@application), notice: 'Application was successfully created.', status: :see_other
-    else
-      render :new, status: :unprocessable_content
-    end
-  end
-
   def edit; end
 
   def update
@@ -83,12 +73,15 @@ class Admin::ApplicationsController < Admin::BaseController
     withdrawing = params[:withdraw_enrollment].present? || attributes[:application_status] == 'withdrawn'
 
     if withdrawing && @application.application_status != 'withdrawn'
-      withdraw(attributes)
+      released = @application.withdraw!(extra_attrs: attributes.to_h.symbolize_keys)
+      redirect_to admin_application_path(@application), notice: withdrawal_notice(released), status: :see_other
     elsif @application.update(attributes)
       redirect_to admin_application_path(@application), notice: 'Application was successfully updated.', status: :see_other
     else
       render :edit, status: :unprocessable_content
     end
+  rescue ActiveRecord::RecordInvalid
+    render :edit, status: :unprocessable_content
   end
 
   def destroy
@@ -98,6 +91,31 @@ class Admin::ApplicationsController < Admin::BaseController
 
   def batch
     perform_batch_action(Enrollment.all, BATCH_ACTIONS, redirect_to_path: admin_applications_path)
+  end
+
+  # --- Member actions (the ActiveAdmin show-page "action items") ---
+
+  def waitlist
+    @application.transition_application_status!('waitlisted')
+    redirect_to admin_application_path(@application), notice: 'Application was placed on waitlist.', status: :see_other
+  end
+
+  def remove_from_waitlist
+    @application.transition_application_status!('application complete')
+    redirect_to admin_application_path(@application), status: :see_other,
+                notice: 'Application was removed from waitlist. Send an email to the applicant with further instructions.'
+  end
+
+  def withdraw
+    released = @application.withdraw!
+    redirect_to admin_application_path(@application), notice: withdrawal_notice(released), status: :see_other
+  rescue ActiveRecord::RecordInvalid => e
+    redirect_to admin_application_path(@application), alert: e.record.errors.full_messages.to_sentence, status: :see_other
+  end
+
+  def send_finaid_request_email
+    FinaidMailer.with(enrollment: @application).fin_aid_request_email.deliver_now
+    redirect_to admin_application_path(@application), notice: 'Financial aid request link was sent to the applicant.', status: :see_other
   end
 
   private
@@ -110,24 +128,10 @@ class Admin::ApplicationsController < Admin::BaseController
     Enrollment.left_joins(:applicant_detail).includes(:user, :applicant_detail)
   end
 
-  # Withdrawing removes every course assignment (they free up seats) and records what was removed
-  # in the flash, matching the behaviour of EnrollmentsController#withdraw.
-  def withdraw(attributes)
-    deleted = @application.course_assignments.includes(course: :camp_occurrence).map do |assignment|
-      "Course: #{assignment.course.title}, Session: #{assignment.course.camp_occurrence.description}"
-    end
-    @application.course_assignments.destroy_all
-
-    attributes = attributes.merge(application_status: 'withdrawn', application_status_updated_on: Date.current)
-    attributes.delete(:course_assignments_attributes)
-
-    if @application.update(attributes)
-      notice = 'Enrollment has been withdrawn.'
-      notice += " Deleted course assignment(s): #{deleted.join('; ')}" if deleted.any?
-      redirect_to admin_application_path(@application), notice: notice, status: :see_other
-    else
-      render :edit, status: :unprocessable_content
-    end
+  def withdrawal_notice(released_assignments)
+    notice = 'Enrollment has been withdrawn.'
+    notice += " Deleted course assignment(s): #{released_assignments.join('; ')}" if released_assignments.any?
+    notice
   end
 
   def application_params

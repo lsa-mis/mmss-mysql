@@ -3,14 +3,14 @@
 <% admin_page_actions do %>
   <% case @application.application_status %>
   <% when 'application complete' %>
-    <%= button_to 'Place on Wait List', waitlisted_path(@application), method: :post, class: 'admin-btn-secondary',
+    <%= button_to 'Place on Wait List', waitlist_admin_application_path(@application), method: :post, class: 'admin-btn-secondary',
                   form: { data: { turbo_confirm: 'Are you sure you want to wait list this application?' } } %>
     <%= link_to 'Reject Applicant', new_legacy_admin_rejection_path(enrollment_id: @application.id), class: 'admin-btn-secondary', data: { turbo: false } %>
   <% when 'waitlisted' %>
-    <%= button_to 'Remove from Wait List', remove_from_waitlist_path(@application), method: :post, class: 'admin-btn-secondary',
+    <%= button_to 'Remove from Wait List', remove_from_waitlist_admin_application_path(@application), method: :post, class: 'admin-btn-secondary',
                   form: { data: { turbo_confirm: 'Are you sure you want to remove this application from wait list?' } } %>
   <% when 'enrolled' %>
-    <%= button_to 'Withdraw Enrollment', withdraw_enrollment_path(@application), method: :post, class: 'admin-btn-danger',
+    <%= button_to 'Withdraw Enrollment', withdraw_admin_application_path(@application), method: :post, class: 'admin-btn-danger',
                   form: { data: { turbo_confirm: 'Are you sure you want to withdraw this enrollment? This will delete all associated course assignments.' } } %>
   <% end %>
   <%= link_to 'Edit', edit_admin_application_path(@application), class: 'admin-btn-primary' %>
@@ -122,7 +122,8 @@
     <%= admin_panel "Finances — Balance Due: #{admin_money_from_cents(@payment_state.balance_due)} · Total Cost: #{admin_money_from_cents(@payment_state.total_cost)}",
                     body_class: '',
                     actions: safe_join([
-                      link_to('Send Financial Aid Request Link', send_finaid_request_email_path(enrollment_id: @application.id), class: 'admin-btn-link', data: { turbo_confirm: 'Email the financial aid request link to this applicant?' }),
+                      button_to('Send Financial Aid Request Link', send_finaid_request_email_admin_application_path(@application), method: :post, class: 'admin-btn-link',
+                                form: { data: { turbo_confirm: 'Email the financial aid request link to this applicant?' } }),
                       link_to('Add Financial Aid Request', new_legacy_admin_financial_aid_request_path(enrollment_id: @application.id), class: 'admin-btn-link', data: { turbo: false }),
                       link_to('Add Manual Payment', new_legacy_admin_payment_path(enrollment_id: @application.id), class: 'admin-btn-link', data: { turbo: false })
                     ]) do %>

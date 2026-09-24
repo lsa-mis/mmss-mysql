@@ -9,7 +9,7 @@
     <div class="grid gap-5 xl:col-span-2">
       <%= render 'admin/dashboard/recent_applications', applications: @recent_applications, camp_year: @active_camp.camp_year %>
       <%= render 'admin/dashboard/recent_payments', payments: @recent_payments, camp_year: @active_camp.camp_year %>
-      <%= render 'admin/dashboard/balance_due', balance_due: @balance_due %>
+      <%= render 'admin/dashboard/balance_due', balance_due: @balance_due, total: @balance_due_total %>
       <%= render 'admin/dashboard/pending_financial_aids', financial_aids: @pending_financial_aids %>
     </div>
 
