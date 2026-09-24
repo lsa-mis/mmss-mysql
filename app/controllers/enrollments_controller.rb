@@ -56,8 +56,8 @@ class EnrollmentsController < ApplicationController
         end
         format.json { render :show, status: :created, location: @enrollment }
       else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @enrollment.errors, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_content }
+        format.json { render json: @enrollment.errors, status: :unprocessable_content }
       end
     end
   end
@@ -81,8 +81,8 @@ class EnrollmentsController < ApplicationController
         if @current_enrollment.errors.include?(:student_packet) || @current_enrollment.errors.include?(:vaccine_record) || @current_enrollment.errors.include?(:covid_test_record)
           format.html { redirect_to root_path, alert: @current_enrollment.errors.full_messages.to_sentence, status: :see_other }
         else
-          format.html { render :edit, status: :unprocessable_entity }
-          format.json { render json: @current_enrollment.errors, status: :unprocessable_entity }
+          format.html { render :edit, status: :unprocessable_content }
+          format.json { render json: @current_enrollment.errors, status: :unprocessable_content }
         end
       end
     end

@@ -53,6 +53,20 @@ RSpec.describe RecuploadsController, type: :controller do
   end
 
   describe 'GET #new' do
+    context 'when the recommendation cannot be resolved' do
+      it 'redirects to the error page and logs identifiers only, never the hash or params' do
+        logged = []
+        allow(Rails.logger).to receive(:error) { |msg| logged << msg }
+
+        get :new, params: { hash: 'SECRETHASH_nGklDoc2egIkzFxr0U999999', id: 12_345, recupload: { letter: 'PRIVATE LETTER' } }
+
+        expect(response).to redirect_to(recupload_error_path)
+        message = logged.join("\n")
+        expect(message).to include('Error in get_recommendation', 'recommendation_id: 999999', 'applicant_detail_id: "12345"', 'hash_present: true')
+        expect(message).not_to include('SECRETHASH', 'PRIVATE LETTER', 'ActionController::Parameters')
+      end
+    end
+
     context 'when recommendation has no recupload' do
       before do
         allow(controller).to receive(:get_recommendation)
@@ -145,7 +159,7 @@ RSpec.describe RecuploadsController, type: :controller do
 
       it 'responds with JSON error' do
         post :create, params: invalid_params.merge(format: :json)
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.content_type).to include('application/json')
       end
     end

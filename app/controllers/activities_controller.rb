@@ -29,7 +29,7 @@ class ActivitiesController < ApplicationController
     if @activity.persisted?
       redirect_to activities_path, notice: 'Activity was successfully created.', status: :see_other
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 
@@ -41,8 +41,8 @@ class ActivitiesController < ApplicationController
         format.html { redirect_to @activity, notice: 'Activity was successfully updated.', status: :see_other }
         format.json { render :show, status: :ok, location: @activity }
       else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @activity.errors, status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_content }
+        format.json { render json: @activity.errors, status: :unprocessable_content }
       end
     end
   end

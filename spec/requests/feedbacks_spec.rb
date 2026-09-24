@@ -63,7 +63,7 @@ RSpec.describe 'Feedbacks', type: :request do
         expect {
           post feedbacks_path, params: { feedback: long_message }
         }.not_to change(Feedback, :count)
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include('too long')
       end
 
@@ -72,7 +72,7 @@ RSpec.describe 'Feedbacks', type: :request do
         expect {
           post feedbacks_path, params: { feedback: params }
         }.not_to change(Feedback, :count)
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include('error')
       end
 
@@ -81,7 +81,7 @@ RSpec.describe 'Feedbacks', type: :request do
         expect {
           post feedbacks_path, params: { feedback: params }
         }.not_to change(Feedback, :count)
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include('error')
       end
     end

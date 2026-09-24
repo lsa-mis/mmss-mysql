@@ -1,148 +1,106 @@
+require "active_support/core_ext/integer/time"
+
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
   # Code is not reloaded between requests.
-  config.cache_classes = true
+  config.enable_reloading = false
 
-  # Eager load code on boot. This eager loads most of Rails and
-  # your application in memory, allowing both threaded web servers
-  # and those relying on copy on write to perform better.
-  # Rake tasks automatically ignore this option for performance.
+  # Eager load code on boot for better performance and memory savings (ignored by Rake tasks).
   config.eager_load = true
 
-  # Full error reports are disabled and caching is turned on.
-  config.consider_all_requests_local       = false
+  # Full error reports are disabled.
+  config.consider_all_requests_local = false
+
+  # Turn on fragment caching in view templates.
   config.action_controller.perform_caching = true
 
-  # Ensures that a master key has been made available in either ENV["RAILS_MASTER_KEY"]
-  # or in config/master.key. This key is used to decrypt credentials (and other encrypted files).
-  # config.require_master_key = true
-
   # Disable serving static files from the `/public` folder by default since
-  # Apache or NGINX already handles this.
-  config.public_file_server.enabled = ENV['RAILS_SERVE_STATIC_FILES'].present?
+  # NGINX already handles this. Hosts that need Rails to serve them (e.g. Hatchbox)
+  # set RAILS_SERVE_STATIC_FILES.
+  config.public_file_server.enabled = ENV["RAILS_SERVE_STATIC_FILES"].present?
 
-  # CSS compression is disabled app-wide (config/application.rb); the Tailwind build is pre-minified.
+  # Cache assets for far-future expiry since they are all digest stamped.
+  config.public_file_server.headers = { "cache-control" => "public, max-age=#{1.year.to_i}" }
 
   # Do not fallback to assets pipeline if a precompiled asset is missed.
+  # (CSS compression is disabled app-wide in config/application.rb; the Tailwind build is pre-minified.)
   config.assets.compile = false
 
-  # config.serve_static_assets = true
-  # config.assets.compile = true
-
-  # Enable serving of images, stylesheets, and JavaScripts from an asset server.
-  # config.action_controller.asset_host = 'http://assets.example.com'
-
-  # Specifies the header that your server uses for sending files.
-  # config.action_dispatch.x_sendfile_header = 'X-Sendfile' # for Apache
-  # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for NGINX
-
-  # # Store uploaded files on the local file system (see config/storage.yml for options).
-  # config.active_storage.service = :local
-
-  # Store uploaded files on the GCP file system (see config/storage.yml for options).
+  # Store uploaded files on Google Cloud Storage (see config/storage.yml for options).
   config.active_storage.service = :google
 
-  # Mount Action Cable outside main process or domain.
-  # config.action_cable.mount_path = nil
-  # config.action_cable.url = 'wss://example.com/cable'
-  # config.action_cable.allowed_request_origins = [ 'http://example.com', /http:\/\/example.*/ ]
-
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
+  # NGINX forwards X-Forwarded-Proto, so `assume_ssl` is not needed.
   config.force_ssl = true
+
+  # Skip http-to-https redirect for the default health check endpoint.
+  config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
 
   # Ensure the session cookies are also set to secure in production
   # Extended timeout (4 hours) to accommodate long forms like enrollment applications
   # This prevents CSRF token expiration while users fill out lengthy forms
-  Rails.application.config.session_store :cookie_store,
-                                         key: 'mmss_security_session',
-                                         secure: Rails.env.production?,
-                                         expire_after: 4.hours
+  config.session_store :cookie_store,
+    key: "mmss_security_session",
+    secure: true,
+    expire_after: 4.hours
 
-  # Use the lowest log level to ensure availability of diagnostic information
-  # when problems arise.
-  config.log_level = :info
-
-  # Prepend all log lines with the following tags.
+  # Prepend all log lines with the request id. Logs go to log/production.log unless
+  # RAILS_LOG_TO_STDOUT is set (e.g. on Hatchbox), in which case they go to STDOUT.
   config.log_tags = [:request_id]
+  config.logger = ActiveSupport::TaggedLogging.logger($stdout) if ENV["RAILS_LOG_TO_STDOUT"].present?
 
-  # Use a different cache store in production.
+  # Change to "debug" to log everything (including potentially personally-identifiable information!)
+  config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")
+
+  # Prevent health checks from clogging up the logs.
+  config.silence_healthcheck_path = "/up"
+
+  # Don't log any deprecations.
+  config.active_support.report_deprecations = false
+
+  # Replace the default in-process memory cache store with a durable alternative.
   # config.cache_store = :mem_cache_store
 
-  # Use a real queuing backend for Active Job (and separate queues per environment).
-  # config.active_job.queue_adapter     = :resque
-  # config.active_job.queue_name_prefix = "mmss_production"
+  # Replace the default in-process and non-durable queuing backend for Active Job.
+  # config.active_job.queue_adapter = :resque
 
-  # The `perform_caching` option determines whether or not Action Mailer will
-  # cache emails. When set to `true`, Action Mailer will cache emails to improve
-  # performance. This can be useful if your application sends out a lot of emails
-  # that are identical or very similar, as it can reduce the amount of work the
-  # server has to do.
-  # When set to `false`, which means that Action Mailer will not cache emails.
-  # This might be because the emails your application sends are unique, so caching
-  # wouldn't provide a performance benefit. Or it might be to avoid potential issues
-  # with stale or incorrect emails being sent out due to caching.
+  # Deliver mail through SendGrid; raise so delivery problems surface in Sentry.
   config.action_mailer.perform_caching = false
   config.action_mailer.perform_deliveries = true
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.delivery_method = :smtp
-  config.action_mailer.default_url_options = { host: 'mmss-registration.math.lsa.umich.edu', protocol: 'https' }
-  ActionMailer::Base.smtp_settings = {
-    address: 'smtp.sendgrid.net',
-    port: '587',
+  config.action_mailer.default_url_options = { host: "mmss-registration.math.lsa.umich.edu", protocol: "https" }
+  config.action_mailer.smtp_settings = {
+    address: "smtp.sendgrid.net",
+    port: 587,
     authentication: :plain,
-    user_name: 'apikey',
+    user_name: "apikey",
     password: Rails.application.credentials.SENDGRID_API_KEY,
-    domain: 'math.lsa.umich.edu',
-    enable_starttls_auto: true
+    domain: "math.lsa.umich.edu",
+    enable_starttls_auto: true,
+    # Explicit 5 s bounds (also the Rails 7.0+ smtp_timeout default) so a stalled SendGrid
+    # connection raises instead of tying up a Puma thread.
+    open_timeout: 5,
+    read_timeout: 5
   }
-
-  # Ignore bad email addresses and do not raise email delivery errors.
-  # Set this to true and configure the email server for immediate delivery to raise delivery errors.
-  # config.action_mailer.raise_delivery_errors = false
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).
   config.i18n.fallbacks = true
 
-  # Send deprecation notices to registered listeners.
-  config.active_support.deprecation = :notify
-
-  # Use default logging formatter so that PID and timestamp are not suppressed.
-  # config.log_formatter = ::Logger::Formatter.new
-  # config.log_formatter = ::NewRelic::Agent::Logging::DecoratingFormatter.new
-
-  # Use a different logger for distributed setups.
-  # require 'syslog/logger'
-  # config.logger = ActiveSupport::TaggedLogging.new(Syslog::Logger.new 'app-name')
-
-  if ENV['RAILS_LOG_TO_STDOUT'].present?
-    logger           = ActiveSupport::Logger.new(STDOUT)
-    logger.formatter = config.log_formatter
-    config.logger    = ActiveSupport::TaggedLogging.new(logger)
-  end
-
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
-  # Inserts middleware to perform automatic connection switching.
-  # The `database_selector` hash is used to pass options to the DatabaseSelector
-  # middleware. The `delay` is used to determine how long to wait after a write
-  # to send a subsequent read to the primary.
+  # Only use :id for inspections in production.
+  config.active_record.attributes_for_inspect = [:id]
+
+  # Enable DNS rebinding protection and other `Host` header attacks.
+  # config.hosts = [
+  #   "example.com",     # Allow requests from example.com
+  #   /.*\.example\.com/ # Allow requests from subdomains like `www.example.com`
+  # ]
   #
-  # The `database_resolver` class is used by the middleware to determine which
-  # database is appropriate to use based on the time delay.
-  #
-  # The `database_resolver_context` class is used by the middleware to set
-  # timestamps for the last write to the primary. The resolver uses the context
-  # class timestamps to determine how long to wait before reading from the
-  # replica.
-  #
-  # By default Rails will store a last write timestamp in the session. The
-  # DatabaseSelector middleware is designed as such you can define your own
-  # strategy for connection switching and pass that into the middleware through
-  # these configuration options.
-  # config.active_record.database_selector = { delay: 2.seconds }
-  # config.active_record.database_resolver = ActiveRecord::Middleware::DatabaseSelector::Resolver
-  # config.active_record.database_resolver_context = ActiveRecord::Middleware::DatabaseSelector::Resolver::Session
+  # Skip DNS rebinding protection for the default health check endpoint.
+  # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 end

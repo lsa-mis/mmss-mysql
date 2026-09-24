@@ -41,11 +41,11 @@ A Ruby on Rails application for managing summer camp applications, enrollments, 
 | Layer            | Technology                                                       |
 | ---------------- | ---------------------------------------------------------------- |
 | **Runtime**      | Ruby 3.4.9                                                       |
-| **Framework**    | Rails 7.2.3.1                                                    |
+| **Framework**    | Rails 8.1.3.1 (`config.load_defaults 8.1`)                       |
 | **Database**     | MySQL 8 (mysql2 gem), utf8mb4                                    |
 | **Auth**         | Devise (users, admins, faculties)                                |
 | **Admin**        | ActiveAdmin 3.x                                                  |
-| **Server**       | Puma 5.6                                                         |
+| **Server**       | Puma 8 (systemd notify built in)                                 |
 | **Frontend**     | importmap-rails, Hotwire (Turbo Drive + Stimulus), Tailwind CSS 4 (tailwindcss-rails), Flatpickr; Sprockets only for ActiveAdmin |
 | **File storage** | Active Storage (local disk / Google Cloud Storage in production) |
 | **Monitoring**   | Skylight, Sentry                                                 |

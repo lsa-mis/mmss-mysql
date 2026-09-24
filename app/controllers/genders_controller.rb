@@ -34,8 +34,8 @@ class GendersController < ApplicationController
         format.html { redirect_to @gender, notice: 'Gender was successfully created.', status: :see_other }
         format.json { render :show, status: :created, location: @gender }
       else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @gender.errors, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_content }
+        format.json { render json: @gender.errors, status: :unprocessable_content }
       end
     end
   end
@@ -48,8 +48,8 @@ class GendersController < ApplicationController
         format.html { redirect_to @gender, notice: 'Gender was successfully updated.', status: :see_other }
         format.json { render :show, status: :ok, location: @gender }
       else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @gender.errors, status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_content }
+        format.json { render json: @gender.errors, status: :unprocessable_content }
       end
     end
   end

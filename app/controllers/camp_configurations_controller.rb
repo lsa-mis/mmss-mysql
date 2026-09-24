@@ -34,8 +34,8 @@ class CampConfigurationsController < ApplicationController
         format.html { redirect_to @camp_configuration, notice: 'Camp configuration was successfully created.', status: :see_other }
         format.json { render :show, status: :created, location: @camp_configuration }
       else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @camp_configuration.errors, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_content }
+        format.json { render json: @camp_configuration.errors, status: :unprocessable_content }
       end
     end
   end
@@ -48,8 +48,8 @@ class CampConfigurationsController < ApplicationController
         format.html { redirect_to @camp_configuration, notice: 'Camp configuration was successfully updated.', status: :see_other }
         format.json { render :show, status: :ok, location: @camp_configuration }
       else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @camp_configuration.errors, status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_content }
+        format.json { render json: @camp_configuration.errors, status: :unprocessable_content }
       end
     end
   end

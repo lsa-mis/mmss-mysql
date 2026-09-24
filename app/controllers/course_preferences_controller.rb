@@ -6,7 +6,7 @@ class CoursePreferencesController < ApplicationController
 
   before_action :set_current_enrollment, except: [:show]
   before_action :prepare_show, only: [:show]
-  before_action :course_preference, only: %i[update destroy]
+  before_action :course_preference, only: %i[update]
 
   def index
     load_course_preference_sessions
@@ -32,8 +32,8 @@ class CoursePreferencesController < ApplicationController
         format.html { redirect_to enrollment_course_preferences_path(@current_enrollment), notice: 'Course Preference was successfully edited.', status: :see_other }
         format.json { render :show, status: :created, location: @course_preference }
       else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @course_preference.errors, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_content }
+        format.json { render json: @course_preference.errors, status: :unprocessable_content }
       end
     end
   end
@@ -55,7 +55,7 @@ class CoursePreferencesController < ApplicationController
     if rankings.blank? || rankings.keys.to_set != allowed_ids || rankings.values.any?(&:blank?)
       load_course_preference_sessions
       flash.now[:alert] = 'Please choose a rank for every selected course.'
-      render :index, status: :unprocessable_entity
+      render :index, status: :unprocessable_content
       return
     end
 
@@ -72,7 +72,7 @@ class CoursePreferencesController < ApplicationController
       load_course_preference_sessions
       flash.now[:alert] = e.record.errors.full_messages.to_sentence.presence ||
         'Unable to save rankings. Each session needs unique ranks within the allowed range.'
-      render :index, status: :unprocessable_entity
+      render :index, status: :unprocessable_content
     end
   end
 
@@ -90,8 +90,8 @@ class CoursePreferencesController < ApplicationController
       else
         @course_camp = @course_preference.course.camp_occurrence
         @remaining_selections = get_rankings_available(@course_camp)
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @course_preference.errors, status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_content }
+        format.json { render json: @course_preference.errors, status: :unprocessable_content }
       end
     end
   end

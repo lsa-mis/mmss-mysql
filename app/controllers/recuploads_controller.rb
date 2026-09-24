@@ -45,8 +45,8 @@ class RecuploadsController < InheritedResources::Base
       else
         @student = ApplicantDetail.find(params[:id]).full_name if params[:id]
         @recommendation = Recommendation.find(@recupload.recommendation_id) if @recupload.recommendation_id
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @recupload.errors, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_content }
+        format.json { render json: @recupload.errors, status: :unprocessable_content }
       end
     end
   end
@@ -95,8 +95,11 @@ class RecuploadsController < InheritedResources::Base
       @student = @recommendation.applicant_name
     end
   rescue StandardError => e
-    # Log the error
-    Rails.logger.error("Error in get_recommendation: #{e.message}, params: #{params.inspect}")
+    # Log identifiers only: params carries the recommendation access hash and form fields.
+    Rails.logger.error(
+      "Error in get_recommendation: #{e.class}: #{e.message} " \
+      "(recommendation_id: #{rec_id.inspect}, applicant_detail_id: #{params[:id].inspect}, hash_present: #{params['hash'].present?})"
+    )
     redirect_to recupload_error_path,
                 alert: 'We could not find the recommendation request. Please contact MMSS admin for assistance.'
   end

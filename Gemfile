@@ -15,12 +15,11 @@ gem 'money-rails', '~> 1.14'
 # gem install mysql2 -v '0.5.6' -- --with-mysql-dir=/opt/homebrew/bin/mysql --with-mysql-lib=/opt/homebrew/Cellar/mysql/8.3.0/lib --with-mysql-include=/opt/homebrew/Cellar/mysql/8.3.0/include/mysql
 gem 'mysql2', '~> 0.5.6'
 gem 'ostruct', '~> 0.5.5'
-gem 'puma', '5.6.9'
-gem 'rails', '~> 7.2'
+gem 'puma', '~> 8.0'
+gem 'rails', '~> 8.1.3'
 # Sprockets + sassc remain only for ActiveAdmin's bundled assets; Propshaft replaces them once ActiveAdmin is gone.
 gem 'sass-rails', '~> 6.0'
-gem 'sd_notify'
-gem 'skylight'
+gem 'skylight', '~> 7.1'
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 
 # Node-free front end: import maps for JS, Hotwire (Turbo Drive + Stimulus), Tailwind 4 via the standalone CLI.
@@ -41,8 +40,8 @@ gem 'observer', require: false
 
 gem 'nokogiri', '~> 1.19'
 
-gem 'sentry-rails', '~> 6.3'
-gem 'sentry-ruby', '~> 6.3' # 5.24+ for Sentry Logging (enable_logs)
+gem 'sentry-rails', '~> 7.0'
+gem 'sentry-ruby', '~> 7.0'
 gem 'stackprof'
 
 # Seeds use Faker; staging loads seeds but should not install full :test tooling (Capybara, RSpec, …).

@@ -3,7 +3,6 @@
 class SessionAssignmentsController < ApplicationController
   devise_group :logged_in, contains: [:user, :admin]
   before_action :authenticate_logged_in!
-  before_action :authenticate_admin!, only: [:index, :destroy]
 
   before_action :set_session_assignment
 
@@ -14,7 +13,7 @@ class SessionAssignmentsController < ApplicationController
         format.json { render :show, status: :ok, location: @session_assignment }
       else
         format.html { redirect_to root_path, notice: 'There was a problem processing the offer.', status: :see_other }
-        format.json { render json: @session_assignment.errors, status: :unprocessable_entity }
+        format.json { render json: @session_assignment.errors, status: :unprocessable_content }
       end
     end
   end
@@ -26,7 +25,7 @@ class SessionAssignmentsController < ApplicationController
         format.json { render :show, status: :ok, location: @session_assignment }
       else
         format.html { redirect_to root_path, notice: 'There was a problem processing the offer.', status: :see_other }
-        format.json { render json: @session_assignment.errors, status: :unprocessable_entity }
+        format.json { render json: @session_assignment.errors, status: :unprocessable_content }
       end
     end
   end

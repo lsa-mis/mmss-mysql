@@ -38,8 +38,8 @@ class TravelsController < ApplicationController
         format.html { redirect_to root_path, notice: 'Travel was successfully created.', status: :see_other }
         format.json { render :show, status: :created, location: @travel }
       else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @travel.errors, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_content }
+        format.json { render json: @travel.errors, status: :unprocessable_content }
       end
     end
   end
@@ -53,8 +53,8 @@ class TravelsController < ApplicationController
         format.html { redirect_to root_path, notice: 'Travel was successfully updated.', status: :see_other }
         format.json { render :show, status: :ok, location: @travel }
       else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @travel.errors, status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_content }
+        format.json { render json: @travel.errors, status: :unprocessable_content }
       end
     end
   end
