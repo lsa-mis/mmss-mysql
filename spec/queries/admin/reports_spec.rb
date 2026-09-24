@@ -96,6 +96,17 @@ RSpec.describe Admin::Reports, :admin_reports do
       expect(row.last).to eq(Money.new(110_000, 'USD'))
     end
 
+    it 'treats a negative (refund) payment as signed cents, like PaymentState' do
+      create(:payment, user: fixtures.accepted.user, total_amount: '-20000', transaction_status: '1',
+                       camp_year: camp.camp_year)
+      fixtures.accepted.update_columns(application_status: 'offer accepted')
+
+      row = Admin::Reports::OfferAcceptedWithBalanceDue.new(camp).rows.sole
+
+      expect(row.last).to eq(Money.new(PaymentState.new(fixtures.accepted).balance_due, 'USD'))
+      expect(row.last).to eq(Money.new(130_000, 'USD'))
+    end
+
     it 'formats the financial aid amount as money' do
       csv = CSV.parse(Admin::Reports::AllCompleteApps.new(camp).to_csv)
       amount = csv[2].index('FIN AID AMOUNT')

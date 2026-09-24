@@ -43,7 +43,7 @@ class Admin::Reports::OfferAcceptedWithBalanceDue < Admin::Reports::Base
         WHERE enrollment_id = e.id AND status = 'awarded'
       ), 0) -
       COALESCE((
-        SELECT SUM(CAST(total_amount AS UNSIGNED))
+        SELECT SUM(CAST(total_amount AS SIGNED))
         FROM payments
         WHERE user_id = e.user_id AND camp_year = :camp_year AND transaction_status = '1'
       ), 0)
