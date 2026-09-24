@@ -177,6 +177,20 @@ RSpec.describe 'Admin users', type: :request do
       expect { delete admin_user_path(other) }.to change(User, :count).by(-1)
       expect(response).to redirect_to(admin_users_path)
     end
+
+    it 'refuses to delete a user with payment requests or payments and explains why' do
+      create(:payment_request, user: other)
+
+      expect { delete admin_user_path(other) }.not_to change(User, :count)
+      expect(response).to redirect_to(admin_user_path(other))
+      expect(flash[:alert]).to include('User could not be deleted')
+      expect(flash[:alert]).to include('payment requests')
+      expect(PaymentRequest.where(user: other).count).to eq(1)
+
+      get admin_user_path(other)
+      expect(response.body).to include('cannot be deleted')
+      expect(response.body).not_to include(%(class="button_to" method="post" action="#{admin_user_path(other)}"))
+    end
   end
 
   describe 'POST /admin/users/batch' do
@@ -187,6 +201,18 @@ RSpec.describe 'Admin users', type: :request do
 
       expect(response).to redirect_to(admin_users_path)
       expect(flash[:notice]).to include('Deleted 2')
+    end
+
+    it 'skips users with payments or payment requests and names them' do
+      create(:payment, user: other)
+
+      expect do
+        post batch_admin_users_path, params: { batch_action: 'destroy', ids: [user.id, other.id] }
+      end.to change(User, :count).by(-1)
+
+      expect(User.exists?(other.id)).to be(true)
+      expect(flash[:notice]).to include('Deleted 1 user.')
+      expect(flash[:notice]).to include("Skipped 1 with payments or payment requests: #{other.email}")
     end
 
     it 'rejects unknown batch actions' do

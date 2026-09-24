@@ -29,7 +29,17 @@ RSpec.describe User, type: :model do
   describe 'associations' do
     it { is_expected.to have_one(:applicant_detail).dependent(:destroy) }
     it { is_expected.to have_many(:enrollments).dependent(:destroy) }
-    it { is_expected.to have_many(:payments).dependent(:destroy) }
+    it { is_expected.to have_many(:payments).dependent(:restrict_with_error) }
+    it { is_expected.to have_many(:payment_requests).dependent(:restrict_with_error) }
+
+    it 'cannot be destroyed while it has payments or payment requests' do
+      user = create(:user)
+      create(:payment_request, user: user)
+
+      expect(user.destroy).to be(false)
+      expect(user.errors[:base].join).to include('payment requests')
+      expect(User.exists?(user.id)).to be(true)
+    end
     it { is_expected.to have_many(:feedbacks).dependent(:destroy) }
   end
 

@@ -56,8 +56,12 @@ class Admin::UsersController < Admin::BaseController
   end
 
   def destroy
-    @user.destroy
-    redirect_to admin_users_path, notice: 'User was successfully deleted.', status: :see_other
+    if @user.destroy
+      redirect_to admin_users_path, notice: 'User was successfully deleted.', status: :see_other
+    else
+      redirect_to admin_user_path(@user), alert: "User could not be deleted: #{@user.errors.full_messages.to_sentence}",
+                                          status: :see_other
+    end
   end
 
   def batch
@@ -68,6 +72,17 @@ class Admin::UsersController < Admin::BaseController
 
   def set_user
     @user = User.includes(:applicant_detail).find(params[:id])
+  end
+
+  # Users with payments or payment requests refuse to be destroyed (see User); report them
+  # instead of failing the whole batch.
+  def batch_destroy(records)
+    destroyed, kept = records.to_a.partition(&:destroy)
+    notice = "Deleted #{destroyed.size} #{'user'.pluralize(destroyed.size)}."
+    if kept.any?
+      notice += " Skipped #{kept.size} with payments or payment requests: #{kept.map(&:email).to_sentence}."
+    end
+    notice
   end
 
   def csv_export

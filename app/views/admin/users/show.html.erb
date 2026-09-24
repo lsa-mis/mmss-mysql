@@ -1,8 +1,12 @@
 <% admin_page_title "User ##{@user.id}", subtitle: @user.email %>
 <% admin_page_actions do %>
   <%= link_to 'Edit', edit_admin_user_path(@user), class: 'admin-btn-primary' %>
-  <%= button_to 'Delete', admin_user_path(@user), method: :delete, class: 'admin-btn-danger',
-                form: { data: { turbo_confirm: 'Delete this user and everything they submitted (applicant detail, applications, payments)? This cannot be undone.' } } %>
+  <% if @user.payments.exists? || @user.payment_requests.exists? %>
+    <span class="admin-btn-danger cursor-not-allowed opacity-50" title="Users with payments or payment requests cannot be deleted." aria-disabled="true">Delete</span>
+  <% else %>
+    <%= button_to 'Delete', admin_user_path(@user), method: :delete, class: 'admin-btn-danger',
+                  form: { data: { turbo_confirm: 'Delete this user and everything they submitted (applicant detail, applications, feedback)? This cannot be undone.' } } %>
+  <% end %>
 <% end %>
 
 <div class="grid gap-5 xl:grid-cols-3">
