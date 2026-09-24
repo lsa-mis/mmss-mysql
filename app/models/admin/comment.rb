@@ -27,6 +27,17 @@ class Admin::Comment < ApplicationRecord
 
   NAMESPACE = 'admin'
 
+  # Models that accept admin comments (they must `include AdminCommentable`). Add an entry when
+  # porting a resource whose ActiveAdmin show page rendered `active_admin_comments`. Lambdas keep
+  # autoloading lazy, and looking classes up here means user input is never constantized.
+  COMMENTABLE_MODELS = {
+    'Enrollment' => -> { Enrollment }
+  }.freeze
+
+  def self.commentable_class(type)
+    COMMENTABLE_MODELS[type.to_s]&.call
+  end
+
   belongs_to :resource, polymorphic: true
   belongs_to :author, polymorphic: true
 

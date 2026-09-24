@@ -32,11 +32,10 @@ class Admin::CommentsController < Admin::BaseController
     params.require(:admin_comment).permit(:body)
   end
 
-  # Only models that opted into AdminCommentable can be commented on.
+  # Only models registered in Admin::Comment::COMMENTABLE_MODELS can be commented on.
   def find_commentable
-    type = params.require(:resource_type)
-    klass = type.safe_constantize
-    raise ActiveRecord::RecordNotFound unless klass.is_a?(Class) && klass < ApplicationRecord && klass.include?(AdminCommentable)
+    klass = Admin::Comment.commentable_class(params.require(:resource_type))
+    raise ActiveRecord::RecordNotFound unless klass
 
     klass.find(params.require(:resource_id))
   end
