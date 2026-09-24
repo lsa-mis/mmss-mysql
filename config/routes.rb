@@ -30,8 +30,16 @@ Rails.application.routes.draw do
   namespace :admin do
     root to: 'dashboard#index'
 
-    resources :applications do
+    # Admins never create enrollments (applicants do, through the public flow), so no new/create.
+    resources :applications, except: %i[new create] do
       collection { post :batch }
+      # Status mutations formerly exposed on the public EnrollmentsController; admin-only now.
+      member do
+        post :waitlist
+        post :remove_from_waitlist
+        post :withdraw
+        post :send_finaid_request_email
+      end
     end
 
     resources :comments, only: %i[index create destroy]
@@ -131,9 +139,6 @@ Rails.application.routes.draw do
   post 'accept_session_offer/:id', to: 'session_assignments#accept_session_offer', as: :accept_session_offer
   post 'decline_session_offer/:id', to: 'session_assignments#decline_session_offer', as: :decline_session_offer
 
-  post 'waitlisted/:id', to: 'enrollments#add_to_waitlist', as: :waitlisted
-  post 'remove_from_waitlist/:id', to: 'enrollments#remove_from_waitlist', as: :remove_from_waitlist
-  post 'withdraw/:id', to: 'enrollments#withdraw', as: :withdraw_enrollment
 
   get 'static_pages/index'
   get 'static_pages/contact'
@@ -152,6 +157,5 @@ Rails.application.routes.draw do
 
   get 'send_request_email', to: 'recommendations#send_request_email', as: :send_request_email
 
-  get 'send_finaid_request_email', to: 'enrollments#send_finaid_request_email', as: :send_finaid_request_email
 
 end

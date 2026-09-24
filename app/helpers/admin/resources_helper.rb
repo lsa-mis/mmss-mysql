@@ -30,11 +30,25 @@ module Admin::ResourcesHelper
     end
   end
 
+  # True when the record's show page is still served by ActiveAdmin.
+  def admin_resource_legacy?(record)
+    !respond_to?(:"admin_#{admin_resource_route_name(record)}_path")
+  end
+
   def admin_resource_link(record, text = nil)
     return admin_empty_value if record.nil?
 
     text ||= record.try(:display_name) || record.try(:name) || "#{record.class.model_name.human} ##{record.id}"
     path = admin_resource_path(record)
-    path ? link_to(text, path) : text
+    return text unless path
+
+    admin_resource_legacy?(record) ? admin_legacy_link_to(text, path) : link_to(text, path)
+  end
+
+  # link_to for anything under /legacy_admin. ActiveAdmin's page must be a full navigation
+  # (its own jQuery/Sprockets bundle), so Turbo Drive is disabled on the link.
+  def admin_legacy_link_to(text, path, **options)
+    options[:data] = (options[:data] || {}).merge(turbo: false)
+    link_to(text, path, **options)
   end
 end

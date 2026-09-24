@@ -1,11 +1,11 @@
 <%# locals: financial_aids %>
-<%= admin_panel 'Financial Aid Requests', actions: link_to('All requests →', legacy_admin_financial_aid_requests_path, data: { turbo: false }), body_class: 'divide-y divide-slate-100' do %>
+<%= admin_panel 'Financial Aid Requests', actions: admin_legacy_link_to('All requests →', legacy_admin_financial_aid_requests_path), body_class: 'divide-y divide-slate-100' do %>
   <% if financial_aids.empty? %>
     <%= admin_empty_state 'There are no pending requests in the system.' %>
   <% end %>
   <% financial_aids.each do |financial_aid| %>
     <div class="flex flex-wrap items-center justify-between gap-2 px-4 py-2 text-sm">
-      <%= link_to financial_aid.enrollment.display_name, legacy_admin_financial_aid_request_path(financial_aid), data: { turbo: false } %>
+      <%= admin_legacy_link_to financial_aid.enrollment.display_name, legacy_admin_financial_aid_request_path(financial_aid) %>
       <span class="flex items-center gap-2">
         <span class="font-medium text-slate-900"><%= humanized_money_with_symbol(financial_aid.amount) %></span>
         <%= admin_status_badge(financial_aid.status) %>

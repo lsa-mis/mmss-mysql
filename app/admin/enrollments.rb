@@ -39,13 +39,13 @@ ActiveAdmin.register Enrollment, as: 'Application' do
 
   action_item :set_waitlisted, only: :show do
     if ['application complete'].include? application.application_status
-      text_node link_to('Place on Wait List', waitlisted_path(application),
+      text_node link_to('Place on Wait List', waitlist_admin_application_path(application),
                         data: { confirm: 'Are you sure you want to wait list this application?' }, method: :post)
     end
   end
   action_item :remove_from_waitlist, only: :show do
     if ['waitlisted'].include? application.application_status
-      text_node link_to('Remove from Wait List', remove_from_waitlist_path(application),
+      text_node link_to('Remove from Wait List', remove_from_waitlist_admin_application_path(application),
                         data: { confirm: 'Are you sure you want to remove this application from wait list?' }, method: :post)
     end
   end
@@ -57,7 +57,7 @@ ActiveAdmin.register Enrollment, as: 'Application' do
   end
   action_item :withdraw_enrollment, only: :show do
     if ['enrolled'].include? application.application_status
-      text_node link_to('Withdraw Enrollment', withdraw_enrollment_path(application),
+      text_node link_to('Withdraw Enrollment', withdraw_admin_application_path(application),
                         data: { confirm: 'Are you sure you want to withdraw this enrollment? This will delete all associated course assignments.' }, method: :post)
     end
   end
@@ -285,7 +285,7 @@ ActiveAdmin.register Enrollment, as: 'Application' do
       end
 
       text_node link_to('[Send Financial Aid Request Link to Applicant]',
-                        send_finaid_request_email_path(enrollment_id: application))
+                        send_finaid_request_email_admin_application_path(application), method: :post)
       text_node ' --- '
       text_node link_to('[Add Financial Aid Request]',
                         new_legacy_admin_financial_aid_request_path(enrollment_id: application))

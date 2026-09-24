@@ -35,7 +35,7 @@ module Admin::TableHelper
   def admin_sortable_header(label, sort_key)
     active = current_sort.to_s == sort_key.to_s
     next_direction = active && current_sort_direction.to_s == 'asc' ? 'desc' : 'asc'
-    url = url_for(request.query_parameters.merge(sort: sort_key, direction: next_direction, page: nil))
+    url = admin_index_path(sort: sort_key, direction: next_direction, page: nil)
 
     link_to url, class: class_names('group inline-flex items-center gap-1 hover:text-slate-900', 'text-um-blue' => active) do
       safe_join([label, admin_sort_indicator(active, current_sort_direction)])
@@ -71,12 +71,12 @@ module Admin::TableHelper
   end
 
   def admin_scope_path(scope)
-    url_for(request.query_parameters.merge(scope: scope.param, page: nil))
+    admin_index_path(scope: scope.param, page: nil)
   end
 
   # Link to the CSV export of the current (filtered, scoped, sorted) index.
   def admin_csv_link(text = 'Download CSV')
-    link_to text, url_for(request.query_parameters.merge(format: :csv, page: nil, limit: nil)),
+    link_to text, admin_index_path(format: :csv, page: nil, limit: nil),
             class: 'admin-btn-secondary', data: { turbo: false }
   end
 end
