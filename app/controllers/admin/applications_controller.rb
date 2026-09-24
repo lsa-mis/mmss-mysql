@@ -52,6 +52,7 @@ class Admin::ApplicationsController < Admin::BaseController
     @scope_counts = scope_counts(relation, SCOPES)
     relation = apply_scope(relation, SCOPES)
     relation = apply_sort(relation, allowed: SORTS, default: :updated_at, default_direction: :desc)
+    relation = Admin::BalanceDueQuery.with_balance_due(relation)
 
     respond_to do |format|
       format.html { @pagy, @applications = paginate(relation) }
@@ -125,7 +126,8 @@ class Admin::ApplicationsController < Admin::BaseController
   end
 
   def base_relation
-    Enrollment.left_joins(:applicant_detail).includes(:user, :applicant_detail)
+    # preload (not includes): the index adds a computed select column, which eager_load would drop.
+    Enrollment.left_joins(:applicant_detail).preload(:user, :applicant_detail)
   end
 
   def withdrawal_notice(released_assignments)
@@ -166,7 +168,7 @@ class Admin::ApplicationsController < Admin::BaseController
       column :notes
       column :partner_program
       column :camp_doc_form_completed
-      column('Balance Due') { |app| view.admin_money_from_cents(PaymentState.new(app).balance_due) }
+      column('Balance Due') { |app| view.admin_money_from_cents(app.balance_due_cents) }
       column('Camp Year') { |app| app.campyear }
     end
   end

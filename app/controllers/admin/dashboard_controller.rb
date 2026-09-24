@@ -21,7 +21,7 @@ class Admin::DashboardController < Admin::BaseController
                                           .includes(enrollment: %i[user applicant_detail])
     @sessions = CampOccurrence.active.to_a
     @session_stats = session_stats(@sessions)
-    @camp_notes = Campnote.all.select { |note| note.opendate.present? && note.closedate.present? && (note.opendate..note.closedate).cover?(Time.current) }
+    @camp_notes = Campnote.currently_open.order(:opendate)
   end
 
   private

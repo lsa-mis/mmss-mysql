@@ -60,6 +60,20 @@ RSpec.describe Admin::BalanceDueQuery do
     expect(query.count).to eq(2)
   end
 
+  describe '.with_balance_due' do
+    it 'adds balance_due_cents to any Enrollment relation, matching PaymentState for every row' do
+      owing = accepted_enrollment(payments: [{ total_amount: '1500', transaction_status: '1' }])
+      plain = create(:enrollment, user: create(:user, :with_applicant_detail))
+
+      rows = described_class.with_balance_due(Enrollment.where(id: [owing.id, plain.id]).order(:id)).to_a
+
+      expect(rows.map(&:id)).to eq([owing.id, plain.id])
+      rows.each { |row| expect(row.balance_due_cents.to_i).to eq(PaymentState.new(row).balance_due) }
+      expect(rows.first.balance_due_cents.to_i).to eq(session.cost_cents + camp.application_fee_cents - 1_500)
+      expect(described_class.with_balance_due(Enrollment.all).count(:all)).to eq(Enrollment.count)
+    end
+  end
+
   it 'is empty without an active camp' do
     query = described_class.new(nil)
 
