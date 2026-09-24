@@ -1,0 +1,32 @@
+<% admin_page_title 'Session Configurations', subtitle: "#{number_with_delimiter(@pagy.count)} #{'session'.pluralize(@pagy.count)}" %>
+<% admin_page_actions do %>
+  <%= admin_csv_link %>
+  <%= link_to 'New Session Configuration', new_admin_session_configuration_path, class: 'admin-btn-primary' %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-4">
+  <div class="xl:col-span-3">
+    <%= admin_table @session_configurations, pagy: @pagy,
+                    batch_actions: Admin::SessionConfigurationsController::BATCH_ACTIONS, batch_url: batch_admin_session_configurations_path,
+                    actions: ->(session) { [admin_session_configuration_path(session), edit_admin_session_configuration_path(session), admin_session_configuration_path(session)] } do |t| %>
+      <% t.column 'Camp Year', sort: 'camp_year' do |session| %>
+        <%= link_to session.camp_configuration.camp_year, admin_camp_configuration_path(session.camp_configuration) %>
+      <% end %>
+      <% t.column :description, sort: true do |session| %>
+        <%= link_to session.description, admin_session_configuration_path(session), class: 'font-medium' %>
+      <% end %>
+      <% t.column 'Cost', sort: 'cost' do |session| %>
+        <%= humanized_money_with_symbol(session.cost) %>
+      <% end %>
+      <% t.column :begin_date, sort: true %>
+      <% t.column :end_date, sort: true %>
+      <% t.column :active, sort: true %>
+      <% t.column :created_at, sort: true %>
+      <% t.column :updated_at, sort: true %>
+    <% end %>
+  </div>
+
+  <div class="xl:col-span-1">
+    <%= admin_filter_form @filter, url: admin_session_configurations_path %>
+  </div>
+</div>

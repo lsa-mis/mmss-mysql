@@ -14,7 +14,6 @@ Rails.application.routes.draw do
   get 'faculty/student_page/:id', to: 'faculties#student_page', as: :student_page
   get 'faculty_login', to: 'static_pages#faculty_login', as: :faculty_login
 
-  resources :campnotes
   # Recommenders upload letters through the emailed link; everything else is under /admin/recuploads.
   resources :recuploads, only: %i[new create]
   resources :feedbacks
@@ -81,6 +80,45 @@ Rails.application.routes.draw do
 
     resources :comments, only: %i[index create destroy]
 
+    # Camp Setup
+    resources :camp_configurations do
+      collection { post :batch }
+    end
+    resources :session_configurations do
+      collection { post :batch }
+    end
+    resources :activities do
+      collection { post :batch }
+    end
+    resources :courses do
+      collection { post :batch }
+    end
+    resources :campnotes do
+      collection { post :batch }
+    end
+    resources :demographics do
+      collection { post :batch }
+    end
+    resources :gender_types do
+      collection { post :batch }
+    end
+
+    # Logins Info
+    resources :admins do
+      collection { post :batch }
+      member { post :unlock }
+    end
+    resources :users do
+      collection { post :batch }
+    end
+    resources :faculties, only: %i[index show destroy] do
+      collection { post :batch }
+    end
+    # Feedback is submitted by applicants on the public site; admins only review/edit/delete it.
+    resources :feedbacks, except: %i[new create] do
+      collection { post :batch }
+    end
+
     # Cutover aid: bookmarks and links to resources that are not ported yet keep working.
     # Remove together with ActiveAdmin.
     get '*path', format: false, to: redirect { |path_params, request|
@@ -105,25 +143,6 @@ Rails.application.routes.draw do
                                                            as: :legacy_admin_reports_enrolled_events_per_session
 
   ActiveAdmin.routes(self)
-  # authenticated :admin do
-    resources :genders
-    resources :demographics
-
-    resources :camp_configurations do
-      resources :camp_occurrences
-    end
-
-    resources :camp_occurrences do
-      resources :activities
-    end
-
-    resources :camp_occurrences do
-      resources :courses
-    end
-
-    resources :activities
-    resources :courses
-  # end
 
   devise_for :users, controllers: {
     registrations: 'users/registrations'
@@ -133,10 +152,6 @@ Rails.application.routes.draw do
   # Applicant-facing; admin listing/deletion lives under /admin/travels and /admin/recommendations.
   resources :enrollments do
     resources :travels, except: %i[index destroy]
-  end
-
-  resources :enrollments do
-    resources :activities
   end
 
   resources :enrollments do

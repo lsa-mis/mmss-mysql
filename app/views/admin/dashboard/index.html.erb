@@ -2,7 +2,7 @@
 
 <% unless @active_camp %>
   <%= admin_panel 'Notifications' do %>
-    <p class="text-sm text-slate-700">No active camps. <%= admin_legacy_link_to 'Configure a camp', legacy_admin_camp_configurations_path %> to get started.</p>
+    <p class="text-sm text-slate-700">No active camps. <%= link_to 'Configure a camp', admin_camp_configurations_path %> to get started.</p>
   <% end %>
 <% else %>
   <div class="grid gap-5 xl:grid-cols-3">

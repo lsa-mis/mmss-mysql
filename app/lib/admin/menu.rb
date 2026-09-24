@@ -34,19 +34,19 @@ class Admin::Menu
       Item.new(label: 'Nelnet Callback Logs', route: :admin_nelnet_callback_logs_path)
     ]),
     Group.new(label: 'Camp Setup', items: [
-      Item.new(label: 'Camp Configurations', route: :legacy_admin_camp_configurations_path, legacy: true),
-      Item.new(label: 'Session Configurations', route: :legacy_admin_session_configurations_path, legacy: true),
-      Item.new(label: 'Activities', route: :legacy_admin_activities_path, legacy: true),
-      Item.new(label: 'Courses', route: :legacy_admin_courses_path, legacy: true),
-      Item.new(label: 'Campnotes', route: :legacy_admin_campnotes_path, legacy: true),
-      Item.new(label: 'Demographics', route: :legacy_admin_demographics_path, legacy: true),
-      Item.new(label: 'Gender Types', route: :legacy_admin_gender_types_path, legacy: true)
+      Item.new(label: 'Camp Configurations', route: :admin_camp_configurations_path),
+      Item.new(label: 'Session Configurations', route: :admin_session_configurations_path),
+      Item.new(label: 'Activities', route: :admin_activities_path),
+      Item.new(label: 'Courses', route: :admin_courses_path),
+      Item.new(label: 'Campnotes', route: :admin_campnotes_path),
+      Item.new(label: 'Demographics', route: :admin_demographics_path),
+      Item.new(label: 'Gender Types', route: :admin_gender_types_path)
     ]),
     Group.new(label: 'Logins Info', items: [
-      Item.new(label: 'Admins', route: :legacy_admin_admins_path, legacy: true),
-      Item.new(label: 'Faculties', route: :legacy_admin_faculties_path, legacy: true),
-      Item.new(label: 'Users', route: :legacy_admin_users_path, legacy: true),
-      Item.new(label: 'Feedbacks', route: :legacy_admin_feedbacks_path, legacy: true)
+      Item.new(label: 'Admins', route: :admin_admins_path),
+      Item.new(label: 'Faculties', route: :admin_faculties_path),
+      Item.new(label: 'Users', route: :admin_users_path),
+      Item.new(label: 'Feedbacks', route: :admin_feedbacks_path)
     ]),
     Group.new(label: 'Admin', items: [
       Item.new(label: 'Comments', route: :admin_comments_path)

@@ -6,7 +6,8 @@ require 'rails_helper'
 # `legacy_admin_*` route helpers. Pages still served by ActiveAdmin that used to link them (the
 # legacy Applications show page: rejection action item, session/course assignment, recommendation
 # and recupload tables) were repointed to the new admin; rendering them here turns a missed helper
-# into a failing spec instead of a production 500. The remaining legacy indexes are rendered too.
+# into a failing spec instead of a production 500. Every remaining legacy index is rendered by
+# spec/requests/legacy_admin_spec.rb.
 RSpec.describe 'Legacy ActiveAdmin pages linking Applicant Info resources', type: :request do
   let(:user) { create(:user, :with_applicant_detail) }
   let!(:enrollment) { create(:enrollment, :application_complete, user: user) }
@@ -44,21 +45,6 @@ RSpec.describe 'Legacy ActiveAdmin pages linking Applicant Info resources', type
       get "/legacy_admin/#{resource}"
 
       expect(response).to have_http_status(:not_found), "/legacy_admin/#{resource} returned #{response.status}"
-    end
-  end
-
-  # Registrations in app/admin are loaded lazily; load them so the list is built from the source
-  # of truth rather than a hand-maintained array.
-  ActiveAdmin.application.load!
-  legacy_index_paths = ActiveAdmin.application.namespaces[:legacy_admin].resources
-                                  .select { |resource| resource.is_a?(ActiveAdmin::Resource) }
-                                  .to_h { |resource| [resource.resource_name.to_s, resource.route_collection_path] }
-
-  legacy_index_paths.each do |resource_name, path|
-    it "renders the remaining legacy #{resource_name} index (#{path})" do
-      get path
-
-      expect(response).to have_http_status(:ok), "#{path} returned #{response.status}"
     end
   end
 end

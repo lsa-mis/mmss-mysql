@@ -166,7 +166,8 @@ ActiveAdmin.register Enrollment, as: 'Application' do
     actions
     column :updated_at
     column 'Applicant' do |application|
-      link_to application.display_name, legacy_admin_user_path(application.user_id)
+      # Users are served by the new admin; leaving ActiveAdmin needs a full page load.
+      link_to application.display_name, admin_user_path(application.user_id), data: { turbo: false }
     end
     column 'Transcript' do |enroll|
       link_to enroll.transcript.filename, url_for(enroll.transcript) if enroll.transcript.attached?

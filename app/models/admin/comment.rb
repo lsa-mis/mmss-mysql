@@ -32,6 +32,9 @@ class Admin::Comment < ApplicationRecord
   # autoloading lazy, and looking classes up here means user input is never constantized.
   COMMENTABLE_MODELS = {
     'Enrollment' => -> { Enrollment },
+    'CampOccurrence' => -> { CampOccurrence },
+    'Activity' => -> { Activity },
+    'Course' => -> { Course },
     'CourseAssignment' => -> { CourseAssignment },
     'SessionActivity' => -> { SessionActivity },
     'SessionAssignment' => -> { SessionAssignment },
