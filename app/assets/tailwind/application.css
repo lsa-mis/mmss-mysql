@@ -162,11 +162,17 @@
   --font-weight-hairline: 100;
   --font-weight-thin: 200;
 
+  /* The old config spelled the bare-utility key `default` (a Tailwind 1 convention);
+     Tailwind 2 expected `DEFAULT`, so `rounded`, `rounded-t`, `shadow`, `border` and
+     `flex-grow` were never emitted. `--radius` / `--shadow` below carry those intended
+     values, so the views' `rounded` cards and `shadow` boxes now render. */
   --radius-*: initial;
+  --radius: 0.25rem;
   --radius-sm: 0.125rem;
   --radius-lg: 0.5rem;
 
   --shadow-*: initial;
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
