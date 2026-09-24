@@ -11,7 +11,7 @@ ActiveAdmin.register_page 'Dashboard' do
             if Enrollment.current_camp_year_applications.any?
               ul do
                 Enrollment.current_camp_year_applications.order(created_at: :desc).limit(10).map do |enroll|
-                  li link_to(enroll.applicant_detail.full_name + ', ' + enroll.user.email,
+                  li link_to([enroll.applicant_detail&.full_name, enroll.user.email].compact.join(', '),
                              legacy_admin_application_path(enroll))
                 end
               end
@@ -23,7 +23,7 @@ ActiveAdmin.register_page 'Dashboard' do
               ul do
                 Payment.current_camp_payments.order(created_at: :desc).limit(10).map do |payment|
                   li link_to(
-                    "#{payment.user.applicant_detail.full_name_and_email} - #{humanized_money_with_symbol(payment.total_amount.to_f / 100)}", admin_payment_path(payment.id), data: { turbo: false }
+                    "#{payment.user.applicant_detail&.full_name_and_email || payment.user.email} - #{humanized_money_with_symbol(payment.total_amount.to_f / 100)}", admin_payment_path(payment.id), data: { turbo: false }
                   )
                 end
               end

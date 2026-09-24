@@ -29,6 +29,17 @@ RSpec.describe 'Legacy ActiveAdmin pages linking Money resources', type: :reques
     expect(body).not_to match(%r{legacy_admin/(payments|financial_aid_requests|applicant_details)})
   end
 
+  it 'renders the legacy dashboard when a recent payment or application belongs to a user without applicant details' do
+    bare_user = create(:user)
+    create(:enrollment, :accepted, user: bare_user)
+    create(:payment, user: bare_user, camp_year: enrollment.campyear, transaction_status: '2')
+
+    get '/legacy_admin'
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include(bare_user.email)
+  end
+
   it 'renders the legacy applications show page with links into the new admin' do
     get "/legacy_admin/applications/#{enrollment.id}"
 
