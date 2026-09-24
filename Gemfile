@@ -16,7 +16,7 @@ gem 'money-rails', '~> 1.14'
 gem 'mysql2', '~> 0.5.6'
 gem 'ostruct', '~> 0.5.5'
 gem 'puma', '5.6.9'
-gem 'rails', '~> 7.2'
+gem 'rails', '~> 8.0.0'
 # Sprockets + sassc remain only for ActiveAdmin's bundled assets; Propshaft replaces them once ActiveAdmin is gone.
 gem 'sass-rails', '~> 6.0'
 gem 'sd_notify'

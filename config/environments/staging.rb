@@ -1,7 +1,7 @@
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
-  config.cache_classes = true
+  config.enable_reloading = false
   config.eager_load = true
 
   config.consider_all_requests_local = false
@@ -10,6 +10,7 @@ Rails.application.configure do
   # config.require_master_key = true
 
   config.public_file_server.enabled = ENV["RAILS_SERVE_STATIC_FILES"].present?
+  config.public_file_server.headers = {"cache-control" => "public, max-age=#{1.year.to_i}"}
 
   config.assets.compile = false
 
@@ -17,15 +18,18 @@ Rails.application.configure do
   config.active_storage.service = :local
 
   config.force_ssl = ActiveModel::Type::Boolean.new.cast(ENV.fetch("STAGING_FORCE_SSL", "true"))
+  config.ssl_options = {redirect: {exclude: ->(request) { request.path == "/up" }}}
 
   # Match production session behavior on HTTPS staging (secure cookies).
-  Rails.application.config.session_store :cookie_store,
+  config.session_store :cookie_store,
     key: "mmss_security_session",
     secure: true,
     expire_after: 4.hours
 
-  config.log_level = :info
+  config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")
   config.log_tags = [:request_id]
+  config.silence_healthcheck_path = "/up"
+  config.active_record.attributes_for_inspect = [:id]
 
   config.action_mailer.perform_caching = false
   config.action_mailer.perform_deliveries = true
@@ -36,13 +40,10 @@ Rails.application.configure do
   config.action_mailer.default_url_options = {host: staging_host, protocol: staging_protocol}
 
   config.i18n.fallbacks = true
-  config.active_support.deprecation = :notify
+  config.active_support.report_deprecations = false
 
-  if ENV["RAILS_LOG_TO_STDOUT"].present?
-    logger = ActiveSupport::Logger.new($stdout)
-    logger.formatter = config.log_formatter
-    config.logger = ActiveSupport::TaggedLogging.new(logger)
-  end
+  # Hatchbox collects STDOUT; set RAILS_LOG_TO_STDOUT there.
+  config.logger = ActiveSupport::TaggedLogging.logger($stdout) if ENV["RAILS_LOG_TO_STDOUT"].present?
 
   config.active_record.dump_schema_after_migration = false
 

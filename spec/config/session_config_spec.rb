@@ -2,7 +2,7 @@
 
 # Tests for production session configuration:
 # - 4 hour session timeout (expire_after: 4.hours)
-# - Secure cookies in production (secure: Rails.env.production?)
+# - Secure cookies in production (secure: true)
 # - Session key (key: 'mmss_security_session')
 #
 # Note: These tests verify the configuration in production.rb, but to fully test
@@ -39,8 +39,8 @@ RSpec.describe 'Session Configuration', type: :request do
       
       # Verify the configuration includes the expected values
       expect(production_config_content).to include("expire_after: 4.hours")
-      expect(production_config_content).to include("secure: Rails.env.production?")
-      expect(production_config_content).to include("key: 'mmss_security_session'")
+      expect(production_config_content).to include("secure: true")
+      expect(production_config_content).to match(/key: ['"]mmss_security_session['"]/)
       expect(production_config_content).to include("session_store :cookie_store")
     end
   end
@@ -144,7 +144,7 @@ RSpec.describe 'Session Configuration', type: :request do
       # Verify all production requirements are in the config file
       expect(production_config_content).to match(/session_store\s*:cookie_store/)
       expect(production_config_content).to match(/key:\s*['"]mmss_security_session['"]/)
-      expect(production_config_content).to match(/secure:\s*Rails\.env\.production\?/)
+      expect(production_config_content).to match(/secure:\s*true/)
       expect(production_config_content).to match(/expire_after:\s*4\.hours/)
     end
 

@@ -3,7 +3,6 @@
 class SessionAssignmentsController < ApplicationController
   devise_group :logged_in, contains: [:user, :admin]
   before_action :authenticate_logged_in!
-  before_action :authenticate_admin!, only: [:index, :destroy]
 
   before_action :set_session_assignment
 

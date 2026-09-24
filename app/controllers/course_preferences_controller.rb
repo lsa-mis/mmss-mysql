@@ -6,7 +6,7 @@ class CoursePreferencesController < ApplicationController
 
   before_action :set_current_enrollment, except: [:show]
   before_action :prepare_show, only: [:show]
-  before_action :course_preference, only: %i[update destroy]
+  before_action :course_preference, only: %i[update]
 
   def index
     load_course_preference_sessions

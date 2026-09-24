@@ -10,8 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2025_11_12_171302) do
-
+ActiveRecord::Schema[8.0].define(version: 2026_09_24_135333) do
   create_table "active_admin_comments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "namespace"
     t.text "body"
@@ -19,8 +18,8 @@ ActiveRecord::Schema.define(version: 2025_11_12_171302) do
     t.bigint "resource_id"
     t.string "author_type"
     t.bigint "author_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["author_type", "author_id"], name: "index_active_admin_comments_on_author_type_and_author_id"
     t.index ["namespace"], name: "index_active_admin_comments_on_namespace"
     t.index ["resource_type", "resource_id"], name: "index_active_admin_comments_on_resource_type_and_resource_id"
@@ -43,9 +42,15 @@ ActiveRecord::Schema.define(version: 2025_11_12_171302) do
     t.text "metadata"
     t.string "service_name", null: false
     t.bigint "byte_size", null: false
-    t.string "checksum", null: false
+    t.string "checksum"
     t.datetime "created_at", null: false
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
   create_table "activities", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -54,8 +59,8 @@ ActiveRecord::Schema.define(version: 2025_11_12_171302) do
     t.integer "cost_cents"
     t.date "date_occurs"
     t.boolean "active", default: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["camp_occurrence_id"], name: "index_activities_on_camp_occurrence_id"
   end
 
@@ -70,8 +75,8 @@ ActiveRecord::Schema.define(version: 2025_11_12_171302) do
     t.integer "failed_attempts", default: 0, null: false
     t.string "unlock_token"
     t.datetime "locked_at"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.string "reset_password_token"
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
@@ -108,8 +113,8 @@ ActiveRecord::Schema.define(version: 2025_11_12_171302) do
     t.string "parentphone", null: false
     t.string "parentworkphone"
     t.string "parentemail"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.string "demographic_other"
     t.bigint "demographic_id"
     t.index ["demographic_id"], name: "index_applicant_details_on_demographic_id"
@@ -124,8 +129,8 @@ ActiveRecord::Schema.define(version: 2025_11_12_171302) do
     t.date "application_materials_due", null: false
     t.date "camper_acceptance_due", null: false
     t.boolean "active", default: false, null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.text "offer_letter"
     t.string "student_packet_url"
     t.integer "application_fee_cents"
@@ -141,8 +146,8 @@ ActiveRecord::Schema.define(version: 2025_11_12_171302) do
     t.date "begin_date", null: false
     t.date "end_date", null: false
     t.boolean "active", default: false, null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.integer "cost_cents"
     t.index ["camp_configuration_id"], name: "index_camp_occurrences_on_camp_configuration_id"
   end
@@ -152,15 +157,15 @@ ActiveRecord::Schema.define(version: 2025_11_12_171302) do
     t.datetime "opendate"
     t.datetime "closedate"
     t.string "notetype"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "course_assignments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "enrollment_id", null: false
     t.bigint "course_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.boolean "wait_list", default: false
     t.index ["course_id"], name: "index_course_assignments_on_course_id"
     t.index ["enrollment_id"], name: "index_course_assignments_on_enrollment_id"
@@ -170,8 +175,8 @@ ActiveRecord::Schema.define(version: 2025_11_12_171302) do
     t.bigint "enrollment_id", null: false
     t.bigint "course_id", null: false
     t.integer "ranking"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["course_id"], name: "index_course_preferences_on_course_id"
     t.index ["enrollment_id"], name: "index_course_preferences_on_enrollment_id"
   end
@@ -181,8 +186,8 @@ ActiveRecord::Schema.define(version: 2025_11_12_171302) do
     t.string "title"
     t.integer "available_spaces"
     t.string "status"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.string "faculty_uniqname"
     t.string "faculty_name"
     t.index ["camp_occurrence_id"], name: "index_courses_on_camp_occurrence_id"
@@ -191,16 +196,16 @@ ActiveRecord::Schema.define(version: 2025_11_12_171302) do
   create_table "demographics", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "description", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.boolean "protected", default: false
   end
 
   create_table "enrollment_activities", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "enrollment_id", null: false
     t.bigint "activity_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["activity_id"], name: "index_enrollment_activities_on_activity_id"
     t.index ["enrollment_id"], name: "index_enrollment_activities_on_enrollment_id"
   end
@@ -224,8 +229,8 @@ ActiveRecord::Schema.define(version: 2025_11_12_171302) do
     t.string "application_status"
     t.string "offer_status"
     t.string "partner_program"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.integer "campyear"
     t.date "application_deadline"
     t.date "application_status_updated_on"
@@ -246,8 +251,8 @@ ActiveRecord::Schema.define(version: 2025_11_12_171302) do
     t.datetime "last_sign_in_at"
     t.string "current_sign_in_ip"
     t.string "last_sign_in_ip"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["email"], name: "index_faculties_on_email", unique: true
     t.index ["reset_password_token"], name: "index_faculties_on_reset_password_token", unique: true
   end
@@ -256,8 +261,8 @@ ActiveRecord::Schema.define(version: 2025_11_12_171302) do
     t.string "genre"
     t.string "message"
     t.bigint "user_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_feedbacks_on_user_id"
   end
 
@@ -267,8 +272,8 @@ ActiveRecord::Schema.define(version: 2025_11_12_171302) do
     t.string "source"
     t.text "note"
     t.string "status", default: "pending"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.date "payments_deadline"
     t.integer "adjusted_gross_income"
     t.index ["enrollment_id"], name: "index_financial_aids_on_enrollment_id"
@@ -277,8 +282,8 @@ ActiveRecord::Schema.define(version: 2025_11_12_171302) do
   create_table "genders", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "description"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "nelnet_callback_logs", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
@@ -287,8 +292,8 @@ ActiveRecord::Schema.define(version: 2025_11_12_171302) do
     t.string "transaction_status"
     t.string "transaction_total_amount"
     t.text "raw_params", comment: "Full request params as JSON"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["created_at"], name: "index_nelnet_callback_logs_on_created_at"
     t.index ["order_number"], name: "index_nelnet_callback_logs_on_order_number"
     t.index ["transaction_id"], name: "index_nelnet_callback_logs_on_transaction_id"
@@ -301,8 +306,8 @@ ActiveRecord::Schema.define(version: 2025_11_12_171302) do
     t.integer "camp_year"
     t.bigint "request_timestamp", null: false, comment: "Epoch timestamp sent in URL to Nelnet"
     t.bigint "payment_id", comment: "Set when receipt received"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["payment_id"], name: "index_payment_requests_on_payment_id"
     t.index ["user_id", "order_number"], name: "index_payment_requests_on_user_id_and_order_number"
     t.index ["user_id"], name: "index_payment_requests_on_user_id"
@@ -322,8 +327,8 @@ ActiveRecord::Schema.define(version: 2025_11_12_171302) do
     t.string "timestamp"
     t.string "transaction_hash"
     t.bigint "user_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.integer "camp_year"
     t.index ["user_id"], name: "index_payments_on_user_id"
   end
@@ -345,8 +350,8 @@ ActiveRecord::Schema.define(version: 2025_11_12_171302) do
     t.string "best_contact_time"
     t.string "submitted_recommendation"
     t.datetime "date_submitted"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["enrollment_id"], name: "index_recommendations_on_enrollment_id"
   end
 
@@ -355,24 +360,24 @@ ActiveRecord::Schema.define(version: 2025_11_12_171302) do
     t.string "authorname", null: false
     t.string "studentname", null: false
     t.bigint "recommendation_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["recommendation_id"], name: "index_recuploads_on_recommendation_id"
   end
 
   create_table "rejections", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "enrollment_id", null: false
     t.text "reason"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["enrollment_id"], name: "index_rejections_on_enrollment_id"
   end
 
   create_table "session_activities", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "enrollment_id", null: false
     t.bigint "camp_occurrence_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["camp_occurrence_id"], name: "index_session_activities_on_camp_occurrence_id"
     t.index ["enrollment_id"], name: "index_session_activities_on_enrollment_id"
   end
@@ -380,8 +385,8 @@ ActiveRecord::Schema.define(version: 2025_11_12_171302) do
   create_table "session_assignments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "enrollment_id", null: false
     t.bigint "camp_occurrence_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.string "offer_status"
     t.index ["camp_occurrence_id"], name: "index_session_assignments_on_camp_occurrence_id"
     t.index ["enrollment_id"], name: "index_session_assignments_on_enrollment_id"
@@ -393,8 +398,8 @@ ActiveRecord::Schema.define(version: 2025_11_12_171302) do
     t.string "arrival_carrier"
     t.string "arrival_route_num"
     t.text "note"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.date "arrival_date"
     t.time "arrival_time"
     t.string "depart_transport"
@@ -418,13 +423,14 @@ ActiveRecord::Schema.define(version: 2025_11_12_171302) do
     t.datetime "last_sign_in_at"
     t.string "current_sign_in_ip"
     t.string "last_sign_in_ip"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "activities", "camp_occurrences"
   add_foreign_key "applicant_details", "demographics"
   add_foreign_key "applicant_details", "users"

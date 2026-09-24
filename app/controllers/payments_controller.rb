@@ -21,7 +21,7 @@ class PaymentsController < ApplicationController
   prepend_before_action :log_nelnet_callback, only: %i[payment_receipt]
   before_action :authenticate_logged_in!
   skip_before_action :authenticate_logged_in!, only: %i[payment_receipt]
-  before_action :authenticate_admin!, only: %i[index destroy]
+  before_action :authenticate_admin!, only: %i[index]
 
   before_action :set_current_enrollment
   skip_before_action :set_current_enrollment, only: %i[payment_receipt]
