@@ -91,6 +91,17 @@ RSpec.describe 'Admin feedbacks', type: :request do
       expect(csv.second[2]).to eq('The submit button does nothing')
       expect(csv.second[3]).to eq('reporter@example.com')
     end
+
+    it 'neutralises formula-leading messages in the CSV' do
+      create(:feedback, user: user, message: '=HYPERLINK("https://evil.example","Click me")')
+
+      get admin_feedbacks_path(format: :csv)
+
+      messages = CSV.parse(response.body).drop(1).map { |row| row[2] }
+      expect(messages).to include(%q('=HYPERLINK("https://evil.example","Click me")))
+      expect(messages).to include('The submit button does nothing')
+      expect(messages).not_to include(%q(=HYPERLINK("https://evil.example","Click me")))
+    end
   end
 
   describe 'GET /admin/feedbacks/:id' do
