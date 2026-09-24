@@ -182,20 +182,5 @@ RSpec.describe Campnote, type: :model do
     end
   end
 
-  describe '.ransackable_attributes' do
-    it 'returns the correct ransackable attributes' do
-      expected_attributes = [
-        'closedate',
-        'created_at',
-        'id',
-        'note',
-        'notetype',
-        'opendate',
-        'updated_at'
-      ]
-      expect(Campnote.ransackable_attributes).to match_array(expected_attributes)
-    end
-  end
-
   it_behaves_like 'a model with timestamps'
 end

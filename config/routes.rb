@@ -15,7 +15,6 @@ Rails.application.routes.draw do
   get 'faculty_login', to: 'static_pages#faculty_login', as: :faculty_login
 
   resources :rejections
-  resources :campnotes
   resources :recuploads
   resources :feedbacks
   # resources :payments
@@ -50,6 +49,29 @@ Rails.application.routes.draw do
     end
 
     resources :comments, only: %i[index create destroy]
+
+    # Camp Setup
+    resources :camp_configurations do
+      collection { post :batch }
+    end
+    resources :session_configurations do
+      collection { post :batch }
+    end
+    resources :activities do
+      collection { post :batch }
+    end
+    resources :courses do
+      collection { post :batch }
+    end
+    resources :campnotes do
+      collection { post :batch }
+    end
+    resources :demographics do
+      collection { post :batch }
+    end
+    resources :gender_types do
+      collection { post :batch }
+    end
 
     # Logins Info
     resources :admins do
@@ -91,25 +113,6 @@ Rails.application.routes.draw do
                                                            as: :legacy_admin_reports_enrolled_events_per_session
 
   ActiveAdmin.routes(self)
-  # authenticated :admin do
-    resources :genders
-    resources :demographics
-
-    resources :camp_configurations do
-      resources :camp_occurrences
-    end
-
-    resources :camp_occurrences do
-      resources :activities
-    end
-
-    resources :camp_occurrences do
-      resources :courses
-    end
-
-    resources :activities
-    resources :courses
-  # end
 
   devise_for :users, controllers: {
     registrations: 'users/registrations'
@@ -118,10 +121,6 @@ Rails.application.routes.draw do
 
   resources :enrollments do
     resources :travels
-  end
-
-  resources :enrollments do
-    resources :activities
   end
 
   resources :enrollments do

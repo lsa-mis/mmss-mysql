@@ -92,20 +92,20 @@ RSpec.describe 'Turbo-compatible redirects after non-GET requests', type: :reque
     end
   end
 
-  describe 'scaffold create/update/destroy (admin)' do
+  describe 'admin create/update/destroy' do
     before { sign_in create(:admin) }
 
     it 'answers 303 after create, update and destroy' do
-      post genders_path, params: { gender: { name: 'Probe', description: 'probe' } }
+      post admin_gender_types_path, params: { gender: { name: 'Probe', description: 'probe' } }
       expect(response).to have_http_status(:see_other)
       gender = Gender.find_by!(name: 'Probe')
 
-      patch gender_path(gender), params: { gender: { description: 'updated' } }
+      patch admin_gender_type_path(gender), params: { gender: { description: 'updated' } }
       expect(response).to have_http_status(:see_other)
 
-      delete gender_path(gender)
+      delete admin_gender_type_path(gender)
       expect(response).to have_http_status(:see_other)
-      expect(response).to redirect_to(genders_url)
+      expect(response).to redirect_to(admin_gender_types_url)
     end
   end
 end

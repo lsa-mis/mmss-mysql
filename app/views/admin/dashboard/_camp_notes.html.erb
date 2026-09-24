@@ -1,5 +1,5 @@
 <%# locals: notes %>
-<%= admin_panel 'Active Camp Note', actions: admin_legacy_link_to('Campnotes →', legacy_admin_campnotes_path) do %>
+<%= admin_panel 'Active Camp Note', actions: link_to('Campnotes →', admin_campnotes_path) do %>
   <% if notes.empty? %>
     <p class="text-sm text-slate-500">No camp note is currently active.</p>
   <% end %>
