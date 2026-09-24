@@ -34,7 +34,10 @@ RSpec.describe 'Sentry configuration', type: :request do
 
   it 'filters request and response headers with the Rails parameter filter terms' do
     collection = Sentry.configuration.data_collection
-    rails_terms = Rails.application.config.filter_parameters.map { |t| t.is_a?(Regexp) ? t : t.to_s.downcase }
+    # The terms from config/initializers/filter_parameter_logging.rb. (The live
+    # Rails.application.config.filter_parameters can grow later, e.g. Action Text appends
+    # "encrypted_rich_text.body" when its models load under eager loading.)
+    rails_terms = %w[passw email secret token _key crypt salt certificate otp ssn cvv cvc]
 
     %i[request response].each do |direction|
       headers = collection.http_headers.public_send(direction)
