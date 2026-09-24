@@ -5,13 +5,17 @@ After=network.target
 [Service]
 Environment=PATH=/home/deployer/.asdf/shims:/home/deployer/.asdf/bin:/usr/local/bin:/usr/bin:/bin:$PATH
 # Puma >= 6 speaks the systemd notify protocol out of the box (READY=1 once the app has
-# booted, RELOADING=1 during `pumactl restart`, WATCHDOG pings). Use Type=simple and drop
-# WatchdogSec if the unit must run an older Puma.
+# booted, RELOADING=1 during a hot restart, WATCHDOG pings). Puma itself must be the main
+# process, so ExecStart launches `puma` directly; pumactl is only used for control commands.
+# Use Type=simple and drop WatchdogSec if the unit must run an older Puma.
 Type=notify
 WatchdogSec=10
 User=deployer
 WorkingDirectory=/home/deployer/apps/mmss-mysql/current
-ExecStart=/home/deployer/.asdf/shims/bundle exec pumactl -F /home/deployer/apps/mmss-mysql/current/config/puma.rb start
+ExecStart=/home/deployer/.asdf/shims/bundle exec puma -C /home/deployer/apps/mmss-mysql/current/config/puma.rb
+# Hot restart (SIGUSR2, same as `cap production deploy` -> puma:restart) and graceful stop.
+ExecReload=/home/deployer/.asdf/shims/bundle exec pumactl -F /home/deployer/apps/mmss-mysql/current/config/puma.rb restart
+ExecStop=/home/deployer/.asdf/shims/bundle exec pumactl -F /home/deployer/apps/mmss-mysql/current/config/puma.rb stop
 Restart=always
 RestartSec=5
 ProtectSystem=full
