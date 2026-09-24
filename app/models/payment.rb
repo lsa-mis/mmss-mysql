@@ -51,12 +51,10 @@ class Payment < ApplicationRecord
   # destroyed (`destroy` returns false with an error on :base). The admin exposes no destroy at all.
   has_one :payment_request, dependent: :restrict_with_error
 
-  # Virtual attribute for dollar amounts in the admin manual-payment form. Only a plain
-  # non-negative decimal with up to two places ("150", "150.25", "$1,500.00") is accepted;
-  # anything else leaves total_amount untouched and fails validation instead of being coerced
-  # (`to_f` would have turned "abc" into $0 and let "-5" through).
-  DOLLARS_FORMAT = /\A\d+(\.\d{1,2})?\z/
-
+  # Virtual attribute for dollar amounts in the admin manual-payment form. Only what
+  # Admin::MoneyInput accepts ("150", "150.25", "$1,500.00") is stored; anything else leaves
+  # total_amount untouched and fails validation instead of being coerced (`to_f` would have
+  # turned "abc" into $0 and let "-5" through).
   def total_amount_dollars
     return @total_amount_dollars_input if invalid_dollar_input?
     return nil if total_amount.blank?
@@ -69,16 +67,9 @@ class Payment < ApplicationRecord
     input = value.to_s.strip
     if input.empty?
       self.total_amount = nil
-    elsif (cents = self.class.dollars_to_cents(input))
+    elsif (cents = Admin::MoneyInput.parse_cents(input))
       self.total_amount = cents.to_s
     end
-  end
-
-  def self.dollars_to_cents(input)
-    normalized = input.to_s.strip.delete(',').delete_prefix('$')
-    return nil unless normalized.match?(DOLLARS_FORMAT)
-
-    (BigDecimal(normalized) * 100).to_i
   end
 
   scope :current_camp_payments, -> { where('camp_year = ? ', CampConfiguration.active_camp_year) }
@@ -88,7 +79,7 @@ class Payment < ApplicationRecord
 
   def invalid_dollar_input?
     input = @total_amount_dollars_input.to_s.strip
-    input.present? && self.class.dollars_to_cents(input).nil?
+    input.present? && !Admin::MoneyInput.valid?(input)
   end
 
   def total_amount_dollars_is_money

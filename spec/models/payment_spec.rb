@@ -92,7 +92,7 @@ RSpec.describe Payment, type: :model do
     end
 
     it 'refuses negative, non-numeric, non-finite and over-precise input without coercing it' do
-      ['-5', 'abc', 'Infinity', '-Infinity', 'NaN', '1e3', '12.345', '0x10'].each do |bad|
+      ['-5', 'abc', 'Infinity', '-Infinity', 'NaN', '1e3', '12.345', '0x10', '1,2,3', '12,34.5', '1,,000'].each do |bad|
         payment = build(:payment, total_amount: '25050', total_amount_dollars: bad)
         expect(payment.total_amount).to eq('25050'), "#{bad.inspect} overwrote the amount"
         expect(payment).not_to be_valid, "#{bad.inspect} was accepted"

@@ -35,12 +35,10 @@ class FinancialAid < ApplicationRecord
 
   # Awards are never negative (a negative award would inflate the balance due). money-rails
   # already rejects non-numeric input; blank means "no amount yet" rather than an error, and the
-  # raw input must be a plain dollar amount (no exponents / third decimal, which Money would
-  # otherwise quietly reinterpret).
+  # raw input must satisfy Admin::MoneyInput (no exponents, third decimals or stray commas, which
+  # Money would otherwise quietly reinterpret).
   monetize :amount_cents, numericality: { greater_than_or_equal_to: 0 }
   validate :amount_is_plain_money
-
-  AMOUNT_FORMAT = /\A\$?\d+(\.\d{1,2})?\z/
 
   module BlankAmountIsZero
     def amount=(value)
@@ -64,7 +62,7 @@ class FinancialAid < ApplicationRecord
   def amount_is_plain_money
     raw = instance_variable_get(:@amount_money_before_type_cast)
     return unless raw.is_a?(String)
-    return if raw.strip.delete(',').match?(AMOUNT_FORMAT)
+    return if Admin::MoneyInput.valid?(raw)
     return if errors[:amount].any? # money-rails already reported it (not a number / negative)
 
     errors.add(:amount, 'must be a non-negative dollar amount with at most two decimals (e.g. 150.25)')
