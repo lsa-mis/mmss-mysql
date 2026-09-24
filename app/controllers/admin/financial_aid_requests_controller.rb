@@ -94,9 +94,12 @@ class Admin::FinancialAidRequestsController < Admin::BaseController
                 .preload({ taxform_attachment: :blob }, enrollment: %i[user applicant_detail])
   end
 
+  # The application is fixed once the request exists: moving it would shift the award to another
+  # applicant's balance and email the wrong person from the status callback.
   def financial_aid_params
-    params.require(:financial_aid).permit(:enrollment_id, :amount, :source, :note, :status, :payments_deadline, :taxform,
-                                          :adjusted_gross_income)
+    permitted = %i[amount source note status payments_deadline taxform adjusted_gross_income]
+    permitted.unshift(:enrollment_id) if action_name == 'create'
+    params.require(:financial_aid).permit(*permitted)
   end
 
   def csv_export

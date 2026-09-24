@@ -240,6 +240,17 @@ RSpec.describe 'Admin financial aid requests', type: :request do
       expect(created.payments_deadline).to eq(Date.new(2030, 6, 1))
     end
 
+    it 'refuses a negative award on create' do
+      post admin_financial_aid_requests_path, params: { financial_aid: { enrollment_id: enrollment.id, note: 'neg',
+                                                                          adjusted_gross_income: 40_000, status: 'awarded',
+                                                                          amount: '-250', source: 'Scholarship',
+                                                                          payments_deadline: '2030-06-01' } }
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include('must be greater than or equal to 0')
+      expect(FinancialAid.count).to eq(1)
+    end
+
     it 're-renders the form with the model validation errors' do
       post admin_financial_aid_requests_path, params: { financial_aid: { enrollment_id: enrollment.id, note: 'x',
                                                                           adjusted_gross_income: 40_000, status: 'awarded',
@@ -264,6 +275,9 @@ RSpec.describe 'Admin financial aid requests', type: :request do
       expect(body).to include('enctype="multipart/form-data"')
       expect(body).to include('<option selected="selected" value="legacy-status">legacy-status</option>')
       expect(body).to include('value="125.50"')
+      expect(body).not_to include('name="financial_aid[enrollment_id]"')
+      expect(body).to include('The application is fixed once the request is recorded.')
+      expect(body).to include('Zimmerman, Ada')
     end
   end
 
@@ -278,6 +292,27 @@ RSpec.describe 'Admin financial aid requests', type: :request do
       expect(financial_aid.note).to eq('Updated note')
       expect(financial_aid.adjusted_gross_income).to eq(61_000)
       expect(financial_aid.taxform).to be_attached
+    end
+
+    it 'never moves the request to another application' do
+      other = create(:enrollment, :accepted, user: create(:user, :with_applicant_detail))
+
+      patch admin_financial_aid_request_path(financial_aid),
+            params: { financial_aid: { note: 'moved?', enrollment_id: other.id } }
+
+      expect(response).to redirect_to(admin_financial_aid_request_path(financial_aid))
+      financial_aid.reload
+      expect(financial_aid.note).to eq('moved?')
+      expect(financial_aid.enrollment).to eq(enrollment)
+    end
+
+    it 'rejects negative and malformed amounts without saving them' do
+      ['-50', 'abc', 'Infinity', '1e3', '12.345'].each do |bad|
+        patch admin_financial_aid_request_path(financial_aid), params: { financial_aid: { amount: bad } }
+
+        expect(response).to have_http_status(:unprocessable_content), "#{bad.inspect} was accepted"
+        expect(financial_aid.reload.amount_cents).to eq(12_550)
+      end
     end
 
     it 'rejects the request and emails the applicant' do

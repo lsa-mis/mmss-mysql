@@ -37,6 +37,29 @@ RSpec.describe FinancialAid, type: :model do
     it { is_expected.to validate_presence_of(:adjusted_gross_income) }
     it { is_expected.to validate_numericality_of(:adjusted_gross_income).is_greater_than_or_equal_to(0) }
 
+    it 'refuses a negative award' do
+      aid = build(:financial_aid, amount_cents: -5)
+      expect(aid).not_to be_valid
+      expect(aid.errors[:amount]).to include('must be greater than or equal to 0')
+    end
+  end
+
+  describe '#amount= (admin dollar input)' do
+    it 'stores whole cents for plain and formatted input and treats blank as no amount' do
+      expect(build(:financial_aid, amount: '150.25').amount_cents).to eq(15_025)
+      expect(build(:financial_aid, amount: '$1,500.5').amount_cents).to eq(150_050)
+      expect(build(:financial_aid, amount: '').amount_cents).to eq(0)
+      expect(build(:financial_aid, amount: '')).to be_valid
+    end
+
+    it 'refuses negative, non-numeric, non-finite and over-precise input' do
+      ['-50', 'abc', 'Infinity', 'NaN', '1e3', '12.345'].each do |bad|
+        aid = build(:financial_aid, amount: bad)
+        expect(aid).not_to be_valid, "#{bad.inspect} was accepted"
+        expect(aid.errors[:amount].size).to eq(1), "#{bad.inspect}: #{aid.errors[:amount].inspect}"
+      end
+    end
+
     describe 'source validation' do
       context 'when status is awarded and amount is assigned' do
         it 'requires source to be present' do
