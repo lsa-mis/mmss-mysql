@@ -15,8 +15,10 @@ Sentry.init do |config|
   config.release = ENV["SENTRY_RELEASE"].presence ||
     (File.read(Rails.root.join("REVISION")).strip if Rails.root.join("REVISION").exist?)
 
-  # Sentry Logs and Metrics are on by default since sentry-ruby 7.0; sentry-rails also forwards
-  # Rails structured logs. Opt out with `config.rails.structured_logging.enabled = false`.
+  # sentry-ruby 7.0 enables Sentry Logs by default and sentry-rails would forward Rails
+  # controller/Active Record events to it. That is a capture surface the app never had, so it
+  # stays off; errors, breadcrumbs and traces are unaffected.
+  config.rails.structured_logging.enabled = false
 
   # Logging configuration
   config.breadcrumbs_logger = [:active_support_logger, :http_logger]

@@ -32,6 +32,10 @@ RSpec.describe 'Sentry configuration', type: :request do
     expect(collection.stack_frame_variables.mode).to eq(:off)
   end
 
+  it 'does not forward Rails structured logs to Sentry Logs' do
+    expect(Sentry.configuration.rails.structured_logging.enabled?).to be(false)
+  end
+
   it 'filters request and response headers with the Rails parameter filter terms' do
     collection = Sentry.configuration.data_collection
     # The terms from config/initializers/filter_parameter_logging.rb. (The live

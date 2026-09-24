@@ -78,7 +78,11 @@ Rails.application.configure do
     user_name: "apikey",
     password: Rails.application.credentials.SENDGRID_API_KEY,
     domain: "math.lsa.umich.edu",
-    enable_starttls_auto: true
+    enable_starttls_auto: true,
+    # Explicit 5 s bounds (also the Rails 7.0+ smtp_timeout default) so a stalled SendGrid
+    # connection raises instead of tying up a Puma thread.
+    open_timeout: 5,
+    read_timeout: 5
   }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
