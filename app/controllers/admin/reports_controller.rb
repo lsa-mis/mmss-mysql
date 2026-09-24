@@ -26,10 +26,11 @@ class Admin::ReportsController < Admin::BaseController
 
   private
 
-  # The selected camp: `?camp_year=YYYY` (must exist) or the active camp.
+  # The selected camp: `?camp_year=YYYY` (must exist) or, when the parameter is absent or an
+  # unselected form field (empty string), the active camp. Anything else is rejected.
   def set_camp
     camp_year = params[:camp_year]
-    @camp = if camp_year.blank?
+    @camp = if camp_year.nil? || camp_year == ''
               CampConfiguration.active.last
             elsif camp_year.is_a?(String) && camp_year.match?(CAMP_YEAR_FORMAT)
               CampConfiguration.find_by!(camp_year: Integer(camp_year, 10))

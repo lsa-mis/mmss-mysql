@@ -202,7 +202,7 @@ RSpec.describe 'Admin reports', type: :request do
 
       it 'rejects camp years that are not a configured four-digit year' do
         tampered = ['2026 OR 1=1', "#{camp.camp_year}; DROP TABLE users", '1999', '20260', 'abcd',
-                    "#{camp.camp_year}.0"]
+                    "#{camp.camp_year}.0", ' ', " #{camp.camp_year}", "#{camp.camp_year}\n"]
         tampered.each do |value|
           get admin_report_path('all_complete_apps', camp_year: value)
 
@@ -210,11 +210,19 @@ RSpec.describe 'Admin reports', type: :request do
           expect(response.media_type).not_to eq('text/csv')
         end
 
-        get admin_report_path('all_complete_apps'), params: { camp_year: [camp.camp_year] }
-        expect(response).to redirect_to(admin_reports_path)
+        [[camp.camp_year], [''], { year: camp.camp_year }].each do |value|
+          get admin_report_path('all_complete_apps'), params: { camp_year: value }
 
-        get admin_report_path('all_complete_apps'), params: { camp_year: { year: camp.camp_year } }
-        expect(response).to redirect_to(admin_reports_path)
+          expect(response).to redirect_to(admin_reports_path), "camp_year=#{value.inspect} was accepted"
+        end
+      end
+
+      it 'treats an absent or empty camp_year as the active camp' do
+        get admin_report_path('all_complete_apps', camp_year: '')
+
+        expect(response).to have_http_status(:ok)
+        expect(response.media_type).to eq('text/csv')
+        expect(CSV.parse(response.body)[1]).to eq(['Total number of records: 2'])
       end
 
       it 'refuses to run without a camp' do
