@@ -17,13 +17,16 @@ Rails.application.configure do
   # Local disk only (no GCS on staging).
   config.active_storage.service = :local
 
-  config.force_ssl = ActiveModel::Type::Boolean.new.cast(ENV.fetch("STAGING_FORCE_SSL", "true"))
+  # STAGING_FORCE_SSL=false runs staging over plain HTTP; the session cookie must then not be
+  # marked Secure, or browsers would never send it back and every request would look logged out.
+  staging_force_ssl = ActiveModel::Type::Boolean.new.cast(ENV.fetch("STAGING_FORCE_SSL", "true"))
+  config.force_ssl = staging_force_ssl
   config.ssl_options = {redirect: {exclude: ->(request) { request.path == "/up" }}}
 
   # Match production session behavior on HTTPS staging (secure cookies).
   config.session_store :cookie_store,
     key: "mmss_security_session",
-    secure: true,
+    secure: staging_force_ssl,
     expire_after: 4.hours
 
   config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")

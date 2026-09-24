@@ -136,6 +136,67 @@ RSpec.describe 'Session Configuration', type: :request do
     end
   end
 
+  describe 'staging session cookie follows STAGING_FORCE_SSL' do
+    # Evaluates config/environments/staging.rb against a recording stand-in for the Rails
+    # configuration (the staging gem group is not installed in test/CI, so the environment
+    # cannot simply be booted) and captures the session_store options it produces.
+    let(:recorder_class) do
+      Class.new do
+        attr_reader :session_store_options, :settings
+
+        def initialize
+          @settings = {}
+        end
+
+        def config
+          self
+        end
+
+        def session_store(_store, **options)
+          @session_store_options = options
+        end
+
+        def force_ssl=(value)
+          @settings[:force_ssl] = value
+        end
+
+        def method_missing(*_args)
+          self
+        end
+
+        def respond_to_missing?(*_args)
+          true
+        end
+      end
+    end
+
+    def staging_config_with(force_ssl_env)
+      recorder = recorder_class.new
+      source = Rails.root.join('config', 'environments', 'staging.rb').read
+      previous = ENV['STAGING_FORCE_SSL']
+      ENV['STAGING_FORCE_SSL'] = force_ssl_env
+      allow(Rails.application).to receive(:configure) { |&block| recorder.instance_eval(&block) }
+      recorder.instance_eval(source, 'config/environments/staging.rb')
+      recorder
+    ensure
+      previous.nil? ? ENV.delete('STAGING_FORCE_SSL') : ENV['STAGING_FORCE_SSL'] = previous
+    end
+
+    it 'uses a Secure cookie when STAGING_FORCE_SSL is unset (HTTPS default)' do
+      recorder = staging_config_with(nil)
+
+      expect(recorder.settings[:force_ssl]).to be(true)
+      expect(recorder.session_store_options).to include(key: 'mmss_security_session', secure: true, expire_after: 4.hours)
+    end
+
+    it 'uses a non-Secure cookie when STAGING_FORCE_SSL=false (plain HTTP staging)' do
+      recorder = staging_config_with('false')
+
+      expect(recorder.settings[:force_ssl]).to be(false)
+      expect(recorder.session_store_options).to include(key: 'mmss_security_session', secure: false, expire_after: 4.hours)
+    end
+  end
+
   describe 'production configuration verification' do
     it 'ensures production.rb has all required session configuration' do
       production_config_file = Rails.root.join('config', 'environments', 'production.rb')
