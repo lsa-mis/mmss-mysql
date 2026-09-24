@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 module Admin::CampnotesHelper
-  # A note is shown in the public navigation while the current time falls in its open/close window
-  # (see app/views/admin/_camp_note.erb).
+  # A note is shown while the current time falls in its open/close window — the per-record form of
+  # the Campnote.currently_open scope used by the admin dashboard (app/views/admin/dashboard/_camp_notes.html.erb)
+  # and the public navigation banner (app/views/admin/_camp_note.erb, rendered from layouts/_nav_links_for_auth).
   def admin_campnote_visible?(note)
     note.opendate.present? && note.closedate.present? && (note.opendate..note.closedate).cover?(Time.current)
   end
