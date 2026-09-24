@@ -45,8 +45,8 @@ class RecuploadsController < InheritedResources::Base
       else
         @student = ApplicantDetail.find(params[:id]).full_name if params[:id]
         @recommendation = Recommendation.find(@recupload.recommendation_id) if @recupload.recommendation_id
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @recupload.errors, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_content }
+        format.json { render json: @recupload.errors, status: :unprocessable_content }
       end
     end
   end

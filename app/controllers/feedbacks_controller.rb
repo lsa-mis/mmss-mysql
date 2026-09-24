@@ -28,8 +28,8 @@ class FeedbacksController < ApplicationController
         format.json { render :show, status: :created, location: @feedback }
         FeedbackMailer.with(feedback: @feedback).feedback_email.deliver_now
       else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @feedback.errors, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_content }
+        format.json { render json: @feedback.errors, status: :unprocessable_content }
       end
     end
   end

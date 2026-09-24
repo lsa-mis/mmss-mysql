@@ -288,7 +288,7 @@ Devise.setup do |config|
   # ==> Hotwire/Turbo configuration
   # Turbo Drive only renders form responses that carry an error status and only
   # follows redirects after non-GET submissions when they use 303 See Other.
-  config.responder.error_status = :unprocessable_entity
+  config.responder.error_status = :unprocessable_content
   config.responder.redirect_status = :see_other
 
   # ==> Configuration for :registerable

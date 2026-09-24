@@ -145,7 +145,7 @@ RSpec.describe RecuploadsController, type: :controller do
 
       it 'responds with JSON error' do
         post :create, params: invalid_params.merge(format: :json)
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.content_type).to include('application/json')
       end
     end

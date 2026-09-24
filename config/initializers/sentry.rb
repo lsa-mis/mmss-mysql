@@ -15,13 +15,14 @@ Sentry.init do |config|
   config.release = ENV["SENTRY_RELEASE"].presence ||
     (File.read(Rails.root.join("REVISION")).strip if Rails.root.join("REVISION").exist?)
 
-  # Structured logging (sentry-ruby 5.24+); view in Sentry Logs and link to errors/traces
-  config.enable_logs = true
+  # Sentry Logs and Metrics are on by default since sentry-ruby 7.0; sentry-rails also forwards
+  # Rails structured logs. Opt out with `config.rails.structured_logging.enabled = false`.
 
   # Logging configuration
   config.breadcrumbs_logger = [:active_support_logger, :http_logger]
 
-  # Add user context data (PII)
+  # Add user context data (PII). Deprecated in favour of the granular `config.data_collection.*`
+  # settings (sentry-ruby 7.0); still honoured until sentry-ruby 8.
   config.send_default_pii = true
 
   # Performance monitoring: traces_sampler is the single source of truth (overrides traces_sample_rate)

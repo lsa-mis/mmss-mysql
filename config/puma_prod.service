@@ -4,7 +4,11 @@ After=network.target
 
 [Service]
 Environment=PATH=/home/deployer/.asdf/shims:/home/deployer/.asdf/bin:/usr/local/bin:/usr/bin:/bin:$PATH
-Type=simple
+# Puma >= 6 speaks the systemd notify protocol out of the box (READY=1 once the app has
+# booted, RELOADING=1 during `pumactl restart`, WATCHDOG pings). Use Type=simple and drop
+# WatchdogSec if the unit must run an older Puma.
+Type=notify
+WatchdogSec=10
 User=deployer
 WorkingDirectory=/home/deployer/apps/mmss-mysql/current
 ExecStart=/home/deployer/.asdf/shims/bundle exec pumactl -F /home/deployer/apps/mmss-mysql/current/config/puma.rb start

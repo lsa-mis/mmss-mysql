@@ -86,7 +86,7 @@ RSpec.describe FeedbacksController, type: :controller do
 
         it 're-renders new with errors' do
           post :create, params: { feedback: invalid_attributes }
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
           expect(response).to render_template(:new)
           expect(assigns(:feedback).errors).not_to be_empty
         end
