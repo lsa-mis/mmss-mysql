@@ -13,7 +13,7 @@
         <%= admin_applicant_link(assignment.enrollment, with_email: true) %>
       <% end %>
       <% t.column 'Course', sort: 'course' do |assignment| %>
-        <%= link_to assignment.course.title, admin_course_assignment_path(assignment) %>
+        <%= admin_resource_link(assignment.course, assignment.course.title) %>
         <div class="text-xs text-slate-500"><%= assignment.course.camp_occurrence.description %></div>
       <% end %>
       <% t.column :wait_list, sort: true %>

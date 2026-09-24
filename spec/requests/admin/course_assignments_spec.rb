@@ -24,6 +24,7 @@ RSpec.describe 'Admin course assignments', type: :request do
       expect(body).to include('Zimmerman, Ada')
       expect(body).to include(admin_application_path(enrollment))
       expect(body).to include('Number Theory')
+      expect(body).to include(%(href="#{admin_course_path(course)}"))
       expect(body).to include('With selected:')
       expect(body).to include('Download CSV')
       expect(body).to include(edit_admin_course_assignment_path(assignment))

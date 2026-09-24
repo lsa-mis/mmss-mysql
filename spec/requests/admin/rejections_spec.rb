@@ -176,11 +176,16 @@ RSpec.describe 'Admin rejections', type: :request do
       expect(response.body).to include('Incomplete transcript')
     end
 
-    it 'updates the reason' do
-      patch admin_rejection_path(rejection), params: { rejection: { reason: 'Updated reason' } }
+    it 'updates the reason without re-sending the rejection letter or changing the application' do
+      ActionMailer::Base.deliveries.clear
+
+      expect do
+        patch admin_rejection_path(rejection), params: { rejection: { reason: 'Updated reason' } }
+      end.not_to change { ActionMailer::Base.deliveries.size }
 
       expect(response).to redirect_to(admin_rejection_path(rejection))
       expect(rejection.reload.reason).to eq('Updated reason')
+      expect(enrollment.reload.application_status).to eq('rejected')
     end
 
     it 'ignores a submitted enrollment_id so a rejection can never be reassigned to a second application' do
