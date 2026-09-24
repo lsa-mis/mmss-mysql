@@ -88,9 +88,10 @@ Rails.application.routes.draw do
 
     resources :comments, only: %i[index create destroy]
 
-    # CSV reports: /admin/reports lists them, /admin/reports/<key> downloads one (keys are looked up
-    # in Admin::Reports).
-    resources :reports, only: %i[index show], constraints: { id: /[a-z_]+/ }
+    # CSV reports: /admin/reports lists them, /admin/reports/<key> downloads one. Any id reaches the
+    # controller (no constraint, no format suffix) so unknown/malformed keys get the controller's
+    # redirect instead of falling through to the legacy catch-all below.
+    resources :reports, only: %i[index show], format: false, constraints: { id: %r{[^/]+} }
 
     # Camp Setup
     resources :camp_configurations do

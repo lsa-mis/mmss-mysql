@@ -186,13 +186,18 @@ RSpec.describe 'Admin reports', type: :request do
         expect(response.body).to include('Unknown report or camp year.')
       end
 
-      it 'rejects a report key carrying a SQL fragment' do
-        # Fails the route constraint (/[a-z_]+/), so it never reaches the controller.
-        get '/admin/reports/all_complete_apps;DROP'
+      it 'redirects malformed report keys to the index instead of erroring' do
+        ['all_complete_apps;DROP', '..', '%2e%2e', '%00', 'a' * 3000, 'All_Complete_Apps', 'all-complete-apps',
+         'all_complete_apps.csv', 'all_complete_apps.json', 'all_complete_apps%20x', "all_complete_apps'",
+         '%3Cscript%3E'].each do |id|
+          get "/admin/reports/#{id}"
 
-        expect(response).not_to have_http_status(:ok)
-        expect(response.media_type).not_to eq('text/csv')
+          expect(response).to redirect_to(admin_reports_path), "/admin/reports/#{id[0, 40]} returned #{response.status}"
+          expect(response.media_type).not_to eq('text/csv')
+        end
+      end
 
+      it 'ignores a query-string id' do
         get admin_report_path('all_complete_apps'), params: { id: 'users; DROP TABLE users' }
 
         expect(response).to have_http_status(:ok)

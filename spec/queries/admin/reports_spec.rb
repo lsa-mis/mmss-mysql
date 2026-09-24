@@ -97,9 +97,10 @@ RSpec.describe Admin::Reports, :admin_reports do
     end
 
     it 'treats a negative (refund) payment as signed cents, like PaymentState' do
-      create(:payment, user: fixtures.accepted.user, total_amount: '-20000', transaction_status: '1',
-                       camp_year: camp.camp_year)
-      fixtures.accepted.update_columns(application_status: 'offer accepted')
+      # Payment now refuses negative amounts (#258); legacy rows can still hold them.
+      refund = build(:payment, user: fixtures.accepted.user, total_amount: '-20000', transaction_status: '1',
+                               camp_year: camp.camp_year)
+      refund.save!(validate: false)
 
       row = Admin::Reports::OfferAcceptedWithBalanceDue.new(camp).rows.sole
 
