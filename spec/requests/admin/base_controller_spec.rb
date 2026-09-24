@@ -57,10 +57,10 @@ RSpec.describe 'Admin::BaseController authentication', type: :request do
     it 'redirects unported /admin paths to /legacy_admin (keeping the query string)' do
       sign_in create(:admin)
 
-      get '/admin/payments?order=id_desc'
+      get '/admin/reports?order=id_desc'
 
       expect(response).to have_http_status(:moved_permanently)
-      expect(response).to redirect_to('/legacy_admin/payments?order=id_desc')
+      expect(response).to redirect_to('/legacy_admin/reports?order=id_desc')
     end
 
     it 'keeps the admin_* helpers used elsewhere in the app' do
