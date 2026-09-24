@@ -35,6 +35,11 @@ class Admin::Comment < ApplicationRecord
     'CampOccurrence' => -> { CampOccurrence },
     'Activity' => -> { Activity },
     'Course' => -> { Course },
+    'CourseAssignment' => -> { CourseAssignment },
+    'SessionActivity' => -> { SessionActivity },
+    'SessionAssignment' => -> { SessionAssignment },
+    'Recommendation' => -> { Recommendation },
+    'Recupload' => -> { Recupload },
     'ApplicantDetail' => -> { ApplicantDetail },
     'FinancialAid' => -> { FinancialAid }
   }.freeze

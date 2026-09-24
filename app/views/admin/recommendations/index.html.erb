@@ -1,0 +1,41 @@
+<% admin_page_title 'Recommendations', subtitle: "#{number_with_delimiter(@pagy.count)} #{'recommendation'.pluralize(@pagy.count)}" %>
+<% admin_page_actions do %>
+  <%= admin_csv_link %>
+  <%= link_to 'New Recommendation', new_admin_recommendation_path, class: 'admin-btn-primary' %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-4">
+  <div class="grid gap-4 xl:col-span-3">
+    <%= admin_table @recommendations, pagy: @pagy,
+                    batch_actions: Admin::RecommendationsController::BATCH_ACTIONS, batch_url: batch_admin_recommendations_path,
+                    actions: ->(recommendation) { [admin_recommendation_path(recommendation), edit_admin_recommendation_path(recommendation), admin_recommendation_path(recommendation)] } do |t| %>
+      <% t.column 'Enrollment', sort: 'enrollment_id' do |recommendation| %>
+        <%= admin_applicant_link(recommendation.enrollment, with_email: true) %>
+      <% end %>
+      <% t.column 'Letter' do |recommendation| %>
+        <% if recommendation.recupload %>
+          <%= link_to 'received', admin_recupload_path(recommendation.recupload), class: 'admin-badge-green' %>
+        <% else %>
+          <span class="admin-badge-yellow">waiting</span>
+        <% end %>
+      <% end %>
+      <% t.column :email, sort: true %>
+      <% t.column :lastname, sort: true %>
+      <% t.column :firstname, sort: true %>
+      <% t.column :organization, sort: true %>
+      <% t.column :address1 %>
+      <% t.column :address2 %>
+      <% t.column :city, sort: true %>
+      <% t.column :state, sort: true %>
+      <% t.column :state_non_us %>
+      <% t.column :postalcode %>
+      <% t.column :country, sort: true %>
+      <% t.column :phone_number %>
+      <% t.column :best_contact_time %>
+    <% end %>
+  </div>
+
+  <div class="xl:col-span-1">
+    <%= admin_filter_form @filter, url: admin_recommendations_path %>
+  </div>
+</div>

@@ -70,7 +70,8 @@ RSpec.describe 'Admin::BaseController authentication', type: :request do
       expect(edit_admin_application_path(1)).to eq('/admin/applications/1/edit')
       expect(new_admin_session_path).to eq('/admin/login')
       expect(destroy_admin_session_path).to eq('/admin/logout')
-      expect(legacy_admin_recommendation_path(1)).to eq('/legacy_admin/recommendations/1')
+      expect(admin_recommendation_path(1)).to eq('/admin/recommendations/1')
+      expect(legacy_admin_reports_path).to eq('/legacy_admin/reports')
       expect(legacy_admin_reports_offer_accepted_with_balance_due_path).to eq('/legacy_admin/reports/offer_accepted_with_balance_due')
     end
   end

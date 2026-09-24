@@ -1,0 +1,15 @@
+<%# locals: applicant_activity %>
+<%= admin_form_with model: applicant_activity, scope: :enrollment_activity,
+                    url: (applicant_activity.persisted? ? admin_applicant_activity_path(applicant_activity) : admin_applicant_activities_path),
+                    class: 'grid gap-5' do |f| %>
+  <%= f.errors_summary %>
+
+  <%= f.fieldset 'Applicant Activity' do %>
+    <%= f.input :enrollment_id, as: :select, label: 'Enrollment', include_blank: 'Select an applicant', required: true,
+                                collection: Admin::EnrollmentOptions.current_camp(include: applicant_activity.enrollment) %>
+    <%= f.input :activity_id, as: :select, label: 'Activity', include_blank: 'Select an activity', required: true,
+                              collection: Admin::CampOptions.activities(include: applicant_activity.activity) %>
+  <% end %>
+
+  <%= f.actions 'Save Applicant Activity', cancel: (applicant_activity.persisted? ? admin_applicant_activity_path(applicant_activity) : admin_applicant_activities_path) %>
+<% end %>

@@ -1,0 +1,31 @@
+<% admin_page_title 'Session Assignments', subtitle: "#{number_with_delimiter(@pagy.count)} #{'session assignment'.pluralize(@pagy.count)} · #{current_scope.label}" %>
+<% admin_page_actions do %>
+  <%= admin_csv_link %>
+  <%= link_to 'New Session Assignment', new_admin_session_assignment_path, class: 'admin-btn-primary' %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-4">
+  <div class="grid gap-4 xl:col-span-3">
+    <%= admin_scope_tabs Admin::SessionAssignmentsController::SCOPES, counts: @scope_counts %>
+
+    <%= admin_table @session_assignments, pagy: @pagy,
+                    batch_actions: Admin::SessionAssignmentsController::BATCH_ACTIONS, batch_url: batch_admin_session_assignments_path,
+                    actions: ->(assignment) { [admin_session_assignment_path(assignment), edit_admin_session_assignment_path(assignment), admin_session_assignment_path(assignment)] } do |t| %>
+      <% t.column 'Enrollment', sort: 'enrollment' do |assignment| %>
+        <%= admin_applicant_link(assignment.enrollment, with_email: true) %>
+      <% end %>
+      <% t.column 'Session', sort: 'session' do |assignment| %>
+        <%= assignment.camp_occurrence.display_name %>
+      <% end %>
+      <% t.column :created_at, sort: true %>
+      <% t.column :updated_at, sort: true %>
+      <% t.column :offer_status, sort: true do |assignment| %>
+        <%= admin_status_badge(assignment.offer_status) %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="xl:col-span-1">
+    <%= admin_filter_form @filter, url: admin_session_assignments_path %>
+  </div>
+</div>

@@ -14,8 +14,8 @@ Rails.application.routes.draw do
   get 'faculty/student_page/:id', to: 'faculties#student_page', as: :student_page
   get 'faculty_login', to: 'static_pages#faculty_login', as: :faculty_login
 
-  resources :rejections
-  resources :recuploads
+  # Recommenders upload letters through the emailed link; everything else is under /admin/recuploads.
+  resources :recuploads, only: %i[new create]
   resources :feedbacks
   # resources :payments
   root to: 'static_pages#index'
@@ -50,11 +50,41 @@ Rails.application.routes.draw do
     end
     resources :payments, except: :destroy
 
-    # Recommendations are ported in a later PR; only the admin-only "resend request" action lives here
-    # (it used to be a public GET on RecommendationsController).
-    resources :recommendations, only: [] do
+    # Applicant Info (models named after their ActiveAdmin resource where they differ; the
+    # controllers keep the model): session_selections = SessionActivity,
+    # applicant_activities = EnrollmentActivity.
+    resources :course_assignments do
+      collection { post :batch }
+    end
+    resources :course_preferences do
+      collection { post :batch }
+    end
+    resources :session_selections, controller: 'session_selections' do
+      collection { post :batch }
+    end
+    resources :session_assignments do
+      collection { post :batch }
+    end
+    resources :applicant_activities, controller: 'applicant_activities' do
+      collection { post :batch }
+    end
+    resources :recommendations do
+      collection { post :batch }
+      # "Resend request" used to be a public GET on RecommendationsController; admin-only now.
       member { post :send_request_email }
     end
+    resources :recuploads do
+      collection { post :batch }
+    end
+    resources :rejections do
+      collection { post :batch }
+    end
+    resources :travels do
+      collection { post :batch }
+    end
+    # Read-only audit trails of the Nelnet payment flow.
+    resources :payment_requests, only: %i[index show]
+    resources :nelnet_callback_logs, only: %i[index show]
 
     resources :comments, only: %i[index create destroy]
 
@@ -128,8 +158,9 @@ Rails.application.routes.draw do
   # Applicant-facing; the admin listing lives under /admin/applicant_details (no destroy anywhere).
   resources :applicant_details, except: %i[index destroy]
 
+  # Applicant-facing; admin listing/deletion lives under /admin/travels and /admin/recommendations.
   resources :enrollments do
-    resources :travels
+    resources :travels, except: %i[index destroy]
   end
 
   # Applicant-facing request form; admin listing/deletion lives under /admin/financial_aid_requests.
@@ -140,10 +171,10 @@ Rails.application.routes.draw do
   resources :financial_aids, except: %i[index destroy]
 
   resources :enrollments do
-    resources :recommendations
+    resources :recommendations, except: %i[index destroy]
   end
 
-  resources :recommendations
+  resources :recommendations, except: %i[index destroy]
 
   resources :enrollments do
       resources :course_preferences do
@@ -154,15 +185,10 @@ Rails.application.routes.draw do
   end
 
   resources :enrollments do
-    resources :course_assignments
-  end
-
-  resources :enrollments do
     resources :session_assignments
   end
 
   resources :course_preferences
-  resources :course_assignments
   resources :session_assignments
 
   # post 'accept_offer', to: 'enrollments#accept_offer'

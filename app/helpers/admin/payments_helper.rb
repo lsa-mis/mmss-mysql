@@ -21,7 +21,7 @@ module Admin::PaymentsHelper
   # payment's persisted user selectable on edit.
   def admin_payment_user_options(payment)
     include = payment.persisted? ? payment.user&.enrollments&.order(:id)&.last : nil
-    options = Admin::ApplicantOptions.users(include: include)
+    options = Admin::EnrollmentOptions.current_camp_users(include: include)
     if payment.user_id && options.none? { |_label, id| id == payment.user_id }
       options << [payment.user.email, payment.user_id]
     end

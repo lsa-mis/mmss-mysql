@@ -1,0 +1,29 @@
+<% admin_page_title 'Nelnet Callback Logs', subtitle: "#{number_with_delimiter(@pagy.count)} #{'callback'.pluralize(@pagy.count)}" %>
+<% admin_page_actions do %>
+  <%= admin_csv_link %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-4">
+  <div class="grid gap-4 xl:col-span-3">
+    <%= admin_table @nelnet_callback_logs, pagy: @pagy,
+                    actions: ->(log) { [admin_nelnet_callback_log_path(log), nil, nil] } do |t| %>
+      <% t.column :id, sort: true do |log| %>
+        <%= link_to log.id, admin_nelnet_callback_log_path(log), class: 'font-medium' %>
+      <% end %>
+      <% t.column 'Transaction ID', sort: 'transaction_id', &:transaction_id %>
+      <% t.column :order_number, sort: true %>
+      <% t.column :transaction_status, sort: true do |log| %>
+        <%= log.transaction_status.present? ? transaction_status_message(log.transaction_status) : admin_empty_value %>
+        <% if log.transaction_status.present? %><span class="text-xs text-slate-500">(<%= log.transaction_status %>)</span><% end %>
+      <% end %>
+      <% t.column 'Total amount', sort: 'transaction_total_amount' do |log| %>
+        <%= admin_money_from_cents(log.transaction_total_amount) %>
+      <% end %>
+      <% t.column :created_at, sort: true %>
+    <% end %>
+  </div>
+
+  <div class="xl:col-span-1">
+    <%= admin_filter_form @filter, url: admin_nelnet_callback_logs_path %>
+  </div>
+</div>

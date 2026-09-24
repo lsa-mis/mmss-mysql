@@ -1,0 +1,43 @@
+<% admin_page_title "Recommendation ##{@recommendation.id}", subtitle: "#{@recommendation.full_name} · for #{admin_applicant_name(@recommendation.enrollment)}" %>
+<% admin_page_actions do %>
+  <%= button_to 'Resend request', send_request_email_admin_recommendation_path(@recommendation), method: :post, class: 'admin-btn-secondary',
+                form: { data: { turbo_confirm: 'Email the recommendation request to the recommender again?' } } %>
+  <%= link_to 'Edit', edit_admin_recommendation_path(@recommendation), class: 'admin-btn-primary' %>
+  <%= button_to 'Delete', admin_recommendation_path(@recommendation), method: :delete, class: 'admin-btn-danger',
+                form: { data: { turbo_confirm: 'Delete this recommendation? An uploaded letter will be deleted too.' } } %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-3">
+  <div class="grid gap-5 xl:col-span-2">
+    <%= admin_panel 'Recommendation', body_class: '' do %>
+      <%= admin_attributes @recommendation do |a| %>
+        <% a.row :id %>
+        <% a.row 'Enrollment' do |recommendation| %>
+          <%= admin_applicant_link(recommendation.enrollment) %>
+          <span class="text-slate-500"><%= recommendation.enrollment.user.email %></span>
+        <% end %>
+        <% a.row :firstname, :lastname, :email, :organization, :address1, :address2, :city, :state, :state_non_us,
+                 :postalcode, :country, :phone_number, :best_contact_time, :created_at, :updated_at %>
+      <% end %>
+    <% end %>
+
+    <%= render 'admin/comments/comments', resource: @recommendation %>
+  </div>
+
+  <div class="grid gap-5 self-start">
+    <%= admin_panel 'Letter', body_class: '' do %>
+      <% if (recupload = @recommendation.recupload) %>
+        <%= admin_attributes recupload do |a| %>
+          <% a.row 'Upload' do |upload| %>
+            <%= link_to "Recupload ##{upload.id}", admin_recupload_path(upload) %>
+          <% end %>
+          <% a.row('Author', &:authorname) %>
+          <% a.row 'File' do |upload| %><%= admin_attachment_link(upload.recletter) %><% end %>
+          <% a.row('Received', &:created_at) %>
+        <% end %>
+      <% else %>
+        <%= admin_empty_state 'Waiting for the recommender to respond.' %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

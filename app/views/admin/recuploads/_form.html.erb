@@ -1,0 +1,22 @@
+<%# locals: recupload %>
+<%= admin_form_with model: recupload,
+                    url: (recupload.persisted? ? admin_recupload_path(recupload) : admin_recuploads_path),
+                    multipart: true, class: 'grid gap-5' do |f| %>
+  <%= f.errors_summary %>
+
+  <%= f.fieldset 'Recommendation letter', description: 'Either paste the letter text or attach a PDF/JPEG/PNG file (max 20 MB).' do %>
+    <%= f.input :recommendation_id, as: :select, label: 'Applicant Name', include_blank: 'Select an applicant', required: true,
+                                    collection: Admin::RecommendationOptions.current_camp(include: recupload.recommendation) %>
+    <%= f.input :letter, as: :textarea, rows: 8 %>
+    <% if recupload.recletter.attached? %>
+      <p class="text-sm text-slate-600">Current file: <%= admin_attachment_link(recupload.recletter) %></p>
+    <% end %>
+    <%= f.input :recletter, as: :file, label: 'Attached file', accept: 'application/pdf,image/png,image/jpeg' %>
+    <div class="grid gap-4 md:grid-cols-2">
+      <%= f.input :authorname, label: 'Author / recommender', required: true %>
+      <%= f.input :studentname, label: 'Student name', required: true %>
+    </div>
+  <% end %>
+
+  <%= f.actions cancel: (recupload.persisted? ? admin_recupload_path(recupload) : admin_recuploads_path) %>
+<% end %>

@@ -5,8 +5,7 @@ require 'rails_helper'
 # Porting Payments, Financial Aid Requests and Applicant Details deleted their app/admin
 # registrations and therefore their `legacy_admin_*` route helpers. Pages still served by
 # ActiveAdmin that used to link them (the legacy dashboard's payments / financial aid panels, the
-# legacy Applications show page's applicant, payment and financial aid links, the Payment Requests
-# "Matched payment" link) were repointed to the new admin; rendering them here turns a missed
+# legacy Applications show page's applicant, payment and financial aid links) were repointed to the new admin; rendering them here turns a missed
 # helper into a failing spec instead of a production 500. The remaining legacy indexes are
 # rendered too.
 RSpec.describe 'Legacy ActiveAdmin pages linking Money resources', type: :request do
@@ -41,13 +40,6 @@ RSpec.describe 'Legacy ActiveAdmin pages linking Money resources', type: :reques
     expect(body).to include(new_admin_financial_aid_request_path(enrollment_id: enrollment.id))
     expect(body).to include(admin_financial_aid_request_path(financial_aid))
     expect(body).not_to match(%r{legacy_admin/(payments|financial_aid_requests|applicant_details)})
-  end
-
-  it 'renders the legacy payment requests index with the matched payment link' do
-    get '/legacy_admin/payment_requests'
-
-    expect(response).to have_http_status(:ok)
-    expect(response.body).to include(admin_payment_path(payment))
   end
 
   it 'no longer serves the ported resources from ActiveAdmin' do

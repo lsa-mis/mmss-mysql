@@ -14,7 +14,7 @@
       <%= f.input :enrollment_id, as: :hidden %>
     <% else %>
       <%= f.input :enrollment_id, as: :select, label: 'Enrollment', include_blank: 'Select an applicant', required: true,
-                                  collection: Admin::ApplicantOptions.enrollments(include: financial_aid.enrollment) %>
+                                  collection: Admin::EnrollmentOptions.current_camp(include: financial_aid.enrollment) %>
     <% end %>
     <div class="grid gap-4 md:grid-cols-2">
       <%= f.input :amount, as: :number, label: 'Amount ($)', step: 0.01, min: 0 %>

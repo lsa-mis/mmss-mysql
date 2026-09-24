@@ -1,0 +1,16 @@
+<%# locals: course_assignment %>
+<%= admin_form_with model: course_assignment,
+                    url: (course_assignment.persisted? ? admin_course_assignment_path(course_assignment) : admin_course_assignments_path),
+                    class: 'grid gap-5' do |f| %>
+  <%= f.errors_summary %>
+
+  <%= f.fieldset 'Course Assignment' do %>
+    <%= f.input :enrollment_id, as: :select, label: 'Enrollment', include_blank: 'Select an applicant', required: true,
+                                collection: Admin::EnrollmentOptions.current_camp(include: course_assignment.enrollment) %>
+    <%= f.input :course_id, as: :select, label: 'Course', include_blank: 'Select a course', required: true,
+                            collection: Admin::CampOptions.courses(include: course_assignment.course) %>
+    <%= f.input :wait_list %>
+  <% end %>
+
+  <%= f.actions cancel: (course_assignment.persisted? ? admin_course_assignment_path(course_assignment) : admin_course_assignments_path) %>
+<% end %>
