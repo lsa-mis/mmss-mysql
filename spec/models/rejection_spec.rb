@@ -186,21 +186,28 @@ RSpec.describe Rejection, type: :model do
           rejection.save!
         end
 
-        it 'runs on update since record is persisted' do
+        it 'does not run again on update' do
           rejection.save!
-          # The callback will run on update, but transition should handle already-rejected status
-          expect(rejection).to receive(:set_rejection_status).and_call_original
-          rejection.update(reason: 'Updated reason')
+          expect(rejection).not_to receive(:set_rejection_status)
+          rejection.update!(reason: 'Updated reason')
         end
 
-        it 'safely handles multiple calls when enrollment is already rejected' do
+        it 'leaves assignments, status and timestamps untouched when only the reason changes' do
           rejection.save!
           expect(enrollment.reload.application_status).to eq('rejected')
+          # Assignments added after the rejection (e.g. by an admin) must survive a reason edit.
+          course_assignment = create(:course_assignment, enrollment: enrollment, course: create(:course))
+          session_assignment = create(:session_assignment, enrollment: enrollment, camp_occurrence: create(:camp_occurrence))
+          enrollment.update_columns(application_status_updated_on: Date.new(2020, 1, 1), offer_status: 'offered')
 
-          # Update should not cause errors even though enrollment is already rejected
-          expect {
-            rejection.update(reason: 'Updated reason')
-          }.not_to raise_error
+          expect { rejection.update!(reason: 'Updated reason') }.not_to change { ActionMailer::Base.deliveries.size }
+
+          expect(CourseAssignment.exists?(course_assignment.id)).to be(true)
+          expect(SessionAssignment.exists?(session_assignment.id)).to be(true)
+          enrollment.reload
+          expect(enrollment.application_status).to eq('rejected')
+          expect(enrollment.application_status_updated_on).to eq(Date.new(2020, 1, 1))
+          expect(enrollment.offer_status).to eq('offered')
         end
       end
 
@@ -231,7 +238,7 @@ RSpec.describe Rejection, type: :model do
       expect(Rejection.instance_methods(false)).to include(:set_rejection_status)
     end
 
-    it 'is called after commit when persisted' do
+    it 'is called after the create commit' do
       new_rejection = build(:rejection, enrollment: enrollment)
       expect(new_rejection).to receive(:set_rejection_status).and_call_original
       new_rejection.save!

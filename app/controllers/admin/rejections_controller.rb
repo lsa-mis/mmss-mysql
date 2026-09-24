@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Rejections: saving one destroys the application's course/session assignments, moves it to
-# `rejected` and emails the applicant (Rejection#set_rejection_status, an after_commit callback).
+# `rejected` and emails the applicant (Rejection#set_rejection_status, an after_create_commit callback).
 # The status transition is checked up front so a rejection is never recorded for an application
 # that cannot be rejected (enrolled/withdrawn), which would otherwise fail after the commit.
 class Admin::RejectionsController < Admin::BaseController
@@ -81,8 +81,9 @@ class Admin::RejectionsController < Admin::BaseController
 
   private
 
-  # Saving re-runs the status transition (after_commit); refuse up front when it would be
-  # rejected by Enrollment's transition rules.
+  # The create commit runs the status transition; refuse up front when Enrollment's transition
+  # rules would reject it (an existing rejection's application is already rejected, so this is
+  # a no-op on update).
   def rejectable?
     enrollment = @rejection.enrollment
     return true if enrollment.nil? || enrollment.can_transition_application_status?('rejected')
