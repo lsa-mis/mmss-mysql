@@ -41,8 +41,21 @@ class Admin::CsvExport
       csv << [title.to_s.titleize]
       csv << ["Total number of records: #{rows.size}"] if total_row
       csv << columns
-      rows.each { |row| csv << (block_given? ? yield(row) : row) }
+      rows.each { |row| csv << (block_given? ? yield(row) : row).map { |cell| sanitize_cell(cell) } }
     end
+  end
+
+  # Spreadsheet formula injection guard. Excel/LibreOffice/Sheets evaluate cells that start with
+  # `=`, `+`, `-` or `@` (and treat a leading tab/CR as a control prefix), so a user-supplied value
+  # such as `=HYPERLINK(...)` in a feedback message, name or note would execute when an admin opens
+  # the export. Such strings are prefixed with a single quote, the spreadsheet convention for
+  # "this is text" (the quote is not displayed in the cell). Only strings are touched: numbers,
+  # dates, booleans and Money are formatted by the exporter itself, so a negative balance
+  # (`-$25.00`) is never mangled.
+  FORMULA_PREFIX = /\A[=+\-@\t\r]/
+
+  def self.sanitize_cell(value)
+    value.is_a?(String) && value.match?(FORMULA_PREFIX) ? "'#{value}" : value
   end
 
   def initialize
@@ -77,8 +90,8 @@ class Admin::CsvExport
     when ActiveSupport::TimeWithZone, Time, DateTime then value.strftime('%Y-%m-%d %H:%M:%S')
     when Date then value.iso8601
     when Money then value.format
-    when true, false then value.to_s
-    else value.to_s
+    when Numeric, true, false then value.to_s
+    else self.class.sanitize_cell(value.to_s)
     end
   end
 end

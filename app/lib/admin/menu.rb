@@ -43,10 +43,10 @@ class Admin::Menu
       Item.new(label: 'Gender Types', route: :admin_gender_types_path)
     ]),
     Group.new(label: 'Logins Info', items: [
-      Item.new(label: 'Admins', route: :legacy_admin_admins_path, legacy: true),
-      Item.new(label: 'Faculties', route: :legacy_admin_faculties_path, legacy: true),
-      Item.new(label: 'Users', route: :legacy_admin_users_path, legacy: true),
-      Item.new(label: 'Feedbacks', route: :legacy_admin_feedbacks_path, legacy: true)
+      Item.new(label: 'Admins', route: :admin_admins_path),
+      Item.new(label: 'Faculties', route: :admin_faculties_path),
+      Item.new(label: 'Users', route: :admin_users_path),
+      Item.new(label: 'Feedbacks', route: :admin_feedbacks_path)
     ]),
     Group.new(label: 'Admin', items: [
       Item.new(label: 'Comments', route: :admin_comments_path)
