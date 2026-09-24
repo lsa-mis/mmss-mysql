@@ -84,7 +84,7 @@ RSpec.describe 'Admin faculties', type: :request do
 
       get admin_faculty_path(faculty)
 
-      expect(response.body).to include('No courses in the current camp')
+      expect(response.body).to include('No courses assigned to jsmith for the current camp.')
     end
   end
 
