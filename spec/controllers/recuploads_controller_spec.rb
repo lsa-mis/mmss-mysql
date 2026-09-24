@@ -120,11 +120,6 @@ RSpec.describe RecuploadsController, type: :controller do
         expect(response).to render_template(:new)
       end
 
-      it 'assigns student name for error display' do
-        post :create, params: invalid_params
-        expect(assigns(:student)).to eq(enrollment.user.applicant_detail.full_name)
-      end
-
       it 'responds with JSON error' do
         post :create, params: invalid_params.merge(format: :json)
         expect(response).to have_http_status(:unprocessable_content)

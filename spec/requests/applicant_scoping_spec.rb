@@ -177,6 +177,40 @@ RSpec.describe 'Applicant-facing controllers scope records to the signed-in user
     end
   end
 
+  describe 'RecuploadsController (recommender token flow, no login)' do
+    let!(:recommendation_a) { create(:recommendation, enrollment: enrollment_a) }
+    let!(:recommendation_b) { create(:recommendation, enrollment: enrollment_b) }
+    let(:token_for_a) { "x_nGklDoc2egIkzFxr0U#{recommendation_a.id}" }
+
+    before { sign_out user_a }
+
+    it 'attaches the letter to the recommendation the emailed link resolves to, ignoring a submitted recommendation_id' do
+      expect do
+        post recuploads_path, params: { hash: token_for_a,
+                                        recupload: { recommendation_id: recommendation_b.id, authorname: 'Prof. X', studentname: 'Ada',
+                                                     letter: 'A fine student.' } }
+      end.to change(Recupload, :count).by(1)
+
+      expect(response).to redirect_to(recupload_success_path)
+      expect(Recupload.last.recommendation).to eq(recommendation_a)
+      expect(recommendation_b.reload.recupload).to be_nil
+    end
+
+    it 'renders no recommendation_id field on the upload form' do
+      get new_recupload_path, params: { hash: token_for_a }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).not_to include('recupload[recommendation_id]')
+    end
+
+    it 're-renders the form on validation errors' do
+      post recuploads_path, params: { hash: token_for_a, recupload: { authorname: '', studentname: '', letter: '' } }
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(Recupload.count).to eq(0)
+    end
+  end
+
   describe 'FinancialAidsController' do
     it "creates the request against the applicant's own enrollment whatever enrollment_id the form sends" do
       post financial_aids_path, params: { financial_aid: { enrollment_id: enrollment_b.id, note: 'help', adjusted_gross_income: 10_000 } }

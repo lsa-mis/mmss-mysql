@@ -58,8 +58,10 @@ class Admin::RejectionsController < Admin::BaseController
 
   def edit; end
 
+  # The enrollment is immutable once a rejection exists: reassigning it would leave the old
+  # application rejected and reject a second one (the status change runs after commit).
   def update
-    @rejection.assign_attributes(rejection_params)
+    @rejection.assign_attributes(rejection_params.slice(:reason))
 
     if rejectable? && @rejection.save
       redirect_to admin_rejection_path(@rejection), notice: 'Rejection was successfully updated.', status: :see_other

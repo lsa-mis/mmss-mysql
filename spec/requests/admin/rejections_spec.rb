@@ -166,11 +166,13 @@ RSpec.describe 'Admin rejections', type: :request do
   end
 
   describe 'edit/update' do
-    it 'renders the edit form with the applicant select' do
+    it 'renders the edit form with the applicant read-only' do
       get edit_admin_rejection_path(rejection)
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include(%(<option selected="selected" value="#{enrollment.id}">))
+      expect(response.body).to include('Zimmerman, Ada')
+      expect(response.body).not_to include('name="rejection[enrollment_id]"')
+      expect(response.body).to include('cannot be changed on an existing rejection')
       expect(response.body).to include('Incomplete transcript')
     end
 
@@ -179,6 +181,18 @@ RSpec.describe 'Admin rejections', type: :request do
 
       expect(response).to redirect_to(admin_rejection_path(rejection))
       expect(rejection.reload.reason).to eq('Updated reason')
+    end
+
+    it 'ignores a submitted enrollment_id so a rejection can never be reassigned to a second application' do
+      other = create(:enrollment, :application_complete, user: create(:user, :with_applicant_detail))
+
+      patch admin_rejection_path(rejection), params: { rejection: { enrollment_id: other.id, reason: 'Moved' } }
+
+      expect(response).to redirect_to(admin_rejection_path(rejection))
+      rejection.reload
+      expect(rejection.enrollment).to eq(enrollment)
+      expect(rejection.reason).to eq('Moved')
+      expect(other.reload.application_status).to eq('application complete')
     end
   end
 

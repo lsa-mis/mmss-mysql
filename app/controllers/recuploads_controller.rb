@@ -21,7 +21,9 @@ class RecuploadsController < ApplicationController
   end
 
   def create
-    @recupload = Recupload.new(recupload_params)
+    # Always attach to the recommendation the emailed link resolved to, never to a
+    # caller-supplied recommendation_id.
+    @recupload = @recommendation.build_recupload(recupload_params)
 
     respond_to do |format|
       if @recupload.save
@@ -30,8 +32,6 @@ class RecuploadsController < ApplicationController
         RecuploadMailer.with(recupload: @recupload).received_email.deliver_now
         RecuploadMailer.with(recupload: @recupload).applicant_received_email.deliver_now
       else
-        @student = ApplicantDetail.find(params[:id]).full_name if params[:id]
-        @recommendation = Recommendation.find(@recupload.recommendation_id) if @recupload.recommendation_id
         format.html { render :new, status: :unprocessable_content }
         format.json { render json: @recupload.errors, status: :unprocessable_content }
       end
@@ -77,6 +77,6 @@ class RecuploadsController < ApplicationController
   end
 
   def recupload_params
-    params.require(:recupload).permit(:letter, :authorname, :studentname, :recommendation_id, :rechash, :recletter)
+    params.require(:recupload).permit(:letter, :authorname, :studentname, :recletter)
   end
 end

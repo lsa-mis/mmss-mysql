@@ -5,7 +5,14 @@
   <%= f.errors_summary %>
 
   <%= f.fieldset 'Rejection', description: 'Saving removes the applicant\'s course and session assignments, sets the application to rejected and emails the rejection letter.' do %>
-    <% if rejection.new_record? && rejection.enrollment %>
+    <% if rejection.persisted? %>
+      <p class="text-sm">
+        <span class="font-semibold">Application:</span>
+        <%= admin_applicant_link(rejection.enrollment) %>
+        <span class="text-slate-500"><%= rejection.enrollment.user.email %></span>
+      </p>
+      <p class="admin-hint">The application cannot be changed on an existing rejection; delete it and reject the right application instead.</p>
+    <% elsif rejection.enrollment %>
       <p class="text-sm">
         <span class="font-semibold">Application:</span>
         <%= admin_applicant_link(rejection.enrollment) %>
