@@ -36,6 +36,14 @@ RSpec.describe Admin::Filter do
     expect(filter_class.new(nil)).not_to be_active
   end
 
+  it 'discards array and hash values (only scalars are filterable)' do
+    filter = filter_class.new(ActionController::Parameters.new(description: %w[a b], status: { x: 'open' }, cost_cents: 5))
+
+    expect(filter.values).to eq('cost_cents' => '5')
+    expect { filter.apply(Activity.all).to_a }.not_to raise_error
+    expect(filter_class.new(description: ['Dorm']).apply(Activity.all).to_sql).not_to include('LIKE')
+  end
+
   it 'filters text with starts_with and contains, escaping LIKE wildcards' do
     dorm = create(:activity, camp_occurrence: session, description: 'Dormitory (Residential Stay)')
     create(:activity, camp_occurrence: session, description: 'Airport Shuttle - departure')

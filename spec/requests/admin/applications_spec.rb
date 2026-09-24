@@ -90,11 +90,69 @@ RSpec.describe 'Admin applications', type: :request do
       expect(response).to have_http_status(:ok)
     end
 
-    it 'paginates with a configurable page size' do
-      get admin_applications_path, params: { limit: 1 }
+    it 'paginates with a configurable page size, clamped to the maximum' do
+      3.times { create(:enrollment, :application_complete, user: create(:user, :with_applicant_detail)) }
+
+      get admin_applications_path, params: { limit: 2 }
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('Showing <span class="font-medium">1</span>–<span class="font-medium">2</span>')
+      expect(response.body).to include('of <span class="font-medium">4</span>')
+      expect(response.body.scan(/<tr id="enrollment_\d+">/).size).to eq(2)
+
+      get admin_applications_path, params: { limit: 2, page: 2 }
+      expect(response.body).to include('Showing <span class="font-medium">3</span>–<span class="font-medium">4</span>')
+      expect(response.body).to include('aria-current="page">2</span>')
+
+      get admin_applications_path, params: { limit: 99_999 }
+      expect(response.body).to include("of <span class=\"font-medium\">4</span>")
+      expect(response.body).to include('Showing <span class="font-medium">1</span>–<span class="font-medium">4</span>')
+
+      get admin_applications_path, params: { limit: 'abc' }
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('Showing <span class="font-medium">1</span>–<span class="font-medium">4</span>')
+    end
+
+    it 'renders pagination links (series, prev/next) when there is more than one page' do
+      32.times { create(:enrollment, :application_complete, user: create(:user, :with_applicant_detail)) }
+
+      get admin_applications_path
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include('Showing')
+      expect(response.body).to include('Showing <span class="font-medium">1</span>–<span class="font-medium">30</span>')
+      expect(response.body).to include('of <span class="font-medium">33</span>')
+      expect(response.body).to include('href="/admin/applications?page=2"')
+      expect(response.body).to include('rel="next"')
+      expect(response.body).to include('aria-current="page">1</span>')
+
+      get admin_applications_path, params: { page: 2, scope: 'all' }
+      expect(response.body).to include('Showing <span class="font-medium">31</span>–<span class="font-medium">33</span>')
+      expect(response.body).to match(%r{href="/admin/applications\?(page=1&amp;scope=all|scope=all&amp;page=1)"})
+      expect(response.body).to include('rel="prev"')
+    end
+
+    it 'ignores non-scalar filter values instead of failing' do
+      get admin_applications_path, params: { q: { lastname: ['Zim', 'x'] } }
+      expect(response).to have_http_status(:ok)
+      expect(response.body).not_to include('active filter')
+
+      get admin_applications_path, params: { q: { lastname: { nested: 'Zim' } } }
+      expect(response).to have_http_status(:ok)
+      expect(response.body).not_to include('active filter')
+    end
+
+    it 'shows the SQL-computed balance due that matches PaymentState' do
+      accepted = create(:enrollment, :accepted, user: create(:user, :with_applicant_detail))
+      create(:session_assignment, :accepted, enrollment: accepted, camp_occurrence: CampOccurrence.active.first)
+      expected = PaymentState.new(accepted).balance_due
+      expect(expected).to be_positive
+
+      get admin_applications_path, params: { scope: 'all' }
+      expect(response.body).to include(helpers_money(expected))
+
+      get admin_applications_path(format: :csv), params: { scope: 'all' }
+      csv = CSV.parse(response.body, headers: true)
+      row = csv.find { |r| r['email'] == accepted.user.email }
+      expect(row['Balance Due']).to eq(helpers_money(expected))
     end
 
     it 'exports the current scope as CSV with the ActiveAdmin column set' do
@@ -338,6 +396,10 @@ RSpec.describe 'Admin applications', type: :request do
       expect(flash[:alert]).to include('Unknown batch action')
       expect(Enrollment.exists?(enrollment.id)).to be(true)
     end
+  end
+
+  def helpers_money(cents)
+    ApplicationController.helpers.humanized_money_with_symbol(cents.to_f / 100)
   end
 
   it 'requires an admin' do
