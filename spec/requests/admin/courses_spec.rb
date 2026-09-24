@@ -91,6 +91,19 @@ RSpec.describe 'Admin courses', type: :request do
       expect(response).to have_http_status(:ok)
     end
 
+    it 'renders page links when the results span several pages' do
+      create_list(:course, 2, camp_occurrence: session)
+
+      get admin_courses_path, params: { limit: 1, page: 2 }
+
+      expect(response).to have_http_status(:ok)
+      body = response.body
+      expect(body).to include('Showing <span class="font-medium">2</span>')
+      expect(body).to include('aria-current="page">2<')
+      expect(body).to include('rel="prev"')
+      expect(body).to include('rel="next"')
+    end
+
     it 'exports CSV with seat counts' do
       get admin_courses_path(format: :csv)
 

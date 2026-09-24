@@ -26,7 +26,8 @@
             <span class="admin-btn-secondary admin-btn-sm opacity-50">‹ Prev</span>
           <% end %>
         </li>
-        <% pagy.series.each do |item| %>
+        <%# Pagy 43 keeps #series protected; data_hash is the public accessor. %>
+        <% pagy.data_hash(data_keys: %i[series])[:series].each do |item| %>
           <li>
             <% case item %>
             <% when Integer %>
