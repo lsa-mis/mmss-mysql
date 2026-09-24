@@ -57,7 +57,7 @@ RSpec.describe EnrollmentsController, type: :controller do
         post :withdraw, params: { id: enrollment.id }
         enrollment.reload
         expect(enrollment.application_status).to eq('withdrawn')
-        expect(enrollment.application_status_updated_on).to eq(Date.today)
+        expect(enrollment.application_status_updated_on).to eq(Date.current)
       end
 
       it 'redirects to admin application path with notice' do
