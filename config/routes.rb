@@ -42,6 +42,14 @@ Rails.application.routes.draw do
       end
     end
 
+    # Money: financial_aid_requests = FinancialAid (the ActiveAdmin resource name). Applicant details
+    # and payments had no destroy in ActiveAdmin either (payments are financial records).
+    resources :applicant_details, except: :destroy
+    resources :financial_aid_requests, controller: 'financial_aid_requests' do
+      collection { post :batch }
+    end
+    resources :payments, except: :destroy
+
     # Applicant Info (models named after their ActiveAdmin resource where they differ; the
     # controllers keep the model): session_selections = SessionActivity,
     # applicant_activities = EnrollmentActivity.
@@ -137,18 +145,20 @@ Rails.application.routes.draw do
   devise_for :users, controllers: {
     registrations: 'users/registrations'
   }
-  resources :applicant_details
+  # Applicant-facing; the admin listing lives under /admin/applicant_details (no destroy anywhere).
+  resources :applicant_details, except: %i[index destroy]
 
   # Applicant-facing; admin listing/deletion lives under /admin/travels and /admin/recommendations.
   resources :enrollments do
     resources :travels, except: %i[index destroy]
   end
 
+  # Applicant-facing request form; admin listing/deletion lives under /admin/financial_aid_requests.
   resources :enrollments do
-      resources :financial_aids
+      resources :financial_aids, except: %i[index destroy]
   end
 
-  resources :financial_aids
+  resources :financial_aids, except: %i[index destroy]
 
   resources :enrollments do
     resources :recommendations, except: %i[index destroy]
@@ -182,7 +192,6 @@ Rails.application.routes.draw do
   get 'static_pages/contact'
   get 'static_pages/privacy'
 
-  get 'payments', to: 'payments#index'
   get 'payment_receipt', to: 'payments#payment_receipt'
   post 'payment_receipt', to: 'payments#payment_receipt'
   get 'payment_show', to: 'payments#payment_show', as: 'all_payments'

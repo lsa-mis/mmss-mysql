@@ -24,7 +24,7 @@
       <%= admin_attributes @application do |a| %>
         <% a.row 'Applicant' do |app| %>
           <% if app.applicant_detail %>
-            <%= admin_legacy_link_to app.applicant_detail.full_name.titleize, legacy_admin_applicant_detail_path(app.applicant_detail) %>
+            <%= link_to app.applicant_detail.full_name.titleize, admin_applicant_detail_path(app.applicant_detail) %>
           <% end %>
           <span class="text-slate-500"><%= app.user.email %></span>
         <% end %>
@@ -124,8 +124,8 @@
                     actions: safe_join([
                       button_to('Send Financial Aid Request Link', send_finaid_request_email_admin_application_path(@application), method: :post, class: 'admin-btn-link',
                                 form: { data: { turbo_confirm: 'Email the financial aid request link to this applicant?' } }),
-                      admin_legacy_link_to('Add Financial Aid Request', new_legacy_admin_financial_aid_request_path(enrollment_id: @application.id), class: 'admin-btn-link'),
-                      admin_legacy_link_to('Add Manual Payment', new_legacy_admin_payment_path(enrollment_id: @application.id), class: 'admin-btn-link')
+                      link_to('Add Financial Aid Request', new_admin_financial_aid_request_path(enrollment_id: @application.id), class: 'admin-btn-link'),
+                      link_to('Add Manual Payment', new_admin_payment_path(enrollment_id: @application.id), class: 'admin-btn-link')
                     ]) do %>
       <% unless @application.application_fee_required %>
         <p class="border-b border-amber-200 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-900">
@@ -138,7 +138,7 @@
         <tbody>
           <% @application.user.payments.current_camp_payments.each do |payment| %>
             <tr>
-              <td><%= admin_legacy_link_to payment.id, legacy_admin_payment_path(payment) %></td>
+              <td><%= link_to payment.id, admin_payment_path(payment) %></td>
               <td><%= payment.account_type.to_s.titleize %></td>
               <td><%= (Date.parse(payment.transaction_date) rescue payment.transaction_date) %></td>
               <td><%= transaction_status_message(payment.transaction_status) %></td>
@@ -157,7 +157,7 @@
           <tbody>
             <% @application.financial_aids.each do |financial_aid| %>
               <tr>
-                <td><%= admin_legacy_link_to 'view', legacy_admin_financial_aid_request_path(financial_aid) %></td>
+                <td><%= link_to 'view', admin_financial_aid_request_path(financial_aid) %></td>
                 <td><%= humanized_money_with_symbol(financial_aid.amount) %></td>
                 <td><%= admin_status_badge(financial_aid.status) %></td>
               </tr>

@@ -27,6 +27,18 @@ RSpec.describe 'Admin dashboard', type: :request do
     let!(:financial_aid) { create(:financial_aid, :pending, enrollment: enrollment) }
     let!(:campnote) { create(:campnote, opendate: 1.day.ago, closedate: 1.day.from_now, notetype: 'alert', note: 'Dorm check-in moved') }
 
+    it 'renders when a pending request or payment belongs to a user without applicant details' do
+      bare_user = create(:user)
+      bare_enrollment = create(:enrollment, :accepted, user: bare_user)
+      create(:financial_aid, :pending, enrollment: bare_enrollment)
+      create(:payment, user: bare_user, camp_year: bare_enrollment.campyear, transaction_status: '2')
+
+      get admin_root_path
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(bare_user.email)
+    end
+
     it 'renders the seven dashboard panels' do
       get admin_root_path
 

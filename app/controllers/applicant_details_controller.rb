@@ -1,19 +1,12 @@
 # frozen_string_literal: true
 
 ##
-# Controller handling applicant details management.
-# Provides CRUD operations for applicant information and requires authentication.
+# Applicant-facing applicant details (one record per account, owned by the signed-in user). The
+# admin listing lives in Admin::ApplicantDetailsController; applicant details are never destroyed.
 class ApplicantDetailsController < ApplicationController
   devise_group :logged_in, contains: %i[user admin]
   before_action :authenticate_logged_in!
-  before_action :authenticate_admin!, only: %i[index destroy]
-  before_action :set_applicant_detail, only: %i[show edit update destroy]
-
-  # GET /applicant_details
-  # GET /applicant_details.json
-  def index
-    @applicant_details = ApplicantDetail.all
-  end
+  before_action :set_applicant_detail, only: %i[show edit update]
 
   # GET /applicant_details/1
   # GET /applicant_details/1.json
@@ -71,31 +64,26 @@ class ApplicantDetailsController < ApplicationController
     end
   end
 
-  # DELETE /applicant_details/1
-  # DELETE /applicant_details/1.json
-  def destroy
-    @applicant_detail.destroy
-    respond_to do |format|
-      format.html { redirect_to applicant_details_url, notice: 'Applicant detail was successfully destroyed.', status: :see_other }
-      format.json { head :no_content }
-    end
-  end
-
   private
 
-  # Use callbacks to share common setup or constraints between actions.
+  # The record is always the signed-in applicant's own (the :id in the URL is not looked up);
+  # without one there is nothing to show or edit yet.
   def set_applicant_detail
-    @applicant_detail = current_user.applicant_detail
+    @applicant_detail = current_user&.applicant_detail
+    return if @applicant_detail
+
+    redirect_to new_applicant_detail_path, alert: 'Please fill in your applicant details first.', status: :see_other
   end
 
   def citizen_status
     'You are a US citizen' if @applicant_detail.us_citizen
   end
 
-  # Never trust parameters from the scary internet, only allow the white list through.
+  # The owner is always current_user (create_applicant_detail sets it); user_id is never taken
+  # from the form, so an applicant cannot re-home the record to another account on update.
   def applicant_detail_params
     params.require(:applicant_detail).permit(
-      :user_id, :firstname, :middlename, :lastname, :gender, :us_citizen,
+      :firstname, :middlename, :lastname, :gender, :us_citizen,
       :demographic_id, :demographic_other, :birthdate, :diet_restrictions,
       :shirt_size, :address1, :address2, :city, :state, :state_non_us,
       :postalcode, :country, :phone, :parentname, :parentaddress1, :parentaddress2,

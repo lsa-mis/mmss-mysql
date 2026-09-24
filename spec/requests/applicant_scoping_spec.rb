@@ -211,7 +211,57 @@ RSpec.describe 'Applicant-facing controllers scope records to the signed-in user
     end
   end
 
+  describe 'ApplicantDetailsController' do
+    it 'ignores a client-supplied user_id on update (the record stays with the signed-in applicant)' do
+      detail_a = user_a.applicant_detail
+
+      patch applicant_detail_path(detail_a), params: { applicant_detail: { city: 'Detroit', user_id: user_b.id } }
+
+      expect(response).to redirect_to(root_path)
+      detail_a.reload
+      expect(detail_a.city).to eq('Detroit')
+      expect(detail_a.user).to eq(user_a)
+      expect(user_b.reload.applicant_detail).to be_present
+    end
+
+    it 'ignores a client-supplied user_id on create' do
+      user_c = create(:user)
+      sign_in user_c
+      get root_path
+
+      attrs = attributes_for(:applicant_detail).except(:ensure_demographic)
+                                               .merge(gender: Gender.first.id.to_s, demographic_id: Demographic.first.id,
+                                                      parentemail: 'guardian-c@example.com', user_id: user_b.id)
+      post applicant_details_path, params: { applicant_detail: attrs }
+
+      expect(response).to redirect_to(root_path)
+      expect(user_c.reload.applicant_detail).to be_present
+      expect(ApplicantDetail.where(user_id: user_b.id).count).to eq(1)
+    end
+
+    it 'sends an applicant without details to the new form instead of failing' do
+      user_c = create(:user)
+      sign_in user_c
+      get root_path
+
+      get edit_applicant_detail_path(user_c)
+
+      expect(response).to redirect_to(new_applicant_detail_path)
+    end
+  end
+
   describe 'FinancialAidsController' do
+    it 'redirects an applicant without a current application instead of failing' do
+      user_c = create(:user, :with_applicant_detail)
+      sign_in user_c
+      get root_path
+
+      get new_financial_aid_path
+
+      expect(response).to redirect_to(root_path)
+      expect(flash[:alert]).to include('No current application')
+    end
+
     it "creates the request against the applicant's own enrollment whatever enrollment_id the form sends" do
       post financial_aids_path, params: { financial_aid: { enrollment_id: enrollment_b.id, note: 'help', adjusted_gross_income: 10_000 } }
 

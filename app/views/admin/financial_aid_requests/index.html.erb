@@ -1,0 +1,43 @@
+<% admin_page_title 'Financial Aid Requests', subtitle: "#{number_with_delimiter(@pagy.count)} #{'request'.pluralize(@pagy.count)} · #{current_scope.label}" %>
+<% admin_page_actions do %>
+  <%= admin_csv_link %>
+  <%= link_to 'New Financial Aid Request', new_admin_financial_aid_request_path, class: 'admin-btn-primary' %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-4">
+  <div class="grid gap-4 xl:col-span-3">
+    <%= admin_scope_tabs Admin::FinancialAidRequestsController::SCOPES, counts: @scope_counts %>
+
+    <%= admin_table @financial_aids, pagy: @pagy,
+                    batch_actions: Admin::FinancialAidRequestsController::BATCH_ACTIONS, batch_url: batch_admin_financial_aid_requests_path,
+                    actions: ->(aid) { [admin_financial_aid_request_path(aid), edit_admin_financial_aid_request_path(aid), admin_financial_aid_request_path(aid)] } do |t| %>
+      <% t.column :id, sort: true do |aid| %>
+        <%= link_to aid.id, admin_financial_aid_request_path(aid) %>
+      <% end %>
+      <% t.column 'Enrollment', sort: 'enrollment' do |aid| %>
+        <%= admin_financial_aid_applicant(aid.enrollment) %>
+      <% end %>
+      <% t.column 'AGI', sort: 'adjusted_gross_income' do |aid| %>
+        <%= admin_agi(aid.adjusted_gross_income) || admin_empty_value %>
+      <% end %>
+      <% t.column 'Supporting Doc' do |aid| %>
+        <%= admin_attachment_link(aid.taxform) %>
+      <% end %>
+      <% t.column 'Amount', sort: 'amount' do |aid| %>
+        <%= humanized_money_with_symbol(aid.amount) %>
+      <% end %>
+      <% t.column :source, sort: true %>
+      <% t.column :note do |aid| %>
+        <span class="block max-w-xs truncate" title="<%= aid.note %>"><%= aid.note.presence || admin_empty_value %></span>
+      <% end %>
+      <% t.column :status, sort: true do |aid| %>
+        <%= admin_status_badge(aid.status) %>
+      <% end %>
+      <% t.column :payments_deadline, sort: true %>
+    <% end %>
+  </div>
+
+  <div class="xl:col-span-1">
+    <%= admin_filter_form @filter, url: admin_financial_aid_requests_path %>
+  </div>
+</div>

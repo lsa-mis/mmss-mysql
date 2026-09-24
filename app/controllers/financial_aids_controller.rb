@@ -1,22 +1,13 @@
 # frozen_string_literal: true
 
+# Applicant-facing financial aid request form. Admin listing, awards and deletion live in
+# Admin::FinancialAidRequestsController.
 class FinancialAidsController < ApplicationController
   devise_group :logged_in, contains: [:user, :admin]
   before_action :authenticate_logged_in!
-  before_action :authenticate_admin!, only: [:index, :destroy]
 
   before_action :set_current_enrollment
-  before_action :set_financial_aid, only: [:show, :edit, :update, :destroy]
-
-  # GET /financial_aids
-  # GET /financial_aids.json
-  def index
-    if admin_signed_in?
-      @financial_aids = FinancialAid.all
-    else
-      @financial_aids = FinancialAid.where(enrollment_id: @current_enrollment)
-    end
-  end
+  before_action :set_financial_aid, only: [:show, :edit, :update]
 
   # GET /financial_aids/1
   # GET /financial_aids/1.json
@@ -54,7 +45,7 @@ class FinancialAidsController < ApplicationController
   def update
     respond_to do |format|
       if @financial_aid.update(financial_aid_params)
-        format.html { redirect_to payments_path, notice: 'Financial aid was successfully updated.', status: :see_other }
+        format.html { redirect_to all_payments_path, notice: 'Financial aid was successfully updated.', status: :see_other }
         format.json { render :show, status: :ok, location: @financial_aid }
       else
         format.html { render :edit, status: :unprocessable_content }
@@ -63,19 +54,14 @@ class FinancialAidsController < ApplicationController
     end
   end
 
-  # DELETE /financial_aids/1
-  # DELETE /financial_aids/1.json
-  def destroy
-    @financial_aid.destroy
-    respond_to do |format|
-      format.html { redirect_to financial_aids_url, notice: 'Financial aid was successfully destroyed.', status: :see_other }
-      format.json { head :no_content }
-    end
-  end
-
   private
+    # Every action works on the applicant's current application; without one (no application
+    # this camp year, or an admin-only session) there is nothing to request aid for.
     def set_current_enrollment
-      @current_enrollment = current_user.enrollments.current_camp_year_applications.last
+      @current_enrollment = current_user&.enrollments&.current_camp_year_applications&.last
+      return if @current_enrollment
+
+      redirect_to root_path, alert: 'No current application found for this camp year.', status: :see_other
     end
 
     # Use callbacks to share common setup or constraints between actions.

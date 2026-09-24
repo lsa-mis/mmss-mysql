@@ -1,0 +1,66 @@
+<%# locals: applicant_detail %>
+<%= admin_form_with model: applicant_detail,
+                    url: (applicant_detail.persisted? ? admin_applicant_detail_path(applicant_detail) : admin_applicant_details_path),
+                    class: 'grid gap-5' do |f| %>
+  <%= f.errors_summary %>
+
+  <div class="grid gap-5 xl:grid-cols-2">
+    <%= f.fieldset 'Applicant' do %>
+      <% if applicant_detail.new_record? %>
+        <%= f.input :user_id, as: :select, label: 'User', include_blank: 'Select a user', required: true,
+                              collection: admin_applicant_detail_user_options(applicant_detail),
+                              hint: 'Only accounts without applicant details are listed.' %>
+      <% else %>
+        <div>
+          <span class="admin-label">User</span>
+          <p class="mt-1 text-sm"><%= applicant_detail.user.email %></p>
+        </div>
+      <% end %>
+      <%= f.input :firstname, required: true %>
+      <%= f.input :middlename %>
+      <%= f.input :lastname, required: true %>
+      <%= f.input :gender, as: :select, collection: admin_gender_options, include_blank: 'Select', required: true %>
+      <%= f.input :us_citizen, label: 'US citizen' %>
+      <div data-controller="demographic-other" class="grid gap-4">
+        <%= f.input :demographic_id, as: :select, label: 'Demographic', collection: admin_demographic_options,
+                                     include_blank: 'Select', required: true, id: 'applicant_detail_demographic',
+                                     data: { action: 'change->demographic-other#toggleOtherField' } %>
+        <div data-demographic-other-target="otherfield">
+          <%= f.input :demographic_other, label: 'If Other, specify' %>
+        </div>
+      </div>
+      <%= f.input :birthdate, required: true %>
+      <%= f.input :diet_restrictions, as: :textarea, rows: 2 %>
+      <%= f.input :shirt_size, required: true %>
+    <% end %>
+
+    <div class="grid gap-5">
+      <%= f.fieldset 'Address' do %>
+        <%= f.input :address1, label: 'Address line 1', required: true %>
+        <%= f.input :address2, label: 'Address line 2' %>
+        <%= f.input :city, required: true %>
+        <%= f.input :state, as: :select, collection: us_states, include_blank: 'Select', required: true %>
+        <%= f.input :state_non_us, label: 'State / province (non-US)' %>
+        <%= f.input :postalcode, required: true %>
+        <%= f.input :country, as: :select, collection: country_options_with_priority, include_blank: 'Select', required: true %>
+        <%= f.input :phone, required: true %>
+      <% end %>
+
+      <%= f.fieldset 'Parent / guardian' do %>
+        <%= f.input :parentname, label: 'Name', required: true %>
+        <%= f.input :parentaddress1, label: 'Address line 1' %>
+        <%= f.input :parentaddress2, label: 'Address line 2' %>
+        <%= f.input :parentcity, label: 'City' %>
+        <%= f.input :parentstate, as: :select, label: 'State', collection: us_states, include_blank: 'Select' %>
+        <%= f.input :parentstate_non_us, label: 'State / province (non-US)' %>
+        <%= f.input :parentzip, label: 'Postal code' %>
+        <%= f.input :parentcountry, as: :select, label: 'Country', collection: country_options_with_priority, include_blank: 'Select' %>
+        <%= f.input :parentphone, label: 'Phone', required: true %>
+        <%= f.input :parentworkphone, label: 'Work phone' %>
+        <%= f.input :parentemail, as: :email, label: 'Email', required: true %>
+      <% end %>
+    </div>
+  </div>
+
+  <%= f.actions cancel: (applicant_detail.persisted? ? admin_applicant_detail_path(applicant_detail) : admin_applicant_details_path) %>
+<% end %>
