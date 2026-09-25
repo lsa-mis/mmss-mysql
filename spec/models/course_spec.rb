@@ -86,6 +86,25 @@ RSpec.describe Course, type: :model do
         expect(Course.open).not_to include(closed_course)
       end
     end
+
+    # Admin index/CSV use this scope so remaining_spaces and wait_list_count are select
+    # columns instead of two association queries per row. Wrong SQL would overstate seats.
+    describe '.with_seat_counts' do
+      let!(:course) { create(:course, camp_occurrence: camp_occurrence, available_spaces: 10) }
+
+      before do
+        create_list(:course_assignment, 2, course: course, wait_list: false)
+        create_list(:course_assignment, 3, course: course, wait_list: true)
+      end
+
+      it 'loads confirmed and wait-list counts as select attributes used by seat helpers' do
+        loaded = Course.with_seat_counts.find(course.id)
+
+        expect(loaded.confirmed_assignments_count).to eq(2)
+        expect(loaded.wait_list_count).to eq(3)
+        expect(loaded.remaining_spaces).to eq(8)
+      end
+    end
   end
 
   describe '#display_name' do
