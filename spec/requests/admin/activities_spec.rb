@@ -96,7 +96,7 @@ RSpec.describe 'Admin activities', type: :request do
       get new_admin_activity_path
 
       expect(response).to have_http_status(:ok)
-      expect(CGI.unescapeHTML(response.body)).to include('please use "Residential Stay"')
+      expect(response.body).to include_unescaped('please use "Residential Stay"')
       expect(response.body).to include('name="activity[camp_occurrence_id]"')
     end
   end
@@ -116,7 +116,7 @@ RSpec.describe 'Admin activities', type: :request do
       post admin_activities_path, params: { activity: { camp_occurrence_id: session.id, description: '' } }
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(CGI.unescapeHTML(response.body)).to include("Description can't be blank")
+      expect(response.body).to include_unescaped("Description can't be blank")
     end
   end
 

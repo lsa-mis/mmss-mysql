@@ -1,25 +1,15 @@
 # frozen_string_literal: true
 
+# Applicant-facing application form (one enrollment per camp year). The admin listing, status
+# changes and deletion live in Admin::ApplicationsController.
 class EnrollmentsController < ApplicationController
   include ApplicantState
 
-  devise_group :logged_in, contains: [:user, :admin]
-  before_action :authenticate_logged_in!
-  before_action :authenticate_admin!, only: [:index, :destroy]
+  before_action :authenticate_user!
 
-  before_action :set_current_enrollment, only: [:show, :edit, :update, :destroy]
+  before_action :set_current_enrollment, only: [:show, :edit, :update]
   before_action :set_course_sessions
   before_action :set_activities_sessions
-
-  # GET /enrollments
-  # GET /enrollments.json
-  def index
-    if admin_signed_in?
-      @enrollments = Enrollment.all
-    else
-      redirect_to root_path
-    end
-  end
 
   # GET /enrollments/1
   # GET /enrollments/1.json
@@ -88,23 +78,13 @@ class EnrollmentsController < ApplicationController
     end
   end
 
-  # DELETE /enrollments/1
-  # DELETE /enrollments/1.json
-  def destroy
-    @enrollment.destroy
-    respond_to do |format|
-      format.html { redirect_to enrollments_url, notice: 'Enrollment was successfully destroyed.', status: :see_other }
-      format.json { head :no_content }
-    end
-  end
-
   private
 
     # Use callbacks to share common setup or constraints between actions.
     def set_current_enrollment
       @current_enrollment = current_user.enrollments.current_camp_year_applications.last
       return if @current_enrollment.present?
-      redirect_to root_path, alert: "No current enrollment found.", status: :see_other and return if %i[show edit update destroy].include?(action_name.to_sym)
+      redirect_to root_path, alert: "No current enrollment found.", status: :see_other
     end
 
     def set_course_sessions
@@ -143,18 +123,18 @@ class EnrollmentsController < ApplicationController
       end
     end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
+    # The owner is always current_user (create goes through current_user.enrollments) and the
+    # admin-only columns (notes, application/offer status, partner program) are set through
+    # Admin::ApplicationsController, so none of them is accepted here.
     def enrollment_params
       params.require(:enrollment).permit(
-                          :user_id, :international, :high_school_name,
+                          :international, :high_school_name,
                           :high_school_address1, :high_school_address2,
                           :high_school_city, :high_school_state,
                           :high_school_non_us, :high_school_postalcode,
                           :high_school_country, :year_in_school,
                           :anticipated_graduation_year, :room_mate_request,
-                          :personal_statement, :shirt_size, :notes,
-                          :application_status, :offer_status,
-                          :partner_program, :transcript,
+                          :personal_statement, :shirt_size, :transcript,
                           :student_packet, :campyear, :camp_doc_form_completed,
                           :vaccine_record, :covid_test_record,
                           registration_activity_ids: [],

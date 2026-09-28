@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Applicant Activities = EnrollmentActivity records (activities an applicant selected). The
-# ActiveAdmin resource was registered `as: 'Applicant Activities'`, so the routes keep that name.
+# legacy admin registered the resource as 'Applicant Activities', so the routes keep that name.
 class Admin::ApplicantActivitiesController < Admin::BaseController
   before_action :set_applicant_activity, only: %i[show edit update destroy]
 

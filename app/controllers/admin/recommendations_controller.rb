@@ -86,7 +86,7 @@ class Admin::RecommendationsController < Admin::BaseController
     perform_batch_action(Recommendation.all, BATCH_ACTIONS, redirect_to_path: admin_recommendations_path)
   end
 
-  # "Resend request" (the ActiveAdmin show page's mail link). Admin-only POST; the public GET on
+  # "Resend request" (the show page's mail action). Admin-only POST; the public GET on
   # RecommendationsController was removed in the foundation PR.
   def send_request_email
     RecommendationMailer.with(recommendation: @recommendation).request_email.deliver_now

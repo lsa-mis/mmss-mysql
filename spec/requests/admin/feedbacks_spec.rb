@@ -166,8 +166,8 @@ RSpec.describe 'Admin feedbacks', type: :request do
       patch admin_feedback_path(feedback), params: { feedback: { genre: '', message: '' } }
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(CGI.unescapeHTML(response.body)).to include("Genre can't be blank")
-      expect(CGI.unescapeHTML(response.body)).to include("Message can't be blank")
+      expect(response.body).to include_unescaped("Genre can't be blank")
+      expect(response.body).to include_unescaped("Message can't be blank")
     end
 
     it 're-renders with errors when the message is too long' do

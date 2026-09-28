@@ -27,7 +27,10 @@
 #
 FactoryBot.define do
   factory :camp_configuration do
-    sequence(:camp_year) { |n| 2025 + n }
+    # Years start two above the current one so a default camp never collides with the
+    # :current_year / :next_year traits (or an enrollment's Date.current.year camp) on the unique
+    # camp_year index, whichever year the suite runs in.
+    sequence(:camp_year) { |n| Date.current.year + 1 + n }
 
     application_open { Date.new(camp_year, 1, 1) }
     application_close { Date.new(camp_year, 10, 31) }

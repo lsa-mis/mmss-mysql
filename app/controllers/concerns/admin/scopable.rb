@@ -25,7 +25,7 @@ module Admin::Scopable
   def current_scope = @current_scope
 
   # Counts are computed against the unscoped-but-filtered relation so the numbers reflect the
-  # active filters, the same way ActiveAdmin did.
+  # active filters.
   def scope_counts(relation, scopes)
     scopes.index_with { |scope| scope.apply(relation).count }
   end

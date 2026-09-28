@@ -188,7 +188,7 @@ RSpec.describe 'Faculties', type: :request do
       it 'displays student name' do
         get student_page_path(enrollment)
         if enrollment.applicant_detail
-          expect(CGI.unescapeHTML(response.body)).to include(enrollment.applicant_detail.full_name)
+          expect(response.body).to include_unescaped(enrollment.applicant_detail.full_name)
         end
       end
 

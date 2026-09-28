@@ -4,7 +4,7 @@ require 'csv'
 
 # CSV output for the admin.
 #
-# 1. Per-resource column sets (the ActiveAdmin `csv do ... end` block equivalent):
+# 1. Per-resource column sets:
 #
 #      EXPORT = Admin::CsvExport.define do
 #        column :updated_at
@@ -68,8 +68,12 @@ class Admin::CsvExport
   # the export. Such strings are prefixed with a single quote, the spreadsheet convention for
   # "this is text" (the quote is not displayed in the cell). Only strings are touched: numbers,
   # dates, booleans and Money are formatted by the exporter itself, so a negative balance
-  # (`-$25.00`) is never mangled.
-  FORMULA_PREFIX = /\A[=+\-@\t\r]/
+  # (`$-25.00`) is never mangled.
+  #
+  # Spreadsheets skip leading whitespace, control characters and Unicode format characters
+  # (zero-width space, BOM, bidi marks) before deciding whether a cell is a formula, so
+  # `" =1+1"` and `"\u200B=1+1"` are just as dangerous as `"=1+1"` and the guard skips them too.
+  FORMULA_PREFIX = /\A(?:\p{Space}|\p{Cf}|[\u0000-\u0008\u000E-\u001F])*[=+\-@\t\r]/
 
   def self.sanitize_cell(value)
     value.is_a?(String) && value.match?(FORMULA_PREFIX) ? "'#{value}" : value

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Declarative, hand-rolled filter objects for admin index pages (replaces Ransack).
+# Declarative, hand-rolled filter objects for admin index pages.
 #
 #   class Admin::ApplicationsFilter < Admin::Filter
 #     text :lastname, label: 'Last Name (Starts with)', match: :starts_with,

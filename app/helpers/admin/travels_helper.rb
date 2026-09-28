@@ -2,7 +2,7 @@
 
 module Admin::TravelsHelper
   # Sessions offered for the arrival/departure selects: active sessions for a new travel, the
-  # applicant's assigned sessions when editing (as in ActiveAdmin), plus the persisted value.
+  # applicant's assigned sessions when editing, plus the persisted value.
   def admin_travel_session_options(travel, current)
     sessions = if travel.persisted? && travel.enrollment
                  travel.enrollment.session_assignments.includes(:camp_occurrence).map { |assignment| assignment.camp_occurrence.description_with_month_and_day }
@@ -19,7 +19,7 @@ module Admin::TravelsHelper
     options
   end
 
-  # "%A, %d %b %Y" / "%I:%M %p", the formats the ActiveAdmin index used.
+  # "%A, %d %b %Y" / "%I:%M %p", the formats the legacy index used.
   def admin_travel_date(date) = date.present? ? show_date(date) : admin_empty_value
 
   def admin_travel_time(time) = time.present? ? show_time(time) : admin_empty_value

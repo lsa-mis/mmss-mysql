@@ -157,7 +157,6 @@
   <% end %>
 
   <h2 class= "section-header">Applicant School History</h2>
-    <%= form.text_field :user_id, hidden: true %>
 
   <div class="field">
     <%= form.hidden_field :campyear, value: current_camp_year %>
@@ -287,29 +286,6 @@
     </span>
   </p>
 
-  <% if admin_signed_in? %>
-  <h2>========== Administrative area ==========</h2>
-
-    <div class="field">
-      <%= form.label :notes %>
-      <%= form.text_area :notes %>
-    </div>
-
-    <div class="field">
-      <%= form.label :application_status %>
-      <%= form.select :application_status, applicant_status, {}, include_blank: "-- Please Select --" %>
-    </div>
-
-    <div class="field">
-      <%= form.label :offer_status %>
-      <%= form.select :offer_status, offer_status, {}, include_blank: "-- Please Select --" %>
-    </div>
-
-    <div class="field">
-      <%= form.label :partner_program %>
-      <%= form.text_field :partner_program %>
-    </div>
-  <% end %>
     <div class="actions">
       <% if enrollment.new_record? %>
         <%= form.submit "Submit Application", data: { disable_with: "Please wait..." } %>

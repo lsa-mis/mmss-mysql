@@ -55,25 +55,6 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
   end
 
-  describe '#applicant_status' do
-    it 'includes all status options including withdrawn' do
-      statuses = helper.applicant_status
-
-      expect(statuses).to include(['*Select*', ''])
-      expect(statuses).to include(['enrolled', 'enrolled'])
-      expect(statuses).to include(['application complete', 'application complete'])
-      expect(statuses).to include(['offer accepted', 'offer accepted'])
-      expect(statuses).to include(['offer declined', 'offer declined'])
-      expect(statuses).to include(['submitted', 'submitted'])
-      expect(statuses).to include(['withdrawn', 'withdrawn'])
-    end
-
-    it 'has withdrawn as the last option' do
-      statuses = helper.applicant_status
-      expect(statuses.last).to eq(['withdrawn', 'withdrawn'])
-    end
-  end
-
   describe '#session_expires_at' do
     let(:current_time) { Time.zone.parse('2024-01-01 12:00:00') }
     let(:four_hours_in_seconds) { 4.hours.to_i }

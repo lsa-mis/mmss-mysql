@@ -341,7 +341,7 @@ RSpec.describe PaymentsController, type: :request do
     end
   end
 
-  describe 'payment_receipt when only admin is signed in (no applicant user session)' do
+  describe 'payment_receipt when only an admin is signed in (no applicant user session)' do
     let(:admin) { create(:admin) }
 
     before do
@@ -352,10 +352,12 @@ RSpec.describe PaymentsController, type: :request do
       allow_any_instance_of(Payment).to receive(:set_status).and_return(nil)
     end
 
-    it 'redirects to all_payments_path, not user sign-in' do
+    it 'records the payment for the order number owner and sends the browser to the applicant sign-in' do
       get payment_receipt_path, params: nelnet_receipt_params('transactionId' => 'admin-session-only-1')
-      expect(response).to redirect_to(all_payments_path)
-      expect(response.location).not_to include('users/sign_in')
+      # The admin session is not an applicant session, so the receipt page (all_payments_path)
+      # would only redirect again; go straight to the applicant sign-in with the notice.
+      expect(response).to redirect_to(new_user_session_path)
+      expect(flash[:notice]).to eq('Your payment was successfully recorded')
       payment = Payment.find_by(transaction_id: 'admin-session-only-1')
       expect(payment).to be_present
       expect(payment.user_id).to eq(user.id)

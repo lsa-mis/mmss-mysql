@@ -4,8 +4,7 @@
 # Applicant-facing applicant details (one record per account, owned by the signed-in user). The
 # admin listing lives in Admin::ApplicantDetailsController; applicant details are never destroyed.
 class ApplicantDetailsController < ApplicationController
-  devise_group :logged_in, contains: %i[user admin]
-  before_action :authenticate_logged_in!
+  before_action :authenticate_user!
   before_action :set_applicant_detail, only: %i[show edit update]
 
   # GET /applicant_details/1

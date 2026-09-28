@@ -5,7 +5,7 @@
 # Creating an account requires a password; editing one must not, so an admin can change an
 # email address without resetting the password. When both password fields are blank on
 # update they are dropped from the attributes so Devise's `validatable` does not run the
-# password validations (ActiveAdmin's Users controller did the same in its `update` override).
+# password validations.
 module Admin::DeviseAccountParams
   extend ActiveSupport::Concern
 

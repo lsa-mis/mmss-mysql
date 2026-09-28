@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# Financial Aid Requests = FinancialAid records (the ActiveAdmin resource was registered
-# `as: 'Financial Aid Request'`). The award logic lives in the model: saving with status
+# Financial Aid Requests = FinancialAid records (the legacy admin registered the resource
+# as 'Financial Aid Request'). The award logic lives in the model: saving with status
 # `awarded`/`rejected` emails the applicant and may auto-enroll (FinancialAid#send_status_watch_email),
 # and the validations require a deadline and an amount for anything but a pending request.
 class Admin::FinancialAidRequestsController < Admin::BaseController

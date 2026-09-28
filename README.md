@@ -29,7 +29,7 @@ A Ruby on Rails application for managing summer camp applications, enrollments, 
 - **Financial aid** — Aid requests, amounts, status, and payment deadlines
 - **Recommendations** — Request and upload recommendation letters; email-based workflow
 - **Payments** — Payment flows and receipts (integration with external payment provider)
-- **Admin** — Plain Rails `Admin::` MVC at `/admin` (dashboard, 26 resources in four menu groups, 18 CSV reports, comments on records); ActiveAdmin has been removed and `/legacy_admin` redirects to `/admin`
+- **Admin** — Plain Rails `Admin::` MVC at `/admin` (dashboard, 26 resources in four menu groups, 18 CSV reports, comments on records, CSV exports with a formula-injection guard); `/legacy_admin` bookmarks redirect to `/admin`
 - **Faculty interface** — Faculty login and student list/student page views
 - **Maintenance mode** — Rack middleware (`lib/middleware/maintenance_mode.rb`) serves `public/maintenance.html` while `tmp/maintenance.yml` exists on the server
 
@@ -40,16 +40,18 @@ A Ruby on Rails application for managing summer camp applications, enrollments, 
 
 | Layer            | Technology                                                       |
 | ---------------- | ---------------------------------------------------------------- |
-| **Runtime**      | Ruby 4.0.6                                                       |
-| **Framework**    | Rails 8.1.3.1 (`config.load_defaults 8.1`)                       |
+| **Runtime**      | Ruby 4.0.6 (`.ruby-version`, `.tool-versions`, `Gemfile`), Bundler 4 |
+| **Framework**    | Rails 8.1 (`config.load_defaults 8.1`); no Node.js anywhere      |
 | **Database**     | MySQL 8 (mysql2 gem), utf8mb4                                    |
-| **Auth**         | Devise (users, admins, faculties)                                |
-| **Admin**        | `Admin::` namespace (Tailwind 4 layout, Pagy, hand-rolled filters, `Admin::CsvExport`, `Admin::Reports`) |
+| **Auth**         | Devise (users, admins, faculties); admins sign in at `/admin/login` |
+| **Admin**        | `Admin::` namespace (`Admin::BaseController`, per-resource filters, scopes, Pagy pagination, batch actions, `Admin::CsvExport`, `Admin::Reports` SQL reports, `Admin::Comment`) |
 | **Server**       | Puma 8 (systemd notify built in)                                 |
-| **Assets**       | Propshaft (digests + serves `app/assets/builds`, `app/assets/images`, importmap modules), importmap-rails, Hotwire (Turbo Drive + Stimulus), Tailwind CSS 4 (tailwindcss-rails; `application.css` + `admin.css` bundles), Flatpickr |
+| **Assets**       | Propshaft (digests + serves `app/assets/builds`, `app/assets/images`, importmap modules), importmap-rails, Hotwire (Turbo Drive + Stimulus), Tailwind CSS 4 (tailwindcss-rails; `tailwind.css` + `admin.css` bundles), Flatpickr |
+| **Money**        | money-rails 3 / money 7 (`monetize` columns, USD)                |
 | **File storage** | Active Storage (local disk / Google Cloud Storage in production) |
 | **Monitoring**   | Skylight, Sentry                                                 |
-| **Deployment**   | Capistrano 3, asdf                                               |
+| **Testing / CI** | RSpec, FactoryBot, Capybara + Selenium; GitHub Actions (`.github/workflows/ci.yml`) |
+| **Deployment**   | Production: Capistrano 3 + asdf on a UM host. Staging: Hatchbox (DigitalOcean) |
 
 
 ---
@@ -134,11 +136,28 @@ Uses local disk (`storage/`, `tmp/storage`).
 - **Production**  
 Configured for Google Cloud Storage (GCS). A GCS keyfile is expected. Bucket and project are set in `config/storage.yml`.
 
+### Hosts, SSL and health checks (production and staging)
+
+Both deployed environments run behind a TLS-terminating proxy, so `config.assume_ssl` and
+`config.force_ssl` are on, and `ActionDispatch::HostAuthorization` only answers the public hostname:
+`mmss-registration.math.lsa.umich.edu` (production) and `mmss-registration-staging.lsa.umich.edu`
+(staging). Any other `Host` header gets a 403 and a `Blocked hosts:` log line. To serve additional
+names (the cluster's internal node names, a load-balancer IP, a Hatchbox preview host) set
+
+```bash
+RAILS_ALLOWED_HOSTS=mathmmssapp2.miserver.it.umich.edu,.internal.umich.edu   # comma-separated; leading dot = any subdomain
+```
+
+in the service environment and restart Puma; no deploy is needed (`lib/allowed_hosts.rb`). `/up`
+(the Rails health check) is exempt and is served for any host, so monitors can address the node
+directly. Staging also still reads the legacy `STAGING_ALLOWED_HOSTS` variable.
+
 ### Optional services
 
 - **Skylight** — Set `SKYLIGHT_AUTHENTICATION` or use credentials for production/staging.
-- **Sentry** — Configure in `config/initializers/sentry.rb` and via Sentry DSN.
-- **Redis** — Optional; Action Cable uses `REDIS_URL` (default `redis://localhost:6379/1`).
+- **Sentry** — DSN from credentials (`sentry.dsn`); options in `config/initializers/sentry.rb`.
+- **Redis** — Only referenced by `config/cable.yml` in production (`REDIS_URL`); the app defines no
+  Action Cable channels, so nothing connects unless one is added.
 
 ---
 
@@ -150,10 +169,12 @@ Configured for Google Cloud Storage (GCS). A GCS keyfile is expected. Bucket and
    bin/dev
   ```
    `bin/dev` runs `Procfile.dev` through foreman (installed on first use):
-   `bin/rails server` on port 3000 plus `bin/rails tailwindcss:watch`, which
-   rebuilds `app/assets/builds/tailwind.css` whenever `app/assets/tailwind/`
-   or the views change. Without the watcher, run `bin/rails tailwindcss:build`
-   once after editing styles and start `bin/rails server` on its own.
+   `bin/rails server` on port 3000 plus the two Tailwind watchers
+   (`tailwindcss:watch` for the applicant/faculty bundle, `tailwindcss:watch:admin`
+   for `admin.css`), which rebuild `app/assets/builds/*.css` whenever
+   `app/assets/tailwind/` or the views change. Without the watchers, run
+   `bin/rails tailwindcss:build` once after editing styles and start
+   `bin/rails server` on its own.
    Default: [http://localhost:3000](http://localhost:3000)
 3. **Useful URLs (development)**
   - Root: `/`
@@ -175,34 +196,53 @@ Configured for Google Cloud Storage (GCS). A GCS keyfile is expected. Bucket and
   RAILS_ENV=test bin/rails db:create db:schema:load
   RAILS_ENV=test bin/rails tailwindcss:build
   ```
-  System specs (`spec/system`) drive headless Chrome through Selenium.
+  System specs (`spec/system`) drive headless Chrome through Selenium
+  (`SHOW_BROWSER=1` for a visible browser). CI runs everything except the
+  system specs on every pull request against a MySQL 8 service
+  (`.github/workflows/ci.yml`). Conventions and layout: [TESTING_STRATEGY.md](TESTING_STRATEGY.md);
+  production log forensics: [LOG_INVESTIGATION_GUIDE.md](LOG_INVESTIGATION_GUIDE.md).
 - **Code style (Standard Ruby)**
   ```bash
-  bundle exec standardrb
+  bundle exec standardrb          # not enforced in CI yet; see TESTING_STRATEGY.md
   ```
 
 ---
 
 ## Deployment
 
-### Production (Capistrano + asdf)
+Work lands on `staging` (pull requests, CI), is verified on the staging host, and is then promoted
+to `main`, which production deploys from.
+
+### Production (Capistrano + asdf, UM cluster)
 
 - **Repo**: `git@github.com:lsa-mis/mmss-mysql.git`
 - **Branch**: `main`
-- **Server**: `config/deploy/production.rb` (e.g. `mathmmssapp2.miserver.it.umich.edu`), roles: app, db, web.
+- **Server**: `config/deploy/production.rb` (e.g. `mathmmssapp2.miserver.it.umich.edu`), roles: app, db, web; app lives in `/home/deployer/apps/mmss-mysql`.
 - **Linked files** (must exist in shared config on the server):  
 `config/puma.rb`, `config/nginx.conf`, `config/master.key`, `config/lsa-was-base-c096c776ead3.json`, `mysql/InCommon.CA.crt`
 
+Deploy steps:
+
 ```bash
-bundle exec cap production deploy
-bundle exec cap production deploy:upload
+# 1. once per Ruby bump, on the host as deployer (see below)
+asdf install ruby 4.0.6 && asdf reshim ruby
+
+# 2. from your machine, with main checked out and pushed
+bundle exec cap production deploy          # check_revision, bundle, assets:precompile, db:migrate, puma:restart
+bundle exec cap production deploy:upload   # only when a linked config file changed (puma.rb, nginx.conf, master.key, GCS key, CA cert)
+
+# operations
 bundle exec cap production puma:restart
 bundle exec cap production puma:stop
-bundle exec cap production maintenance:start
+bundle exec cap production maintenance:start   # tmp/maintenance.yml from config/maintenance_template.yml
 bundle exec cap production maintenance:stop
+bundle exec cap production rubygems:update
 ```
 
-Before deploy, `deploy:check_revision` ensures local HEAD matches `origin/main`.
+Before deploy, `deploy:check_revision` ensures local HEAD matches `origin/main`. Migrations run
+through capistrano-rails (`deploy:migrate`, db role) whenever `db/migrate` changed. Puma's
+environment (systemd unit, see `config/puma_prod.service`) is where `RAILS_ALLOWED_HOSTS`,
+`RAILS_LOG_LEVEL` and `RAILS_MAX_THREADS` go.
 
 The host provides Ruby through asdf (`capistrano-asdf` reads `.tool-versions`, and
 `config/deploy.rb` points `bundle`/`ruby` at `/home/deployer/.asdf/shims`). Install the
@@ -228,9 +268,18 @@ the linked `public/assets` directory.
 
 ### Staging (Hatchbox + DigitalOcean)
 
-Use a **separate Hatchbox app** (or equivalent) with the `**staging` git branch** and a **deploy webhook** so merges to `staging` trigger a deploy. Set `**RAILS_ENV=staging`** in the Hatchbox environment so Rails loads `[config/environments/staging.rb](config/environments/staging.rb)` (local Active Storage, `letter_opener_web`, no GCS keyfile).
+Hatchbox builds the app from the repository: it reads `.ruby-version`, runs `bundle install` and
+`bin/rails assets:precompile` (Tailwind via the bundled standalone binary, then Propshaft), and runs
+the release command. Set it up as a **separate Hatchbox app** on the **`staging` branch** with a
+**deploy webhook**, so every merge to `staging` deploys, and:
 
-**Suggested environment variables**
+1. `RAILS_ENV=staging` so Rails loads [config/environments/staging.rb](config/environments/staging.rb)
+   (local Active Storage, `letter_opener_web`, no GCS keyfile, HTTP basic auth on `/letter_opener`).
+2. Release command: `bin/rails db:migrate`.
+3. Process: the root [Procfile](Procfile) (`bundle exec puma -C config/puma.default.rb`, binds `$PORT`).
+4. The environment variables below.
+
+**Environment variables**
 
 
 | Variable                                                                      | Purpose                                                                                                                                                                        |
@@ -241,12 +290,12 @@ Use a **separate Hatchbox app** (or equivalent) with the `**staging` git branch*
 | `DATABASE_URL`                                                                | MySQL URL from Hatchbox / DigitalOcean (e.g. `mysql2://user:pass@host:3306/dbname`) — **or** omit and set `STAGING_DATABASE_`* in `[config/database.yml](config/database.yml)` |
 | `STAGING_MAILER_HOST`                                                         | Public hostname for mailer URLs (e.g. `staging.example.edu`)                                                                                                                   |
 | `STAGING_MAILER_PROTOCOL`                                                     | Usually `https`                                                                                                                                                                |
-| `STAGING_ALLOWED_HOSTS`                                                       | Comma-separated hosts if `ActionDispatch::HostAuthorization` blocks the real hostname                                                                                          |
+| `RAILS_ALLOWED_HOSTS`                                                         | Extra comma-separated hostnames for `ActionDispatch::HostAuthorization` (the public hostname is built in; `STAGING_ALLOWED_HOSTS` still works as a legacy alias)              |
 | `LETTER_OPENER_WEB_HTTP_BASIC_USER` / `LETTER_OPENER_WEB_HTTP_BASIC_PASSWORD` | Optional HTTP basic auth for `/letter_opener`                                                                                                                                  |
 | `RAILS_SERVE_STATIC_FILES`                                                    | Set if the app serves static files without nginx in front                                                                                                                      |
+| `STAGING_FORCE_SSL`                                                           | Defaults to `true` (HTTPS, secure cookies, `assume_ssl`); set `false` only for a plain-HTTP staging box                                                                        |
+| `RAILS_LOG_TO_STDOUT`                                                         | Set so Hatchbox collects the logs                                                                                                                                              |
 
-
-The root `[Procfile](Procfile)` runs Puma with `[config/puma.default.rb](config/puma.default.rb)` (binds to `$PORT`). For local development use `bin/dev` (Rails server + Tailwind watcher from `Procfile.dev`).
 
 ---
 
@@ -256,6 +305,8 @@ The root `[Procfile](Procfile)` runs Puma with `[config/puma.default.rb](config/
 | Path                        | Purpose                                                                                 |
 | --------------------------- | --------------------------------------------------------------------------------------- |
 | `app/`                      | Models, controllers, views, mailers, helpers; the admin lives in `app/{controllers,views,helpers,filters,lib,queries}/admin/` |
+| `lib/allowed_hosts.rb`      | Host allow-list for production/staging (`RAILS_ALLOWED_HOSTS`)                          |
+| `lib/middleware/`           | `MaintenanceMode` and the staging `LetterOpenerWebBasicAuth` Rack middleware             |
 | `app/javascript/`           | Import-map entry point (`application.js`) and Stimulus controllers                      |
 | `app/assets/tailwind/`      | Tailwind 4 CSS-first config and app styles, built to `app/assets/builds/tailwind.css`   |
 | `config/importmap.rb`       | JavaScript import map pins; `bin/importmap pin <pkg>` vendors into `vendor/javascript/` |
@@ -263,7 +314,7 @@ The root `[Procfile](Procfile)` runs Puma with `[config/puma.default.rb](config/
 | `Procfile` / `Procfile.dev` | Puma on `$PORT` for PaaS; local Rails server + Tailwind watcher (`bin/dev`)             |
 | `config/puma.default.rb`    | Portable Puma (Hatchbox / DO); production Capistrano still uses linked `config/puma.rb` |
 | `db/`                       | Schema, migrations, seeds                                                               |
-| `lib/capistrano/tasks/`     | Custom Capistrano tasks                                                                 |
+| `config/deploy.rb`          | Capistrano (production): puma, maintenance, rubygems and debug tasks                    |
 | `spec/`                     | RSpec tests and support                                                                 |
 | `config/storage.yml`        | Active Storage backends (local, GCS)                                                    |
 

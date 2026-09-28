@@ -1,3 +1,5 @@
+require_relative "../../lib/allowed_hosts"
+
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
@@ -18,6 +20,9 @@ Rails.application.configure do
   # STAGING_FORCE_SSL=false runs staging over plain HTTP; the session cookie must then not be
   # marked Secure, or browsers would never send it back and every request would look logged out.
   staging_force_ssl = ActiveModel::Type::Boolean.new.cast(ENV.fetch("STAGING_FORCE_SSL", "true"))
+  # Hatchbox terminates TLS at its proxy; treat every request as HTTPS (secure cookies, https
+  # URLs) whenever staging runs over SSL at all.
+  config.assume_ssl = staging_force_ssl
   config.force_ssl = staging_force_ssl
   config.ssl_options = {redirect: {exclude: ->(request) { request.path == "/up" }}}
 
@@ -48,12 +53,11 @@ Rails.application.configure do
 
   config.active_record.dump_schema_after_migration = false
 
-  # HostAuthorization behind reverse proxies: set STAGING_ALLOWED_HOSTS=comma,separated,hosts
-  if (hosts = ENV["STAGING_ALLOWED_HOSTS"].presence)
-    hosts.split(",").map(&:strip).reject(&:empty?).each do |host|
-      config.hosts << host
-    end
-  end
+  # Host header protection: the public staging hostname plus RAILS_ALLOWED_HOSTS (comma-separated;
+  # STAGING_ALLOWED_HOSTS is still read for Hatchbox apps configured before the rename). /up stays
+  # reachable from any host for health checks. See lib/allowed_hosts.rb.
+  AllowedHosts.configure(config, "mmss-registration-staging.lsa.umich.edu",
+    env_keys: [AllowedHosts::ENV_KEY, "STAGING_ALLOWED_HOSTS"])
 
   require Rails.root.join("lib/middleware/letter_opener_web_basic_auth")
   config.middleware.use LetterOpenerWebBasicAuth

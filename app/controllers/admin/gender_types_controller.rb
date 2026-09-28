@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Gender Types = Gender records (the ActiveAdmin resource was registered `as: 'Gender Types'`).
+# Gender Types = Gender records (the legacy admin registered the resource as 'Gender Types').
 class Admin::GenderTypesController < Admin::BaseController
   before_action :set_gender_type, only: %i[show edit update destroy]
 

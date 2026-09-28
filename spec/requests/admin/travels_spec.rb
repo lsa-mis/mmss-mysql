@@ -113,7 +113,7 @@ RSpec.describe 'Admin travels', type: :request do
       expect(response.body).to include('Showing <span class="font-medium">31</span>–<span class="font-medium">33</span>')
     end
 
-    it 'exports the ActiveAdmin CSV columns with formatted dates and times' do
+    it 'exports the legacy CSV columns with formatted dates and times' do
       get admin_travels_path(format: :csv)
 
       expect(response.media_type).to eq('text/csv')
@@ -171,7 +171,7 @@ RSpec.describe 'Admin travels', type: :request do
       post admin_travels_path, params: { travel: { enrollment_id: enrollment.id, arrival_session: '', depart_session: session_label } }
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(CGI.unescapeHTML(response.body)).to include("Arrival session can't be blank")
+      expect(response.body).to include_unescaped("Arrival session can't be blank")
     end
   end
 
@@ -187,7 +187,7 @@ RSpec.describe 'Admin travels', type: :request do
       body = response.body
       expect(body).to include(assigned.description_with_month_and_day)
       expect(body).to include('<option selected="selected" value="Old Session: June 01 to June 08">')
-      # Active-but-unassigned sessions are not offered when editing (as in ActiveAdmin): the active
+      # Active-but-unassigned sessions are not offered when editing (as in the legacy admin): the active
       # session only appears as the persisted depart_session option.
       expect(body.scan(%(value="#{session_label}")).size).to eq(1)
       expect(body).to include('<option selected="selected" value="Train">Train</option>')

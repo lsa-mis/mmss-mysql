@@ -3,8 +3,7 @@
 # Select options for the "Enrollment" / "Applicant" pickers shared by the Applicant Info and
 # Money resources (course assignments, session selections, travels, financial aid, payments, ...):
 # current-year applications labelled "Lastname, Firstname - email", alphabetically. Loaded in one
-# query per render (the ActiveAdmin collections called `display_name` per row, which was two
-# queries each).
+# query per render (calling `display_name` per row would cost two queries each).
 #
 # `include:` keeps a record's persisted enrollment selectable when it belongs to an older camp
 # year, so editing an old record does not silently clear the association.

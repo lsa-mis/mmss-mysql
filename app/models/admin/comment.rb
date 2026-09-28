@@ -20,10 +20,10 @@
 #  index_admin_comments_on_namespace                      (namespace)
 #  index_admin_comments_on_resource_type_and_resource_id  (resource_type,resource_id)
 #
-# Admin comments on any admin-managed record. The table is the former ActiveAdmin
+# Admin comments on any admin-managed record. The table is the legacy admin's
 # `active_admin_comments` table, renamed so the existing comments survived the cutover.
 #
-# `namespace` is a leftover of ActiveAdmin, which scoped comments per admin namespace: rows
+# `namespace` is a leftover of the legacy admin, which scoped comments per admin namespace: rows
 # written before the cutover carry 'admin' (or 'legacy_admin' from the side-by-side period). The
 # new admin writes NAMESPACE and reads every namespace, so nothing is hidden. The column stays
 # (and stays NOT blank) only so old rows keep their provenance; nothing filters on it.
@@ -33,7 +33,7 @@ class Admin::Comment < ApplicationRecord
   NAMESPACE = 'admin'
 
   # Models that accept admin comments (they must `include AdminCommentable`). Add an entry when
-  # porting a resource whose ActiveAdmin show page rendered `active_admin_comments`. Lambdas keep
+  # a resource's show page renders the comments partial. Lambdas keep
   # autoloading lazy, and looking classes up here means user input is never constantized.
   COMMENTABLE_MODELS = {
     'Enrollment' => -> { Enrollment },

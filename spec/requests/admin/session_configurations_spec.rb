@@ -103,7 +103,7 @@ RSpec.describe 'Admin session configurations', type: :request do
       post admin_session_configurations_path, params: { camp_occurrence: { description: '', camp_configuration_id: camp.id } }
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(CGI.unescapeHTML(response.body)).to include("Description can't be blank")
+      expect(response.body).to include_unescaped("Description can't be blank")
     end
   end
 

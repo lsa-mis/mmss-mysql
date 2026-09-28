@@ -44,7 +44,7 @@ RSpec.describe 'Admin::BaseController authentication', type: :request do
     end
   end
 
-  describe 'after the ActiveAdmin cutover' do
+  describe 'after the legacy admin cutover' do
     it 'redirects the former /legacy_admin URLs to the new admin' do
       get '/legacy_admin'
       expect(response).to redirect_to('/admin')
@@ -62,7 +62,7 @@ RSpec.describe 'Admin::BaseController authentication', type: :request do
       expect(response).to have_http_status(:not_found)
     end
 
-    it 'defines no legacy_admin route helpers or ActiveAdmin routes' do
+    it 'defines no legacy_admin route helpers or legacy admin engine routes' do
       helpers = Rails.application.routes.named_routes.names.map(&:to_s)
       expect(helpers.grep(/legacy_admin/)).to be_empty
 

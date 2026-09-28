@@ -3,8 +3,7 @@
 # Applicant-facing financial aid request form. Admin listing, awards and deletion live in
 # Admin::FinancialAidRequestsController.
 class FinancialAidsController < ApplicationController
-  devise_group :logged_in, contains: [:user, :admin]
-  before_action :authenticate_logged_in!
+  before_action :authenticate_user!
 
   before_action :set_current_enrollment
   before_action :set_financial_aid, only: [:show, :edit, :update]
@@ -56,9 +55,9 @@ class FinancialAidsController < ApplicationController
 
   private
     # Every action works on the applicant's current application; without one (no application
-    # this camp year, or an admin-only session) there is nothing to request aid for.
+    # this camp year) there is nothing to request aid for.
     def set_current_enrollment
-      @current_enrollment = current_user&.enrollments&.current_camp_year_applications&.last
+      @current_enrollment = current_user.enrollments.current_camp_year_applications.last
       return if @current_enrollment
 
       redirect_to root_path, alert: 'No current application found for this camp year.', status: :see_other
@@ -69,16 +68,10 @@ class FinancialAidsController < ApplicationController
       @financial_aid = @current_enrollment.financial_aids.find(params[:id])
     end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
+    # The enrollment is always the applicant's current one (set_current_enrollment); never take it
+    # from the form. Award fields (amount, source, status, deadline) are admin-only and set through
+    # Admin::FinancialAidRequestsController.
     def financial_aid_params
-      # The enrollment is always the applicant's current one (set_current_enrollment); never take it from the form.
-      permitted = [:note, :adjusted_gross_income]
-
-      # Only allow admin-only fields if user is an admin
-      if admin_signed_in?
-        permitted += [:amount_cents, :source, :status, :payments_deadline]
-      end
-
-      params.require(:financial_aid).permit(*permitted)
+      params.require(:financial_aid).permit(:note, :adjusted_gross_income)
     end
 end

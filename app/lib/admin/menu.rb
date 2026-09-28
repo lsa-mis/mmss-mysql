@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# Sidebar navigation for the admin layout. Mirrors the four menu groups of the former ActiveAdmin
-# navigation. Each item names a route helper.
+# Sidebar navigation for the admin layout: four menu groups (Applicant Info, Camp Setup, Logins
+# Info, Reports). Each item names a route helper.
 class Admin::Menu
   Item = Struct.new(:label, :route, :match, keyword_init: true)
   Group = Struct.new(:label, :items, keyword_init: true)

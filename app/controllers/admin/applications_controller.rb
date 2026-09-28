@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-# Applications = Enrollment records (the ActiveAdmin resource was registered `as: 'Application'`).
+# Applications = Enrollment records (the legacy admin registered the resource as 'Application').
 # Reference implementation for porting resources: filters, scopes, sorting, pagination, CSV,
 # batch actions, comments, admin-only member actions and a custom update flow (withdrawal).
 #
 # There is deliberately no new/create: applicants create their own enrollment through the public
-# flow (session/course registrations, transcript), and the ActiveAdmin form never satisfied the
+# flow (session/course registrations, transcript), and the legacy admin form never satisfied the
 # model validations either.
 class Admin::ApplicationsController < Admin::BaseController
   before_action :set_application, except: %i[index batch]
@@ -94,7 +94,7 @@ class Admin::ApplicationsController < Admin::BaseController
     perform_batch_action(Enrollment.all, BATCH_ACTIONS, redirect_to_path: admin_applications_path)
   end
 
-  # --- Member actions (the ActiveAdmin show-page "action items") ---
+  # --- Member actions (the show-page action buttons) ---
 
   def waitlist
     @application.transition_application_status!('waitlisted')

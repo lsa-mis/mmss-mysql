@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# CSV reports (the ActiveAdmin "Reports" page). The index lists every registered report; `show`
+# CSV reports. The index lists every registered report; `show`
 # streams one as CSV. The only inputs are the report key (looked up in Admin::Reports, never used
 # to build SQL) and an optional camp year, which must match a CampConfiguration row; anything else
 # is rejected with a redirect back to the index.

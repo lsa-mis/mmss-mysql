@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 class CoursePreferencesController < ApplicationController
-  devise_group :logged_in, contains: [:user, :admin]
-  before_action :authenticate_logged_in!
+  before_action :authenticate_user!
 
   before_action :set_current_enrollment, except: [:show]
   before_action :prepare_show, only: [:show]

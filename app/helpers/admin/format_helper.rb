@@ -37,7 +37,7 @@ module Admin::FormatHelper
     value.blank? ? admin_empty_value : value.in_time_zone.strftime('%b %-d, %Y %-l:%M %p')
   end
 
-  # Cents (Integer or numeric String) to a currency string, matching the ActiveAdmin views.
+  # Cents (Integer or numeric String) to a currency string, matching the legacy admin views.
   def admin_money_from_cents(cents)
     return admin_empty_value if cents.blank?
 

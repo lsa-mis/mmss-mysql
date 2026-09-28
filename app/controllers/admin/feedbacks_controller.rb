@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Feedback submitted by applicants from the public site. No new/create: feedback is written by
-# applicants (the ActiveAdmin form never permitted user_id, so it could not save either).
+# applicants (the legacy admin form never permitted user_id, so it could not save either).
 class Admin::FeedbacksController < Admin::BaseController
   before_action :set_feedback, only: %i[show edit update destroy]
 

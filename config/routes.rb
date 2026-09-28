@@ -42,15 +42,15 @@ Rails.application.routes.draw do
       end
     end
 
-    # Money: financial_aid_requests = FinancialAid (the ActiveAdmin resource name). Applicant details
-    # and payments had no destroy in ActiveAdmin either (payments are financial records).
+    # Money: financial_aid_requests = FinancialAid (the legacy admin's resource name). Applicant details
+    # and payments have no destroy (payments are financial records).
     resources :applicant_details, except: :destroy
     resources :financial_aid_requests, controller: 'financial_aid_requests' do
       collection { post :batch }
     end
     resources :payments, except: :destroy
 
-    # Applicant Info (models named after their ActiveAdmin resource where they differ; the
+    # Applicant Info (models named after their legacy admin resource where they differ; the
     # controllers keep the model): session_selections = SessionActivity,
     # applicant_activities = EnrollmentActivity.
     resources :course_assignments do
@@ -133,7 +133,7 @@ Rails.application.routes.draw do
     end
   end
 
-  # ActiveAdmin used to run at /legacy_admin during the cutover. Old bookmarks land on the new
+  # The legacy admin ran at /legacy_admin during the cutover. Old bookmarks land on the new
   # admin's dashboard (the legacy URL structure does not map 1:1 onto the new routes).
   get '/legacy_admin(/*path)', to: redirect('/admin', status: 301), format: false
 
@@ -143,41 +143,26 @@ Rails.application.routes.draw do
   # Applicant-facing; the admin listing lives under /admin/applicant_details (no destroy anywhere).
   resources :applicant_details, except: %i[index destroy]
 
-  # Applicant-facing; admin listing/deletion lives under /admin/travels and /admin/recommendations.
-  resources :enrollments do
+  # Applicant-facing application (one per camp year); the admin listing, status changes and
+  # deletion live under /admin/applications. The nested resources are applicant-facing too; their
+  # admin listings/deletions live under /admin/travels, /admin/financial_aid_requests,
+  # /admin/recommendations, /admin/course_preferences and /admin/session_assignments.
+  resources :enrollments, except: %i[index destroy] do
     resources :travels, except: %i[index destroy]
-  end
-
-  # Applicant-facing request form; admin listing/deletion lives under /admin/financial_aid_requests.
-  resources :enrollments do
-      resources :financial_aids, except: %i[index destroy]
-  end
-
-  resources :financial_aids, except: %i[index destroy]
-
-  resources :enrollments do
+    resources :financial_aids, except: %i[index destroy]
     resources :recommendations, except: %i[index destroy]
-  end
-
-  resources :recommendations, except: %i[index destroy]
-
-  resources :enrollments do
-      resources :course_preferences do
-        collection do
-          patch :bulk_update
-        end
+    resources :course_preferences do
+      collection do
+        patch :bulk_update
       end
-  end
-
-  resources :enrollments do
+    end
     resources :session_assignments
   end
 
+  resources :financial_aids, except: %i[index destroy]
+  resources :recommendations, except: %i[index destroy]
   resources :course_preferences
   resources :session_assignments
-
-  # post 'accept_offer', to: 'enrollments#accept_offer'
-  # post 'decline_offer', to: 'enrollments#decline_offer'
 
   post 'accept_session_offer/:id', to: 'session_assignments#accept_session_offer', as: :accept_session_offer
   post 'decline_session_offer/:id', to: 'session_assignments#decline_session_offer', as: :decline_session_offer

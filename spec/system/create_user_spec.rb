@@ -21,7 +21,7 @@ RSpec.describe 'Create user', type: :system do
       # Ensure only one active camp so registration_open? is deterministic
       CampConfiguration.update_all(active: false)
       create(:camp_configuration,
-             camp_year: 2026,
+             camp_year: Date.current.year,
              application_open: Date.current - 30.days,
              application_close: Date.current + 90.days,
              active: true)
@@ -42,7 +42,7 @@ RSpec.describe 'Create user', type: :system do
     it 'shows the right content' do
       # Create test data directly in the test
       create(:camp_configuration,
-             camp_year: 2027,
+             camp_year: Date.current.year,
              application_open: Date.current - 30.days,
              application_close: Date.current + 90.days,
              active: true)
@@ -66,7 +66,7 @@ RSpec.describe 'Create user', type: :system do
     it 'show password mismatch error' do
       # Create test data directly in the test
       create(:camp_configuration,
-             camp_year: 2025,
+             camp_year: Date.current.year,
              application_open: Date.current - 30.days,
              application_close: Date.current + 90.days,
              active: true)

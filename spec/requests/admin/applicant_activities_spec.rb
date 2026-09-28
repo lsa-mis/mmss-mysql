@@ -74,7 +74,7 @@ RSpec.describe 'Admin applicant activities', type: :request do
       expect(response.body).to include('Showing <span class="font-medium">31</span>–<span class="font-medium">33</span>')
     end
 
-    it 'exports the ActiveAdmin CSV columns' do
+    it 'exports the legacy CSV columns' do
       get admin_applicant_activities_path(format: :csv)
 
       expect(response.media_type).to eq('text/csv')
@@ -118,7 +118,7 @@ RSpec.describe 'Admin applicant activities', type: :request do
       post admin_applicant_activities_path, params: { enrollment_activity: { enrollment_id: enrollment.id, activity_id: '' } }
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(CGI.unescapeHTML(response.body)).to include("Activity can't be blank")
+      expect(response.body).to include_unescaped("Activity can't be blank")
     end
   end
 

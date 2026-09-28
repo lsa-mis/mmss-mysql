@@ -8,7 +8,7 @@
 # the CSV formula guard is exercised.
 module AdminReportFixtures
   # CSV header row of every report (upper-cased, titleized SQL column aliases), taken from the
-  # legacy ActiveAdmin downloads. `balance_due` used to be `balance_due_cents` renamed by the formatter.
+  # legacy admin downloads. `balance_due` used to be `balance_due_cents` renamed by the formatter.
   EXPECTED_HEADERS = {
     'all_complete_apps' => %w[LAST\ UPDATE NAME EMAIL GENDER US\ CITIZEN DEMOGRAPHIC BIRTHDATE DIET\ RESTRICTIONS
                               SHIRT\ SIZE ADDRESS PHONE PARENTNAME PARENT\ ADDRESS PARENTPHONE PARENTWORKPHONE

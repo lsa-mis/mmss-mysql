@@ -17,10 +17,9 @@ class PaymentsController < ApplicationController
     transactionAcountType transactionResultCode transactionResultMessage orderNumber orderType
   ].freeze
 
-  devise_group :logged_in, contains: %i[user admin]
   prepend_before_action :log_nelnet_callback, only: %i[payment_receipt]
-  before_action :authenticate_logged_in!
-  skip_before_action :authenticate_logged_in!, only: %i[payment_receipt]
+  # Nelnet posts the receipt without a browser session; identify_user_for_payment_receipt! handles it.
+  before_action :authenticate_user!, except: %i[payment_receipt]
 
   before_action :set_current_enrollment
   skip_before_action :set_current_enrollment, only: %i[payment_receipt]
@@ -201,8 +200,9 @@ class PaymentsController < ApplicationController
     @payment_receipt_user || current_user
   end
 
+  # Nelnet returns the browser to payment_receipt; the applicant is normally still signed in.
   def payment_receipt_completion_path
-    logged_in_signed_in? ? all_payments_path : new_user_session_path
+    user_signed_in? ? all_payments_path : new_user_session_path
   end
 
   def reject_payment_receipt_if_payment_user_mismatch!(payment)

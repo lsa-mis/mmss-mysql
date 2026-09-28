@@ -6,7 +6,7 @@ RSpec.describe 'Session Timeout Integration', type: :request do
   let(:user) { create(:user) }
   let(:camp_config) do
     create(:camp_configuration,
-           camp_year: 2025,
+           camp_year: Date.current.year,
            application_open: Date.current - 30.days,
            application_close: Date.current + 90.days,
            active: true)

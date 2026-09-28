@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Applicant Details: the personal / address / parent record each applicant fills in once. No
-# destroy (ActiveAdmin had none; the applicant's account owns the record) and the owning user is
+# destroy (the applicant's account owns the record) and the owning user is
 # fixed once the record exists — the public form never lets an applicant re-home it either.
 class Admin::ApplicantDetailsController < Admin::BaseController
   before_action :set_applicant_detail, only: %i[show edit update]

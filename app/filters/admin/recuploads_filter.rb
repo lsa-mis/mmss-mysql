@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# ActiveAdmin had filters disabled here; these are additive.
+# Index filters for Admin::RecuploadsController (the legacy admin had none here).
 class Admin::RecuploadsFilter < Admin::Filter
   text :studentname, label: 'Student name'
   text :authorname, label: 'Author / recommender'

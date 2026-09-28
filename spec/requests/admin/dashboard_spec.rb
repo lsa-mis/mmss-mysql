@@ -46,7 +46,7 @@ RSpec.describe 'Admin dashboard', type: :request do
       body = response.body
 
       expect(body).to include("Recent Applications for #{enrollment.campyear} Camp")
-      expect(CGI.unescapeHTML(body)).to include(user.applicant_detail.full_name)
+      expect(body).to include_unescaped(user.applicant_detail.full_name)
       expect(body).to include(admin_application_path(enrollment))
 
       expect(body).to include("Recent Payments for #{enrollment.campyear} Camp")
@@ -54,10 +54,10 @@ RSpec.describe 'Admin dashboard', type: :request do
 
       expect(body).to include('Offer Accepted with Balance Due')
       expect(body).to include(admin_report_path('offer_accepted_with_balance_due'))
-      expect(CGI.unescapeHTML(body)).to include("Parent: #{user.applicant_detail.parentname}")
+      expect(body).to include_unescaped("Parent: #{user.applicant_detail.parentname}")
 
       expect(body).to include('Financial Aid Requests')
-      expect(CGI.unescapeHTML(body)).to include(enrollment.display_name)
+      expect(body).to include_unescaped(enrollment.display_name)
 
       expect(body).to include('Session Stats')
       expect(body).to include('Active Camp Note')
