@@ -100,9 +100,20 @@ RSpec.describe Course, type: :model do
       it 'loads confirmed and wait-list counts as select attributes used by seat helpers' do
         loaded = Course.with_seat_counts.find(course.id)
 
-        expect(loaded.confirmed_assignments_count).to eq(2)
-        expect(loaded.wait_list_count).to eq(3)
-        expect(loaded.remaining_spaces).to eq(8)
+        # The count helpers fall back to association COUNT queries when the aliases are not
+        # projected, so the values alone would not catch the scope dropping them from the SELECT.
+        expect(loaded).to have_attribute(:confirmed_assignments_count)
+        expect(loaded).to have_attribute(:wait_list_count)
+
+        queries = []
+        callback = ->(*, payload) { queries << payload[:sql] }
+        ActiveSupport::Notifications.subscribed(callback, 'sql.active_record') do
+          expect(loaded.confirmed_assignments_count).to eq(2)
+          expect(loaded.wait_list_count).to eq(3)
+          expect(loaded.remaining_spaces).to eq(8)
+        end
+
+        expect(queries).to be_empty
       end
     end
   end
