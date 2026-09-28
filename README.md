@@ -46,7 +46,7 @@ A Ruby on Rails application for managing summer camp applications, enrollments, 
 | **Auth**         | Devise (users, admins, faculties)                                |
 | **Admin**        | `Admin::` namespace (Tailwind 4 layout, Pagy, hand-rolled filters, `Admin::CsvExport`, `Admin::Reports`) |
 | **Server**       | Puma 8 (systemd notify built in)                                 |
-| **Frontend**     | importmap-rails, Hotwire (Turbo Drive + Stimulus), Tailwind CSS 4 (tailwindcss-rails; `application.css` + `admin.css` bundles), Flatpickr; Sprockets only for ActiveAdmin |
+| **Assets**       | Propshaft (digests + serves `app/assets/builds`, `app/assets/images`, importmap modules), importmap-rails, Hotwire (Turbo Drive + Stimulus), Tailwind CSS 4 (tailwindcss-rails; `application.css` + `admin.css` bundles), Flatpickr |
 | **File storage** | Active Storage (local disk / Google Cloud Storage in production) |
 | **Monitoring**   | Skylight, Sentry                                                 |
 | **Deployment**   | Capistrano 3, asdf                                               |
@@ -205,8 +205,11 @@ bundle exec cap production maintenance:stop
 Before deploy, `deploy:check_revision` ensures local HEAD matches `origin/main`.
 
 Assets are compiled on the server by capistrano-rails (`bin/rails assets:precompile`),
-which runs `tailwindcss:build` and then Sprockets; no Node.js, Yarn or `NODE_OPTIONS`
-are needed on the host. Compiled assets live in the linked `public/assets` directory.
+which runs `tailwindcss:build` (both bundles, via the `tailwindcss-ruby` standalone
+binary) and then Propshaft copies the digested files to `public/assets` (manifest:
+`public/assets/.manifest.json`, which capistrano-rails 1.7 backs up and restores).
+No Node.js, Yarn or `NODE_OPTIONS` are needed on the host. Compiled assets live in
+the linked `public/assets` directory.
 
 `maintenance:start` uploads `config/maintenance_template.yml` to `tmp/maintenance.yml` on the server; while that file exists the `MaintenanceMode` middleware answers every request routed through Rails (except `allowed_paths` / `allowed_ips`) with `public/maintenance.html`; static files that nginx serves directly from `public/` via `try_files` never reach the middleware (same as with turnout), the `response_code` (default 503) and a `Retry-After` header. `maintenance:stop` removes the file. Edit the template's `reason`, `allowed_ips`, etc. before starting.
 
