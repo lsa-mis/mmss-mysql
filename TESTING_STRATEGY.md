@@ -7,7 +7,6 @@ This document outlines the comprehensive testing solution implemented for the MM
 ## What Was Accomplished
 
 ### 1. Fixed Blocking Issues ✅
-- **ActiveAdmin Database Queries**: Wrapped all ActiveAdmin collection queries in `proc {}` blocks to prevent database queries at load time
 - **Model Validations**: Fixed the `parentemail_not_user_email` validation to handle nil users
 - **Factory Data**: Corrected Faker usage and added required fields
 
@@ -15,7 +14,7 @@ This document outlines the comprehensive testing solution implemented for the MM
 
 ```ruby
 # Gemfile additions:
-gem 'shoulda-matchers', '~> 5.0'  # Matchers for common Rails patterns
+gem 'shoulda-matchers', '~> 8.0'  # Matchers for common Rails patterns
 gem 'database_cleaner-active_record', '~> 2.0'  # Database state management
 gem 'simplecov', '~> 0.21'  # Code coverage tracking
 ```
@@ -25,7 +24,7 @@ gem 'simplecov', '~> 0.21'  # Code coverage tracking
 **spec/spec_helper.rb:**
 - SimpleCov integration with Rails-specific configuration
 - Code coverage tracking by component (Models, Controllers, Mailers, etc.)
-- Filters for spec/, config/, vendor/, and app/admin/ directories
+- Filters for spec/, config/ and vendor/ directories
 
 **spec/rails_helper.rb:**
 - Database Cleaner integration with transaction strategy

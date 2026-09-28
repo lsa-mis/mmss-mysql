@@ -23,6 +23,8 @@
 #
 class Activity < ApplicationRecord
   include MoneyRails::ActionViewExtension
+  include AdminCommentable
+
   belongs_to :camp_occurrence
   has_many :enrollment_activities, dependent: :destroy
   has_many :enrolled_users, through: :enrollment_activities, source: :enrollment
@@ -41,13 +43,5 @@ class Activity < ApplicationRecord
 
   def display_name
     "#{description} - #{camp_occurrence.description}" # or whatever column you want
-  end
-
-  def self.ransackable_associations(_auth_object = nil)
-    %w[camp_occurrence enrolled_users enrollment_activities]
-  end
-
-  def self.ransackable_attributes(_auth_object = nil)
-    %w[active camp_occurrence_id cost_cents created_at date_occurs description id updated_at]
   end
 end

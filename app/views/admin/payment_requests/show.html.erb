@@ -1,0 +1,29 @@
+<% admin_page_title "Payment Request ##{@payment_request.id}", subtitle: "#{@payment_request.user&.email} · #{@payment_request.order_number}" %>
+<% admin_page_actions do %>
+  <%= link_to 'Back to payment requests', admin_payment_requests_path, class: 'admin-btn-secondary' %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-3">
+  <div class="grid gap-5 xl:col-span-2">
+    <%= admin_panel 'Payment Request', body_class: '' do %>
+      <%= admin_attributes @payment_request do |a| %>
+        <% a.row :id %>
+        <% a.row('User') { |request| request.user&.email } %>
+        <% a.row :order_number %>
+        <% a.row('Amount (cents)', &:amount_cents) %>
+        <% a.row('Amount') { |request| admin_money_from_cents(request.amount_cents) } %>
+        <% a.row :camp_year %>
+        <% a.row('Request timestamp (epoch ms)', &:request_timestamp) %>
+        <% a.row('Request time') { |request| request.requested_at } %>
+        <% a.row 'Payment' do |request| %>
+          <% if request.payment_id? %>
+            <%= admin_resource_link(request.payment, "Payment ##{request.payment_id}") %>
+          <% else %>
+            <span class="admin-badge-red">Unmatched</span>
+          <% end %>
+        <% end %>
+        <% a.row :created_at, :updated_at %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

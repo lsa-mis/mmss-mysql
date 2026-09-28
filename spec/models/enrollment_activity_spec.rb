@@ -62,29 +62,6 @@ RSpec.describe EnrollmentActivity, type: :model do
     end
   end
 
-  describe 'ransackable_associations' do
-    it 'returns the correct associations' do
-      expect(described_class.ransackable_associations).to match_array(['activity', 'enrollment'])
-    end
-
-    it 'accepts an auth_object parameter' do
-      expect { described_class.ransackable_associations(nil) }.not_to raise_error
-      expect { described_class.ransackable_associations(double) }.not_to raise_error
-    end
-  end
-
-  describe 'ransackable_attributes' do
-    it 'returns the correct attributes' do
-      expected_attributes = ['activity_id', 'created_at', 'enrollment_id', 'id', 'updated_at']
-      expect(described_class.ransackable_attributes).to match_array(expected_attributes)
-    end
-
-    it 'accepts an auth_object parameter' do
-      expect { described_class.ransackable_attributes(nil) }.not_to raise_error
-      expect { described_class.ransackable_attributes(double) }.not_to raise_error
-    end
-  end
-
   describe 'creation and persistence' do
     let(:enrollment) { create(:enrollment) }
     let(:activity) { create(:activity) }

@@ -35,12 +35,33 @@ require 'rails_helper'
 RSpec.describe Payment, type: :model do
   describe 'associations' do
     it { is_expected.to belong_to(:user) }
+    it { is_expected.to have_one(:payment_request).dependent(:restrict_with_error) }
 
     it 'optionally has one payment_request' do
       payment = create(:payment)
       request = create(:payment_request, user: payment.user, payment: payment)
 
       expect(payment.payment_request).to eq(request)
+    end
+  end
+
+  describe '#destroy' do
+    let(:user) { create(:user) }
+
+    it 'refuses to destroy a payment matched to a Nelnet payment request' do
+      payment = create(:payment, user: user, transaction_status: '2')
+      create(:payment_request, user: user, payment: payment)
+
+      expect(payment.destroy).to be(false)
+      expect(payment.errors[:base]).to be_present
+      expect(Payment.exists?(payment.id)).to be(true)
+    end
+
+    it 'destroys an unmatched payment' do
+      payment = create(:payment, user: user, transaction_status: '2')
+
+      expect(payment.destroy).to be_truthy
+      expect(Payment.exists?(payment.id)).to be(false)
     end
   end
 
@@ -51,6 +72,46 @@ RSpec.describe Payment, type: :model do
     it { is_expected.to validate_presence_of(:transaction_type) }
     it { is_expected.to validate_presence_of(:transaction_status) }
     it { is_expected.to validate_presence_of(:camp_year) }
+
+    it 'requires total_amount to be a whole number of cents' do
+      %w[-100 10.5 abc].each do |bad|
+        payment = build(:payment, total_amount: bad)
+        expect(payment).not_to be_valid, "#{bad.inspect} was accepted"
+        expect(payment.errors[:total_amount]).to include('must be a whole number of cents')
+      end
+      expect(build(:payment, total_amount: '0')).to be_valid
+    end
+  end
+
+  describe '#total_amount_dollars=' do
+    it 'stores whole cents for plain, formatted and two-decimal input' do
+      expect(build(:payment, total_amount_dollars: '150').total_amount).to eq('15000')
+      expect(build(:payment, total_amount_dollars: '150.25').total_amount).to eq('15025')
+      expect(build(:payment, total_amount_dollars: '$1,500.5').total_amount).to eq('150050')
+      expect(build(:payment, total_amount_dollars: ' 7 ').total_amount).to eq('700')
+    end
+
+    it 'treats blank input as a missing amount' do
+      payment = build(:payment, total_amount_dollars: '')
+      expect(payment).not_to be_valid
+      expect(payment.errors[:total_amount]).to include("can't be blank")
+      expect(payment.errors[:total_amount_dollars]).to be_empty
+    end
+
+    it 'refuses negative, non-numeric, non-finite and over-precise input without coercing it' do
+      ['-5', 'abc', 'Infinity', '-Infinity', 'NaN', '1e3', '12.345', '0x10', '1,2,3', '12,34.5', '1,,000'].each do |bad|
+        payment = build(:payment, total_amount: '25050', total_amount_dollars: bad)
+        expect(payment.total_amount).to eq('25050'), "#{bad.inspect} overwrote the amount"
+        expect(payment).not_to be_valid, "#{bad.inspect} was accepted"
+        expect(payment.errors[:total_amount_dollars].first).to include('non-negative dollar amount')
+        expect(payment.total_amount_dollars).to eq(bad)
+      end
+    end
+
+    it 'reads back the stored amount in dollars' do
+      expect(build(:payment, total_amount: '25050').total_amount_dollars).to eq(250.5)
+      expect(build(:payment, total_amount: nil).total_amount_dollars).to be_nil
+    end
   end
 
   describe 'factory' do
@@ -92,30 +153,6 @@ RSpec.describe Payment, type: :model do
 
     it 'can be converted to dollars' do
       expect(payment.total_amount.to_i / 100.0).to eq(500.00)
-    end
-  end
-
-  describe '#total_amount_dollars' do
-    it 'converts stored cents to a dollar float for admin display' do
-      payment = build(:payment, total_amount: '12345')
-      expect(payment.total_amount_dollars).to eq(123.45)
-    end
-
-    it 'returns nil when total_amount is blank' do
-      payment = build(:payment, total_amount: nil)
-      expect(payment.total_amount_dollars).to be_nil
-    end
-
-    it 'stores dollars as rounded cents when assigned' do
-      payment = build(:payment)
-      payment.total_amount_dollars = '99.999'
-      expect(payment.total_amount).to eq('10000')
-    end
-
-    it 'clears total_amount when assigned a blank dollar value' do
-      payment = build(:payment, total_amount: '5000')
-      payment.total_amount_dollars = '  '
-      expect(payment.total_amount).to be_nil
     end
   end
 

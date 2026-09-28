@@ -1,0 +1,10 @@
+<% admin_page_title 'New Financial Aid Request', subtitle: (@financial_aid.enrollment ? "For #{@financial_aid.enrollment.applicant_detail&.full_name || @financial_aid.enrollment.user.email}" : nil) %>
+<% admin_page_actions do %>
+  <% if @financial_aid.enrollment %>
+    <%= link_to 'Back to application', admin_application_path(@financial_aid.enrollment), class: 'admin-btn-secondary' %>
+  <% else %>
+    <%= link_to 'Back to requests', admin_financial_aid_requests_path, class: 'admin-btn-secondary' %>
+  <% end %>
+<% end %>
+
+<%= render 'admin/financial_aid_requests/form', financial_aid: @financial_aid %>

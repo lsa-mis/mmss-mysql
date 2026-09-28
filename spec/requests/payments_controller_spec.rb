@@ -489,10 +489,10 @@ RSpec.describe PaymentsController, type: :request do
   end
 
   describe 'GET /payments (index)' do
-    it 'requires admin for index' do
+    it 'no longer exists (the admin listing is /admin/payments)' do
       sign_in user
-      get payments_path
-      expect(response).to redirect_to('/admin/login')
+      get '/payments'
+      expect(response).to have_http_status(:not_found)
     end
   end
 

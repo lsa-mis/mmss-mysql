@@ -1,0 +1,46 @@
+<% admin_page_title 'Reports', subtitle: (@camp ? "#{@camp.camp_year} camp · #{Admin::Reports.all.size} CSV reports" : 'No active camp') %>
+
+<div class="grid gap-5">
+  <%= admin_panel 'Parameters', body_class: 'admin-card-body' do %>
+    <% if @camp_years.empty? %>
+      <p class="text-sm text-slate-700">No camp has been configured yet. <%= link_to 'Configure a camp', admin_camp_configurations_path %> before running reports.</p>
+    <% else %>
+      <%= form_with url: admin_reports_path, method: :get, class: 'flex flex-wrap items-end gap-3', data: { controller: 'auto-submit', turbo_frame: '_top' } do |f| %>
+        <div>
+          <%= f.label :camp_year, 'Camp year', class: 'admin-label' %>
+          <%= f.select :camp_year, options_for_select(@camp_years, @camp&.camp_year), {},
+                       class: 'admin-input mt-1 w-auto', data: { action: 'change->auto-submit#submit' } %>
+        </div>
+        <p class="pb-2 text-sm text-slate-600">
+          Every report is bound to one camp year<%= ' (the active camp is selected by default)' if @camp&.active? %>.
+          Downloads are CSV files named <code class="text-xs">MMSS-report-&lt;report&gt;-&lt;date&gt;.csv</code>.
+        </p>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% @groups.each do |group_label, reports| %>
+    <%= admin_panel group_label, body_class: 'divide-y divide-slate-100' do %>
+      <% reports.each do |report| %>
+        <div class="flex flex-wrap items-start justify-between gap-3 px-4 py-3" id="report_<%= report.key %>">
+          <div class="min-w-0 flex-1">
+            <h3 class="text-sm font-medium text-slate-900"><%= report.label %></h3>
+            <p class="mt-0.5 text-sm text-slate-600"><%= report.description %></p>
+            <p class="mt-1 flex flex-wrap items-center gap-1 text-xs text-slate-500">
+              <span>Parameters:</span>
+              <% report.parameters.each do |parameter| %>
+                <span class="admin-badge-gray"><%= parameter.to_s.humanize %><%= " = #{@camp.camp_year}" if parameter == :camp_year && @camp %></span>
+              <% end %>
+            </p>
+          </div>
+          <% if @camp %>
+            <%= link_to 'Download CSV', admin_report_path(report.key, camp_year: @camp.camp_year),
+                        class: 'admin-btn-secondary admin-btn-sm shrink-0', data: { turbo: false } %>
+          <% else %>
+            <span class="admin-btn-secondary admin-btn-sm shrink-0 cursor-not-allowed opacity-50" aria-disabled="true">Download CSV</span>
+          <% end %>
+        </div>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>

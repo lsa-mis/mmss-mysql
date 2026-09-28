@@ -93,7 +93,7 @@ RSpec.describe Recupload, type: :model do
       it 'updates enrollment status to complete' do
         create(:recupload, recommendation:)
         expect(enrollment.reload.application_status).to eq('application complete')
-        expect(enrollment.application_status_updated_on).to eq(Date.today)
+        expect(enrollment.application_status_updated_on).to eq(Date.current)
       end
     end
 
@@ -109,7 +109,7 @@ RSpec.describe Recupload, type: :model do
         it 'updates enrollment status to complete' do
           create(:recupload, recommendation:)
           expect(enrollment.reload.application_status).to eq('application complete')
-          expect(enrollment.application_status_updated_on).to eq(Date.today)
+          expect(enrollment.application_status_updated_on).to eq(Date.current)
         end
       end
 

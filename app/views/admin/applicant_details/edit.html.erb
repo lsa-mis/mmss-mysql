@@ -1,0 +1,6 @@
+<% admin_page_title "Edit #{@applicant_detail.full_name}", subtitle: @applicant_detail.user.email %>
+<% admin_page_actions do %>
+  <%= link_to 'View applicant detail', admin_applicant_detail_path(@applicant_detail), class: 'admin-btn-secondary' %>
+<% end %>
+
+<%= render 'admin/applicant_details/form', applicant_detail: @applicant_detail %>

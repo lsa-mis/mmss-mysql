@@ -1,0 +1,10 @@
+<% content_for :title, 'Resend unlock instructions' %>
+<h1 class="mb-4 text-lg font-semibold text-slate-900">Resend unlock instructions</h1>
+
+<%= admin_form_with model: resource, scope: resource_name, url: unlock_path(resource_name), method: :post, class: 'grid gap-4' do |f| %>
+  <%= f.errors_summary %>
+  <%= f.input :email, as: :email, autofocus: true, autocomplete: 'email', required: true %>
+  <%= f.button 'Resend unlock instructions', class: 'admin-btn-primary w-full justify-center' %>
+<% end %>
+
+<%= render 'admins/shared/links' %>

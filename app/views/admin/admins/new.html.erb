@@ -1,0 +1,7 @@
+<% admin_page_title 'New Admin' %>
+<% admin_page_actions do %>
+  <%= link_to 'Back to admins', admin_admins_path, class: 'admin-btn-secondary' %>
+<% end %>
+
+<%= render 'admin/shared/account_form', account: @admin, scope: :admin, label: 'Admin',
+                                        url: admin_admins_path, cancel: admin_admins_path %>

@@ -1,0 +1,9 @@
+<%# locals: record, rows %>
+<dl class="admin-attributes">
+  <% rows.each do |row| %>
+    <div>
+      <dt><%= row.label %></dt>
+      <dd><%= admin_attribute_value(record, row) %></dd>
+    </div>
+  <% end %>
+</dl>

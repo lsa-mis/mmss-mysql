@@ -291,28 +291,6 @@ RSpec.describe SessionAssignment, type: :model do
     end
   end
 
-  describe 'ransackable methods' do
-    describe '.ransackable_associations' do
-      it 'returns the correct associations' do
-        expect(described_class.ransackable_associations).to match_array(['camp_occurrence', 'enrollment'])
-      end
-    end
-
-    describe '.ransackable_attributes' do
-      it 'returns the correct attributes' do
-        expected_attributes = [
-          'camp_occurrence_id',
-          'created_at',
-          'enrollment_id',
-          'id',
-          'offer_status',
-          'updated_at'
-        ]
-        expect(described_class.ransackable_attributes).to match_array(expected_attributes)
-      end
-    end
-  end
-
   describe 'wait_list_assignments association' do
     let(:enrollment) { create(:enrollment) }
     let(:camp_occurrence) { create(:camp_occurrence) }

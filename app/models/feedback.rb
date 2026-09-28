@@ -24,15 +24,18 @@ class Feedback < ApplicationRecord
 
   MESSAGE_MAX_LENGTH = 255
 
+  # Stored value => label shown to users (the public feedback form offers the same three).
+  GENRES = {
+    'page_error' => 'Error on Page',
+    'layout_issue' => 'Layout Issue',
+    'suggestion' => 'Suggestion'
+  }.freeze
+
   validates :genre, presence: true
   validates :message, presence: true
   validates :message, length: { maximum: MESSAGE_MAX_LENGTH, message: "is too long (maximum is %{count} characters)" }
 
-  def self.ransackable_associations(auth_object = nil)
-    ["user"]
-  end
-
-  def self.ransackable_attributes(auth_object = nil)
-    ["created_at", "genre", "id", "message", "updated_at", "user_id"]
+  def genre_label
+    GENRES.fetch(genre, genre)
   end
 end

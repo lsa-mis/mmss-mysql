@@ -1,0 +1,106 @@
+<%# locals: application %>
+<%= admin_form_with model: application, scope: :enrollment, url: admin_application_path(application),
+                    multipart: true, class: 'grid gap-5' do |f| %>
+  <%= f.errors_summary %>
+
+  <div class="grid gap-5 xl:grid-cols-2">
+    <%= f.fieldset 'Applicant' do %>
+      <%= f.input :user_id, as: :select, label: 'User', include_blank: 'Select a user',
+                            collection: User.order(:email).pluck(:email, :id), required: true %>
+      <% if application.application_status == 'enrolled' %>
+        <%= f.input :uniqname %>
+      <% end %>
+      <%= f.input :campyear, label: 'Camp year', required: true %>
+      <%= f.input :international %>
+    <% end %>
+
+    <%= f.fieldset 'Application' do %>
+      <%= f.input :year_in_school, as: :select, collection: year_in_school, required: true %>
+      <%= f.input :anticipated_graduation_year, as: :text, required: true %>
+      <%= f.input :room_mate_request %>
+      <%= f.input :camp_doc_form_completed %>
+      <%= f.input :partner_program %>
+    <% end %>
+  </div>
+
+  <%= f.fieldset 'High school' do %>
+    <div class="grid gap-4 md:grid-cols-2">
+      <%= f.input :high_school_name, required: true %>
+      <%= f.input :high_school_address1, label: 'Address line 1', required: true %>
+      <%= f.input :high_school_address2, label: 'Address line 2' %>
+      <%= f.input :high_school_city, required: true %>
+      <%= f.input :high_school_state, as: :select, collection: us_states %>
+      <%= f.input :high_school_non_us, label: 'State / province (non-US)' %>
+      <%= f.input :high_school_postalcode, required: true %>
+      <%= f.input :high_school_country, as: :select, collection: country_options_with_priority, required: true %>
+    </div>
+  <% end %>
+
+  <%= f.fieldset 'Statement, transcript and notes' do %>
+    <%= f.input :personal_statement, as: :textarea, rows: 6, required: true, hint: 'At least 100 characters.' %>
+    <div>
+      <span class="admin-label">Current transcript</span>
+      <p class="mt-1 text-sm"><%= admin_attachment_link(application.transcript) %></p>
+    </div>
+    <%= f.input :transcript, as: :file, label: 'Update transcript', accept: 'application/pdf,image/png,image/jpeg',
+                             hint: 'PDF, JPEG or PNG up to 20 MB.' %>
+    <%= f.input :notes, as: :textarea, rows: 3 %>
+  <% end %>
+
+  <div class="grid gap-5 xl:grid-cols-2">
+    <div data-controller="nested-form">
+      <%= f.fieldset 'Session assignments', description: 'If you delete a session assignment be certain to delete any corresponding course assignment.' do %>
+        <div class="grid gap-2" data-nested-form-target="container">
+          <%= f.fields_for :session_assignments do |sa| %>
+            <%= render 'admin/applications/session_assignment_fields', f: sa, application: application %>
+          <% end %>
+        </div>
+        <template data-nested-form-target="template">
+          <%= f.fields_for :session_assignments, SessionAssignment.new, child_index: 'NEW_RECORD' do |sa| %>
+            <%= render 'admin/applications/session_assignment_fields', f: sa, application: application %>
+          <% end %>
+        </template>
+        <div>
+          <button type="button" class="admin-btn-secondary admin-btn-sm" data-action="nested-form#add">+ Add session assignment</button>
+        </div>
+      <% end %>
+    </div>
+
+    <div data-controller="nested-form">
+      <%= f.fieldset 'Course assignments' do %>
+        <div class="grid gap-2" data-nested-form-target="container">
+          <%= f.fields_for :course_assignments do |ca| %>
+            <%= render 'admin/applications/course_assignment_fields', f: ca, application: application %>
+          <% end %>
+        </div>
+        <template data-nested-form-target="template">
+          <%= f.fields_for :course_assignments, CourseAssignment.new, child_index: 'NEW_RECORD' do |ca| %>
+            <%= render 'admin/applications/course_assignment_fields', f: ca, application: application %>
+          <% end %>
+        </template>
+        <div>
+          <button type="button" class="admin-btn-secondary admin-btn-sm" data-action="nested-form#add">+ Add course assignment</button>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <% if application.session_assignments.any? && application.course_assignments.any? %>
+    <%= f.fieldset 'Status', description: 'Available once the application has both a session and a course assignment.' do %>
+      <div class="grid gap-4 md:grid-cols-3">
+        <%= f.input :offer_status, as: :select, collection: Admin::ApplicationsController::OFFER_STATUS_OPTIONS %>
+        <%= f.input :application_deadline %>
+        <%= f.input :application_status, as: :select, collection: admin_application_status_options(application),
+                                         id: 'application_application_status' %>
+      </div>
+    <% end %>
+  <% end %>
+
+  <%= f.actions('Update Application', cancel: admin_application_path(application)) do %>
+    <% if application.application_status != 'withdrawn' %>
+      <%= f.button 'Withdraw Enrollment', name: 'withdraw_enrollment', value: '1', class: 'admin-btn-danger',
+                   formnovalidate: true,
+                   data: { turbo_confirm: 'Are you sure you want to withdraw this enrollment? This will delete all associated course assignments.' } %>
+    <% end %>
+  <% end %>
+<% end %>

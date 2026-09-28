@@ -1,0 +1,17 @@
+<% admin_page_title 'Gender Types', subtitle: "#{number_with_delimiter(@pagy.count)} #{'option'.pluralize(@pagy.count)}" %>
+<% admin_page_actions do %>
+  <%= admin_csv_link %>
+  <%= link_to 'New Gender Type', new_admin_gender_type_path, class: 'admin-btn-primary' %>
+<% end %>
+
+<%= admin_table @gender_types, pagy: @pagy,
+                batch_actions: Admin::GenderTypesController::BATCH_ACTIONS, batch_url: batch_admin_gender_types_path,
+                actions: ->(gender) { [admin_gender_type_path(gender), edit_admin_gender_type_path(gender), admin_gender_type_path(gender)] } do |t| %>
+  <% t.column :id, sort: true %>
+  <% t.column :name, sort: true do |gender| %>
+    <%= link_to gender.name, admin_gender_type_path(gender), class: 'font-medium' %>
+  <% end %>
+  <% t.column :description, sort: true %>
+  <% t.column :created_at, sort: true %>
+  <% t.column :updated_at, sort: true %>
+<% end %>

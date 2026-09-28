@@ -1,0 +1,56 @@
+<% admin_page_title "User ##{@user.id}", subtitle: @user.email %>
+<% admin_page_actions do %>
+  <%= link_to 'Edit', edit_admin_user_path(@user), class: 'admin-btn-primary' %>
+  <% if @user.payments.exists? || @user.payment_requests.exists? %>
+    <span class="admin-btn-danger cursor-not-allowed opacity-50" title="Users with payments or payment requests cannot be deleted." aria-disabled="true">Delete</span>
+  <% else %>
+    <%= button_to 'Delete', admin_user_path(@user), method: :delete, class: 'admin-btn-danger',
+                  form: { data: { turbo_confirm: 'Delete this user and everything they submitted (applicant detail, applications, feedback)? This cannot be undone.' } } %>
+  <% end %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-3">
+  <div class="grid gap-5 xl:col-span-2">
+    <%= admin_panel 'User', body_class: '' do %>
+      <%= admin_attributes @user do |a| %>
+        <% a.row :id, :email %>
+        <% a.row 'Applicant detail' do |user| %>
+          <% if user.applicant_detail %>
+            <%= admin_resource_link(user.applicant_detail, user.applicant_detail.full_name.titleize) %>
+          <% else %>
+            <span class="text-slate-500">not started</span>
+          <% end %>
+        <% end %>
+        <% a.row :created_at, :updated_at %>
+      <% end %>
+    <% end %>
+
+    <%= admin_panel 'Applications', body_class: '' do %>
+      <table class="admin-table">
+        <thead><tr><th>ID</th><th>Camp year</th><th>Application status</th><th>Offer status</th><th>Updated</th></tr></thead>
+        <tbody>
+          <% @enrollments.each do |enrollment| %>
+            <tr>
+              <td><%= link_to enrollment.id, admin_application_path(enrollment) %></td>
+              <td><%= enrollment.campyear %></td>
+              <td><%= admin_status_badge(enrollment.application_status) %></td>
+              <td><%= admin_status_badge(enrollment.offer_status) %></td>
+              <td><%= admin_datetime(enrollment.updated_at) %></td>
+            </tr>
+          <% end %>
+          <% if @enrollments.empty? %>
+            <tr><td colspan="5"><%= admin_empty_state 'No applications.' %></td></tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% end %>
+  </div>
+
+  <div class="grid gap-5 self-start">
+    <%= admin_panel 'Sign-in activity', body_class: '' do %>
+      <%= admin_attributes @user do |a| %>
+        <% a.row :sign_in_count, :current_sign_in_at, :current_sign_in_ip, :last_sign_in_at, :last_sign_in_ip, :remember_created_at %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

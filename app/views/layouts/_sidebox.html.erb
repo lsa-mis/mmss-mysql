@@ -91,8 +91,8 @@
               </div>
             <% else %>
               <div class="my-2">
-                <%= link_to "Accept", accept_session_offer_path(as.id), method: "POST", data: { confirm: "Are you sure you want to accept this session?"}, class: "btn btn-blue" %> |
-                <%= link_to "Decline", decline_session_offer_path(as.id), method: "POST", data: { confirm: "Are you sure you want to decline this session?"}, class: "btn btn-red" %>
+                <%= link_to "Accept", accept_session_offer_path(as.id), data: { turbo_method: :post, turbo_confirm: "Are you sure you want to accept this session?" }, class: "btn btn-blue" %> |
+                <%= link_to "Decline", decline_session_offer_path(as.id), data: { turbo_method: :post, turbo_confirm: "Are you sure you want to decline this session?" }, class: "btn btn-red" %>
               </div>
             <% end %>
             <hr>

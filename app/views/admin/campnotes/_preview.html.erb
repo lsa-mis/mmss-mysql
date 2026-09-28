@@ -1,0 +1,9 @@
+<%# locals: note %>
+<% if note.notetype == 'notice' %>
+  <div class="rounded border border-yellow-600 bg-gray-200 p-2 text-sm text-slate-900"><%= note.note %></div>
+<% else %>
+  <div class="flex gap-2 rounded border border-red-800 bg-yellow-200 p-2 text-sm text-slate-900">
+    <div class="shrink-0"><%= render partial: 'svg/alert' %></div>
+    <div><%= note.note %></div>
+  </div>
+<% end %>

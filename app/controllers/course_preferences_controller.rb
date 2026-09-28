@@ -6,7 +6,7 @@ class CoursePreferencesController < ApplicationController
 
   before_action :set_current_enrollment, except: [:show]
   before_action :prepare_show, only: [:show]
-  before_action :course_preference, only: %i[update destroy]
+  before_action :course_preference, only: %i[update]
 
   def index
     load_course_preference_sessions
@@ -29,11 +29,11 @@ class CoursePreferencesController < ApplicationController
 
     respond_to do |format|
       if @course_preference.save
-        format.html { redirect_to enrollment_course_preferences_path(@current_enrollment), notice: 'Course Preference was successfully edited.' }
+        format.html { redirect_to enrollment_course_preferences_path(@current_enrollment), notice: 'Course Preference was successfully edited.', status: :see_other }
         format.json { render :show, status: :created, location: @course_preference }
       else
-        format.html { render :new }
-        format.json { render json: @course_preference.errors, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_content }
+        format.json { render json: @course_preference.errors, status: :unprocessable_content }
       end
     end
   end
@@ -46,7 +46,7 @@ class CoursePreferencesController < ApplicationController
   def bulk_update
     unless @current_enrollment.course_rankings_editable?
       redirect_to enrollment_course_preferences_path(@current_enrollment),
-                  alert: 'Course rankings cannot be changed after your application has been processed.'
+                  alert: 'Course rankings cannot be changed after your application has been processed.', status: :see_other
       return
     end
 
@@ -55,7 +55,7 @@ class CoursePreferencesController < ApplicationController
     if rankings.blank? || rankings.keys.to_set != allowed_ids || rankings.values.any?(&:blank?)
       load_course_preference_sessions
       flash.now[:alert] = 'Please choose a rank for every selected course.'
-      render :index, status: :unprocessable_entity
+      render :index, status: :unprocessable_content
       return
     end
 
@@ -67,12 +67,12 @@ class CoursePreferencesController < ApplicationController
           cp.update!(ranking: rankings[cp.id.to_s].to_s.to_i)
         end
       end
-      redirect_to root_path, notice: 'Course rankings were successfully saved.'
+      redirect_to root_path, notice: 'Course rankings were successfully saved.', status: :see_other
     rescue ActiveRecord::RecordInvalid => e
       load_course_preference_sessions
       flash.now[:alert] = e.record.errors.full_messages.to_sentence.presence ||
         'Unable to save rankings. Each session needs unique ranks within the allowed range.'
-      render :index, status: :unprocessable_entity
+      render :index, status: :unprocessable_content
     end
   end
 
@@ -81,17 +81,17 @@ class CoursePreferencesController < ApplicationController
     respond_to do |format|
       if @course_preference.update(cp_params)
         if !@current_enrollment.reload.course_rankings_complete?
-          format.html { redirect_to course_preferences_path, notice: 'Course Preference was successfully updated.' }
+          format.html { redirect_to course_preferences_path, notice: 'Course Preference was successfully updated.', status: :see_other }
           format.json { render :show, status: :ok, location: course_preferences_path }
         else
-          format.html { redirect_to root_path, notice: 'Course Preference was successfully updated.' }
+          format.html { redirect_to root_path, notice: 'Course Preference was successfully updated.', status: :see_other }
           format.json { render :show, status: :ok, location: root_path }
         end
       else
         @course_camp = @course_preference.course.camp_occurrence
         @remaining_selections = get_rankings_available(@course_camp)
-        format.html { render :edit }
-        format.json { render json: @course_preference.errors, status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_content }
+        format.json { render json: @course_preference.errors, status: :unprocessable_content }
       end
     end
   end
@@ -101,7 +101,7 @@ class CoursePreferencesController < ApplicationController
   def prepare_show
     @course_pref = CoursePreference.find(params[:id])
     if @course_pref.enrollment.user_id != current_user.id
-      redirect_to root_path, alert: 'Not authorized.'
+      redirect_to root_path, alert: 'Not authorized.', status: :see_other
       return
     end
 
@@ -113,7 +113,7 @@ class CoursePreferencesController < ApplicationController
     @current_enrollment = enrollment_from_params_or_current_year
     return if @current_enrollment.present?
 
-    redirect_to root_path, alert: 'No current enrollment found.'
+    redirect_to root_path, alert: 'No current enrollment found.', status: :see_other
     return
   end
 

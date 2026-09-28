@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
+  # Can be used by load balancers and uptime monitors to verify that the app is live.
+  get "up" => "rails/health#show", as: :rails_health_check
+
   mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development? || Rails.env.staging?
 
   devise_for :faculties, controllers: {
@@ -10,79 +14,152 @@ Rails.application.routes.draw do
   get 'faculty/student_page/:id', to: 'faculties#student_page', as: :student_page
   get 'faculty_login', to: 'static_pages#faculty_login', as: :faculty_login
 
-  resources :rejections
-  resources :campnotes
-  resources :recuploads
+  # Recommenders upload letters through the emailed link; everything else is under /admin/recuploads.
+  resources :recuploads, only: %i[new create]
   resources :feedbacks
   # resources :payments
   root to: 'static_pages#index'
 
-  devise_for :admins, ActiveAdmin::Devise.config
-  get '/admin/reports/all_complete_apps', to: 'admin/reports#all_complete_apps', as: :admin_reports_all_complete_apps
-  get '/admin/reports/registered_but_not_applied', to: 'admin/reports#registered_but_not_applied', as: :admin_reports_registered_but_not_applied
-  get '/admin/reports/enrolled_with_addresses', to: 'admin/reports#enrolled_with_addresses', as: :admin_reports_enrolled_with_addresses
-  get '/admin/reports/pending_course_assignments_with_students', to: 'admin/reports#pending_course_assignments_with_students', as: :admin_reports_pending_course_assignments_with_students
-  get '/admin/reports/accepted_course_assignments_with_students', to: 'admin/reports#accepted_course_assignments_with_students', as: :admin_reports_accepted_course_assignments_with_students
-  get '/admin/reports/enrolled_student_demographic_report', to: 'admin/reports#enrolled_student_demographic_report', as: :admin_reports_enrolled_student_demographic_report
-  get '/admin/reports/complete_apps_demographic_report', to: 'admin/reports#complete_apps_demographic_report', as: :admin_reports_complete_apps_demographic_report
-  get '/admin/reports/enrolled_events_per_session', to: 'admin/reports#events_per_session_for_enrolled', as: :admin_reports_enrolled_events_per_session
-  get '/admin/reports/complete_applications_with_course_preferences', to: 'admin/reports#complete_applications_with_course_preferences', as: :admin_reports_complete_applications_with_course_preferences
-  get '/admin/reports/waitlisted_applications_with_course_preferences', to: 'admin/reports#waitlisted_applications_with_course_preferences', as: :admin_reports_waitlisted_applications_with_course_preferences
-  get '/admin/reports/enrolled_with_sessions_and_courses', to: 'admin/reports#enrolled_with_sessions_and_courses', as: :admin_reports_enrolled_with_sessions_and_courses
-  get '/admin/reports/enrolled_with_sessions_and_tshirt', to: 'admin/reports#enrolled_with_sessions_and_tshirt', as: :admin_reports_enrolled_with_sessions_and_tshirt
-  get '/admin/reports/course_assignments', to: 'admin/reports#course_assignments', as: :admin_reports_course_assignments
-  get '/admin/reports/enrolled_with_covid_verification', to: 'admin/reports#enrolled_with_covid_verification', as: :admin_reports_enrolled_with_covid_verification
-  get '/admin/reports/enrolled_with_addresses_and_more', to: 'admin/reports#enrolled_with_addresses_and_more', as: :admin_reports_enrolled_with_addresses_and_more
-  get '/admin/reports/enrolled_for_more_than_one_session', to: 'admin/reports#enrolled_for_more_than_one_session', as: :admin_reports_enrolled_for_more_than_one_session
-  get '/admin/reports/dorm_by_gender_by_session', to: 'admin/reports#dorm_by_gender_by_session', as: :admin_reports_dorm_by_gender_by_session
-  get '/admin/reports/finaid_with_app_and_offer_status', to: 'admin/reports#finaid_with_app_and_offer_status', as: :admin_reports_finaid_with_app_and_offer_status
-  get '/admin/reports/offer_accepted_with_balance_due', to: 'admin/reports#offer_accepted_with_balance_due', as: :admin_reports_offer_accepted_with_balance_due
+  # Admin authentication (Devise `Admin` model) is served by the new admin at /admin/login etc.
+  # Route helper names (new_admin_session_path, destroy_admin_session_path) are unchanged.
+  devise_for :admins, path: 'admin',
+                      path_names: { sign_in: 'login', sign_out: 'logout' },
+                      controllers: { sessions: 'admins/sessions', passwords: 'admins/passwords', unlocks: 'admins/unlocks' }
 
-  ActiveAdmin.routes(self)
-  # authenticated :admin do
-    resources :genders
-    resources :demographics
+  # New plain-MVC admin. Resources are ported here from app/admin one menu group at a time.
+  namespace :admin do
+    root to: 'dashboard#index'
 
+    # Admins never create enrollments (applicants do, through the public flow), so no new/create.
+    resources :applications, except: %i[new create] do
+      collection { post :batch }
+      # Status mutations formerly exposed on the public EnrollmentsController; admin-only now.
+      member do
+        post :waitlist
+        post :remove_from_waitlist
+        post :withdraw
+        post :send_finaid_request_email
+      end
+    end
+
+    # Money: financial_aid_requests = FinancialAid (the ActiveAdmin resource name). Applicant details
+    # and payments had no destroy in ActiveAdmin either (payments are financial records).
+    resources :applicant_details, except: :destroy
+    resources :financial_aid_requests, controller: 'financial_aid_requests' do
+      collection { post :batch }
+    end
+    resources :payments, except: :destroy
+
+    # Applicant Info (models named after their ActiveAdmin resource where they differ; the
+    # controllers keep the model): session_selections = SessionActivity,
+    # applicant_activities = EnrollmentActivity.
+    resources :course_assignments do
+      collection { post :batch }
+    end
+    resources :course_preferences do
+      collection { post :batch }
+    end
+    resources :session_selections, controller: 'session_selections' do
+      collection { post :batch }
+    end
+    resources :session_assignments do
+      collection { post :batch }
+    end
+    resources :applicant_activities, controller: 'applicant_activities' do
+      collection { post :batch }
+    end
+    resources :recommendations do
+      collection { post :batch }
+      # "Resend request" used to be a public GET on RecommendationsController; admin-only now.
+      member { post :send_request_email }
+    end
+    resources :recuploads do
+      collection { post :batch }
+    end
+    resources :rejections do
+      collection { post :batch }
+    end
+    resources :travels do
+      collection { post :batch }
+    end
+    # Read-only audit trails of the Nelnet payment flow.
+    resources :payment_requests, only: %i[index show]
+    resources :nelnet_callback_logs, only: %i[index show]
+
+    resources :comments, only: %i[index create destroy]
+
+    # CSV reports: /admin/reports lists them, /admin/reports/<key> downloads one. Any id reaches the
+    # controller (no constraint, no format suffix) so unknown/malformed keys get the controller's
+    # redirect instead of falling through to the legacy catch-all below.
+    resources :reports, only: %i[index show], format: false, constraints: { id: %r{[^/]+} }
+
+    # Camp Setup
     resources :camp_configurations do
-      resources :camp_occurrences
+      collection { post :batch }
+    end
+    resources :session_configurations do
+      collection { post :batch }
+    end
+    resources :activities do
+      collection { post :batch }
+    end
+    resources :courses do
+      collection { post :batch }
+    end
+    resources :campnotes do
+      collection { post :batch }
+    end
+    resources :demographics do
+      collection { post :batch }
+    end
+    resources :gender_types do
+      collection { post :batch }
     end
 
-    resources :camp_occurrences do
-      resources :activities
+    # Logins Info
+    resources :admins do
+      collection { post :batch }
+      member { post :unlock }
     end
-
-    resources :camp_occurrences do
-      resources :courses
+    resources :users do
+      collection { post :batch }
     end
+    resources :faculties, only: %i[index show destroy] do
+      collection { post :batch }
+    end
+    # Feedback is submitted by applicants on the public site; admins only review/edit/delete it.
+    resources :feedbacks, except: %i[new create] do
+      collection { post :batch }
+    end
+  end
 
-    resources :activities
-    resources :courses
-  # end
+  # ActiveAdmin used to run at /legacy_admin during the cutover. Old bookmarks land on the new
+  # admin's dashboard (the legacy URL structure does not map 1:1 onto the new routes).
+  get '/legacy_admin(/*path)', to: redirect('/admin', status: 301), format: false
 
   devise_for :users, controllers: {
     registrations: 'users/registrations'
   }
-  resources :applicant_details
+  # Applicant-facing; the admin listing lives under /admin/applicant_details (no destroy anywhere).
+  resources :applicant_details, except: %i[index destroy]
 
+  # Applicant-facing; admin listing/deletion lives under /admin/travels and /admin/recommendations.
   resources :enrollments do
-    resources :travels
+    resources :travels, except: %i[index destroy]
   end
 
+  # Applicant-facing request form; admin listing/deletion lives under /admin/financial_aid_requests.
   resources :enrollments do
-    resources :activities
+      resources :financial_aids, except: %i[index destroy]
   end
 
-  resources :enrollments do
-      resources :financial_aids
-  end
-
-  resources :financial_aids
+  resources :financial_aids, except: %i[index destroy]
 
   resources :enrollments do
-    resources :recommendations
+    resources :recommendations, except: %i[index destroy]
   end
 
-  resources :recommendations
+  resources :recommendations, except: %i[index destroy]
 
   resources :enrollments do
       resources :course_preferences do
@@ -93,15 +170,10 @@ Rails.application.routes.draw do
   end
 
   resources :enrollments do
-    resources :course_assignments
-  end
-
-  resources :enrollments do
     resources :session_assignments
   end
 
   resources :course_preferences
-  resources :course_assignments
   resources :session_assignments
 
   # post 'accept_offer', to: 'enrollments#accept_offer'
@@ -110,15 +182,11 @@ Rails.application.routes.draw do
   post 'accept_session_offer/:id', to: 'session_assignments#accept_session_offer', as: :accept_session_offer
   post 'decline_session_offer/:id', to: 'session_assignments#decline_session_offer', as: :decline_session_offer
 
-  post 'waitlisted/:id', to: 'enrollments#add_to_waitlist', as: :waitlisted
-  post 'remove_from_waitlist/:id', to: 'enrollments#remove_from_waitlist', as: :remove_from_waitlist
-  post 'withdraw/:id', to: 'enrollments#withdraw', as: :withdraw_enrollment
 
   get 'static_pages/index'
   get 'static_pages/contact'
   get 'static_pages/privacy'
 
-  get 'payments', to: 'payments#index'
   get 'payment_receipt', to: 'payments#payment_receipt'
   post 'payment_receipt', to: 'payments#payment_receipt'
   get 'payment_show', to: 'payments#payment_show', as: 'all_payments'
@@ -129,8 +197,6 @@ Rails.application.routes.draw do
   get 'recupload_success', to: 'recuploads#success'
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
 
-  get 'send_request_email', to: 'recommendations#send_request_email', as: :send_request_email
 
-  get 'send_finaid_request_email', to: 'enrollments#send_finaid_request_email', as: :send_finaid_request_email
 
 end

@@ -1,0 +1,22 @@
+<% admin_page_title "Feedback ##{@feedback.id}", subtitle: @feedback.genre_label %>
+<% admin_page_actions do %>
+  <%= link_to 'Edit', edit_admin_feedback_path(@feedback), class: 'admin-btn-primary' %>
+  <%= button_to 'Delete', admin_feedback_path(@feedback), method: :delete, class: 'admin-btn-danger',
+                form: { data: { turbo_confirm: 'Delete this feedback? This cannot be undone.' } } %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-3">
+  <div class="xl:col-span-2">
+    <%= admin_panel 'Feedback', body_class: '' do %>
+      <%= admin_attributes @feedback do |a| %>
+        <% a.row :id %>
+        <% a.row :genre do |feedback| %><%= admin_status_badge(feedback.genre_label) %><% end %>
+        <% a.row :message do |feedback| %>
+          <p class="admin-prose"><%= feedback.message %></p>
+        <% end %>
+        <% a.row 'User' do |feedback| %><%= admin_resource_link(feedback.user) %><% end %>
+        <% a.row :created_at, :updated_at %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

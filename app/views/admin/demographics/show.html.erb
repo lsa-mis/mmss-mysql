@@ -1,0 +1,23 @@
+<% admin_page_title @demographic.name, subtitle: "Demographic ##{@demographic.id}#{' · protected' if @demographic.protected?}" %>
+<% admin_page_actions do %>
+  <% unless @demographic.protected? %>
+    <%= link_to 'Edit', edit_admin_demographic_path(@demographic), class: 'admin-btn-primary' %>
+    <%= button_to 'Delete', admin_demographic_path(@demographic), method: :delete, class: 'admin-btn-danger',
+                  form: { data: { turbo_confirm: 'Delete this demographic option?' } } %>
+  <% end %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-3">
+  <div class="xl:col-span-2">
+    <%= admin_panel 'Demographic', body_class: '' do %>
+      <% if @demographic.protected? %>
+        <p class="border-b border-amber-200 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-900">
+          This demographic record is protected and cannot be modified.
+        </p>
+      <% end %>
+      <%= admin_attributes @demographic do |a| %>
+        <% a.row :name, :description, :protected, :created_at, :updated_at %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

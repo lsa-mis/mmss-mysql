@@ -1,0 +1,6 @@
+<% admin_page_title "Edit Rejection ##{@rejection.id}", subtitle: admin_applicant_name(@rejection.enrollment) %>
+<% admin_page_actions do %>
+  <%= link_to 'View rejection', admin_rejection_path(@rejection), class: 'admin-btn-secondary' %>
+<% end %>
+
+<%= render 'admin/rejections/form', rejection: @rejection %>

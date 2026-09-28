@@ -1,0 +1,16 @@
+<% admin_page_title @gender_type.name, subtitle: "Gender Type ##{@gender_type.id}" %>
+<% admin_page_actions do %>
+  <%= link_to 'Edit', edit_admin_gender_type_path(@gender_type), class: 'admin-btn-primary' %>
+  <%= button_to 'Delete', admin_gender_type_path(@gender_type), method: :delete, class: 'admin-btn-danger',
+                form: { data: { turbo_confirm: 'Delete this gender type?' } } %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-3">
+  <div class="xl:col-span-2">
+    <%= admin_panel 'Gender Type', body_class: '' do %>
+      <%= admin_attributes @gender_type do |a| %>
+        <% a.row :id, :name, :description, :created_at, :updated_at %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

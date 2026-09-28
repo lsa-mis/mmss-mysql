@@ -1,22 +1,13 @@
 # frozen_string_literal: true
 
+# Applicant-facing financial aid request form. Admin listing, awards and deletion live in
+# Admin::FinancialAidRequestsController.
 class FinancialAidsController < ApplicationController
   devise_group :logged_in, contains: [:user, :admin]
   before_action :authenticate_logged_in!
-  before_action :authenticate_admin!, only: [:index, :destroy]
 
   before_action :set_current_enrollment
-  before_action :set_financial_aid, only: [:show, :edit, :update, :destroy]
-
-  # GET /financial_aids
-  # GET /financial_aids.json
-  def index
-    if admin_signed_in?
-      @financial_aids = FinancialAid.all
-    else
-      @financial_aids = FinancialAid.where(enrollment_id: @current_enrollment)
-    end
-  end
+  before_action :set_financial_aid, only: [:show, :edit, :update]
 
   # GET /financial_aids/1
   # GET /financial_aids/1.json
@@ -40,11 +31,11 @@ class FinancialAidsController < ApplicationController
 
     respond_to do |format|
       if @financial_aid.save
-        format.html { redirect_to all_payments_path, notice: 'Financial aid was successfully created.' }
+        format.html { redirect_to all_payments_path, notice: 'Financial aid was successfully created.', status: :see_other }
         format.json { render :show, status: :created, location: @financial_aid }
       else
-        format.html { render :new }
-        format.json { render json: @financial_aid.errors, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_content }
+        format.json { render json: @financial_aid.errors, status: :unprocessable_content }
       end
     end
   end
@@ -54,28 +45,23 @@ class FinancialAidsController < ApplicationController
   def update
     respond_to do |format|
       if @financial_aid.update(financial_aid_params)
-        format.html { redirect_to payments_path, notice: 'Financial aid was successfully updated.' }
+        format.html { redirect_to all_payments_path, notice: 'Financial aid was successfully updated.', status: :see_other }
         format.json { render :show, status: :ok, location: @financial_aid }
       else
-        format.html { render :edit }
-        format.json { render json: @financial_aid.errors, status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_content }
+        format.json { render json: @financial_aid.errors, status: :unprocessable_content }
       end
     end
   end
 
-  # DELETE /financial_aids/1
-  # DELETE /financial_aids/1.json
-  def destroy
-    @financial_aid.destroy
-    respond_to do |format|
-      format.html { redirect_to financial_aids_url, notice: 'Financial aid was successfully destroyed.' }
-      format.json { head :no_content }
-    end
-  end
-
   private
+    # Every action works on the applicant's current application; without one (no application
+    # this camp year, or an admin-only session) there is nothing to request aid for.
     def set_current_enrollment
-      @current_enrollment = current_user.enrollments.current_camp_year_applications.last
+      @current_enrollment = current_user&.enrollments&.current_camp_year_applications&.last
+      return if @current_enrollment
+
+      redirect_to root_path, alert: 'No current application found for this camp year.', status: :see_other
     end
 
     # Use callbacks to share common setup or constraints between actions.
@@ -85,7 +71,8 @@ class FinancialAidsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def financial_aid_params
-      permitted = [:enrollment_id, :note, :adjusted_gross_income]
+      # The enrollment is always the applicant's current one (set_current_enrollment); never take it from the form.
+      permitted = [:note, :adjusted_gross_income]
 
       # Only allow admin-only fields if user is an admin
       if admin_signed_in?

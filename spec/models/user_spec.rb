@@ -29,7 +29,38 @@ RSpec.describe User, type: :model do
   describe 'associations' do
     it { is_expected.to have_one(:applicant_detail).dependent(:destroy) }
     it { is_expected.to have_many(:enrollments).dependent(:destroy) }
-    it { is_expected.to have_many(:payments).dependent(:destroy) }
+    it { is_expected.to have_many(:payments).dependent(:restrict_with_error) }
+    it { is_expected.to have_many(:payment_requests).dependent(:restrict_with_error) }
+
+    it 'cannot be destroyed while it has payments or payment requests' do
+      user = create(:user)
+      create(:payment_request, user: user)
+
+      expect(user.destroy).to be(false)
+      expect(user.errors[:base].join).to include('payment requests')
+      expect(User.exists?(user.id)).to be(true)
+    end
+
+    it 'checks the financial restriction before destroying any application data' do
+      user = create(:user, :with_applicant_detail)
+      enrollment = create(:enrollment, user: user)
+      feedback = create(:feedback, user: user)
+      create(:payment, user: user)
+      applicant_detail = user.applicant_detail
+
+      deletes = []
+      callback = ->(*, payload) { deletes << payload[:sql] if payload[:sql].start_with?('DELETE') }
+      ActiveSupport::Notifications.subscribed(callback, 'sql.active_record') do
+        expect(user.destroy).to be(false)
+      end
+
+      # Not merely rolled back by the transaction: no DELETE was issued at all.
+      expect(deletes).to be_empty
+      expect(applicant_detail.reload).to be_persisted
+      expect(enrollment.reload).to be_persisted
+      expect(feedback.reload).to be_persisted
+      expect(user.errors[:base].join).to include('payments')
+    end
     it { is_expected.to have_many(:feedbacks).dependent(:destroy) }
   end
 
@@ -91,12 +122,6 @@ RSpec.describe User, type: :model do
 
     it 'is configured for timeoutable' do
       expect(User.devise_modules).to include(:timeoutable)
-    end
-  end
-
-  describe '.ransackable_attributes' do
-    it 'returns searchable attributes' do
-      expect(User.ransackable_attributes).to include('email')
     end
   end
 

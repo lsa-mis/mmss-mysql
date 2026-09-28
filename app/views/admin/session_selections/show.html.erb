@@ -1,0 +1,25 @@
+<% admin_page_title "Session Selection ##{@session_selection.id}", subtitle: "#{admin_applicant_name(@session_selection.enrollment)} · #{@session_selection.camp_occurrence.description}" %>
+<% admin_page_actions do %>
+  <%= link_to 'Edit', edit_admin_session_selection_path(@session_selection), class: 'admin-btn-primary' %>
+  <%= button_to 'Delete', admin_session_selection_path(@session_selection), method: :delete, class: 'admin-btn-danger',
+                form: { data: { turbo_confirm: 'Delete this session selection?' } } %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-3">
+  <div class="grid gap-5 xl:col-span-2">
+    <%= admin_panel 'Session Selection', body_class: '' do %>
+      <%= admin_attributes @session_selection do |a| %>
+        <% a.row 'Enrollment' do |selection| %>
+          <%= link_to selection.enrollment.user.email, admin_application_path(selection.enrollment), class: 'font-medium' %>
+          <span class="text-slate-500"><%= admin_applicant_name(selection.enrollment) %></span>
+        <% end %>
+        <% a.row 'Session' do |selection| %>
+          <%= admin_resource_link(selection.camp_occurrence) %>
+        <% end %>
+        <% a.row :created_at, :updated_at %>
+      <% end %>
+    <% end %>
+
+    <%= render 'admin/comments/comments', resource: @session_selection %>
+  </div>
+</div>

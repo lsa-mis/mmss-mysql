@@ -36,6 +36,9 @@ class CampConfiguration < ApplicationRecord
   validates :camper_acceptance_due, presence: true
   validate :only_one_active_camp
   validates :offer_letter, :reject_letter, :waitlist_letter, presence: true
+  # Rendered as a clickable link in the admin and mailed to campers, so only web URLs are allowed.
+  validates :student_packet_url, format: { with: %r{\Ahttps?://\S+\z}i, message: 'must start with http:// or https://' },
+                                 allow_blank: true
 
   monetize :application_fee_cents
 
@@ -85,10 +88,5 @@ class CampConfiguration < ApplicationRecord
       new_camp_configuration.camper_acceptance_due = ''
       new_camp_configuration.active = ''
     end
-  end
-
-  def self.ransackable_attributes(auth_object = nil)
-    %w[active application_close application_fee_cents application_fee_required application_materials_due
-       application_open camp_year camper_acceptance_due created_at id offer_letter priority reject_letter student_packet_url updated_at waitlist_letter]
   end
 end

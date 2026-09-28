@@ -1,0 +1,20 @@
+<%# locals: account, scope, url, cancel, label -%>
+<%# Devise account form shared by Admins and Users: email + password/confirmation. Passwords are
+    required when creating an account and optional when editing (blank = keep the current one). -%>
+<% editing = account.persisted? %>
+<%= admin_form_with model: account, scope: scope, url: url, class: 'grid gap-5 max-w-2xl' do |f| %>
+  <%= f.errors_summary %>
+
+  <%= f.fieldset label do %>
+    <%= f.input :email, as: :email, required: true, autocomplete: 'off' %>
+  <% end %>
+
+  <%= f.fieldset 'Password',
+                 description: (editing ? 'Leave both fields blank to keep the current password.' : 'At least 6 characters.') do %>
+    <%= f.input :password, as: :password, required: !editing, autocomplete: 'new-password',
+                           hint: (editing ? "Leave blank if you don't want to change the password" : nil) %>
+    <%= f.input :password_confirmation, as: :password, required: !editing, autocomplete: 'new-password' %>
+  <% end %>
+
+  <%= f.actions cancel: cancel %>
+<% end %>

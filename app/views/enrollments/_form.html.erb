@@ -34,7 +34,7 @@
           <%= form.collection_check_boxes(:session_registration_ids, CampOccurrence.active, :id, :description_with_date_and_price, required: true) do |b| %>
             <div>
               <%= b.label(class: "inline-flex items-center") do %>
-                <%= b.check_box(class: "form-checkbox mr-2", :"data-action" => "input->enrollment#display_toggle_session", :"data-index" => index, :"data-target" => "enrollment.checkbox") %>
+                <%= b.check_box(class: "form-checkbox mr-2", :"data-action" => "input->enrollment#display_toggle_session", :"data-index" => index, :"data-enrollment-target" => "checkbox") %>
                 <%= b.text %>
               <% end %>
             </div>
@@ -50,7 +50,7 @@
         session(s) you selected.
       </p>
 
-      <div id="sessionActivity1" data-target="enrollment.session" class="session--hide">
+      <div id="sessionActivity1" data-enrollment-target="session" class="session--hide">
         <% if @activities_session1.present? %>
           <div class= "text-sm bg-yellow-500">Session 1</div>
           <div class="mt-2">
@@ -66,7 +66,7 @@
         <% end %>
       </div>
 
-      <div id="sessionActivity2"  data-target="enrollment.session" class="session--hide">
+      <div id="sessionActivity2"  data-enrollment-target="session" class="session--hide">
         <% if @activities_session2.present? %>
             <div class= "text-sm bg-yellow-500">Session 2</div>
             <div class="mt-2">
@@ -82,7 +82,7 @@
         <% end %>
       </div>
 
-      <div id="sessionActivity3" data-target="enrollment.session" class="session--hide">
+      <div id="sessionActivity3" data-enrollment-target="session" class="session--hide">
         <% if @activities_session3.present? %>
           <div class= "text-sm bg-yellow-500">Session 3</div>
           <div class="mt-2">
@@ -105,7 +105,7 @@
         Check the box next to each course in which you are interested. You will be able to rank your choices in order of preference in a later step.
       </p>
 
-      <div id="sessionCourses1" data-target="enrollment.courses" class="session--hide">
+      <div id="sessionCourses1" data-enrollment-target="courses" class="session--hide">
         <% if @courses_session1.present? %>
           <div class="display-box">
             <div class= "text-sm bg-yellow-500 -mx-2">Session 1</div>
@@ -121,7 +121,7 @@
         <% end %>
       </div>
 
-      <div id="sessionCourses2" data-target="enrollment.courses" class="session--hide">
+      <div id="sessionCourses2" data-enrollment-target="courses" class="session--hide">
         <% if @courses_session2.present? %>
           <div class="display-box">
             <div class= "text-sm bg-yellow-500 -mx-2">Session 2</div>
@@ -137,7 +137,7 @@
         <% end %>
       </div>
 
-      <div id="sessionCourses3" data-target="enrollment.courses" class="session--hide">
+      <div id="sessionCourses3" data-enrollment-target="courses" class="session--hide">
         <% if @courses_session3.present? %>
           <div class="display-box">
             <div class= "text-sm bg-yellow-500 -mx-2">Session 3</div>

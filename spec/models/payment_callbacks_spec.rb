@@ -28,7 +28,7 @@ RSpec.describe 'Payment callbacks', type: :model do
     expect { payment.save! }.to change { Payment.count }.by(1)
 
     expect(enrollment.reload.application_status).to eq('submitted')
-    expect(enrollment.application_status_updated_on).to eq(Date.today)
+    expect(enrollment.application_status_updated_on).to eq(Date.current)
   end
 
   it 'on first successful payment + recupload sets application complete' do
@@ -43,7 +43,7 @@ RSpec.describe 'Payment callbacks', type: :model do
     payment.save!
 
     expect(enrollment.reload.application_status).to eq('application complete')
-    expect(enrollment.application_status_updated_on).to eq(Date.today)
+    expect(enrollment.application_status_updated_on).to eq(Date.current)
   end
 
   it 'does not change status on subsequent successful payments (until enrolled condition met)' do

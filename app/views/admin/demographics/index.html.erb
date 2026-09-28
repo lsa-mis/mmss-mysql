@@ -1,0 +1,23 @@
+<% admin_page_title 'Demographics', subtitle: "#{number_with_delimiter(@pagy.count)} #{'option'.pluralize(@pagy.count)}" %>
+<% admin_page_actions do %>
+  <%= admin_csv_link %>
+  <%= link_to 'New Demographic', new_admin_demographic_path, class: 'admin-btn-primary' %>
+<% end %>
+
+<%= admin_table @demographics, pagy: @pagy,
+                batch_actions: Admin::DemographicsController::BATCH_ACTIONS, batch_url: batch_admin_demographics_path,
+                actions: ->(demographic) {
+                  if demographic.protected?
+                    [admin_demographic_path(demographic), nil, nil]
+                  else
+                    [admin_demographic_path(demographic), edit_admin_demographic_path(demographic), admin_demographic_path(demographic)]
+                  end
+                } do |t| %>
+  <% t.column :name, sort: true do |demographic| %>
+    <%= link_to demographic.name, admin_demographic_path(demographic), class: 'font-medium' %>
+  <% end %>
+  <% t.column :description, sort: true %>
+  <% t.column :protected, sort: true %>
+  <% t.column :created_at, sort: true %>
+  <% t.column :updated_at, sort: true %>
+<% end %>

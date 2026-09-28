@@ -1,0 +1,30 @@
+<% admin_page_title "Recupload ##{@recupload.id}", subtitle: "#{@recupload.authorname} · for #{admin_applicant_name(@recupload.recommendation.enrollment)}" %>
+<% admin_page_actions do %>
+  <%= link_to 'Edit', edit_admin_recupload_path(@recupload), class: 'admin-btn-primary' %>
+  <%= button_to 'Delete', admin_recupload_path(@recupload), method: :delete, class: 'admin-btn-danger',
+                form: { data: { turbo_confirm: 'Delete this uploaded recommendation letter?' } } %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-3">
+  <div class="grid gap-5 xl:col-span-2">
+    <%= admin_panel 'Recupload', body_class: '' do %>
+      <%= admin_attributes @recupload do |a| %>
+        <% a.row :id %>
+        <% a.row 'Recommendation' do |recupload| %>
+          <%= link_to "Recommendation ##{recupload.recommendation_id} (#{recupload.recommendation.full_name})", admin_recommendation_path(recupload.recommendation_id) %>
+        <% end %>
+        <% a.row 'Applicant name' do |recupload| %>
+          <%= admin_applicant_link(recupload.recommendation.enrollment) %>
+          <span class="text-slate-500"><%= recupload.recommendation.enrollment.user.email %></span>
+        <% end %>
+        <% a.row :letter do |recupload| %>
+          <p class="admin-prose whitespace-pre-line"><%= recupload.letter.presence || admin_empty_value %></p>
+        <% end %>
+        <% a.row :recletter do |recupload| %><%= admin_attachment_link(recupload.recletter) %><% end %>
+        <% a.row :authorname, :studentname, :created_at, :updated_at %>
+      <% end %>
+    <% end %>
+
+    <%= render 'admin/comments/comments', resource: @recupload %>
+  </div>
+</div>

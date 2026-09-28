@@ -5,15 +5,15 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <%= stylesheet_pack_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
-    <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <%= stylesheet_link_tag 'tailwind', media: 'all', 'data-turbo-track': 'reload' %>
+    <%= javascript_importmap_tags %>
 
     <noscript>
       <meta http-equiv="refresh" content="2;url=nojavascript.html">
     </noscript>
   </head>
 
-  <body data-environment = Rails.env >
+  <body data-environment="<%= Rails.env %>">
     <header class="w-full h-auto">
       <%= render 'layouts/nav_links_for_auth' %>
     </header>
