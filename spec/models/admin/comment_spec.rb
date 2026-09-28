@@ -3,8 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe Admin::Comment, type: :model do
-  it 'uses the ActiveAdmin comments table and defaults to the admin namespace' do
-    expect(described_class.table_name).to eq('active_admin_comments')
+  it 'uses the renamed admin_comments table and defaults to the admin namespace' do
+    expect(described_class.table_name).to eq('admin_comments')
     expect(described_class.new.namespace).to eq('admin')
   end
 

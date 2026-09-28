@@ -1,14 +1,9 @@
 # frozen_string_literal: true
 
-# Sidebar navigation for the admin layout. Mirrors the four ActiveAdmin menu groups.
-#
-# Each item names a route helper. While a resource still lives in ActiveAdmin its item points at
-# the legacy_admin_* helper and is flagged `legacy: true`; porting a resource means switching the
-# item to the new admin_* helper and dropping the flag.
+# Sidebar navigation for the admin layout. Mirrors the four menu groups of the former ActiveAdmin
+# navigation. Each item names a route helper.
 class Admin::Menu
-  Item = Struct.new(:label, :route, :legacy, :match, keyword_init: true) do
-    def legacy? = legacy == true
-  end
+  Item = Struct.new(:label, :route, :match, keyword_init: true)
   Group = Struct.new(:label, :items, keyword_init: true)
 
   GROUPS = [

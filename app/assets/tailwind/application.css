@@ -14,8 +14,8 @@
 /* Third-party styles bundled with the app stylesheet (flatpickr date picker). */
 @import "./flatpickr.css";
 
-/* Explicit sources: the Rails root also holds specs, seeds and ActiveAdmin DSL files
-   that would otherwise be scanned for class names. */
+/* Explicit sources: the Rails root also holds specs and seeds that would otherwise be
+   scanned for class names. */
 @source "../../views";
 @source "../../helpers";
 @source "../../javascript";

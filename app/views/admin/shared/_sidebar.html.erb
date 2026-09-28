@@ -20,12 +20,8 @@
           <li>
             <%= link_to admin_menu_item_path(item),
                         class: class_names('admin-nav-link', 'admin-nav-link-active' => admin_menu_item_active?(item)),
-                        data: ({ turbo: false } if item.legacy?),
                         aria: { current: admin_menu_item_active?(item) ? 'page' : nil } do %>
               <span class="truncate"><%= item.label %></span>
-              <% if item.legacy? %>
-                <span class="ml-auto rounded bg-white/10 px-1 text-[10px] uppercase tracking-wide text-slate-300" title="Still served by ActiveAdmin">legacy</span>
-              <% end %>
             <% end %>
           </li>
         <% end %>

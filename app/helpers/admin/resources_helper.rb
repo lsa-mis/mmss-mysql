@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 # Maps models to their admin show pages. Models whose resource name differs from the model
-# name (ActiveAdmin's `as:`) are listed explicitly; everything else falls back to the
-# conventional `admin_<model>_path`. Resources not yet ported return the legacy route instead.
+# name (the former ActiveAdmin `as:` names, kept for the routes) are listed explicitly;
+# everything else falls back to the conventional `admin_<model>_path`.
 module Admin::ResourcesHelper
   ROUTE_NAMES = {
     'Enrollment' => 'application',
@@ -17,22 +17,12 @@ module Admin::ResourcesHelper
     ROUTE_NAMES.fetch(record.class.name) { record.class.model_name.singular }
   end
 
-  # Path to the record's admin show page: the new admin when the route exists, otherwise the
-  # legacy ActiveAdmin page. Returns nil when neither exists.
+  # Path to the record's admin show page, or nil when the model has no admin resource.
   def admin_resource_path(record)
     return nil if record.nil?
 
-    name = admin_resource_route_name(record)
-    if respond_to?(:"admin_#{name}_path")
-      public_send(:"admin_#{name}_path", record)
-    elsif respond_to?(:"legacy_admin_#{name}_path")
-      public_send(:"legacy_admin_#{name}_path", record)
-    end
-  end
-
-  # True when the record's show page is still served by ActiveAdmin.
-  def admin_resource_legacy?(record)
-    !respond_to?(:"admin_#{admin_resource_route_name(record)}_path")
+    helper = :"admin_#{admin_resource_route_name(record)}_path"
+    public_send(helper, record) if respond_to?(helper)
   end
 
   def admin_resource_link(record, text = nil)
@@ -40,15 +30,6 @@ module Admin::ResourcesHelper
 
     text ||= record.try(:display_name) || record.try(:name) || "#{record.class.model_name.human} ##{record.id}"
     path = admin_resource_path(record)
-    return text unless path
-
-    admin_resource_legacy?(record) ? admin_legacy_link_to(text, path) : link_to(text, path)
-  end
-
-  # link_to for anything under /legacy_admin. ActiveAdmin's page must be a full navigation
-  # (its own jQuery/Sprockets bundle), so Turbo Drive is disabled on the link.
-  def admin_legacy_link_to(text, path, **options)
-    options[:data] = (options[:data] || {}).merge(turbo: false)
-    link_to(text, path, **options)
+    path ? link_to(text, path) : text
   end
 end

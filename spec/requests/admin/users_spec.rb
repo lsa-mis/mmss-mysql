@@ -87,7 +87,7 @@ RSpec.describe 'Admin users', type: :request do
       get admin_user_path(user)
 
       expect(response).to have_http_status(:ok)
-      body = response.body
+      body = CGI.unescapeHTML(response.body)
       expect(body).to include("User ##{user.id}")
       expect(body).to include(user.applicant_detail.full_name.titleize)
       expect(body).to include('Applications')
