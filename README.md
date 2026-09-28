@@ -40,7 +40,7 @@ A Ruby on Rails application for managing summer camp applications, enrollments, 
 
 | Layer            | Technology                                                       |
 | ---------------- | ---------------------------------------------------------------- |
-| **Runtime**      | Ruby 3.4.9                                                       |
+| **Runtime**      | Ruby 4.0.6                                                       |
 | **Framework**    | Rails 8.1.3.1 (`config.load_defaults 8.1`)                       |
 | **Database**     | MySQL 8 (mysql2 gem), utf8mb4                                    |
 | **Auth**         | Devise (users, admins, faculties)                                |
@@ -56,9 +56,9 @@ A Ruby on Rails application for managing summer camp applications, enrollments, 
 
 ## Prerequisites
 
-- **Ruby** 3.4.9 (recommended: [asdf](https://asdf-vm.com/) or rbenv)
+- **Ruby** 4.0.6 (recommended: [asdf](https://asdf-vm.com/) or rbenv; `.ruby-version` and `.tool-versions` pin it)
 - **MySQL** 8.x (with OpenSSL available for the `mysql2` gem)
-- **Bundler** 2.x
+- **Bundler** 4.x (ships with Ruby 4.0; `Gemfile.lock` records the version)
 - **Git**
 
 ### MySQL and mysql2 gem
@@ -203,6 +203,19 @@ bundle exec cap production maintenance:stop
 ```
 
 Before deploy, `deploy:check_revision` ensures local HEAD matches `origin/main`.
+
+The host provides Ruby through asdf (`capistrano-asdf` reads `.tool-versions`, and
+`config/deploy.rb` points `bundle`/`ruby` at `/home/deployer/.asdf/shims`). Install the
+Ruby version pinned in `.tool-versions` on the host before deploying a release that bumps
+it, e.g. for 4.0.6:
+
+```bash
+asdf install ruby 4.0.6        # needs libyaml-dev, libssl-dev, zlib1g-dev, libffi-dev, libmysqlclient-dev
+asdf reshim ruby
+```
+
+`debug:print_ruby_version` runs before `bundler:install` and prints the Ruby the release
+resolved to, so a missing install fails early.
 
 Assets are compiled on the server by capistrano-rails (`bin/rails assets:precompile`),
 which runs `tailwindcss:build` (both bundles, via the `tailwindcss-ruby` standalone

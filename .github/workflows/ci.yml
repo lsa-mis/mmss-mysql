@@ -52,7 +52,8 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          # Reads .ruby-version (3.4.9); installs and caches the bundle.
+          # Reads .ruby-version (4.0.6; a prebuilt ruby/ruby-builder release exists for it);
+          # installs and caches the bundle with the Bundler version from Gemfile.lock.
           bundler-cache: true
 
       - name: Build Tailwind CSS
