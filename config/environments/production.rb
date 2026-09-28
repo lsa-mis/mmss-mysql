@@ -1,4 +1,5 @@
 require "active_support/core_ext/integer/time"
+require_relative "../../lib/allowed_hosts"
 
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
@@ -26,8 +27,13 @@ Rails.application.configure do
   # Store uploaded files on Google Cloud Storage (see config/storage.yml for options).
   config.active_storage.service = :google
 
+  # TLS terminates at the reverse proxy (NGINX / the UM cluster's load balancer), so every request
+  # reaches Puma over plain HTTP. `assume_ssl` makes Rails treat them all as HTTPS regardless of
+  # the forwarded headers: secure cookies are set, generated URLs are https and `force_ssl` never
+  # redirect-loops when a proxy hop drops X-Forwarded-Proto.
+  config.assume_ssl = true
+
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  # NGINX forwards X-Forwarded-Proto, so `assume_ssl` is not needed.
   config.force_ssl = true
 
   # Skip http-to-https redirect for the default health check endpoint.
@@ -91,12 +97,8 @@ Rails.application.configure do
   # Only use :id for inspections in production.
   config.active_record.attributes_for_inspect = [:id]
 
-  # Enable DNS rebinding protection and other `Host` header attacks.
-  # config.hosts = [
-  #   "example.com",     # Allow requests from example.com
-  #   /.*\.example\.com/ # Allow requests from subdomains like `www.example.com`
-  # ]
-  #
-  # Skip DNS rebinding protection for the default health check endpoint.
-  # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+  # DNS rebinding / Host header protection: only the public hostname is served, plus anything in
+  # RAILS_ALLOWED_HOSTS (comma-separated; e.g. the cluster's internal node names). /up stays
+  # reachable from any host for health checks. See lib/allowed_hosts.rb.
+  AllowedHosts.configure(config, "mmss-registration.math.lsa.umich.edu")
 end
