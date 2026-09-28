@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Session Selections = SessionActivity records (the sessions an applicant registered for). The
-# ActiveAdmin resource was registered `as: 'Session Selection'`, so the routes keep that name.
+# legacy admin registered the resource as 'Session Selection', so the routes keep that name.
 class Admin::SessionSelectionsController < Admin::BaseController
   before_action :set_session_selection, only: %i[show edit update destroy]
 

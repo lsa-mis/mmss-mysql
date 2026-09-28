@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 class FeedbacksController < ApplicationController
-  devise_group :logged_in, contains: [:user, :admin, :faculty]
-  before_action :authenticate_logged_in!
+  # Feedback belongs to an applicant account (current_user.feedbacks); the footer only offers the
+  # link to signed-in users.
+  before_action :authenticate_user!
 
   def index
     redirect_to root_path

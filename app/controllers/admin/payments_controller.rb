@@ -26,7 +26,7 @@ class Admin::PaymentsController < Admin::BaseController
     created_at: 'payments.created_at'
   }.freeze
 
-  # Defaults of a manual payment (ActiveAdmin pre-filled the same values): a successful (1)
+  # Defaults of a manual payment (the legacy admin pre-filled the same values): a successful (1)
   # web (1) transaction dated now, for the active camp.
   MANUAL_TRANSACTION_TYPE = '1'
   MANUAL_TRANSACTION_STATUS = '1'
@@ -112,7 +112,7 @@ class Admin::PaymentsController < Admin::BaseController
     params.require(:payment).permit(:total_amount_dollars, :transaction_id, :account_type, :result_message)
   end
 
-  # The ActiveAdmin resource had no custom CSV, so every column was exported; the Nelnet signature
+  # Every column is exported (as the legacy admin did); the Nelnet signature
   # (transaction_hash) is left out here.
   def csv_export
     view = helpers

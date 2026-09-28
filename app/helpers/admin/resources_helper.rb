@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Maps models to their admin show pages. Models whose resource name differs from the model
-# name (the former ActiveAdmin `as:` names, kept for the routes) are listed explicitly;
+# name (the legacy admin's resource names, kept for the routes) are listed explicitly;
 # everything else falls back to the conventional `admin_<model>_path`.
 module Admin::ResourcesHelper
   ROUTE_NAMES = {

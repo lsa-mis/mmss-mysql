@@ -2,9 +2,6 @@
 
 class StaticPagesController < ApplicationController
   include ApplicantState
-  # devise_group :logged_in, contains: [:user, :admin]
-  # before_action :authenticate_logged_in!, except: [:contact :privacy]
-  # before_action :authenticate_admin!, only: [:destroy]
   before_action :set_current_enrollment
 
   def index

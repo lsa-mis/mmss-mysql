@@ -278,5 +278,66 @@ RSpec.describe 'Applicant-facing controllers scope records to the signed-in user
       expect(response).to have_http_status(:not_found)
       expect(aid_b.reload.enrollment).to eq(enrollment_b)
     end
+
+    it 'never accepts the award fields (amount, source, status, deadline) from an applicant' do
+      post financial_aids_path, params: {
+        financial_aid: { note: 'help', adjusted_gross_income: 10_000, amount_cents: 500_000, source: 'Self-award',
+                         status: 'awarded', payments_deadline: Date.current }
+      }
+
+      aid = FinancialAid.last
+      expect(aid.enrollment).to eq(enrollment_a)
+      expect(aid.amount_cents).to eq(0)
+      expect(aid.source).to be_blank
+      expect(aid.status).not_to eq('awarded')
+      expect(aid.payments_deadline).to be_nil
+
+      patch financial_aid_path(aid), params: { financial_aid: { note: 'updated', amount_cents: 500_000, status: 'awarded' } }
+      expect(aid.reload.note).to eq('updated')
+      expect(aid.amount_cents).to eq(0)
+      expect(aid.status).not_to eq('awarded')
+    end
+  end
+
+  describe 'EnrollmentsController' do
+    it 'ignores the owner and the admin-only status columns in the application form' do
+      patch enrollment_path(enrollment_a), params: {
+        enrollment: { room_mate_request: 'Sam', user_id: user_b.id, application_status: 'enrolled',
+                      offer_status: 'accepted', notes: 'self-note', partner_program: 'VIP' }
+      }
+
+      enrollment_a.reload
+      expect(enrollment_a.room_mate_request).to eq('Sam')
+      expect(enrollment_a.user).to eq(user_a)
+      expect(enrollment_a.application_status).to be_nil
+      expect(enrollment_a.offer_status).to be_nil
+      expect(enrollment_a.notes).to be_nil
+      expect(enrollment_a.partner_program).to be_nil
+    end
+
+    it 'has no index or destroy (the admin listing is /admin/applications)' do
+      get '/enrollments'
+      expect(response).to have_http_status(:not_found)
+
+      expect { delete enrollment_path(enrollment_a) }.not_to change(Enrollment, :count)
+      expect(response).to have_http_status(:not_found)
+    end
+  end
+
+  describe 'admin sessions on applicant pages' do
+    # Admins have no current_user; every applicant-facing controller requires an applicant session
+    # (the old devise_group let admins in and then failed or fell into admin-only branches).
+    it 'redirects an admin-only session to the applicant sign-in' do
+      sign_out user_a
+      sign_in create(:admin)
+      get admin_root_path
+
+      { new_financial_aid_path => FinancialAid, new_enrollment_path => Enrollment, all_payments_path => nil,
+        new_feedback_path => Feedback, enrollment_course_preferences_path(enrollment_a) => CoursePreference,
+        edit_applicant_detail_path(user_a.applicant_detail) => ApplicantDetail }.each_key do |path|
+        get path
+        expect(response).to redirect_to(new_user_session_path), "expected #{path} to require an applicant session"
+      end
+    end
   end
 end

@@ -85,7 +85,7 @@ RSpec.describe 'Admin course assignments', type: :request do
       expect(response.body).to include('rel="prev"')
     end
 
-    it 'exports the ActiveAdmin CSV columns' do
+    it 'exports the legacy CSV columns' do
       get admin_course_assignments_path(format: :csv)
 
       expect(response.media_type).to eq('text/csv')

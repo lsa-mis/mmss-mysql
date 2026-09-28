@@ -40,7 +40,7 @@ RSpec.describe 'Admin comments', type: :request do
     expect(Admin::Comment.count).to eq(0)
   end
 
-  it 'reads pre-existing ActiveAdmin comments from the renamed table' do
+  it 'reads comments written by the legacy admin from the renamed table' do
     ActiveRecord::Base.connection.execute(<<~SQL.squish)
       INSERT INTO admin_comments (namespace, body, resource_type, resource_id, author_type, author_id, created_at, updated_at)
       VALUES ('admin', 'Legacy note', 'Enrollment', #{enrollment.id}, 'Admin', #{admin.id}, NOW(), NOW())
@@ -71,7 +71,7 @@ RSpec.describe 'Admin comments', type: :request do
     expect(response.body).to include('Enrollment')
   end
 
-  it 'lists comments written under the former ActiveAdmin namespaces and links their records' do
+  it 'lists comments written under the legacy admin namespaces and links their records' do
     financial_aid = create(:financial_aid, enrollment: enrollment)
     Admin::Comment.create!(body: 'legacy record note', author: admin, resource: financial_aid, namespace: 'legacy_admin')
 

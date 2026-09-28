@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# A named scope tab on an admin index page (the equivalent of ActiveAdmin's `scope`).
+# A named scope tab on an admin index page.
 #
 #   Admin::Scope.new(:current_camp_year_applications, label: 'Current years Applications', default: true)
 #   Admin::Scope.new(:offered, group: :offer_status)

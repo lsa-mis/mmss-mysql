@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Faculty accounts (the Devise `Faculty` model used by the faculty student-list pages).
-# Read-only apart from delete, as in ActiveAdmin: faculty register themselves and their
+# Read-only apart from delete: faculty register themselves and their
 # access is derived from Course#faculty_uniqname.
 class Admin::FacultiesController < Admin::BaseController
   before_action :set_faculty, only: %i[show destroy]

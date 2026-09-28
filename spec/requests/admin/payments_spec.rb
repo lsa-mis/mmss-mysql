@@ -27,7 +27,7 @@ RSpec.describe 'Admin payments', type: :request do
   end
 
   describe 'GET /admin/payments' do
-    it 'lists payments with the ActiveAdmin columns, filters and view/edit actions but no delete or batch actions' do
+    it 'lists payments with the legacy columns, filters and view/edit actions but no delete or batch actions' do
       get admin_payments_path
 
       expect(response).to have_http_status(:ok)

@@ -7,7 +7,7 @@ require 'rails_helper'
 RSpec.describe Admin::Reports, :admin_reports do
   let(:camp) { create(:camp_configuration, :current_year) }
 
-  it 'registers the eighteen ActiveAdmin reports in two groups with unique keys' do
+  it 'registers the eighteen legacy reports in two groups with unique keys' do
     expect(described_class.all.size).to eq(18)
     expect(described_class::GROUPS.keys).to eq(['Applications', 'Enrolled students'])
     expect(described_class.keys).to match_array(AdminReportFixtures::EXPECTED_HEADERS.keys)

@@ -23,7 +23,7 @@ RSpec.describe 'Admin applicant details', type: :request do
   end
 
   describe 'GET /admin/applicant_details' do
-    it 'lists applicants with scopes, filters, the ActiveAdmin columns and view/edit actions but no delete' do
+    it 'lists applicants with scopes, filters, the legacy columns and view/edit actions but no delete' do
       get admin_applicant_details_path
 
       expect(response).to have_http_status(:ok)
@@ -136,7 +136,7 @@ RSpec.describe 'Admin applicant details', type: :request do
       expect(response.body).to include('rel="prev"')
     end
 
-    it 'exports the ActiveAdmin CSV column set' do
+    it 'exports the legacy CSV column set' do
       get admin_applicant_details_path(format: :csv)
 
       expect(response).to have_http_status(:ok)

@@ -25,7 +25,7 @@ RSpec.describe 'Admin financial aid requests', type: :request do
   end
 
   describe 'GET /admin/financial_aid_requests' do
-    it 'lists current camp requests with scopes, filters, batch actions and the ActiveAdmin columns' do
+    it 'lists current camp requests with scopes, filters, batch actions and the legacy columns' do
       get admin_financial_aid_requests_path
 
       expect(response).to have_http_status(:ok)
@@ -125,7 +125,7 @@ RSpec.describe 'Admin financial aid requests', type: :request do
       expect(response.body).to include('rel="prev"')
     end
 
-    it 'exports the ActiveAdmin CSV column set with formatted money' do
+    it 'exports the legacy CSV column set with formatted money' do
       get admin_financial_aid_requests_path(format: :csv)
 
       expect(response).to have_http_status(:ok)

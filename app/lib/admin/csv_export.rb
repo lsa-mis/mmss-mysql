@@ -4,7 +4,7 @@ require 'csv'
 
 # CSV output for the admin.
 #
-# 1. Per-resource column sets (the ActiveAdmin `csv do ... end` block equivalent):
+# 1. Per-resource column sets:
 #
 #      EXPORT = Admin::CsvExport.define do
 #        column :updated_at

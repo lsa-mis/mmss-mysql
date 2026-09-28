@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# Session Configurations = CampOccurrence records (the ActiveAdmin resource was registered
-# `as: 'Session Configurations'`).
+# Session Configurations = CampOccurrence records (the legacy admin registered the resource
+# as 'Session Configurations').
 class Admin::SessionConfigurationsController < Admin::BaseController
   before_action :set_session_configuration, only: %i[show edit update destroy]
 

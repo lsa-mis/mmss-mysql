@@ -155,7 +155,7 @@ RSpec.describe 'Admin applications', type: :request do
       expect(row['Balance Due']).to eq(helpers_money(expected))
     end
 
-    it 'exports the current scope as CSV with the ActiveAdmin column set' do
+    it 'exports the current scope as CSV with the legacy column set' do
       get admin_applications_path(format: :csv), params: { scope: 'all' }
 
       expect(response).to have_http_status(:ok)

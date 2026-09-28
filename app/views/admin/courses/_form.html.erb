@@ -4,7 +4,7 @@
                     class: 'grid gap-5' do |f| %>
   <%= f.errors_summary %>
 
-  <%# Active sessions only (as in ActiveAdmin), plus the course's own session so editing an old course keeps it. %>
+  <%# Active sessions only plus the course's own session so editing an old course keeps it. %>
   <% sessions = CampOccurrence.active.reorder(begin_date: :desc).no_any_session.to_a %>
   <% sessions << course.camp_occurrence if course.camp_occurrence && sessions.exclude?(course.camp_occurrence) %>
 

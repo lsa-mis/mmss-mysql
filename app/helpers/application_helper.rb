@@ -57,31 +57,10 @@ module ApplicationHelper
     CampConfiguration.active_camp_fee_cents
   end
 
-  def applicant_status
-    [
-      ['*Select*', ''],
-      ['enrolled', 'enrolled'],
-      ['application complete', 'application complete'],
-      ['offer accepted', 'offer accepted'],
-      ['offer declined', 'offer declined'],
-      ['submitted', 'submitted'],
-      ['withdrawn', 'withdrawn']
-    ]
-  end
-
   def course_status
     [
       %w[open open],
       %w[closed closed]
-    ]
-  end
-
-  def offer_status
-    [
-      ['*Select*', ''],
-      ['accepted', 'accepted'],
-      ['declined', 'declined'],
-      ['offered', 'offered']
     ]
   end
 
