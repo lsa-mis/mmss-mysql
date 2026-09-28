@@ -59,7 +59,7 @@ RSpec.describe 'Course preferences bulk update', type: :request do
       rankings[b] = '1'
 
       patch bulk_update_enrollment_course_preferences_path(enrollment), params: { rankings: rankings }
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(enrollment.reload.course_rankings_complete?).to be false
     end
   end

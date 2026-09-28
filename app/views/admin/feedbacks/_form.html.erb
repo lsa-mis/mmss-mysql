@@ -1,0 +1,12 @@
+<%# locals: feedback %>
+<%= admin_form_with model: feedback, url: admin_feedback_path(feedback), class: 'grid gap-5 max-w-2xl' do |f| %>
+  <%= f.errors_summary %>
+
+  <%= f.fieldset 'Feedback', description: "Submitted by #{feedback.user&.email || 'an unknown user'}" do %>
+    <%= f.input :genre, as: :select, required: true, collection: admin_feedback_genre_options(feedback) %>
+    <%= f.input :message, as: :textarea, rows: 4, required: true, maxlength: Feedback::MESSAGE_MAX_LENGTH,
+                          hint: "Up to #{Feedback::MESSAGE_MAX_LENGTH} characters." %>
+  <% end %>
+
+  <%= f.actions cancel: admin_feedback_path(feedback) %>
+<% end %>

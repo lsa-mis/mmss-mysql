@@ -1,0 +1,21 @@
+<%# locals: session_configuration %>
+<%= admin_form_with model: session_configuration, scope: :camp_occurrence,
+                    url: (session_configuration.persisted? ? admin_session_configuration_path(session_configuration) : admin_session_configurations_path),
+                    class: 'grid gap-5' do |f| %>
+  <%= f.errors_summary %>
+
+  <%= f.fieldset 'Session' do %>
+    <%= f.input :camp_configuration_id, as: :select, label: 'Camp', include_blank: 'Select a camp', required: true,
+                                        collection: CampConfiguration.order(camp_year: :desc).pluck(:camp_year, :id) %>
+    <%= f.input :description, required: true %>
+    <div class="grid gap-4 md:grid-cols-2">
+      <%= f.input :begin_date, required: true %>
+      <%= f.input :end_date, required: true %>
+    </div>
+    <%= f.input :active %>
+    <%= f.input :cost, as: :number, step: 0.01, min: 0, label: 'Cost ($)', required: true %>
+  <% end %>
+
+  <%= f.actions(session_configuration.persisted? ? 'Update Session Configuration' : 'Create Session Configuration',
+                cancel: (session_configuration.persisted? ? admin_session_configuration_path(session_configuration) : admin_session_configurations_path)) %>
+<% end %>

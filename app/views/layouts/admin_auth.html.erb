@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+  <head>
+    <title><%= [content_for(:title).presence, 'MMSS Admin'].compact.join(' · ') %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag 'admin', media: 'all', 'data-turbo-track': 'reload' %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="flex min-h-full flex-col bg-slate-100">
+    <div class="h-2 bg-um-blue"></div>
+    <main class="flex flex-1 items-center justify-center px-4 py-10">
+      <div class="w-full max-w-md">
+        <div class="mb-6 text-center">
+          <%= link_to root_path, class: 'inline-flex items-center gap-2 text-um-blue hover:text-um-blue' do %>
+            <span class="inline-flex h-9 w-9 items-center justify-center rounded bg-um-maize text-sm font-bold text-um-blue">M</span>
+            <span class="text-lg font-semibold">Michigan Math and Science Scholars</span>
+          <% end %>
+          <p class="mt-1 text-sm text-slate-500">Administration</p>
+        </div>
+
+        <%= render 'admin/shared/flash' %>
+
+        <div class="admin-card">
+          <div class="admin-card-body py-6">
+            <%= yield %>
+          </div>
+        </div>
+
+        <p class="mt-6 text-center text-xs text-slate-500">
+          <%= link_to 'Back to the applicant site', root_path, class: 'underline' %>
+        </p>
+      </div>
+    </main>
+  </body>
+</html>

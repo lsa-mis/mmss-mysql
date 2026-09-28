@@ -37,14 +37,6 @@ class CoursePreference < ApplicationRecord
   validate :ranking_within_session_upper_bound
   validate :ranking_unique_within_enrollment_session
 
-  def self.ransackable_associations(_auth_object = nil)
-    ["course", "enrollment"]
-  end
-
-  def self.ransackable_attributes(_auth_object = nil)
-    ["course_id", "created_at", "enrollment_id", "id", "ranking", "updated_at"]
-  end
-
   private
 
   def ranking_upper_bound

@@ -1,0 +1,17 @@
+<%# locals: course_preference %>
+<%= admin_form_with model: course_preference,
+                    url: (course_preference.persisted? ? admin_course_preference_path(course_preference) : admin_course_preferences_path),
+                    class: 'grid gap-5' do |f| %>
+  <%= f.errors_summary %>
+
+  <%= f.fieldset 'Course Preference' do %>
+    <%= f.input :enrollment_id, as: :select, label: 'Enrollment', include_blank: 'Select an applicant', required: true,
+                                collection: Admin::EnrollmentOptions.current_camp(include: course_preference.enrollment) %>
+    <%= f.input :course_id, as: :select, label: 'Course', include_blank: 'Select a course', required: true,
+                            collection: Admin::CampOptions.courses(include: course_preference.course) %>
+    <%= f.input :ranking, as: :select, collection: Admin::CoursePreferencesController::RANKINGS, include_blank: 'Unranked',
+                          hint: 'Ranks must be unique within each session.' %>
+  <% end %>
+
+  <%= f.actions cancel: (course_preference.persisted? ? admin_course_preference_path(course_preference) : admin_course_preferences_path) %>
+<% end %>

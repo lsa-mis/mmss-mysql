@@ -1,0 +1,25 @@
+<% admin_page_title "Rejection ##{@rejection.id}", subtitle: admin_applicant_name(@rejection.enrollment) %>
+<% admin_page_actions do %>
+  <%= link_to 'Edit', edit_admin_rejection_path(@rejection), class: 'admin-btn-primary' %>
+  <%= button_to 'Delete', admin_rejection_path(@rejection), method: :delete, class: 'admin-btn-danger',
+                form: { data: { turbo_confirm: 'Delete this rejection record? The application status is not changed.' } } %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-3">
+  <div class="grid gap-5 xl:col-span-2">
+    <%= admin_panel 'Rejection', body_class: '' do %>
+      <%= admin_attributes @rejection do |a| %>
+        <% a.row :id %>
+        <% a.row 'Enrollment' do |rejection| %>
+          <%= admin_applicant_link(rejection.enrollment) %>
+          <span class="text-slate-500"><%= rejection.enrollment.user.email %></span>
+        <% end %>
+        <% a.row 'Application status' do |rejection| %><%= admin_status_badge(rejection.enrollment.application_status) %><% end %>
+        <% a.row :reason do |rejection| %>
+          <p class="admin-prose whitespace-pre-line"><%= rejection.reason %></p>
+        <% end %>
+        <% a.row :created_at, :updated_at %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,15 @@
+<%# locals: session_selection %>
+<%= admin_form_with model: session_selection, scope: :session_activity,
+                    url: (session_selection.persisted? ? admin_session_selection_path(session_selection) : admin_session_selections_path),
+                    class: 'grid gap-5' do |f| %>
+  <%= f.errors_summary %>
+
+  <%= f.fieldset 'Session Selection' do %>
+    <%= f.input :enrollment_id, as: :select, label: 'Enrollment', include_blank: 'Select an applicant', required: true,
+                                collection: Admin::EnrollmentOptions.current_camp(include: session_selection.enrollment) %>
+    <%= f.input :camp_occurrence_id, as: :select, label: 'Session', include_blank: 'Select a session', required: true,
+                                     collection: Admin::CampOptions.sessions(include: session_selection.camp_occurrence) %>
+  <% end %>
+
+  <%= f.actions 'Save Session Selection', cancel: (session_selection.persisted? ? admin_session_selection_path(session_selection) : admin_session_selections_path) %>
+<% end %>

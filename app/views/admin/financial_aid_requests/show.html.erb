@@ -1,0 +1,62 @@
+<% applicant_name = @financial_aid.enrollment.applicant_detail&.full_name || @financial_aid.enrollment.user.email %>
+<% admin_page_title "Financial Aid Request ##{@financial_aid.id}", subtitle: "#{applicant_name} · #{@financial_aid.status}" %>
+<% admin_page_actions do %>
+  <%= link_to 'Edit', edit_admin_financial_aid_request_path(@financial_aid), class: 'admin-btn-primary' %>
+  <%= button_to 'Delete', admin_financial_aid_request_path(@financial_aid), method: :delete, class: 'admin-btn-danger',
+                form: { data: { turbo_confirm: 'Delete this financial aid request? This cannot be undone.' } } %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-3">
+  <div class="grid gap-5 xl:col-span-2">
+    <%= admin_panel 'Financial aid request', body_class: '' do %>
+      <%= admin_attributes @financial_aid do |a| %>
+        <% a.row :id %>
+        <% a.row 'Application' do |aid| %>
+          <%= admin_financial_aid_applicant(aid.enrollment) %>
+        <% end %>
+        <% a.row 'Adjusted Gross Income (AGI)' do |aid| %>
+          <%= admin_agi(aid.adjusted_gross_income) || admin_empty_value %>
+        <% end %>
+        <% a.row 'Supporting Document' do |aid| %>
+          <%= admin_attachment_link(aid.taxform) %>
+        <% end %>
+        <% a.row 'Amount' do |aid| %>
+          <%= humanized_money_with_symbol(aid.amount) %>
+        <% end %>
+        <% a.row :source %>
+        <% a.row :note do |aid| %>
+          <p class="admin-prose"><%= aid.note %></p>
+        <% end %>
+        <% a.row :status do |aid| %><%= admin_status_badge(aid.status) %><% end %>
+        <% a.row :payments_deadline, :created_at, :updated_at %>
+      <% end %>
+    <% end %>
+
+    <%= render 'admin/comments/comments', resource: @financial_aid %>
+  </div>
+
+  <div class="grid gap-5 self-start">
+    <%= admin_panel 'Balance', body_class: '' do %>
+      <%= admin_attributes @financial_aid do |a| %>
+        <% a.row 'Balance Due' do %>
+          <span class="text-base font-semibold text-slate-900"><%= admin_money_from_cents(@payment_state.balance_due) %></span>
+        <% end %>
+        <% a.row 'Total Cost' do %>
+          <%= admin_money_from_cents(@payment_state.total_cost) %>
+        <% end %>
+        <% a.row 'Aid awarded' do %>
+          <%= admin_money_from_cents(@payment_state.finaids_awarded_ttl) %>
+        <% end %>
+        <% a.row 'Paid' do %>
+          <%= admin_money_from_cents(@payment_state.ttl_paid) %>
+        <% end %>
+        <% a.row 'Application status' do |aid| %>
+          <%= admin_status_badge(aid.enrollment.application_status) %>
+        <% end %>
+        <% a.row 'Offer status' do |aid| %>
+          <%= admin_status_badge(aid.enrollment.offer_status) %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

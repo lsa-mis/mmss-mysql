@@ -1,0 +1,32 @@
+<% admin_page_title 'Applicant Activities', subtitle: "#{number_with_delimiter(@pagy.count)} #{'applicant activity'.pluralize(@pagy.count)}" %>
+<% admin_page_actions do %>
+  <%= admin_csv_link %>
+  <%= link_to 'New Applicant Activity', new_admin_applicant_activity_path, class: 'admin-btn-primary' %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-4">
+  <div class="grid gap-4 xl:col-span-3">
+    <%= admin_table @applicant_activities, pagy: @pagy,
+                    batch_actions: Admin::ApplicantActivitiesController::BATCH_ACTIONS, batch_url: batch_admin_applicant_activities_path,
+                    actions: ->(record) { [admin_applicant_activity_path(record), edit_admin_applicant_activity_path(record), admin_applicant_activity_path(record)] } do |t| %>
+      <% t.column :id, sort: true do |record| %>
+        <%= link_to record.id, admin_applicant_activity_path(record), class: 'font-medium' %>
+      <% end %>
+      <% t.column 'Enrollment', sort: 'enrollment' do |record| %>
+        <%= admin_applicant_link(record.enrollment, with_email: true) %>
+      <% end %>
+      <% t.column 'Activity', sort: 'activity' do |record| %>
+        <%= record.activity.description %>
+      <% end %>
+      <% t.column 'Session', sort: 'session' do |record| %>
+        <%= record.activity.camp_occurrence.description %>
+      <% end %>
+      <% t.column :created_at, sort: true %>
+      <% t.column :updated_at, sort: true %>
+    <% end %>
+  </div>
+
+  <div class="xl:col-span-1">
+    <%= admin_filter_form @filter, url: admin_applicant_activities_path %>
+  </div>
+</div>

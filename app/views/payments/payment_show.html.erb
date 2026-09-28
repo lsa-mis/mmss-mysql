@@ -15,7 +15,7 @@
         pay via wire transfer (contact our office for more information regarding wire
         transfers for international students.)
         <%= button_to "pay the #{humanized_money_with_symbol(current_camp_fee / 100)} non-refundable application fee",
-                      make_payment_path(amount: current_camp_fee / 100), class: 'btn btn-green' %>
+                      make_payment_path(amount: current_camp_fee / 100), class: 'btn btn-green', form: { data: { turbo: false } } %>
       </p>
     <% else %>
       <% if @current_application_status == "offer accepted" %>
@@ -181,7 +181,7 @@
         <% if ((["offer accepted","enrolled"].include? @current_application_status) && (@balance_due > 0)) %>
           <div class="w-2/3">
             <p>Enter a payment up to the balance due amount:</p>
-              <%= form_with url: make_payment_path, local: true do |f| %>
+              <%= form_with url: make_payment_path, data: { turbo: false } do |f| %>
                 <%= f.number_field :amount, value: "#{@balance_due.to_i / 100 }", within: 1..10000, required: true %>
                 <div class="actions">
                   <%= f.submit "Pay Now"%>

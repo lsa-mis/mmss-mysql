@@ -22,6 +22,8 @@
 #  fk_rails_...  (enrollment_id => enrollments.id)
 #
 class SessionAssignment < ApplicationRecord
+  include AdminCommentable
+
   belongs_to :enrollment
   belongs_to :camp_occurrence
 
@@ -48,15 +50,5 @@ class SessionAssignment < ApplicationRecord
       CourseAssignment.handle_session_declination(self, user)
       enrollment.update_status_based_on_session_assignments!
     end
-  end
-
-  private
-
-  def self.ransackable_associations(auth_object = nil)
-    ["camp_occurrence", "enrollment"]
-  end
-
-  def self.ransackable_attributes(auth_object = nil)
-    ["camp_occurrence_id", "created_at", "enrollment_id", "id", "offer_status", "updated_at"]
   end
 end

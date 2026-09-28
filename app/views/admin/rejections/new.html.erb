@@ -1,0 +1,10 @@
+<% admin_page_title 'New Rejection', subtitle: (@rejection.enrollment ? "Reject #{admin_applicant_name(@rejection.enrollment)}" : nil) %>
+<% admin_page_actions do %>
+  <% if @rejection.enrollment %>
+    <%= link_to 'Back to application', admin_application_path(@rejection.enrollment), class: 'admin-btn-secondary' %>
+  <% else %>
+    <%= link_to 'Back to rejections', admin_rejections_path, class: 'admin-btn-secondary' %>
+  <% end %>
+<% end %>
+
+<%= render 'admin/rejections/form', rejection: @rejection %>

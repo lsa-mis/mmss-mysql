@@ -3,7 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe RecuploadsController, type: :controller do
-  let(:admin) { create(:admin) }
   let(:user) { create(:user, :with_applicant_detail) }
   let(:enrollment) { create(:enrollment, user: user) }
   let(:recommendation) { create(:recommendation, enrollment: enrollment) }
@@ -21,38 +20,21 @@ RSpec.describe RecuploadsController, type: :controller do
     }
   end
 
-  describe 'GET #index' do
-    context 'when admin is signed in' do
-      before { sign_in admin }
-
-      it 'renders the index page' do
-        get :index
-        # The controller redirects unless admin_signed_in? is false
-        # Since we're signed in, it should NOT redirect, so we expect 200
-        expect(response).to have_http_status(:ok)
-      end
-    end
-
-    context 'when admin is not signed in' do
-      it 'redirects to admin sign in' do
-        get :index
-        expect(response).to redirect_to(new_admin_session_path)
-      end
-    end
-  end
-
-  describe 'GET #show' do
-    let(:recupload) { create(:recupload, recommendation: recommendation) }
-
-    before { sign_in admin }
-
-    it 'assigns the requested recupload' do
-      get :show, params: { id: recupload.id }
-      expect(assigns(:recupload)).to eq(recupload)
-    end
-  end
-
   describe 'GET #new' do
+    context 'when the recommendation cannot be resolved' do
+      it 'redirects to the error page and logs identifiers only, never the hash or params' do
+        logged = []
+        allow(Rails.logger).to receive(:error) { |msg| logged << msg }
+
+        get :new, params: { hash: 'SECRETHASH_nGklDoc2egIkzFxr0U999999', id: 12_345, recupload: { letter: 'PRIVATE LETTER' } }
+
+        expect(response).to redirect_to(recupload_error_path)
+        message = logged.join("\n")
+        expect(message).to include('Error in get_recommendation', 'recommendation_id: 999999', 'applicant_detail_id: "12345"', 'hash_present: true')
+        expect(message).not_to include('SECRETHASH', 'PRIVATE LETTER', 'ActionController::Parameters')
+      end
+    end
+
     context 'when recommendation has no recupload' do
       before do
         allow(controller).to receive(:get_recommendation)
@@ -138,39 +120,11 @@ RSpec.describe RecuploadsController, type: :controller do
         expect(response).to render_template(:new)
       end
 
-      it 'assigns student name for error display' do
-        post :create, params: invalid_params
-        expect(assigns(:student)).to eq(enrollment.user.applicant_detail.full_name)
-      end
-
       it 'responds with JSON error' do
         post :create, params: invalid_params.merge(format: :json)
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.content_type).to include('application/json')
       end
-    end
-  end
-
-  describe 'DELETE #destroy' do
-    let!(:recupload) { create(:recupload, recommendation: recommendation) }
-
-    before { sign_in admin }
-
-    it 'destroys the requested recupload' do
-      expect {
-        delete :destroy, params: { id: recupload.id }
-      }.to change(Recupload, :count).by(-1)
-    end
-
-    it 'redirects to recuploads index' do
-      delete :destroy, params: { id: recupload.id }
-      expect(response).to redirect_to(recuploads_url)
-      expect(flash[:notice]).to eq('Recommendation was successfully destroyed.')
-    end
-
-    it 'responds with no content for JSON' do
-      delete :destroy, params: { id: recupload.id, format: :json }
-      expect(response).to have_http_status(:no_content)
     end
   end
 
@@ -236,21 +190,6 @@ RSpec.describe RecuploadsController, type: :controller do
   end
 
   describe 'authentication' do
-    context 'for actions requiring admin authentication' do
-      %w[index show edit destroy].each do |action|
-        it "requires admin authentication for #{action}" do
-          case action
-          when 'index'
-            get action.to_sym
-          when 'show', 'edit', 'destroy'
-            recupload = create(:recupload, recommendation: recommendation)
-            get action.to_sym, params: { id: recupload.id }
-          end
-          expect(response).to redirect_to(new_admin_session_path)
-        end
-      end
-    end
-
     context 'for actions not requiring admin authentication' do
       %w[success error new create].each do |action|
         it "allows access to #{action} without admin authentication" do

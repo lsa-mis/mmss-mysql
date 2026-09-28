@@ -318,21 +318,6 @@ RSpec.describe CourseAssignment, type: :model do
     end
   end
 
-  describe 'ransackable methods' do
-    describe '.ransackable_associations' do
-      it 'returns array of ransackable associations' do
-        expect(CourseAssignment.ransackable_associations).to match_array(['course', 'enrollment'])
-      end
-    end
-
-    describe '.ransackable_attributes' do
-      it 'returns array of ransackable attributes' do
-        expected_attributes = ['course_id', 'created_at', 'enrollment_id', 'id', 'updated_at', 'wait_list']
-        expect(CourseAssignment.ransackable_attributes).to match_array(expected_attributes)
-      end
-    end
-  end
-
   describe 'integration with enrollment and course' do
     let!(:camp_config) { create(:camp_configuration, :active, camp_year: Date.current.year) }
     let!(:session) { create(:camp_occurrence, camp_configuration: camp_config, active: true) }

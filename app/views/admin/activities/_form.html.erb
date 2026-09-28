@@ -1,0 +1,18 @@
+<%# locals: activity %>
+<%= admin_form_with model: activity,
+                    url: (activity.persisted? ? admin_activity_path(activity) : admin_activities_path),
+                    class: 'grid gap-5' do |f| %>
+  <%= f.errors_summary %>
+
+  <%= f.fieldset 'Activity' do %>
+    <%= f.input :camp_occurrence_id, as: :select, label: 'Session', include_blank: 'Select a session', required: true,
+                                     collection: CampOccurrence.order(begin_date: :desc).no_any_session.map { |s| [s.display_name, s.id] } %>
+    <%= f.input :description, required: true,
+                              hint: 'For dormitory activities, please use "Residential Stay" (not "Dormitory") to ensure consistency across all environments' %>
+    <%= f.input :cost, as: :number, step: 0.01, min: 0, label: 'Cost ($)', required: true %>
+    <%= f.input :date_occurs, required: true %>
+    <%= f.input :active %>
+  <% end %>
+
+  <%= f.actions cancel: (activity.persisted? ? admin_activity_path(activity) : admin_activities_path) %>
+<% end %>

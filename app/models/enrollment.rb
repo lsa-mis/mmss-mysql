@@ -41,6 +41,8 @@
 #  fk_rails_...  (user_id => users.id)
 #
 class Enrollment < ApplicationRecord
+  include AdminCommentable
+
   class InvalidStatusTransition < StandardError; end
 
   STATUS_TRANSITIONS = {
@@ -210,6 +212,21 @@ class Enrollment < ApplicationRecord
     transition_application_status!('enrolled', force: true)
   end
 
+  # Withdraws the enrollment: course assignments are released (they hold seats) and the status
+  # becomes `withdrawn`, atomically. Returns the released assignments as "Course: …, Session: …"
+  # strings for the flash. Raises ActiveRecord::RecordInvalid (and rolls back) when the status
+  # change is not allowed, leaving the assignments untouched.
+  def withdraw!(extra_attrs: {})
+    transaction do
+      released = course_assignments.includes(course: :camp_occurrence).map do |assignment|
+        "Course: #{assignment.course.title}, Session: #{assignment.course.camp_occurrence.description}"
+      end
+      course_assignments.destroy_all
+      transition_application_status!('withdrawn', extra_attrs: extra_attrs.except(:course_assignments_attributes))
+      released
+    end
+  end
+
   def transition_application_status!(target_status, update_timestamp: true, extra_attrs: {}, force: false)
     normalized_target = normalize_status(target_status)
     with_forced_transition(force) do
@@ -369,30 +386,6 @@ class Enrollment < ApplicationRecord
     return if allowed_targets.include?(to_status)
 
     errors.add(:application_status, "cannot transition from #{from_status || '(none)'} to #{to_status || '(none)'}")
-  end
-
-  def self.ransackable_attributes(auth_object = nil)
-    %w[
-      anticipated_graduation_year application_deadline application_status
-      application_status_updated_on campyear created_at high_school_address1
-      high_school_address2 high_school_city high_school_country
-      high_school_name high_school_non_us high_school_postalcode
-      high_school_state id international notes offer_status partner_program
-      personal_statement room_mate_request uniqname updated_at user_id
-      year_in_school
-    ]
-  end
-
-  def self.ransackable_associations(auth_object = nil)
-    %w[
-      applicant_detail course_assignments course_preferences course_registrations
-      covid_test_record_attachment covid_test_record_blob enrollment_activities
-      financial_aids recommendation registration_activities rejection
-      session_activities session_assignments session_registrations
-      student_packet_attachment student_packet_blob transcript_attachment
-      transcript_blob travels user vaccine_record_attachment
-      vaccine_record_blob
-    ]
   end
 
   def all_session_assignments_declined?(status_array)

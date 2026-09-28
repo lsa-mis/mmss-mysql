@@ -47,17 +47,17 @@ class EnrollmentsController < ApplicationController
     respond_to do |format|
       if @enrollment.save
         if @enrollment.course_rankings_complete?
-          format.html { redirect_to root_path, notice: 'Application was successfully created.' }
+          format.html { redirect_to root_path, notice: 'Application was successfully created.', status: :see_other }
         else
           format.html do
             redirect_to enrollment_course_preferences_path(@enrollment),
-                        notice: 'Application was saved. Next, rank the courses you selected for each session (1 = highest interest).'
+                        notice: 'Application was saved. Next, rank the courses you selected for each session (1 = highest interest).', status: :see_other
           end
         end
         format.json { render :show, status: :created, location: @enrollment }
       else
-        format.html { render :new }
-        format.json { render json: @enrollment.errors, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_content }
+        format.json { render json: @enrollment.errors, status: :unprocessable_content }
       end
     end
   end
@@ -69,20 +69,20 @@ class EnrollmentsController < ApplicationController
       if @current_enrollment.update(enrollment_params)
         @current_enrollment.auto_enroll_if_ready!
         if @current_enrollment.course_rankings_complete?
-          format.html { redirect_to root_path, notice: 'Application was successfully updated.' }
+          format.html { redirect_to root_path, notice: 'Application was successfully updated.', status: :see_other }
         else
           format.html do
             redirect_to enrollment_course_preferences_path(@current_enrollment),
-                        notice: 'Application was updated. When you are ready, rank the courses you selected for each session.'
+                        notice: 'Application was updated. When you are ready, rank the courses you selected for each session.', status: :see_other
           end
         end
         format.json { render :show, status: :ok, location: @current_enrollment }
       else
         if @current_enrollment.errors.include?(:student_packet) || @current_enrollment.errors.include?(:vaccine_record) || @current_enrollment.errors.include?(:covid_test_record)
-          format.html { redirect_to root_path, alert: @current_enrollment.errors.full_messages.to_sentence }
+          format.html { redirect_to root_path, alert: @current_enrollment.errors.full_messages.to_sentence, status: :see_other }
         else
-          format.html { render :edit }
-          format.json { render json: @current_enrollment.errors, status: :unprocessable_entity }
+          format.html { render :edit, status: :unprocessable_content }
+          format.json { render json: @current_enrollment.errors, status: :unprocessable_content }
         end
       end
     end
@@ -93,80 +93,18 @@ class EnrollmentsController < ApplicationController
   def destroy
     @enrollment.destroy
     respond_to do |format|
-      format.html { redirect_to enrollments_url, notice: 'Enrollment was successfully destroyed.' }
+      format.html { redirect_to enrollments_url, notice: 'Enrollment was successfully destroyed.', status: :see_other }
       format.json { head :no_content }
-    end
-  end
-
-  def add_to_waitlist
-    @enrollment = Enrollment.find(params[:id])
-    @enrollment.transition_application_status!('waitlisted')
-    respond_to do |format|
-      format.html { redirect_to admin_applications_path, notice: 'Application was placed on waitlist.' }
-      format.json { head :no_content }
-    end
-  end
-
-  def remove_from_waitlist
-    @enrollment = Enrollment.find(params[:id])
-    @enrollment.transition_application_status!('application complete')
-    respond_to do |format|
-      format.html { redirect_to admin_applications_path, notice: 'Application was removed from waitlist. Send an email to an applicant with further instructions.' }
-      format.json { head :no_content }
-    end
-  end
-
-  def withdraw
-    @enrollment = Enrollment.find(params[:id])
-
-    # Collect course assignment information before deletion
-    deleted_course_assignments = @enrollment.course_assignments.includes(:course).map do |ca|
-      {
-        course_title: ca.course.title,
-        session_description: ca.course.camp_occurrence.description
-      }
-    end
-
-    # Delete all course assignments
-    @enrollment.course_assignments.destroy_all
-
-    # Update enrollment status
-    @enrollment.transition_application_status!('withdrawn')
-
-    # Build notice message with deleted course assignment details
-    notice_message = build_withdraw_notice(deleted_course_assignments)
-
-    respond_to do |format|
-      format.html { redirect_to admin_application_path(@enrollment), notice: notice_message }
-      format.json { head :no_content }
-    end
-  end
-
-  def send_finaid_request_email
-    @enrollment = Enrollment.find_by(id: params[:enrollment_id])
-    FinaidMailer.with(enrollment: @enrollment).fin_aid_request_email.deliver_now
-    respond_to do |format|
-      format.html { redirect_to admin_application_path(@enrollment), notice: 'Request was sent!' }
     end
   end
 
   private
 
-  def build_withdraw_notice(deleted_course_assignments)
-    return 'Enrollment has been withdrawn.' if deleted_course_assignments.blank?
-
-    assignment_details = deleted_course_assignments.map do |ca|
-      "Course: #{ca[:course_title]}, Session: #{ca[:session_description]}"
-    end.join('; ')
-
-    "Enrollment has been withdrawn. Deleted course assignment(s): #{assignment_details}"
-  end
-
     # Use callbacks to share common setup or constraints between actions.
     def set_current_enrollment
       @current_enrollment = current_user.enrollments.current_camp_year_applications.last
       return if @current_enrollment.present?
-      redirect_to root_path, alert: "No current enrollment found." and return if %i[show edit update destroy].include?(action_name.to_sym)
+      redirect_to root_path, alert: "No current enrollment found.", status: :see_other and return if %i[show edit update destroy].include?(action_name.to_sym)
     end
 
     def set_course_sessions

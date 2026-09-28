@@ -1,0 +1,6 @@
+<% admin_page_title "Edit Session Selection ##{@session_selection.id}", subtitle: admin_applicant_name(@session_selection.enrollment) %>
+<% admin_page_actions do %>
+  <%= link_to 'View session selection', admin_session_selection_path(@session_selection), class: 'admin-btn-secondary' %>
+<% end %>
+
+<%= render 'admin/session_selections/form', session_selection: @session_selection %>

@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [staging, main]
+  # Any base branch, so stacked PRs (targeting another feature branch) get a check too.
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  RAILS_ENV: test
+  # Merged over the `test` entry in config/database.yml; points at the service container.
+  DATABASE_URL: mysql2://root:root@127.0.0.1:3306/mmss-mysql_test
+  # Rails only requires the default + test groups under RAILS_ENV=test.
+  BUNDLE_WITHOUT: development:staging
+
+jobs:
+  rspec:
+    name: RSpec (MySQL 8)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install MySQL client headers
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends libmysqlclient-dev
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          # Reads .ruby-version (4.0.6; a prebuilt ruby/ruby-builder release exists for it);
+          # installs and caches the bundle with the Bundler version from Gemfile.lock.
+          bundler-cache: true
+
+      - name: Build Tailwind CSS
+        # Request specs render the layouts, which link app/assets/builds/tailwind.css.
+        # tailwindcss-rails compiles with the tailwindcss-ruby standalone binary; no Node needed.
+        run: bin/rails tailwindcss:build
+
+      - name: Set up database
+        run: bin/rails db:create db:schema:load
+
+      - name: Run RSpec (excluding system specs)
+        run: bundle exec rspec --exclude-pattern "spec/system/**/*" --format progress
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: simplecov-coverage
+          path: coverage
+          if-no-files-found: ignore
+          retention-days: 7

@@ -1,0 +1,41 @@
+<%# locals: travel %>
+<%= admin_form_with model: travel,
+                    url: (travel.persisted? ? admin_travel_path(travel) : admin_travels_path),
+                    class: 'grid gap-5' do |f| %>
+  <%= f.errors_summary %>
+
+  <%= f.fieldset 'Applicant' do %>
+    <%= f.input :enrollment_id, as: :select, label: 'Enrollment', include_blank: 'Select an applicant', required: true,
+                                collection: Admin::EnrollmentOptions.current_camp(include: travel.enrollment) %>
+  <% end %>
+
+  <div class="grid gap-5 xl:grid-cols-2">
+    <%= f.fieldset 'Arrival', description: (travel.persisted? ? "Sessions are limited to the applicant's assigned sessions." : nil) do %>
+      <%= f.input :arrival_session, as: :select, label: 'Session', include_blank: 'Select a session', required: true,
+                                    collection: admin_travel_session_options(travel, travel.arrival_session) %>
+      <%= f.input :arrival_transport, as: :select, label: 'Transport', include_blank: 'Select a transport', required: true,
+                                      collection: admin_travel_transport_options(travel.arrival_transport) %>
+      <%= f.input :arrival_carrier, label: 'Carrier' %>
+      <%= f.input :arrival_route_num, label: 'Route number' %>
+      <%= f.input :arrival_date, label: 'Date' %>
+      <%= f.input :arrival_time, as: :time, label: 'Time' %>
+    <% end %>
+
+    <%= f.fieldset 'Departure' do %>
+      <%= f.input :depart_session, as: :select, label: 'Session', include_blank: 'Select a session', required: true,
+                                   collection: admin_travel_session_options(travel, travel.depart_session) %>
+      <%= f.input :depart_transport, as: :select, label: 'Transport', include_blank: 'Select a transport', required: true,
+                                     collection: admin_travel_transport_options(travel.depart_transport) %>
+      <%= f.input :depart_carrier, label: 'Carrier' %>
+      <%= f.input :depart_route_num, label: 'Route number' %>
+      <%= f.input :depart_date, label: 'Date' %>
+      <%= f.input :depart_time, as: :time, label: 'Time' %>
+    <% end %>
+  </div>
+
+  <%= f.fieldset 'Notes' do %>
+    <%= f.input :note, as: :textarea, rows: 4 %>
+  <% end %>
+
+  <%= f.actions cancel: (travel.persisted? ? admin_travel_path(travel) : admin_travels_path) %>
+<% end %>

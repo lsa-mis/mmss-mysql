@@ -1,0 +1,19 @@
+<% admin_page_title 'Comments', subtitle: 'Admin comments across all records' %>
+
+<%= admin_table @comments, pagy: @pagy do |t| %>
+  <% t.column :created_at, sort: true %>
+  <% t.column 'Author' do |comment| %>
+    <%= comment.author&.email || admin_empty_value %>
+  <% end %>
+  <% t.column 'Record', sort: 'resource_type' do |comment| %>
+    <span class="text-xs text-slate-500"><%= comment.resource_type %></span>
+    <%= admin_resource_link(comment.resource, "##{comment.resource_id}") %>
+  <% end %>
+  <% t.column 'Comment' do |comment| %>
+    <p class="max-w-xl whitespace-pre-line"><%= comment.body %></p>
+  <% end %>
+  <% t.column '' do |comment| %>
+    <%= button_to 'Delete', admin_comment_path(comment), method: :delete, class: 'admin-btn-link text-red-700 hover:text-red-900',
+                  form: { data: { turbo_confirm: 'Delete this comment?' } } %>
+  <% end %>
+<% end %>
