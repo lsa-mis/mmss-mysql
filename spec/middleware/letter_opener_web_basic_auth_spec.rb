@@ -6,7 +6,7 @@ require Rails.root.join('lib/middleware/letter_opener_web_basic_auth')
 RSpec.describe LetterOpenerWebBasicAuth do
   subject(:middleware) { described_class.new(app) }
 
-  let(:app) { ->(_env) { [200, { 'Content-Type' => 'text/plain' }, ['OK']] } }
+  let(:app) { ->(_env) { [200, { 'content-type' => 'text/plain' }, ['OK']] } }
 
   def call_with(path:, headers: {})
     env = Rack::MockRequest.env_for(path)
@@ -77,7 +77,8 @@ RSpec.describe LetterOpenerWebBasicAuth do
     status, headers, body = call_with(path: '/letter_opener')
 
     expect(status).to eq(401)
-    expect(headers['WWW-Authenticate']).to eq('Basic realm="Letter Opener Web"')
+    # Rack 3 requires lowercase response header names.
+    expect(headers['www-authenticate']).to eq('Basic realm="Letter Opener Web"')
     expect(body).to eq(['Unauthorized'])
 
     status, = call_with(
