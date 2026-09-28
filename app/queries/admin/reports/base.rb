@@ -63,6 +63,6 @@ class Admin::Reports::Base
     return code if code.blank?
 
     country = ISO3166::Country[code]
-    country ? "#{country.name} - #{code}" : code
+    country ? "#{country.iso_short_name} - #{code}" : code
   end
 end

@@ -1,19 +1,20 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '3.4.9'
+ruby '4.0.6'
 
 gem 'bootsnap', '~> 1.18', require: false
 gem 'country_select', '~> 6.0'
 gem 'devise', '~> 5.0'
-gem 'dump', '~> 1.2', '>= 1.2.2'
-gem 'drb', '~> 2.1.0'
+# 1.3 drops SortedSet, which Ruby 4.0 no longer autoloads (rake dump:* raised NameError on 1.2).
+gem 'dump', '~> 1.3'
+gem 'drb', '~> 2.2'
 gem 'google-cloud-storage', '~> 1.58', require: false
 gem 'money-rails', '~> 1.14'
 # gem install mysql2 -v '0.5.4' -- --with-ldflags=-L/usr/local/opt/openssl/lib --with-cppflags=-I/usr/local/opt/openssl/include
 # gem install mysql2 -v '0.5.6' -- --with-mysql-dir=/opt/homebrew/bin/mysql --with-mysql-lib=/opt/homebrew/Cellar/mysql/8.3.0/lib --with-mysql-include=/opt/homebrew/Cellar/mysql/8.3.0/include/mysql
 gem 'mysql2', '~> 0.5.6'
-gem 'ostruct', '~> 0.5.5'
+gem 'ostruct', '~> 0.6'
 # Pagination for the Admin:: namespace.
 gem 'pagy', '~> 43.6'
 gem 'puma', '~> 8.0'
@@ -22,7 +23,7 @@ gem 'rails', '~> 8.1.3'
 # and the importmap modules. No compilation step of its own, so no Node on the servers.
 gem 'propshaft', '~> 1.3'
 gem 'skylight', '~> 7.1'
-gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
+gem 'tzinfo-data', platforms: %i[windows jruby]
 
 # Node-free front end: import maps for JS, Hotwire (Turbo Drive + Stimulus), Tailwind 4 via the standalone CLI.
 gem 'importmap-rails', '~> 2.2'
@@ -34,11 +35,9 @@ gem 'base64', require: false
 # Bundled gem on Ruby 3.4+; Admin::CsvExport writes the admin exports and reports.
 gem 'csv'
 gem 'matrix', '~> 0.4.2', require: false
-gem 'mutex_m', require: false
 gem 'net-imap', require: false
 gem 'net-pop', require: false
 gem 'net-smtp', require: false
-gem 'observer', require: false
 
 gem 'nokogiri', '~> 1.19'
 
@@ -73,8 +72,6 @@ end
 group :development, :staging do
   # letter_opener_web loads rexml; not guaranteed on Ruby 3.4+ without an explicit gem
   gem 'rexml'
-  # letter_opener still requires kconv; Ruby 3.4 provides that via the nkf gem
-  gem 'nkf'
   gem 'letter_opener_web', '~> 3.0'
 end
 
