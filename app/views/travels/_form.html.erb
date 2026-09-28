@@ -80,7 +80,7 @@
     <% end %>
       <div class="w-full md:w-1/3">
         <%= form.label :arrival_date, 'Date of arrival *', class:"text-sm font-medium text-gray-900 pt-4" %>
-        <%= form.date_field :arrival_date, class: "datepicker", "data-travel-target": "arrival", "data-action": "change->travel#checkDates", class: "mx-2" %>
+        <%= form.date_field :arrival_date, "data-travel-target": "arrival", "data-action": "change->travel#checkDates", class: "mx-2" %>
       </div>
 
       <div class="field w-full md:w-1/3">
@@ -132,7 +132,7 @@
     <% end %>
       <div class="field w-full md:w-1/3" >
         <%= form.label :depart_date, 'Date of departure *', class: "text-sm font-medium text-gray-900 pt-4" %>
-        <%= form.date_field :depart_date, class: "datepicker", "data-travel-target": "depart", "data-action": "change->travel#checkDates", class: "mx-2" %>
+        <%= form.date_field :depart_date, "data-travel-target": "depart", "data-action": "change->travel#checkDates", class: "mx-2" %>
       </div>
       <div class="errors date-error--hide" data-travel-target="message">
       </div>
