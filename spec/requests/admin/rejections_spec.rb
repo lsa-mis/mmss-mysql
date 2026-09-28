@@ -148,7 +148,7 @@ RSpec.describe 'Admin rejections', type: :request do
       post admin_rejections_path, params: { rejection: { enrollment_id: other.id, reason: '' } }
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(CGI.unescapeHTML(response.body)).to include("Reason can't be blank")
+      expect(response.body).to include_unescaped("Reason can't be blank")
       expect(response.body).to include(%(type="hidden" value="#{other.id}" name="rejection[enrollment_id]"))
     end
 

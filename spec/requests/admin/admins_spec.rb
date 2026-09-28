@@ -112,7 +112,7 @@ RSpec.describe 'Admin admins', type: :request do
       post admin_admins_path, params: { admin: { email: 'new@example.com', password: '', password_confirmation: '' } }
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(CGI.unescapeHTML(response.body)).to include("Password can't be blank")
+      expect(response.body).to include_unescaped("Password can't be blank")
     end
   end
 
@@ -121,7 +121,7 @@ RSpec.describe 'Admin admins', type: :request do
       get edit_admin_admin_path(other)
 
       expect(response).to have_http_status(:ok)
-      expect(CGI.unescapeHTML(response.body)).to include("Leave blank if you don't want to change the password")
+      expect(response.body).to include_unescaped("Leave blank if you don't want to change the password")
       password_input = response.body[/<input[^>]*name="admin\[password\]"[^>]*>/]
       expect(password_input).not_to include('required')
       expect(password_input).not_to include('value=')
@@ -152,7 +152,7 @@ RSpec.describe 'Admin admins', type: :request do
       patch admin_admin_path(other), params: { admin: { email: other.email, password: 'newpassword123', password_confirmation: 'different' } }
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(CGI.unescapeHTML(response.body)).to include("Password confirmation doesn't match")
+      expect(response.body).to include_unescaped("Password confirmation doesn't match")
     end
   end
 

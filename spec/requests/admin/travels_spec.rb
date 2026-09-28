@@ -171,7 +171,7 @@ RSpec.describe 'Admin travels', type: :request do
       post admin_travels_path, params: { travel: { enrollment_id: enrollment.id, arrival_session: '', depart_session: session_label } }
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(CGI.unescapeHTML(response.body)).to include("Arrival session can't be blank")
+      expect(response.body).to include_unescaped("Arrival session can't be blank")
     end
   end
 

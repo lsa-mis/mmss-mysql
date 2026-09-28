@@ -98,7 +98,7 @@ RSpec.describe 'Admin Nelnet callback logs', type: :request do
       expect(body).to include('25000')
       expect(body).to include('$250')
       expect(body).to include('<pre')
-      expect(CGI.unescapeHTML(body)).to include(%("transactionId": "TXN-OK"))
+      expect(body).to include_unescaped(%("transactionId": "TXN-OK"))
     end
 
     it 'falls back to the raw string when the params are not JSON' do

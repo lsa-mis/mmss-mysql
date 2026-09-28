@@ -132,7 +132,7 @@ RSpec.describe 'Admin camp configurations', type: :request do
       post admin_camp_configurations_path, params: { camp_configuration: { camp_year: '' } }
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(CGI.unescapeHTML(response.body)).to include("Camp year can't be blank")
+      expect(response.body).to include_unescaped("Camp year can't be blank")
     end
   end
 

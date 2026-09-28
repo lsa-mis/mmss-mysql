@@ -53,6 +53,18 @@ RSpec.describe Admin::CsvExport do
       expect(csv[3][2]).to eq('4.5')
     end
 
+    it 'looks past leading whitespace, control and Unicode format characters before the trigger' do
+      dangerous = [' =1+1', "\n\t=cmd", "\u200B=1+1", "\uFEFF+SUM(A1)", "\u202E-1", "\u0001@evil", "  \u200B \t=x"]
+      dangerous.each do |cell|
+        expect(described_class.sanitize_cell(cell)).to eq("'#{cell}"), "expected #{cell.inspect} to be prefixed"
+      end
+
+      harmless = [' plain', "\u200Bplain", '  12 = 12', '', ' ', "\n"]
+      harmless.each do |cell|
+        expect(described_class.sanitize_cell(cell)).to eq(cell), "expected #{cell.inspect} to be left alone"
+      end
+    end
+
     it 'also guards raw-SQL report rows' do
       result = ActiveRecord::Result.new(%w[name amount], [['=cmd|calc', 12], ['Ada', -3]])
 

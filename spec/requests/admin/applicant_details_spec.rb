@@ -291,7 +291,7 @@ RSpec.describe 'Admin applicant details', type: :request do
       patch admin_applicant_detail_path(applicant_detail), params: { applicant_detail: { lastname: '' } }
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(CGI.unescapeHTML(response.body)).to include("Lastname can't be blank")
+      expect(response.body).to include_unescaped("Lastname can't be blank")
     end
   end
 

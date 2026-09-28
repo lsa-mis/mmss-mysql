@@ -38,7 +38,7 @@ module FactoryHelpers
   end
 
   # Creates a complete camp setup
-  def create_camp_setup(year: 2025)
+  def create_camp_setup(year: Date.current.year)
     camp_config = create(:camp_configuration, camp_year: year, active: true)
     session1 = create(:camp_occurrence,
       camp_configuration: camp_config,

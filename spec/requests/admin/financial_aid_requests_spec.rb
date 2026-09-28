@@ -328,7 +328,7 @@ RSpec.describe 'Admin financial aid requests', type: :request do
       patch admin_financial_aid_request_path(financial_aid), params: { financial_aid: { note: '' } }
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(CGI.unescapeHTML(response.body)).to include("Note can't be blank")
+      expect(response.body).to include_unescaped("Note can't be blank")
     end
   end
 

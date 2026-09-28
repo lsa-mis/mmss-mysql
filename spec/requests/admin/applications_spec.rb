@@ -246,7 +246,7 @@ RSpec.describe 'Admin applications', type: :request do
 
       expect(response).to have_http_status(:unprocessable_content)
       expect(response.body).to include('1 error prevented this record from being saved')
-      expect(CGI.unescapeHTML(response.body)).to include("High school name can't be blank")
+      expect(response.body).to include_unescaped("High school name can't be blank")
     end
 
     it 'withdraws the enrollment, deleting course assignments, when the Withdraw button is used' do

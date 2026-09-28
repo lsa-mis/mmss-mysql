@@ -296,7 +296,7 @@ RSpec.describe 'Admin payments', type: :request do
       post admin_payments_path, params: { payment: valid_params.merge(total_amount_dollars: '') }
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(CGI.unescapeHTML(response.body)).to include("Total amount can't be blank")
+      expect(response.body).to include_unescaped("Total amount can't be blank")
       expect(response.body).not_to include('must be a non-negative dollar amount')
     end
 
@@ -361,7 +361,7 @@ RSpec.describe 'Admin payments', type: :request do
       patch admin_payment_path(payment), params: { payment: { total_amount_dollars: '' } }
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(CGI.unescapeHTML(response.body)).to include("Total amount can't be blank")
+      expect(response.body).to include_unescaped("Total amount can't be blank")
     end
   end
 

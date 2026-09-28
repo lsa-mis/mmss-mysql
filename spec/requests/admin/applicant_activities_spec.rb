@@ -118,7 +118,7 @@ RSpec.describe 'Admin applicant activities', type: :request do
       post admin_applicant_activities_path, params: { enrollment_activity: { enrollment_id: enrollment.id, activity_id: '' } }
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(CGI.unescapeHTML(response.body)).to include("Activity can't be blank")
+      expect(response.body).to include_unescaped("Activity can't be blank")
     end
   end
 
