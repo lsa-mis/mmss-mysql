@@ -30,7 +30,7 @@ RSpec.describe 'Admin::BaseController authentication', type: :request do
       expect(response.body).to include(destroy_admin_session_path)
       expect(response.body).to include('/assets/admin-')
       expect(response.body).not_to include('active_admin')
-      expect(response.body).to include(%(data-turbo="false" href="#{legacy_admin_root_path}"))
+      expect(response.body).not_to include('legacy_admin')
     end
 
     it 'shows the four menu groups in the sidebar' do
@@ -44,25 +44,30 @@ RSpec.describe 'Admin::BaseController authentication', type: :request do
     end
   end
 
-  describe 'legacy ActiveAdmin' do
-    it 'serves ActiveAdmin at /legacy_admin' do
-      sign_in create(:admin)
+  describe 'after the ActiveAdmin cutover' do
+    it 'redirects the former /legacy_admin URLs to the new admin' do
+      get '/legacy_admin'
+      expect(response).to redirect_to('/admin')
+      expect(response).to have_http_status(:moved_permanently)
 
-      get legacy_admin_root_path
-
-      expect(response).to have_http_status(:ok)
-      expect(response.body).to include('active_admin')
+      get '/legacy_admin/applications/1/edit?order=id_desc'
+      expect(response).to redirect_to('/admin')
     end
 
-    # Every menu resource is ported now; the catch-all still covers old bookmarks of any unmatched
-    # /admin path (e.g. ActiveAdmin's /admin/applications/:id/edit variants) until the cutover PR.
-    it 'redirects unmatched /admin paths to /legacy_admin (keeping the query string)' do
+    it 'no longer redirects unmatched /admin paths anywhere (404)' do
       sign_in create(:admin)
 
       get '/admin/legacy_only_page?order=id_desc'
 
-      expect(response).to have_http_status(:moved_permanently)
-      expect(response).to redirect_to('/legacy_admin/legacy_only_page?order=id_desc')
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it 'defines no legacy_admin route helpers or ActiveAdmin routes' do
+      helpers = Rails.application.routes.named_routes.names.map(&:to_s)
+      expect(helpers.grep(/legacy_admin/)).to be_empty
+
+      controllers = Rails.application.routes.routes.filter_map { |r| r.defaults[:controller] }.uniq
+      expect(controllers.grep(/legacy_admin|active_admin/)).to be_empty
     end
 
     it 'keeps the admin_* helpers used elsewhere in the app' do

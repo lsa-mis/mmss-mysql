@@ -28,7 +28,7 @@ set :keep_releases, 3
 # Default value for :linked_files and linked_dirs is []
 set :linked_files,
     %w[config/puma.rb config/nginx.conf config/master.key config/lsa-was-base-c096c776ead3.json mysql/InCommon.CA.crt]
-# capistrano-rails adds public/assets (Sprockets output, including the Tailwind build) to linked_dirs.
+# capistrano-rails adds public/assets (Propshaft output, including the Tailwind builds) to linked_dirs.
 set :linked_dirs, %w[log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system]
 
 namespace :puma do

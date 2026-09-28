@@ -131,17 +131,11 @@ Rails.application.routes.draw do
     resources :feedbacks, except: %i[new create] do
       collection { post :batch }
     end
-
-    # Cutover aid: bookmarks and links to resources that are not ported yet keep working.
-    # Remove together with ActiveAdmin.
-    get '*path', format: false, to: redirect { |path_params, request|
-      "/legacy_admin/#{path_params[:path]}#{"?#{request.query_string}" if request.query_string.present?}"
-    }
   end
 
-  # Legacy ActiveAdmin admin, mounted at /legacy_admin until every resource is ported (see
-  # config/initializers/active_admin.rb).
-  ActiveAdmin.routes(self)
+  # ActiveAdmin used to run at /legacy_admin during the cutover. Old bookmarks land on the new
+  # admin's dashboard (the legacy URL structure does not map 1:1 onto the new routes).
+  get '/legacy_admin(/*path)', to: redirect('/admin', status: 301), format: false
 
   devise_for :users, controllers: {
     registrations: 'users/registrations'

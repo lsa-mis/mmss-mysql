@@ -2,28 +2,33 @@
 
 # == Schema Information
 #
-# Table name: active_admin_comments
+# Table name: admin_comments
 #
 #  id            :bigint           not null, primary key
-#  namespace     :string(255)
-#  body          :text(65535)
-#  resource_type :string(255)
-#  resource_id   :bigint
-#  author_type   :string(255)
 #  author_id     :bigint
+#  author_type   :string(255)
+#  body          :text(65535)
 #  created_at    :datetime         not null
+#  namespace     :string(255)
+#  resource_id   :bigint
+#  resource_type :string(255)
 #  updated_at    :datetime         not null
 #
 # Indexes
 #
-#  index_active_admin_comments_on_author_type_and_author_id      (author_type,author_id)
-#  index_active_admin_comments_on_namespace                      (namespace)
-#  index_active_admin_comments_on_resource_type_and_resource_id  (resource_type,resource_id)
+#  index_admin_comments_on_author_type_and_author_id      (author_type,author_id)
+#  index_admin_comments_on_namespace                      (namespace)
+#  index_admin_comments_on_resource_type_and_resource_id  (resource_type,resource_id)
 #
-# Admin comments on any admin-managed record. Reuses the ActiveAdmin comments table so the
-# existing comments survive the cutover; the table is renamed once ActiveAdmin is removed.
+# Admin comments on any admin-managed record. The table is the former ActiveAdmin
+# `active_admin_comments` table, renamed so the existing comments survived the cutover.
+#
+# `namespace` is a leftover of ActiveAdmin, which scoped comments per admin namespace: rows
+# written before the cutover carry 'admin' (or 'legacy_admin' from the side-by-side period). The
+# new admin writes NAMESPACE and reads every namespace, so nothing is hidden. The column stays
+# (and stays NOT blank) only so old rows keep their provenance; nothing filters on it.
 class Admin::Comment < ApplicationRecord
-  self.table_name = 'active_admin_comments'
+  self.table_name = 'admin_comments'
 
   NAMESPACE = 'admin'
 
@@ -58,8 +63,4 @@ class Admin::Comment < ApplicationRecord
 
   scope :recent_first, -> { order(created_at: :desc) }
   scope :for_resource, ->(resource) { where(resource: resource) }
-
-  def self.ransackable_attributes(_auth_object = nil) = %w[body created_at namespace resource_type author_type]
-
-  def self.ransackable_associations(_auth_object = nil) = %w[]
 end

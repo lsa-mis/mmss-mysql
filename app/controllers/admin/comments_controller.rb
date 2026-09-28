@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Admin::CommentsController < Admin::BaseController
-  SORTS = { created_at: 'active_admin_comments.created_at', resource_type: 'active_admin_comments.resource_type' }.freeze
+  SORTS = { created_at: 'admin_comments.created_at', resource_type: 'admin_comments.resource_type' }.freeze
 
   def index
     scope = Admin::Comment.includes(:author, :resource)

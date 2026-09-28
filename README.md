@@ -29,7 +29,7 @@ A Ruby on Rails application for managing summer camp applications, enrollments, 
 - **Financial aid** — Aid requests, amounts, status, and payment deadlines
 - **Recommendations** — Request and upload recommendation letters; email-based workflow
 - **Payments** — Payment flows and receipts (integration with external payment provider)
-- **Admin** — Plain Rails `Admin::` MVC at `/admin` (dashboard, CSV reports, applications, comments; other resources being ported one menu group at a time) with the remaining ActiveAdmin resources served at `/legacy_admin` during the cutover
+- **Admin** — Plain Rails `Admin::` MVC at `/admin` (dashboard, 26 resources in four menu groups, 18 CSV reports, comments on records); ActiveAdmin has been removed and `/legacy_admin` redirects to `/admin`
 - **Faculty interface** — Faculty login and student list/student page views
 - **Maintenance mode** — Rack middleware (`lib/middleware/maintenance_mode.rb`) serves `public/maintenance.html` while `tmp/maintenance.yml` exists on the server
 
@@ -44,9 +44,9 @@ A Ruby on Rails application for managing summer camp applications, enrollments, 
 | **Framework**    | Rails 8.1.3.1 (`config.load_defaults 8.1`)                       |
 | **Database**     | MySQL 8 (mysql2 gem), utf8mb4                                    |
 | **Auth**         | Devise (users, admins, faculties)                                |
-| **Admin**        | `Admin::` namespace (Tailwind 4 layout, Pagy, hand-rolled filters); ActiveAdmin 3.x at `/legacy_admin` until fully ported |
+| **Admin**        | `Admin::` namespace (Tailwind 4 layout, Pagy, hand-rolled filters, `Admin::CsvExport`, `Admin::Reports`) |
 | **Server**       | Puma 8 (systemd notify built in)                                 |
-| **Frontend**     | importmap-rails, Hotwire (Turbo Drive + Stimulus), Tailwind CSS 4 (tailwindcss-rails; `application.css` + `admin.css` bundles), Flatpickr; Sprockets only for ActiveAdmin |
+| **Assets**       | Propshaft (digests + serves `app/assets/builds`, `app/assets/images`, importmap modules), importmap-rails, Hotwire (Turbo Drive + Stimulus), Tailwind CSS 4 (tailwindcss-rails; `application.css` + `admin.css` bundles), Flatpickr |
 | **File storage** | Active Storage (local disk / Google Cloud Storage in production) |
 | **Monitoring**   | Skylight, Sentry                                                 |
 | **Deployment**   | Capistrano 3, asdf                                               |
@@ -157,7 +157,7 @@ Configured for Google Cloud Storage (GCS). A GCS keyfile is expected. Bucket and
    Default: [http://localhost:3000](http://localhost:3000)
 3. **Useful URLs (development)**
   - Root: `/`
-  - Admin: `/admin` (login at `/admin/login`); legacy ActiveAdmin: `/legacy_admin`
+  - Admin: `/admin` (login at `/admin/login`; seed admin `admin@example.com` / `passwordpassword` from `db/seeds.rb`)
   - Faculty: `/faculty`, `/faculty_login`
   - Letter opener (development and staging): `/letter_opener` (on staging, protect with HTTP basic auth env vars or network rules)
 
@@ -205,8 +205,11 @@ bundle exec cap production maintenance:stop
 Before deploy, `deploy:check_revision` ensures local HEAD matches `origin/main`.
 
 Assets are compiled on the server by capistrano-rails (`bin/rails assets:precompile`),
-which runs `tailwindcss:build` and then Sprockets; no Node.js, Yarn or `NODE_OPTIONS`
-are needed on the host. Compiled assets live in the linked `public/assets` directory.
+which runs `tailwindcss:build` (both bundles, via the `tailwindcss-ruby` standalone
+binary) and then Propshaft copies the digested files to `public/assets` (manifest:
+`public/assets/.manifest.json`, which capistrano-rails 1.7 backs up and restores).
+No Node.js, Yarn or `NODE_OPTIONS` are needed on the host. Compiled assets live in
+the linked `public/assets` directory.
 
 `maintenance:start` uploads `config/maintenance_template.yml` to `tmp/maintenance.yml` on the server; while that file exists the `MaintenanceMode` middleware answers every request routed through Rails (except `allowed_paths` / `allowed_ips`) with `public/maintenance.html`; static files that nginx serves directly from `public/` via `try_files` never reach the middleware (same as with turnout), the `response_code` (default 503) and a `Retry-After` header. `maintenance:stop` removes the file. Edit the template's `reason`, `allowed_ips`, etc. before starting.
 
@@ -239,7 +242,7 @@ The root `[Procfile](Procfile)` runs Puma with `[config/puma.default.rb](config/
 
 | Path                        | Purpose                                                                                 |
 | --------------------------- | --------------------------------------------------------------------------------------- |
-| `app/`                      | Models, controllers, views, mailers, helpers, ActiveAdmin config                        |
+| `app/`                      | Models, controllers, views, mailers, helpers; the admin lives in `app/{controllers,views,helpers,filters,lib,queries}/admin/` |
 | `app/javascript/`           | Import-map entry point (`application.js`) and Stimulus controllers                      |
 | `app/assets/tailwind/`      | Tailwind 4 CSS-first config and app styles, built to `app/assets/builds/tailwind.css`   |
 | `config/importmap.rb`       | JavaScript import map pins; `bin/importmap pin <pkg>` vendors into `vendor/javascript/` |

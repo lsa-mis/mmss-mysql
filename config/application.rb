@@ -25,10 +25,5 @@ module Mmss
     # Attachments are documents (transcripts, tax forms, letters); no image variants are
     # generated, so skip the vips/image_processing requirement of the 7.0 defaults.
     config.active_storage.variant_processor = :disabled
-
-    # sassc-rails would otherwise register libsass as the Sprockets CSS compressor,
-    # and libsass cannot parse the modern CSS emitted by Tailwind 4 (range media
-    # queries, nesting). The Tailwind build is already minified outside development.
-    config.assets.css_compressor = nil
   end
 end

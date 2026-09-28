@@ -3,7 +3,6 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '3.4.9'
 
-gem 'activeadmin', '~> 3.5', '>= 3.5.2'
 gem 'bootsnap', '~> 1.18', require: false
 gem 'country_select', '~> 6.0'
 gem 'devise', '~> 5.0'
@@ -15,12 +14,13 @@ gem 'money-rails', '~> 1.14'
 # gem install mysql2 -v '0.5.6' -- --with-mysql-dir=/opt/homebrew/bin/mysql --with-mysql-lib=/opt/homebrew/Cellar/mysql/8.3.0/lib --with-mysql-include=/opt/homebrew/Cellar/mysql/8.3.0/include/mysql
 gem 'mysql2', '~> 0.5.6'
 gem 'ostruct', '~> 0.5.5'
-# Pagination for the Admin:: namespace (Kaminari only comes in transitively via ActiveAdmin).
+# Pagination for the Admin:: namespace.
 gem 'pagy', '~> 43.6'
 gem 'puma', '~> 8.0'
 gem 'rails', '~> 8.1.3'
-# Sprockets + sassc remain only for ActiveAdmin's bundled assets; Propshaft replaces them once ActiveAdmin is gone.
-gem 'sass-rails', '~> 6.0'
+# Rails 8 asset pipeline: digests and serves app/assets/builds (Tailwind output), app/assets/images
+# and the importmap modules. No compilation step of its own, so no Node on the servers.
+gem 'propshaft', '~> 1.3'
 gem 'skylight', '~> 7.1'
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 

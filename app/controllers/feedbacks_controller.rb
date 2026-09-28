@@ -4,9 +4,6 @@ class FeedbacksController < ApplicationController
   devise_group :logged_in, contains: [:user, :admin, :faculty]
   before_action :authenticate_logged_in!
 
-  # InheritedResources::Base
-  # see https://railsguides.net/clean-up-controllers-with-inherited-resources/
-
   def index
     redirect_to root_path
   end

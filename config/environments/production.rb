@@ -23,10 +23,6 @@ Rails.application.configure do
   # Cache assets for far-future expiry since they are all digest stamped.
   config.public_file_server.headers = { "cache-control" => "public, max-age=#{1.year.to_i}" }
 
-  # Do not fallback to assets pipeline if a precompiled asset is missed.
-  # (CSS compression is disabled app-wide in config/application.rb; the Tailwind build is pre-minified.)
-  config.assets.compile = false
-
   # Store uploaded files on Google Cloud Storage (see config/storage.yml for options).
   config.active_storage.service = :google
 

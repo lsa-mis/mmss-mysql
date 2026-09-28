@@ -117,20 +117,6 @@ class ApplicantDetail < ApplicationRecord
     errors.add(:base, "Parent/Guardian email should be different than the applicant's email")
   end
 
-  # Still needed by the legacy ActiveAdmin Applications filters (`applicant_detail_lastname_start`);
-  # remove with app/admin/enrollments.rb.
-  def self.ransackable_associations(_auth_object = nil)
-    %w[demographic user]
-  end
-
-  def self.ransackable_attributes(_auth_object = nil)
-    %w[address1 address2 birthdate city country created_at demographic_id diet_restrictions
-       firstname gender id lastname middlename parentaddress1 parentaddress2 parentcity
-       parentcountry parentemail parentname parentphone parentstate parentstate_non_us
-       parentworkphone parentzip phone postalcode shirt_size state state_non_us updated_at
-       us_citizen user_id]
-  end
-
   def formatted_demographic
     if demographic_name == 'Other' && demographic_other.present?
       "#{demographic_name} - #{demographic_other}"

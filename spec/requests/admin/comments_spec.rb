@@ -40,9 +40,9 @@ RSpec.describe 'Admin comments', type: :request do
     expect(Admin::Comment.count).to eq(0)
   end
 
-  it 'reads pre-existing ActiveAdmin comments from the same table' do
+  it 'reads pre-existing ActiveAdmin comments from the renamed table' do
     ActiveRecord::Base.connection.execute(<<~SQL.squish)
-      INSERT INTO active_admin_comments (namespace, body, resource_type, resource_id, author_type, author_id, created_at, updated_at)
+      INSERT INTO admin_comments (namespace, body, resource_type, resource_id, author_type, author_id, created_at, updated_at)
       VALUES ('admin', 'Legacy note', 'Enrollment', #{enrollment.id}, 'Admin', #{admin.id}, NOW(), NOW())
     SQL
 
@@ -71,7 +71,7 @@ RSpec.describe 'Admin comments', type: :request do
     expect(response.body).to include('Enrollment')
   end
 
-  it 'links ported records (including comments written under the ActiveAdmin namespace) into the new admin' do
+  it 'lists comments written under the former ActiveAdmin namespaces and links their records' do
     financial_aid = create(:financial_aid, enrollment: enrollment)
     Admin::Comment.create!(body: 'legacy record note', author: admin, resource: financial_aid, namespace: 'legacy_admin')
 
@@ -79,6 +79,5 @@ RSpec.describe 'Admin comments', type: :request do
 
     expect(response.body).to include('legacy record note')
     expect(response.body).to include(%(href="#{admin_financial_aid_request_path(financial_aid)}"))
-    expect(response.body).not_to include('legacy_admin/financial_aid_requests')
   end
 end
