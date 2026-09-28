@@ -4,13 +4,13 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 ruby '4.0.6'
 
 gem 'bootsnap', '~> 1.18', require: false
-gem 'country_select', '~> 6.0'
+gem 'country_select', '~> 11.0'
 gem 'devise', '~> 5.0'
 # 1.3 drops SortedSet, which Ruby 4.0 no longer autoloads (rake dump:* raised NameError on 1.2).
 gem 'dump', '~> 1.3'
 gem 'drb', '~> 2.2'
 gem 'google-cloud-storage', '~> 1.58', require: false
-gem 'money-rails', '~> 1.14'
+gem 'money-rails', '~> 3.0'
 # gem install mysql2 -v '0.5.4' -- --with-ldflags=-L/usr/local/opt/openssl/lib --with-cppflags=-I/usr/local/opt/openssl/include
 # gem install mysql2 -v '0.5.6' -- --with-mysql-dir=/opt/homebrew/bin/mysql --with-mysql-lib=/opt/homebrew/Cellar/mysql/8.3.0/lib --with-mysql-include=/opt/homebrew/Cellar/mysql/8.3.0/include/mysql
 gem 'mysql2', '~> 0.5.6'
@@ -47,7 +47,7 @@ gem 'stackprof'
 
 # Seeds use Faker; staging loads seeds but should not install full :test tooling (Capybara, RSpec, …).
 group :development, :test, :staging do
-  gem 'faker', '~> 2.23'
+  gem 'faker', '~> 3.8'
 end
 
 group :development, :test do
@@ -66,7 +66,7 @@ end
 group :test do
   gem 'database_cleaner-active_record', '~> 2.0'
   gem 'rails-controller-testing'
-  gem 'simplecov', '~> 0.21', require: false
+  gem 'simplecov', '~> 1.3', require: false
 end
 
 group :development, :staging do

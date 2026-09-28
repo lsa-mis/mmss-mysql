@@ -68,7 +68,7 @@ class Admin::CsvExport
   # the export. Such strings are prefixed with a single quote, the spreadsheet convention for
   # "this is text" (the quote is not displayed in the cell). Only strings are touched: numbers,
   # dates, booleans and Money are formatted by the exporter itself, so a negative balance
-  # (`-$25.00`) is never mangled.
+  # (`$-25.00`) is never mangled.
   FORMULA_PREFIX = /\A[=+\-@\t\r]/
 
   def self.sanitize_cell(value)
