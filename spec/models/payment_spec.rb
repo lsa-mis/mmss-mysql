@@ -36,6 +36,13 @@ RSpec.describe Payment, type: :model do
   describe 'associations' do
     it { is_expected.to belong_to(:user) }
     it { is_expected.to have_one(:payment_request).dependent(:restrict_with_error) }
+
+    it 'optionally has one payment_request' do
+      payment = create(:payment)
+      request = create(:payment_request, user: payment.user, payment: payment)
+
+      expect(payment.payment_request).to eq(request)
+    end
   end
 
   describe '#destroy' do
