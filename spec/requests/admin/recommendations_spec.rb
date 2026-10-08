@@ -201,8 +201,12 @@ RSpec.describe 'Admin recommendations', type: :request do
     end
 
     it 'does not issue or email a link when a letter lands while the resend waits for the row lock' do
+      sneaked_in = false
       allow_any_instance_of(Recommendation).to receive(:lock!).and_wrap_original do |original, *args|
-        create(:recupload, recommendation: Recommendation.find(original.receiver.id))
+        unless sneaked_in
+          sneaked_in = true
+          create(:recupload, recommendation: Recommendation.find(original.receiver.id))
+        end
         original.call(*args)
       end
 

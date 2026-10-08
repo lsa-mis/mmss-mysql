@@ -24,6 +24,10 @@ class Recupload < ApplicationRecord
   include AdminCommentable
 
   belongs_to :recommendation
+  # A letter is written under its recommendation's row lock — the same lock RecuploadsController
+  # and Recommendation#issue_upload_token! take — so letters, public uploads and admin resends
+  # for one recommendation always serialise, whichever controller or console they come from.
+  before_save :lock_recommendation, if: :will_save_change_to_recommendation_id?
   after_create :update_enrollment_status
   # The emailed upload link is single-use: once a letter is in, the token is cleared. Fires on
   # create and on any (re)assignment of the recommendation, so the owner can never keep a live
@@ -61,6 +65,10 @@ class Recupload < ApplicationRecord
     if !enrollment.application_fee_required || Payment.where(user_id: enrollment.user_id).status1_current_camp_payments.exists?
       enrollment.transition_application_status!('application complete')
     end
+  end
+
+  def lock_recommendation
+    recommendation&.lock!
   end
 
   def invalidate_upload_token

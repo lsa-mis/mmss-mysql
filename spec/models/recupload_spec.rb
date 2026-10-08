@@ -261,6 +261,13 @@ RSpec.describe Recupload, type: :model do
       expect(recommendation.reload.upload_token).to be_nil
     end
 
+    it 'takes the recommendation row lock while saving a new letter, and not on unrelated updates' do
+      expect(recommendation).to receive(:lock!).once.and_call_original
+      recupload = create(:recupload, recommendation:)
+
+      recupload.update!(authorname: 'Renamed')
+    end
+
     it 'clears the destination token when a letter is reassigned to another recommendation' do
       recupload = create(:recupload, recommendation:)
       other = create(:recommendation, enrollment: create(:enrollment, :without_transcript))

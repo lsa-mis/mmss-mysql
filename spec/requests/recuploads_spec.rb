@@ -119,8 +119,12 @@ RSpec.describe 'Recommender uploads (token link)', type: :request do
     it 'is single-use under concurrency: a letter that lands while this request waits for the row lock wins' do
       # Simulate a second submission of the same link committing between the token check in the
       # before_action and the locked re-check inside create.
+      sneaked_in = false
       allow_any_instance_of(Recommendation).to receive(:lock!).and_wrap_original do |original, *args|
-        create(:recupload, recommendation: Recommendation.find(original.receiver.id), authorname: 'First', studentname: 'S', letter: 'First letter')
+        unless sneaked_in
+          sneaked_in = true
+          create(:recupload, recommendation: Recommendation.find(original.receiver.id), authorname: 'First', studentname: 'S', letter: 'First letter')
+        end
         original.call(*args)
       end
 
