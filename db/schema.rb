@@ -330,6 +330,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_08_150000) do
     t.datetime "updated_at", null: false
     t.string "user_account"
     t.bigint "user_id", null: false
+    t.index ["transaction_id"], name: "index_payments_on_transaction_id", unique: true
     t.index ["user_id"], name: "index_payments_on_user_id"
   end
 

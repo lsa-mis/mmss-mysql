@@ -257,6 +257,49 @@ RSpec.describe PaymentsController, type: :request do
         expect(Payment.count).to eq(1)
       end
 
+      it 'reuses the winning row when a concurrent receipt commits between find_by and create' do
+        allow_any_instance_of(Payment).to receive(:set_status).and_return(nil)
+        params = nelnet_receipt_params('transactionId' => 'race-123')
+
+        # The other request inserts the row after this one's find_by returned nil, so this one's
+        # create hits the unique index instead of the uniqueness validation.
+        allow(Payment).to receive(:create).and_wrap_original do |original, attrs|
+          original.call(attrs)
+          raise ActiveRecord::RecordNotUnique, "Duplicate entry 'race-123' for key 'index_payments_on_transaction_id'"
+        end
+
+        post payment_receipt_path, params: params
+
+        expect(response).to redirect_to(all_payments_path)
+        expect(flash[:notice]).to include('successfully recorded')
+        expect(Payment.where(transaction_id: 'race-123').count).to eq(1)
+        expect(PaymentRequest.find_by(order_number: order_number).payment).to eq(Payment.find_by(transaction_id: 'race-123'))
+      end
+
+      it 'recovers when the competing receipt commits mid-request and the real unique index rejects the insert' do
+        allow_any_instance_of(Payment).to receive(:set_status).and_return(nil)
+        params = nelnet_receipt_params('transactionId' => 'race-456')
+
+        # The competing request commits after this request's before_action (Payment.exists?) and
+        # find_by both returned nothing. Writing with dirties: false mimics a commit on another
+        # connection: this request's query cache is not cleared, so the uniqueness validator's
+        # SELECT (identical to the before_action's exists?) is replayed from the cache and passes,
+        # the INSERT reaches MySQL and index_payments_on_transaction_id rejects it.
+        allow(Payment).to receive(:create).and_wrap_original do |original, attrs|
+          Payment.uncached(dirties: false) do
+            Payment.insert!(attrs.merge(created_at: Time.current, updated_at: Time.current))
+          end
+          original.call(attrs)
+        end
+
+        post payment_receipt_path, params: params
+
+        expect(response).to redirect_to(all_payments_path)
+        expect(flash[:notice]).to include('successfully recorded')
+        expect(Payment.where(transaction_id: 'race-456').count).to eq(1)
+        expect(PaymentRequest.find_by(order_number: order_number).payment).to eq(Payment.find_by(transaction_id: 'race-456'))
+      end
+
       it 'does not link another user\'s PaymentRequest when orderNumber identifies a different user' do
         allow_any_instance_of(Payment).to receive(:set_status).and_return(nil)
 
