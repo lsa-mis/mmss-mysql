@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 class Admin::Reports::EnrolledWithSessionsAndTshirt < Admin::Reports::Base
-  self.label = 'Enrolled Students with Sessions and T-Shirt size'
-  self.description = 'Enrolled students for the camp year, one row per assigned session, with their t-shirt size.'
-  self.csv_title = 'enrolled_with_sessions_and_tshirt'
+  self.label = "Enrolled Students with Sessions and T-Shirt size"
+  self.description = "Enrolled students for the camp year, one row per assigned session, with their t-shirt size."
+  self.csv_title = "enrolled_with_sessions_and_tshirt"
   self.sql = <<~SQL
     SELECT co.description AS session, en.user_id, REPLACE(ad.lastname, ',', ' ') AS lastname,
       REPLACE(ad.firstname, ',', ' ') AS firstname, u.email, ad.shirt_size

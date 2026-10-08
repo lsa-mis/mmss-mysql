@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 class Admin::Reports::AcceptedCourseAssignmentsWithStudents < Admin::Reports::Base
-  self.label = 'Accepted Course Assignments with Students'
-  self.description = 'Course assignments for the camp year whose applicant has accepted the offer, by session ' \
-                     'and course, with the assigned student.'
-  self.csv_title = 'accepted_course_assignments_with_students'
+  self.label = "Accepted Course Assignments with Students"
+  self.description = "Course assignments for the camp year whose applicant has accepted the offer, by session " \
+                     "and course, with the assigned student."
+  self.csv_title = "accepted_course_assignments_with_students"
   self.sql = <<~SQL
     SELECT co.description, cor.title, en.user_id, REPLACE(ad.lastname, ',', ' ') AS lastname,
       REPLACE(ad.firstname, ',', ' ') AS firstname, u.email

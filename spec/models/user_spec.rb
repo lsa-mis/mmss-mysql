@@ -23,25 +23,25 @@
 #  index_users_on_email                 (email) UNIQUE
 #  index_users_on_reset_password_token  (reset_password_token) UNIQUE
 #
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe User, type: :model do
-  describe 'associations' do
+  describe "associations" do
     it { is_expected.to have_one(:applicant_detail).dependent(:destroy) }
     it { is_expected.to have_many(:enrollments).dependent(:destroy) }
     it { is_expected.to have_many(:payments).dependent(:restrict_with_error) }
     it { is_expected.to have_many(:payment_requests).dependent(:restrict_with_error) }
 
-    it 'cannot be destroyed while it has payments or payment requests' do
+    it "cannot be destroyed while it has payments or payment requests" do
       user = create(:user)
       create(:payment_request, user: user)
 
       expect(user.destroy).to be(false)
-      expect(user.errors[:base].join).to include('payment requests')
+      expect(user.errors[:base].join).to include("payment requests")
       expect(User.exists?(user.id)).to be(true)
     end
 
-    it 'checks the financial restriction before destroying any application data' do
+    it "checks the financial restriction before destroying any application data" do
       user = create(:user, :with_applicant_detail)
       enrollment = create(:enrollment, user: user)
       feedback = create(:feedback, user: user)
@@ -49,8 +49,8 @@ RSpec.describe User, type: :model do
       applicant_detail = user.applicant_detail
 
       deletes = []
-      callback = ->(*, payload) { deletes << payload[:sql] if payload[:sql].start_with?('DELETE') }
-      ActiveSupport::Notifications.subscribed(callback, 'sql.active_record') do
+      callback = ->(*, payload) { deletes << payload[:sql] if payload[:sql].start_with?("DELETE") }
+      ActiveSupport::Notifications.subscribed(callback, "sql.active_record") do
         expect(user.destroy).to be(false)
       end
 
@@ -59,71 +59,71 @@ RSpec.describe User, type: :model do
       expect(applicant_detail.reload).to be_persisted
       expect(enrollment.reload).to be_persisted
       expect(feedback.reload).to be_persisted
-      expect(user.errors[:base].join).to include('payments')
+      expect(user.errors[:base].join).to include("payments")
     end
     it { is_expected.to have_many(:feedbacks).dependent(:destroy) }
   end
 
-  describe 'validations' do
+  describe "validations" do
     subject { build(:user) }
 
     it { is_expected.to validate_presence_of(:email) }
     it { is_expected.to validate_uniqueness_of(:email).case_insensitive }
     it { is_expected.to validate_presence_of(:password) }
-    it { is_expected.to allow_value('valid@email.com').for(:email) }
-    it { is_expected.not_to allow_value('invalid_email').for(:email) }
+    it { is_expected.to allow_value("valid@email.com").for(:email) }
+    it { is_expected.not_to allow_value("invalid_email").for(:email) }
   end
 
-  describe 'factory' do
-    it 'has a valid factory' do
+  describe "factory" do
+    it "has a valid factory" do
       user = build(:user)
       expect(user).to be_valid
     end
 
-    it 'creates a user with sign ins using trait' do
+    it "creates a user with sign ins using trait" do
       user = create(:user, :with_sign_ins)
       expect(user.sign_in_count).to be > 0
       expect(user.current_sign_in_at).to be_present
     end
   end
 
-  describe '#display_name' do
+  describe "#display_name" do
     let(:user) { create(:user) }
 
-    it 'returns the email as display name' do
+    it "returns the email as display name" do
       expect(user.display_name).to eq(user.email)
     end
   end
 
-  describe 'devise configuration' do
-    it 'is configured for database_authenticatable' do
+  describe "devise configuration" do
+    it "is configured for database_authenticatable" do
       expect(User.devise_modules).to include(:database_authenticatable)
     end
 
-    it 'is configured for registerable' do
+    it "is configured for registerable" do
       expect(User.devise_modules).to include(:registerable)
     end
 
-    it 'is configured for recoverable' do
+    it "is configured for recoverable" do
       expect(User.devise_modules).to include(:recoverable)
     end
 
-    it 'is configured for rememberable' do
+    it "is configured for rememberable" do
       expect(User.devise_modules).to include(:rememberable)
     end
 
-    it 'is configured for validatable' do
+    it "is configured for validatable" do
       expect(User.devise_modules).to include(:validatable)
     end
 
-    it 'is configured for trackable' do
+    it "is configured for trackable" do
       expect(User.devise_modules).to include(:trackable)
     end
 
-    it 'is configured for timeoutable' do
+    it "is configured for timeoutable" do
       expect(User.devise_modules).to include(:timeoutable)
     end
   end
 
-  it_behaves_like 'a model with timestamps'
+  it_behaves_like "a model with timestamps"
 end

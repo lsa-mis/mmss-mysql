@@ -29,14 +29,14 @@
 #    - Verify session persists for the full 4 hours
 #    - Verify CSRF token doesn't expire during form completion
 
-require 'rails_helper'
+require "rails_helper"
 
-RSpec.describe 'Session Configuration', type: :request do
-  describe 'production.rb configuration file' do
-    it 'verifies production configuration includes expected session store settings' do
-      production_config_file = Rails.root.join('config', 'environments', 'production.rb')
+RSpec.describe "Session Configuration", type: :request do
+  describe "production.rb configuration file" do
+    it "verifies production configuration includes expected session store settings" do
+      production_config_file = Rails.root.join("config/environments/production.rb")
       production_config_content = File.read(production_config_file)
-      
+
       # Verify the configuration includes the expected values
       expect(production_config_content).to include("expire_after: 4.hours")
       expect(production_config_content).to include("secure: true")
@@ -45,52 +45,52 @@ RSpec.describe 'Session Configuration', type: :request do
     end
   end
 
-  describe 'session store configuration behavior' do
-    it 'configures session store with production settings when Rails.env.production? is true' do
+  describe "session store configuration behavior" do
+    it "configures session store with production settings when Rails.env.production? is true" do
       allow(Rails.env).to receive(:production?).and_return(true)
-      
+
       # Configure as production does
       Rails.application.config.session_store :cookie_store,
-                                             key: 'mmss_security_session',
-                                             secure: Rails.env.production?,
-                                             expire_after: 4.hours
-      
+        key: "mmss_security_session",
+        secure: Rails.env.production?,
+        expire_after: 4.hours
+
       # Verify the session store class is CookieStore
       expect(Rails.application.config.session_store).to eq(ActionDispatch::Session::CookieStore)
-      
+
       # Note: In test environment, we can't easily access the options hash directly,
       # but we can verify the configuration was applied by checking the file content
       # and testing behavior through request specs
     end
 
-    it 'configures session store with non-secure cookies when Rails.env.production? is false' do
+    it "configures session store with non-secure cookies when Rails.env.production? is false" do
       allow(Rails.env).to receive(:production?).and_return(false)
-      
+
       # Configure as production does, but secure should be false
       Rails.application.config.session_store :cookie_store,
-                                             key: 'mmss_security_session',
-                                             secure: Rails.env.production?,
-                                             expire_after: 4.hours
-      
+        key: "mmss_security_session",
+        secure: Rails.env.production?,
+        expire_after: 4.hours
+
       # Verify the session store class is CookieStore
       expect(Rails.application.config.session_store).to eq(ActionDispatch::Session::CookieStore)
     end
   end
 
-  describe 'cookie security and timeout in production', type: :request do
+  describe "cookie security and timeout in production", type: :request do
     let(:user) { create(:user) }
 
-    context 'when simulating production environment' do
+    context "when simulating production environment" do
       before do
         # Stub Rails.env to simulate production for cookie security testing
         allow(Rails.env).to receive(:production?).and_return(true)
         allow(Rails.env).to receive(:test?).and_return(false)
-        
+
         # Reconfigure session store as production does
         Rails.application.config.session_store :cookie_store,
-                                               key: 'mmss_security_session',
-                                               secure: Rails.env.production?,
-                                               expire_after: 4.hours
+          key: "mmss_security_session",
+          secure: Rails.env.production?,
+          expire_after: 4.hours
       end
 
       after do
@@ -101,13 +101,13 @@ RSpec.describe 'Session Configuration', type: :request do
         Rails.application.config.session_store :cookie_store
       end
 
-      it 'configures session store correctly for production' do
+      it "configures session store correctly for production" do
         expect(Rails.application.config.session_store).to eq(ActionDispatch::Session::CookieStore)
         # The secure flag and expire_after are set in the configuration,
         # which will be applied when the app runs in production
       end
 
-      it 'allows session to be set and retrieved' do
+      it "allows session to be set and retrieved" do
         sign_in user
         get root_path
         expect(response).to have_http_status(:success)
@@ -117,26 +117,26 @@ RSpec.describe 'Session Configuration', type: :request do
     end
   end
 
-  describe 'session expiration timeout' do
-    it 'verifies 4 hours equals 14400 seconds' do
+  describe "session expiration timeout" do
+    it "verifies 4 hours equals 14400 seconds" do
       # Verify the timeout value is correct
       expect(4.hours.to_i).to eq(14400)
     end
 
-    it 'allows session to persist in test environment' do
+    it "allows session to persist in test environment" do
       user = create(:user)
       sign_in user
-      
+
       # Set a value in session
       get root_path
       expect(response).to have_http_status(:success)
-      
+
       # Session should be active immediately
       expect(session).to be_present
     end
   end
 
-  describe 'staging session cookie follows STAGING_FORCE_SSL' do
+  describe "staging session cookie follows STAGING_FORCE_SSL" do
     # Evaluates config/environments/staging.rb against a recording stand-in for the Rails
     # configuration (the staging gem group is not installed in test/CI, so the environment
     # cannot simply be booted) and captures the session_store options it produces.
@@ -172,36 +172,36 @@ RSpec.describe 'Session Configuration', type: :request do
 
     def staging_config_with(force_ssl_env)
       recorder = recorder_class.new
-      source = Rails.root.join('config', 'environments', 'staging.rb').read
-      previous = ENV['STAGING_FORCE_SSL']
-      ENV['STAGING_FORCE_SSL'] = force_ssl_env
+      source = Rails.root.join("config/environments/staging.rb").read
+      previous = ENV["STAGING_FORCE_SSL"]
+      ENV["STAGING_FORCE_SSL"] = force_ssl_env
       allow(Rails.application).to receive(:configure) { |&block| recorder.instance_eval(&block) }
-      recorder.instance_eval(source, 'config/environments/staging.rb')
+      recorder.instance_eval(source, "config/environments/staging.rb")
       recorder
     ensure
-      previous.nil? ? ENV.delete('STAGING_FORCE_SSL') : ENV['STAGING_FORCE_SSL'] = previous
+      previous.nil? ? ENV.delete("STAGING_FORCE_SSL") : ENV["STAGING_FORCE_SSL"] = previous
     end
 
-    it 'uses a Secure cookie when STAGING_FORCE_SSL is unset (HTTPS default)' do
+    it "uses a Secure cookie when STAGING_FORCE_SSL is unset (HTTPS default)" do
       recorder = staging_config_with(nil)
 
       expect(recorder.settings[:force_ssl]).to be(true)
-      expect(recorder.session_store_options).to include(key: 'mmss_security_session', secure: true, expire_after: 4.hours)
+      expect(recorder.session_store_options).to include(key: "mmss_security_session", secure: true, expire_after: 4.hours)
     end
 
-    it 'uses a non-Secure cookie when STAGING_FORCE_SSL=false (plain HTTP staging)' do
-      recorder = staging_config_with('false')
+    it "uses a non-Secure cookie when STAGING_FORCE_SSL=false (plain HTTP staging)" do
+      recorder = staging_config_with("false")
 
       expect(recorder.settings[:force_ssl]).to be(false)
-      expect(recorder.session_store_options).to include(key: 'mmss_security_session', secure: false, expire_after: 4.hours)
+      expect(recorder.session_store_options).to include(key: "mmss_security_session", secure: false, expire_after: 4.hours)
     end
   end
 
-  describe 'production configuration verification' do
-    it 'ensures production.rb has all required session configuration' do
-      production_config_file = Rails.root.join('config', 'environments', 'production.rb')
+  describe "production configuration verification" do
+    it "ensures production.rb has all required session configuration" do
+      production_config_file = Rails.root.join("config/environments/production.rb")
       production_config_content = File.read(production_config_file)
-      
+
       # Verify all production requirements are in the config file
       expect(production_config_content).to match(/session_store\s*:cookie_store/)
       expect(production_config_content).to match(/key:\s*['"]mmss_security_session['"]/)
@@ -209,12 +209,12 @@ RSpec.describe 'Session Configuration', type: :request do
       expect(production_config_content).to match(/expire_after:\s*4\.hours/)
     end
 
-    it 'verifies force_ssl is enabled in production' do
-      production_config_file = Rails.root.join('config', 'environments', 'production.rb')
+    it "verifies force_ssl is enabled in production" do
+      production_config_file = Rails.root.join("config/environments/production.rb")
       production_config_content = File.read(production_config_file)
-      
+
       # force_ssl should be enabled, which also helps with secure cookies
-      expect(production_config_content).to include('config.force_ssl = true')
+      expect(production_config_content).to include("config.force_ssl = true")
     end
   end
 end

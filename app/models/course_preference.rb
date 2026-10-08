@@ -27,13 +27,13 @@ class CoursePreference < ApplicationRecord
   belongs_to :enrollment
   belongs_to :course
 
-  validates :course_id, uniqueness: { scope: :enrollment_id }
+  validates :course_id, uniqueness: {scope: :enrollment_id}
   validates :ranking,
-            numericality: {
-              only_integer: true,
-              allow_nil: true,
-              greater_than_or_equal_to: 1
-            }
+    numericality: {
+      only_integer: true,
+      allow_nil: true,
+      greater_than_or_equal_to: 1
+    }
   validate :ranking_within_session_upper_bound
   validate :ranking_unique_within_enrollment_session
 
@@ -59,7 +59,7 @@ class CoursePreference < ApplicationRecord
       !same_record?(preference) && preference.ranking == ranking
     end
 
-    errors.add(:ranking, 'must be unique within each camp session') if duplicate_rank
+    errors.add(:ranking, "must be unique within each camp session") if duplicate_rank
   end
 
   def session_course_preferences
@@ -77,7 +77,7 @@ class CoursePreference < ApplicationRecord
     CoursePreference.includes(:course)
       .joins(:course)
       .where(enrollment_id: enrollment_id)
-      .where(courses: { camp_occurrence_id: course.camp_occurrence_id })
+      .where(courses: {camp_occurrence_id: course.camp_occurrence_id})
       .to_a
   end
 

@@ -16,8 +16,8 @@ module Admin::CsvExportable
 
   def send_csv(export, records, filename:)
     send_data export.generate(records),
-              type: 'text/csv; charset=utf-8',
-              disposition: 'attachment',
-              filename: Admin::CsvExport.filename(filename)
+      type: "text/csv; charset=utf-8",
+      disposition: "attachment",
+      filename: Admin::CsvExport.filename(filename)
   end
 end

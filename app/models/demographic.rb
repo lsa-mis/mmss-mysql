@@ -14,8 +14,8 @@
 class Demographic < ApplicationRecord
   before_validation :normalize_name
 
-  validates :name, presence: true, uniqueness: { case_sensitive: false }
-  validates :description, presence: true, uniqueness: { case_sensitive: false }, length: { maximum: 2250 }
+  validates :name, presence: true, uniqueness: {case_sensitive: false}
+  validates :description, presence: true, uniqueness: {case_sensitive: false}, length: {maximum: 2250}
 
   scope :modifiable, -> { where(protected: false) }
 
@@ -32,17 +32,17 @@ class Demographic < ApplicationRecord
   def prevent_protected_deletion
     return unless protected?
 
-    errors.add(:base, 'Cannot delete protected demographic options')
+    errors.add(:base, "Cannot delete protected demographic options")
     throw :abort
   end
 
   def name_format
     return unless name.present?
 
-    errors.add(:name, 'cannot contain punctuation') if name =~ /[[:punct:]]/
+    errors.add(:name, "cannot contain punctuation") if /[[:punct:]]/.match?(name)
 
-    return unless name =~ /\s{2,}/
+    return unless /\s{2,}/.match?(name)
 
-    errors.add(:name, 'cannot contain consecutive spaces')
+    errors.add(:name, "cannot contain consecutive spaces")
   end
 end

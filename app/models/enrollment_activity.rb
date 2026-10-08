@@ -24,6 +24,6 @@ class EnrollmentActivity < ApplicationRecord
   belongs_to :enrollment
   belongs_to :activity
 
-  validates_presence_of :enrollment
-  validates_presence_of :activity
+  validates :enrollment, presence: true
+  validates :activity, presence: true
 end

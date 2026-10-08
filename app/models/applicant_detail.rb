@@ -51,7 +51,7 @@
 class ApplicantDetail < ApplicationRecord
   include AdminCommentable
 
-  belongs_to :user, required: true, inverse_of: :applicant_detail
+  belongs_to :user, optional: false, inverse_of: :applicant_detail
   belongs_to :demographic, optional: true
 
   before_validation :clear_demographic_other_if_not_other
@@ -65,30 +65,30 @@ class ApplicantDetail < ApplicationRecord
   validates :demographic_id, presence: true
   validates :address1, presence: true
   validates :city, presence: true
-  validates :state, presence: { message: "needs to be selected or if you are
-                                          outside of the US select *Non-US*" }
+  validates :state, presence: {message: "needs to be selected or if you are
+                                          outside of the US select *Non-US*"}
   validates :postalcode, presence: true
   validates :postalcode,
-            length: { minimum: 1, maximum: 25, message: 'must be between 1 and 25 characters' },
-            format: { with: /\A[a-zA-Z0-9\s\-]+\z/, message: 'can only contain letters, numbers, spaces, and dashes' }
+    length: {minimum: 1, maximum: 25, message: "must be between 1 and 25 characters"},
+    format: {with: /\A[a-zA-Z0-9\s-]+\z/, message: "can only contain letters, numbers, spaces, and dashes"}
 
   validates :parentzip,
-            length: { minimum: 1, maximum: 25, message: 'must be between 1 and 25 characters' },
-            format: { with: /\A[a-zA-Z0-9\s\-]+\z/, message: 'can only contain letters, numbers, spaces, and dashes' },
-            allow_blank: true
+    length: {minimum: 1, maximum: 25, message: "must be between 1 and 25 characters"},
+    format: {with: /\A[a-zA-Z0-9\s-]+\z/, message: "can only contain letters, numbers, spaces, and dashes"},
+    allow_blank: true
 
   validates :country, presence: true
   validates :phone, presence: true,
-                    format: { with: /\A(\+|00)?[0-9][0-9 \-?().]{7,}\z/, message: 'number format is incorrect' }
+    format: {with: /\A(\+|00)?[0-9][0-9 \-?().]{7,}\z/, message: "number format is incorrect"}
   validates :parentname, presence: true
   validates :parentphone, presence: true,
-                          format: { with: /\A(\+|00)?[0-9][0-9 \-?().]{7,}\z/, message: 'number format is incorrect' }
-  validates :parentemail, presence: true, length: { maximum: 255 },
-                          format: { with: URI::MailTo::EMAIL_REGEXP, message: 'only allows valid emails' }
+    format: {with: /\A(\+|00)?[0-9][0-9 \-?().]{7,}\z/, message: "number format is incorrect"}
+  validates :parentemail, presence: true, length: {maximum: 255},
+    format: {with: URI::MailTo::EMAIL_REGEXP, message: "only allows valid emails"}
   validate :parentemail_not_user_email
   validate :demographic_other_if_other_selected
 
-  scope :current_camp_enrolled, -> { joins(:user).joins('INNER JOIN enrollments ON enrollments.user_id = users.id').where('enrollments.campyear = ? AND enrollments.application_status = ?', CampConfiguration.active.pick(:camp_year), 'enrolled') }
+  scope :current_camp_enrolled, -> { joins(:user).joins("INNER JOIN enrollments ON enrollments.user_id = users.id").where("enrollments.campyear = ? AND enrollments.application_status = ?", CampConfiguration.active.pick(:camp_year), "enrolled") }
 
   def full_name
     "#{lastname}, #{firstname}"
@@ -107,7 +107,7 @@ class ApplicantDetail < ApplicationRecord
   end
 
   def demographic_name
-    demographic&.name || 'None Selected'
+    demographic&.name || "None Selected"
   end
 
   def parentemail_not_user_email
@@ -118,7 +118,7 @@ class ApplicantDetail < ApplicationRecord
   end
 
   def formatted_demographic
-    if demographic_name == 'Other' && demographic_other.present?
+    if demographic_name == "Other" && demographic_other.present?
       "#{demographic_name} - #{demographic_other}"
     else
       demographic_name
@@ -129,14 +129,14 @@ class ApplicantDetail < ApplicationRecord
 
   def demographic_other_if_other_selected
     return unless demographic_id.present? &&
-                  demographic&.name&.downcase == 'other' &&
-                  demographic_other.blank?
+      demographic&.name&.downcase == "other" &&
+      demographic_other.blank?
 
     errors.add(:demographic_other, "must be specified when 'Other' is selected")
   end
 
   def clear_demographic_other_if_not_other
-    return unless demographic_id.present? && demographic&.name&.downcase != 'other'
+    return unless demographic_id.present? && demographic&.name&.downcase != "other"
 
     self.demographic_other = nil
   end

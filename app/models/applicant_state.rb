@@ -24,7 +24,7 @@ module ApplicantState
   end
 
   def has_any_session
-    session_registrations.pluck(:description).include?('Any Session')
+    session_registrations.pluck(:description).include?("Any Session")
   end
 
   def finaids_ttl
@@ -32,7 +32,7 @@ module ApplicantState
   end
 
   def finaids_awarded_ttl
-    finaids.where(status: 'awarded').pluck(:amount_cents).sum
+    finaids.where(status: "awarded").pluck(:amount_cents).sum
   end
 
   def users_current_payments
@@ -63,7 +63,7 @@ module ApplicantState
   end
 
   def assigned_sessions_ids
-    SessionAssignment.where(enrollment_id: @current_enrollment, offer_status: 'accepted').pluck(:camp_occurrence_id)
+    SessionAssignment.where(enrollment_id: @current_enrollment, offer_status: "accepted").pluck(:camp_occurrence_id)
   end
 
   def cost_sessions_ttl

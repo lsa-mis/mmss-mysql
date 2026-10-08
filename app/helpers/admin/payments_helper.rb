@@ -5,7 +5,7 @@ module Admin::PaymentsHelper
   def admin_payment_user(payment)
     user = payment.user
     name = user.applicant_detail&.full_name || user.email
-    safe_join([tag.span(name, class: 'font-medium'), tag.div(user.email, class: 'text-xs text-slate-500')])
+    safe_join([tag.span(name, class: "font-medium"), tag.div(user.email, class: "text-xs text-slate-500")])
   end
 
   # "Lastname, Firstname · 2026 application" for the applicant row; falls back to the email when
@@ -19,9 +19,9 @@ module Admin::PaymentsHelper
   def admin_payment_status_badge(status)
     return admin_empty_value if status.blank?
 
-    colour = status.to_s == '1' ? 'green' : 'red'
+    colour = (status.to_s == "1") ? "green" : "red"
     tag.span("#{status} · #{transaction_status_message(status)}", class: "admin-badge-#{colour}",
-                                                                  title: transaction_status_message(status))
+      title: transaction_status_message(status))
   end
 
   # Applicant picker for a new manual payment: current-camp applications keyed by user id. The

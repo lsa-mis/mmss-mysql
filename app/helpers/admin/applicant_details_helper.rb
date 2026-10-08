@@ -33,6 +33,6 @@ module Admin::ApplicantDetailsHelper
     enrollment_id ||= applicant_detail.try(:latest_enrollment_id)
     return email if enrollment_id.blank?
 
-    link_to email, admin_application_path(enrollment_id), title: 'Latest application'
+    link_to email, admin_application_path(enrollment_id), title: "Latest application"
   end
 end

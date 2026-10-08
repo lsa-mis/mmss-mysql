@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 class Admin::Reports::RegisteredButNotApplied < Admin::Reports::Base
-  self.label = 'Registered but not Applied'
-  self.description = 'Users who filled in their applicant details but have no application for the camp year, ' \
-                     'with their last login and when the details were created.'
-  self.csv_title = 'registered_but_not_applied'
+  self.label = "Registered but not Applied"
+  self.description = "Users who filled in their applicant details but have no application for the camp year, " \
+                     "with their last login and when the details were created."
+  self.csv_title = "registered_but_not_applied"
   self.sql = <<~SQL
     SELECT u.id, u.email,
       CONCAT(REPLACE(ad.firstname, ',', ' '), ' ',

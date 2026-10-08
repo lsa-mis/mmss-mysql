@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 class Admin::Reports::EnrolledWithAddressesAndMore < Admin::Reports::Base
-  self.label = 'Enrolled with Addresses, Birthdate, Gender, Graduation Year'
-  self.description = 'Enrolled students for the camp year with home address, country, birthdate, gender, ' \
-                     'demographic, graduation year and year in school.'
-  self.csv_title = 'enrolled_with_addresses_and_more'
+  self.label = "Enrolled with Addresses, Birthdate, Gender, Graduation Year"
+  self.description = "Enrolled students for the camp year with home address, country, birthdate, gender, " \
+                     "demographic, graduation year and year in school."
+  self.csv_title = "enrolled_with_addresses_and_more"
   self.sql = <<~SQL
     SELECT
       CONCAT(REPLACE(ad.firstname, ',', ' '), ' ', REPLACE(ad.lastname, ',', ' ')) AS name,

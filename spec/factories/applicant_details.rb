@@ -74,8 +74,8 @@ FactoryBot.define do
 
     us_citizen { true }
     birthdate { Faker::Date.birthday(min_age: 15, max_age: 18) }
-    diet_restrictions { ['Peanuts', 'Gluten', 'Dairy', 'Shellfish', nil].sample }
-    shirt_size { ['Small', 'Medium', 'Large', 'X-Large', 'XX-Large'].sample }
+    diet_restrictions { ["Peanuts", "Gluten", "Dairy", "Shellfish", nil].sample }
+    shirt_size { ["Small", "Medium", "Large", "X-Large", "XX-Large"].sample }
 
     # Applicant address
     address1 { Faker::Address.street_address }
@@ -84,8 +84,8 @@ FactoryBot.define do
     state { Faker::Address.state_abbr }
     state_non_us { nil }
     postalcode { Faker::Address.zip_code }
-    country { 'US' }
-    sequence(:phone) { |n| "+1-555-#{format('%04d', n + 5000)}" }
+    country { "US" }
+    sequence(:phone) { |n| "+1-555-#{format("%04d", n + 5000)}" }
 
     # Parent/Guardian information
     parentname { Faker::Name.name }
@@ -95,29 +95,29 @@ FactoryBot.define do
     parentstate { Faker::Address.state_abbr }
     parentstate_non_us { nil }
     parentzip { Faker::Address.zip_code }
-    parentcountry { 'US' }
-    sequence(:parentphone) { |n| "+1-555-#{format('%04d', n)}" }
-    sequence(:parentworkphone) { |n| "+1-555-#{format('%04d', n + 10000)}" }
+    parentcountry { "US" }
+    sequence(:parentphone) { |n| "+1-555-#{format("%04d", n)}" }
+    sequence(:parentworkphone) { |n| "+1-555-#{format("%04d", n + 10000)}" }
     sequence(:parentemail) { |n| "parent#{n}@example.com" }
 
     # Traits for different scenarios
     trait :international do
       us_citizen { false }
       country { Faker::Address.country_code }
-      state { 'Non-US' }
+      state { "Non-US" }
       state_non_us { Faker::Address.state }
     end
 
     trait :domestic do
       us_citizen { true }
-      country { 'US' }
+      country { "US" }
       state { Faker::Address.state_abbr }
       state_non_us { nil }
     end
 
     trait :with_other_demographic do
-      demographic { Demographic.find_or_create_by!(name: 'Other', description: 'Other option', protected: true) }
-      demographic_other { 'Custom demographic information' }
+      demographic { Demographic.find_or_create_by!(name: "Other", description: "Other option", protected: true) }
+      demographic_other { "Custom demographic information" }
     end
 
     trait :minimal do
@@ -140,8 +140,8 @@ FactoryBot.define do
       end
 
       # Handle demographic_other for "Other" demographic
-      if applicant_detail.demographic&.name&.downcase == 'other' && applicant_detail.demographic_other.blank?
-        applicant_detail.demographic_other = 'Other demographic details'
+      if applicant_detail.demographic&.name&.downcase == "other" && applicant_detail.demographic_other.blank?
+        applicant_detail.demographic_other = "Other demographic details"
       end
     end
   end

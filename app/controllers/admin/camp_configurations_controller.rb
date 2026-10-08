@@ -4,20 +4,20 @@ class Admin::CampConfigurationsController < Admin::BaseController
   before_action :set_camp_configuration, only: %i[show edit update destroy]
 
   SORTS = {
-    camp_year: 'camp_configurations.camp_year',
-    application_open: 'camp_configurations.application_open',
-    application_close: 'camp_configurations.application_close',
-    priority: 'camp_configurations.priority',
-    application_materials_due: 'camp_configurations.application_materials_due',
-    camper_acceptance_due: 'camp_configurations.camper_acceptance_due',
-    active: 'camp_configurations.active',
-    application_fee: 'camp_configurations.application_fee_cents',
-    application_fee_required: 'camp_configurations.application_fee_required',
-    created_at: 'camp_configurations.created_at',
-    updated_at: 'camp_configurations.updated_at'
+    camp_year: "camp_configurations.camp_year",
+    application_open: "camp_configurations.application_open",
+    application_close: "camp_configurations.application_close",
+    priority: "camp_configurations.priority",
+    application_materials_due: "camp_configurations.application_materials_due",
+    camper_acceptance_due: "camp_configurations.camper_acceptance_due",
+    active: "camp_configurations.active",
+    application_fee: "camp_configurations.application_fee_cents",
+    application_fee_required: "camp_configurations.application_fee_required",
+    created_at: "camp_configurations.created_at",
+    updated_at: "camp_configurations.updated_at"
   }.freeze
 
-  BATCH_ACTIONS = { destroy: 'Delete selected' }.freeze
+  BATCH_ACTIONS = {destroy: "Delete selected"}.freeze
 
   CSV_EXPORT = Admin::CsvExport.define do
     column :id
@@ -30,7 +30,7 @@ class Admin::CampConfigurationsController < Admin::BaseController
     column :active
     column :offer_letter
     column :student_packet_url
-    column('Application fee') { |camp| camp.application_fee.format }
+    column("Application fee") { |camp| camp.application_fee.format }
     column :reject_letter
     column :waitlist_letter
     column :application_fee_required
@@ -45,11 +45,12 @@ class Admin::CampConfigurationsController < Admin::BaseController
 
     respond_to do |format|
       format.html { @pagy, @camp_configurations = paginate(relation) }
-      format.csv { send_csv(CSV_EXPORT, relation, filename: 'camp-configurations') }
+      format.csv { send_csv(CSV_EXPORT, relation, filename: "camp-configurations") }
     end
   end
 
-  def show; end
+  def show
+  end
 
   # The letters and fee are copied from the most recent camp so admins only have to fill in the
   # new year and dates (CampConfiguration#dup clears those).
@@ -67,19 +68,20 @@ class Admin::CampConfigurationsController < Admin::BaseController
     @camp_configuration = CampConfiguration.new(camp_configuration_params)
 
     if @camp_configuration.save
-      redirect_to admin_camp_configuration_path(@camp_configuration), notice: 'Camp configuration was successfully created.',
-                                                                       status: :see_other
+      redirect_to admin_camp_configuration_path(@camp_configuration), notice: "Camp configuration was successfully created.",
+        status: :see_other
     else
       render :new, status: :unprocessable_content
     end
   end
 
-  def edit; end
+  def edit
+  end
 
   def update
     if @camp_configuration.update(camp_configuration_params)
-      redirect_to admin_camp_configuration_path(@camp_configuration), notice: 'Camp configuration was successfully updated.',
-                                                                       status: :see_other
+      redirect_to admin_camp_configuration_path(@camp_configuration), notice: "Camp configuration was successfully updated.",
+        status: :see_other
     else
       render :edit, status: :unprocessable_content
     end
@@ -87,7 +89,7 @@ class Admin::CampConfigurationsController < Admin::BaseController
 
   def destroy
     @camp_configuration.destroy
-    redirect_to admin_camp_configurations_path, notice: 'Camp configuration was successfully deleted.', status: :see_other
+    redirect_to admin_camp_configurations_path, notice: "Camp configuration was successfully deleted.", status: :see_other
   end
 
   def batch

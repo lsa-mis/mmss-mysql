@@ -26,7 +26,6 @@ class Rejection < ApplicationRecord
 
   validates :reason, presence: true
 
-
   def set_rejection_status
     if CourseAssignment.where(enrollment_id: enrollment).present?
       CourseAssignment.where(enrollment_id: enrollment).each do |ca|
@@ -41,8 +40,8 @@ class Rejection < ApplicationRecord
     end
 
     Enrollment.find(enrollment_id).transition_application_status!(
-      'rejected',
-      extra_attrs: { offer_status: '' }
+      "rejected",
+      extra_attrs: {offer_status: ""}
     )
   end
 end

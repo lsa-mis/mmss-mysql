@@ -6,13 +6,19 @@ module TestDataHelpers
   # Create basic test data needed for most tests
   def setup_basic_test_data
     # Create genders if they don't exist
-    Gender.find_or_create_by(name: 'Female') { |g| g.description = 'Female' }
-    Gender.find_or_create_by(name: 'Male') { |g| g.description = 'Male' }
-    Gender.find_or_create_by(name: 'Non-binary') { |g| g.description = 'Non-binary' }
+    Gender.find_or_create_by(name: "Female") { |g| g.description = "Female" }
+    Gender.find_or_create_by(name: "Male") { |g| g.description = "Male" }
+    Gender.find_or_create_by(name: "Non-binary") { |g| g.description = "Non-binary" }
 
     # Create demographics if they don't exist
-    Demographic.find_or_create_by(name: 'Test Demographic') { |d| d.description = 'Test Description'; d.protected = false }
-    Demographic.find_or_create_by(name: 'Other') { |d| d.description = 'Other demographic option'; d.protected = true }
+    Demographic.find_or_create_by(name: "Test Demographic") { |d|
+      d.description = "Test Description"
+      d.protected = false
+    }
+    Demographic.find_or_create_by(name: "Other") { |d|
+      d.description = "Other demographic option"
+      d.protected = true
+    }
   end
 
   # Clean up test data
@@ -40,10 +46,16 @@ RSpec.configure do |config|
 
   config.before(:suite) do
     # Setup basic test data once before the suite runs
-    Gender.find_or_create_by(name: 'Female') { |g| g.description = 'Female' }
-    Gender.find_or_create_by(name: 'Male') { |g| g.description = 'Male' }
-    Gender.find_or_create_by(name: 'Non-binary') { |g| g.description = 'Non-binary' }
-    Demographic.find_or_create_by(name: 'Test Demographic') { |d| d.description = 'Test Description'; d.protected = false }
-    Demographic.find_or_create_by(name: 'Other') { |d| d.description = 'Other demographic option'; d.protected = true }
+    Gender.find_or_create_by(name: "Female") { |g| g.description = "Female" }
+    Gender.find_or_create_by(name: "Male") { |g| g.description = "Male" }
+    Gender.find_or_create_by(name: "Non-binary") { |g| g.description = "Non-binary" }
+    Demographic.find_or_create_by(name: "Test Demographic") { |d|
+      d.description = "Test Description"
+      d.protected = false
+    }
+    Demographic.find_or_create_by(name: "Other") { |d|
+      d.description = "Other demographic option"
+      d.protected = true
+    }
   end
 end

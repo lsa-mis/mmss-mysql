@@ -4,20 +4,20 @@ class OfferMailer < ApplicationMailer
   # @param user_id [Integer] The ID of the user to send the offer email to
   # @return [Mail::Message] The email message that was sent
   def offer_email(user_id)
-    raise ArgumentError, 'user_id cannot be nil' if user_id.nil?
+    raise ArgumentError, "user_id cannot be nil" if user_id.nil?
     setup_common_variables(user_id)
     @assigned_courses = @enrollment.course_assignments.where(wait_list: false).reverse
     @assigned_sessions = @enrollment.session_assignments.reverse
 
     result = mail(to: @user.email,
-                 subject: 'University of Michigan - Michigan Math and Science Scholars: Offer to attend Michigan Math and Science Scholars') do |format|
+      subject: "University of Michigan - Michigan Math and Science Scholars: Offer to attend Michigan Math and Science Scholars") do |format|
       format.html
       format.text
     end
 
     update_application_status if @enrollment.present?
     result
-  rescue StandardError => e
+  rescue => e
     log_error("Failed to send offer email for user #{user_id}", e)
     raise
   end
@@ -27,8 +27,8 @@ class OfferMailer < ApplicationMailer
     @session_assignment = session_assignment
     @course_assignment = format_course_assignment(course_assignment)
 
-    mail(to: @user.email, subject: 'University of Michigan - Michigan Math and Science Scholars: Offer Accepted')
-  rescue StandardError => e
+    mail(to: @user.email, subject: "University of Michigan - Michigan Math and Science Scholars: Offer Accepted")
+  rescue => e
     log_error("Failed to send offer accepted email for user #{user_id}", e)
     raise
   end
@@ -38,8 +38,8 @@ class OfferMailer < ApplicationMailer
     @session_assignment = session_assignment
     @course_assignment = format_course_assignment(course_assignment)
 
-    mail(to: @user.email, subject: 'University of Michigan - Michigan Math and Science Scholars: Offer Declined')
-  rescue StandardError => e
+    mail(to: @user.email, subject: "University of Michigan - Michigan Math and Science Scholars: Offer Declined")
+  rescue => e
     log_error("Failed to send offer declined email for user #{user_id}", e)
     raise
   end
@@ -75,16 +75,16 @@ class OfferMailer < ApplicationMailer
   end
 
   def format_course_assignment(course_assignment)
-    return 'Contact MMSS admin to get a course assignment' if course_assignment.nil?
+    return "Contact MMSS admin to get a course assignment" if course_assignment.nil?
 
-    course_assignment.course&.display_name || 'Course name not available'
+    course_assignment.course&.display_name || "Course name not available"
   end
 
   def update_application_status
-    return unless @enrollment.present? && @enrollment.application_status != 'application complete'
+    return unless @enrollment.present? && @enrollment.application_status != "application complete"
 
     @enrollment.update(
-      application_status: 'application complete',
+      application_status: "application complete",
       application_status_updated_on: Date.current
     )
   end

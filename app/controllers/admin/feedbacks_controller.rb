@@ -6,15 +6,15 @@ class Admin::FeedbacksController < Admin::BaseController
   before_action :set_feedback, only: %i[show edit update destroy]
 
   SORTS = {
-    id: 'feedbacks.id',
-    genre: 'feedbacks.genre',
-    message: 'feedbacks.message',
-    user: 'users.email',
-    created_at: 'feedbacks.created_at',
-    updated_at: 'feedbacks.updated_at'
+    id: "feedbacks.id",
+    genre: "feedbacks.genre",
+    message: "feedbacks.message",
+    user: "users.email",
+    created_at: "feedbacks.created_at",
+    updated_at: "feedbacks.updated_at"
   }.freeze
 
-  BATCH_ACTIONS = { destroy: 'Delete selected' }.freeze
+  BATCH_ACTIONS = {destroy: "Delete selected"}.freeze
 
   def index
     @filter = Admin::FeedbacksFilter.new(params[Admin::Filter::PARAM_KEY])
@@ -23,17 +23,19 @@ class Admin::FeedbacksController < Admin::BaseController
 
     respond_to do |format|
       format.html { @pagy, @feedbacks = paginate(relation) }
-      format.csv { send_csv(csv_export, relation, filename: 'feedbacks') }
+      format.csv { send_csv(csv_export, relation, filename: "feedbacks") }
     end
   end
 
-  def show; end
+  def show
+  end
 
-  def edit; end
+  def edit
+  end
 
   def update
     if @feedback.update(feedback_params)
-      redirect_to admin_feedback_path(@feedback), notice: 'Feedback was successfully updated.', status: :see_other
+      redirect_to admin_feedback_path(@feedback), notice: "Feedback was successfully updated.", status: :see_other
     else
       render :edit, status: :unprocessable_content
     end
@@ -41,7 +43,7 @@ class Admin::FeedbacksController < Admin::BaseController
 
   def destroy
     @feedback.destroy
-    redirect_to admin_feedbacks_path, notice: 'Feedback was successfully deleted.', status: :see_other
+    redirect_to admin_feedbacks_path, notice: "Feedback was successfully deleted.", status: :see_other
   end
 
   def batch
@@ -63,7 +65,7 @@ class Admin::FeedbacksController < Admin::BaseController
       column :id
       column :genre
       column :message
-      column('User') { |feedback| feedback.user&.email }
+      column("User") { |feedback| feedback.user&.email }
       column :created_at
       column :updated_at
     end

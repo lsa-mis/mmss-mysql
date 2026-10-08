@@ -11,5 +11,5 @@
 #  updated_at  :datetime         not null
 #
 class Gender < ApplicationRecord
-  validates :name, presence: true, uniqueness: { case_sensitive: false }
+  validates :name, presence: true, uniqueness: {case_sensitive: false}
 end

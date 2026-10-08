@@ -37,8 +37,8 @@ class CampConfiguration < ApplicationRecord
   validate :only_one_active_camp
   validates :offer_letter, :reject_letter, :waitlist_letter, presence: true
   # Rendered as a clickable link in the admin and mailed to campers, so only web URLs are allowed.
-  validates :student_packet_url, format: { with: %r{\Ahttps?://\S+\z}i, message: 'must start with http:// or https://' },
-                                 allow_blank: true
+  validates :student_packet_url, format: {with: %r{\Ahttps?://\S+\z}i, message: "must start with http:// or https://"},
+    allow_blank: true
 
   monetize :application_fee_cents
 
@@ -72,21 +72,21 @@ class CampConfiguration < ApplicationRecord
     return unless active?
 
     matches = CampConfiguration.active
-    matches = matches.where('id != ?', id) if persisted?
+    matches = matches.where.not(id: id) if persisted?
     return unless matches.exists?
 
-    errors.add(:active, 'cannot have another active camp')
+    errors.add(:active, "cannot have another active camp")
   end
 
   def dup
     super.tap do |new_camp_configuration|
-      new_camp_configuration.camp_year = ''
-      new_camp_configuration.application_open = ''
-      new_camp_configuration.application_close = ''
-      new_camp_configuration.application_materials_due = ''
-      new_camp_configuration.priority = ''
-      new_camp_configuration.camper_acceptance_due = ''
-      new_camp_configuration.active = ''
+      new_camp_configuration.camp_year = ""
+      new_camp_configuration.application_open = ""
+      new_camp_configuration.application_close = ""
+      new_camp_configuration.application_materials_due = ""
+      new_camp_configuration.priority = ""
+      new_camp_configuration.camper_acceptance_due = ""
+      new_camp_configuration.active = ""
     end
   end
 end

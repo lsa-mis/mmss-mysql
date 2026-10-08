@@ -30,7 +30,7 @@ class CourseAssignment < ApplicationRecord
   validates :enrollment_id, presence: true
   validates :course_id, presence: true
 
-  scope :for_session, ->(session_id) { joins(:course).where(courses: { camp_occurrence_id: session_id }) }
+  scope :for_session, ->(session_id) { joins(:course).where(courses: {camp_occurrence_id: session_id}) }
   scope :wait_list, -> { where(wait_list: true) }
   scope :confirmed, -> { where(wait_list: false) }
 
@@ -68,6 +68,6 @@ class CourseAssignment < ApplicationRecord
     OfferMailer.offer_declined_email(user.id, session_assignment, course_assignment).deliver_now
   end
 
-  scope :number_of_assignments, ->(course_id="") {where(course_id: course_id, wait_list: false).size}
-  scope :wait_list_number, -> (course_id="") { where(course_id: course_id, wait_list: true).size }
+  scope :number_of_assignments, ->(course_id = "") { where(course_id: course_id, wait_list: false).size }
+  scope :wait_list_number, ->(course_id = "") { where(course_id: course_id, wait_list: true).size }
 end

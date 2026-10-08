@@ -7,14 +7,14 @@ class Admin::DemographicsController < Admin::BaseController
   before_action :reject_protected, only: %i[update destroy]
 
   SORTS = {
-    name: 'demographics.name',
-    description: 'demographics.description',
-    protected: 'demographics.protected',
-    created_at: 'demographics.created_at',
-    updated_at: 'demographics.updated_at'
+    name: "demographics.name",
+    description: "demographics.description",
+    protected: "demographics.protected",
+    created_at: "demographics.created_at",
+    updated_at: "demographics.updated_at"
   }.freeze
 
-  BATCH_ACTIONS = { destroy: 'Delete selected' }.freeze
+  BATCH_ACTIONS = {destroy: "Delete selected"}.freeze
 
   CSV_EXPORT = Admin::CsvExport.define do
     column :id
@@ -30,11 +30,12 @@ class Admin::DemographicsController < Admin::BaseController
 
     respond_to do |format|
       format.html { @pagy, @demographics = paginate(relation) }
-      format.csv { send_csv(CSV_EXPORT, relation, filename: 'demographics') }
+      format.csv { send_csv(CSV_EXPORT, relation, filename: "demographics") }
     end
   end
 
-  def show; end
+  def show
+  end
 
   def new
     @demographic = Demographic.new
@@ -44,17 +45,18 @@ class Admin::DemographicsController < Admin::BaseController
     @demographic = Demographic.new(demographic_params)
 
     if @demographic.save
-      redirect_to admin_demographic_path(@demographic), notice: 'Demographic was successfully created.', status: :see_other
+      redirect_to admin_demographic_path(@demographic), notice: "Demographic was successfully created.", status: :see_other
     else
       render :new, status: :unprocessable_content
     end
   end
 
-  def edit; end
+  def edit
+  end
 
   def update
     if @demographic.update(demographic_params)
-      redirect_to admin_demographic_path(@demographic), notice: 'Demographic was successfully updated.', status: :see_other
+      redirect_to admin_demographic_path(@demographic), notice: "Demographic was successfully updated.", status: :see_other
     else
       render :edit, status: :unprocessable_content
     end
@@ -62,9 +64,9 @@ class Admin::DemographicsController < Admin::BaseController
 
   def destroy
     if @demographic.destroy
-      redirect_to admin_demographics_path, notice: 'Demographic was successfully deleted.', status: :see_other
+      redirect_to admin_demographics_path, notice: "Demographic was successfully deleted.", status: :see_other
     else
-      redirect_to admin_demographic_path(@demographic), flash: { error: @demographic.errors.full_messages.to_sentence }, status: :see_other
+      redirect_to admin_demographic_path(@demographic), flash: {error: @demographic.errors.full_messages.to_sentence}, status: :see_other
     end
   end
 
@@ -83,8 +85,8 @@ class Admin::DemographicsController < Admin::BaseController
   def reject_protected
     return unless @demographic.protected?
 
-    message = action_name == 'destroy' ? 'Cannot delete protected demographic records' : 'Cannot modify protected demographic records'
-    redirect_to admin_demographic_path(@demographic), flash: { error: message }, status: :see_other
+    message = (action_name == "destroy") ? "Cannot delete protected demographic records" : "Cannot modify protected demographic records"
+    redirect_to admin_demographic_path(@demographic), flash: {error: message}, status: :see_other
   end
 
   def demographic_params

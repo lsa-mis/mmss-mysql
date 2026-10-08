@@ -22,8 +22,8 @@ FactoryBot.define do
     end
 
     trait :other do
-      name { 'Other' }
-      description { 'Other demographic option' }
+      name { "Other" }
+      description { "Other demographic option" }
       protected { true }
     end
   end

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require "rails_helper"
 
-RSpec.describe 'Payment callbacks', type: :model do
+RSpec.describe "Payment callbacks", type: :model do
   let!(:camp_config) { create(:camp_configuration, :active, camp_year: Date.current.year, application_fee_cents: 1000) }
   let(:user) { create(:user, :with_applicant_detail) }
   let!(:enrollment) { create(:enrollment, user: user, campyear: camp_config.camp_year) }
@@ -15,10 +15,10 @@ RSpec.describe 'Payment callbacks', type: :model do
   end
 
   def build_payment(attrs = {})
-    build(:payment, { user: user, transaction_status: '1', camp_year: camp_config.camp_year }.merge(attrs))
+    build(:payment, {user: user, transaction_status: "1", camp_year: camp_config.camp_year}.merge(attrs))
   end
 
-  it 'on first successful payment (fee required) sets status submitted and sends app_complete email when no recupload' do
+  it "on first successful payment (fee required) sets status submitted and sends app_complete email when no recupload" do
     # Ensure fee required is true for current enrollment
     enrollment.update!(application_fee_required: true)
 
@@ -27,11 +27,11 @@ RSpec.describe 'Payment callbacks', type: :model do
     payment = build_payment
     expect { payment.save! }.to change { Payment.count }.by(1)
 
-    expect(enrollment.reload.application_status).to eq('submitted')
+    expect(enrollment.reload.application_status).to eq("submitted")
     expect(enrollment.application_status_updated_on).to eq(Date.current)
   end
 
-  it 'on first successful payment + recupload sets application complete' do
+  it "on first successful payment + recupload sets application complete" do
     enrollment.update!(application_fee_required: true)
     # Create recommendation + recupload
     recommendation = create(:recommendation, enrollment: enrollment)
@@ -42,21 +42,21 @@ RSpec.describe 'Payment callbacks', type: :model do
     payment = build_payment
     payment.save!
 
-    expect(enrollment.reload.application_status).to eq('application complete')
+    expect(enrollment.reload.application_status).to eq("application complete")
     expect(enrollment.application_status_updated_on).to eq(Date.current)
   end
 
-  it 'does not change status on subsequent successful payments (until enrolled condition met)' do
+  it "does not change status on subsequent successful payments (until enrolled condition met)" do
     enrollment.update!(application_fee_required: true)
-    create(:payment, user: user, transaction_status: '1', camp_year: camp_config.camp_year)
-    expect(enrollment.reload.application_status).to be_in(['submitted', 'application complete'])
+    create(:payment, user: user, transaction_status: "1", camp_year: camp_config.camp_year)
+    expect(enrollment.reload.application_status).to be_in(["submitted", "application complete"])
 
     expect {
-      create(:payment, user: user, transaction_status: '1', camp_year: camp_config.camp_year)
+      create(:payment, user: user, transaction_status: "1", camp_year: camp_config.camp_year)
     }.not_to change { enrollment.reload.application_status }
   end
 
-  it 'sets enrolled when balance_due is 0 and camp_doc_form_completed is true' do
+  it "sets enrolled when balance_due is 0 and camp_doc_form_completed is true" do
     # Ensure PaymentState balance uses a stable active camp and 0 balance
     allow_any_instance_of(PaymentState).to receive(:balance_due).and_return(0)
     enrollment.update!(camp_doc_form_completed: true)
@@ -66,10 +66,10 @@ RSpec.describe 'Payment callbacks', type: :model do
     allow_any_instance_of(Payment).to receive(:balance_due).and_return(0)
 
     payment.save!
-    expect(enrollment.reload.application_status).to eq('enrolled')
+    expect(enrollment.reload.application_status).to eq("enrolled")
   end
 
-  it 'enforces unique transaction_id' do
+  it "enforces unique transaction_id" do
     tid = "TXN-#{SecureRandom.hex(4)}"
     create(:payment, user: user, transaction_id: tid, camp_year: camp_config.camp_year)
     dup = build(:payment, user: user, transaction_id: tid, camp_year: camp_config.camp_year)

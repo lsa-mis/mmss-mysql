@@ -21,40 +21,40 @@
 #  fk_rails_...  (course_id => courses.id)
 #  fk_rails_...  (enrollment_id => enrollments.id)
 #
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe CoursePreference, type: :model do
-  describe 'associations' do
+  describe "associations" do
     it { is_expected.to belong_to(:enrollment) }
     it { is_expected.to belong_to(:course) }
 
     # Test that the associations are configured with dependent: :destroy
-    it 'is configured to be destroyed when enrollment is destroyed' do
+    it "is configured to be destroyed when enrollment is destroyed" do
       expect(Enrollment.reflect_on_association(:course_preferences).options[:dependent]).to eq(:destroy)
     end
 
-    it 'is configured to be destroyed when course is destroyed' do
+    it "is configured to be destroyed when course is destroyed" do
       expect(Course.reflect_on_association(:course_preferences).options[:dependent]).to eq(:destroy)
     end
   end
 
-  describe 'validations' do
+  describe "validations" do
     subject { build(:course_preference) }
 
     # Note: enrollment_id and course_id are required at the database level (NOT NULL constraint)
     # but not validated at the model level. The belongs_to associations handle the foreign key constraints.
-    it 'requires enrollment_id at database level' do
+    it "requires enrollment_id at database level" do
       preference = build(:course_preference, enrollment: nil)
       expect { preference.save(validate: false) }.to raise_error(ActiveRecord::NotNullViolation)
     end
 
-    it 'requires course_id at database level' do
+    it "requires course_id at database level" do
       preference = build(:course_preference, course: nil)
       expect { preference.save(validate: false) }.to raise_error(ActiveRecord::NotNullViolation)
     end
   end
 
-  describe 'database columns' do
+  describe "database columns" do
     it { is_expected.to have_db_column(:id).of_type(:integer) }
     it { is_expected.to have_db_column(:enrollment_id).of_type(:integer) }
     it { is_expected.to have_db_column(:course_id).of_type(:integer) }
@@ -63,72 +63,72 @@ RSpec.describe CoursePreference, type: :model do
     it { is_expected.to have_db_column(:updated_at).of_type(:datetime) }
   end
 
-  describe 'ranking attribute' do
-    it 'allows ranking to be nil' do
+  describe "ranking attribute" do
+    it "allows ranking to be nil" do
       preference = build(:course_preference, ranking: nil)
       expect(preference).to be_valid
       expect(preference.ranking).to be_nil
     end
 
-    it 'allows ranking to be set to an integer in range' do
+    it "allows ranking to be set to an integer in range" do
       preference = build(:course_preference, ranking: 1)
       expect(preference).to be_valid
       expect(preference.ranking).to eq(1)
     end
 
-    it 'allows ranking to be updated' do
+    it "allows ranking to be updated" do
       preference = create(:course_preference, ranking: nil)
       preference.update(ranking: 1)
       expect(preference.reload.ranking).to eq(1)
     end
 
-    it 'rejects ranking below 1' do
+    it "rejects ranking below 1" do
       preference = build(:course_preference, ranking: 0)
       expect(preference).not_to be_valid
     end
 
-    it 'rejects ranking above the upper bound for the session' do
+    it "rejects ranking above the upper bound for the session" do
       preference = build(:course_preference, ranking: 100)
       expect(preference).not_to be_valid
     end
   end
 
-  describe 'factory' do
-    it 'has a valid factory' do
+  describe "factory" do
+    it "has a valid factory" do
       preference = build(:course_preference)
       expect(preference).to be_valid
     end
 
-    it 'creates a persisted preference' do
+    it "creates a persisted preference" do
       preference = create(:course_preference)
       expect(preference).to be_persisted
       expect(preference).to be_valid
     end
 
-    it 'creates preference with enrollment and course' do
+    it "creates preference with enrollment and course" do
       preference = create(:course_preference)
       expect(preference.enrollment).to be_present
       expect(preference.course).to be_present
     end
 
-    it 'creates preference with default nil ranking' do
+    it "creates preference with default nil ranking" do
       preference = create(:course_preference)
       expect(preference.ranking).to be_nil
     end
 
-    it 'allows creating preference without ranking' do
+    it "allows creating preference without ranking" do
       preference = create(:course_preference, ranking: nil)
       expect(preference.ranking).to be_nil
       expect(preference).to be_valid
     end
 
-    it 'allows creating preference with specific ranking' do
+    it "allows creating preference with specific ranking" do
       preference = create(:course_preference, ranking: 1)
       expect(preference.ranking).to eq(1)
     end
   end
 
-  describe 'integration with enrollment and course' do
+  describe "integration with enrollment and course" do
     let!(:camp_config) { create(:camp_configuration, :active, camp_year: Date.current.year) }
     let!(:session) { create(:camp_occurrence, camp_configuration: camp_config, active: true) }
     let!(:course) { create(:course, camp_occurrence: session) }
@@ -139,7 +139,7 @@ RSpec.describe CoursePreference, type: :model do
       enrollment.reload
     end
 
-    it 'is destroyed when enrollment is destroyed' do
+    it "is destroyed when enrollment is destroyed" do
       # Clear any existing preferences created by the factory
       enrollment.course_preferences.destroy_all
       enrollment.reload
@@ -153,7 +153,7 @@ RSpec.describe CoursePreference, type: :model do
       expect(CoursePreference.find_by(id: preference_id)).to be_nil
     end
 
-    it 'is destroyed when course is destroyed' do
+    it "is destroyed when course is destroyed" do
       # Clear any existing preferences created by the factory
       enrollment.course_preferences.destroy_all
       enrollment.reload
@@ -167,26 +167,26 @@ RSpec.describe CoursePreference, type: :model do
       expect(CoursePreference.find_by(id: preference_id)).to be_nil
     end
 
-    it 'can access enrollment through association' do
+    it "can access enrollment through association" do
       preference = create(:course_preference, enrollment: enrollment, course: course)
       expect(preference.enrollment).to eq(enrollment)
     end
 
-    it 'can access course through association' do
+    it "can access course through association" do
       preference = create(:course_preference, enrollment: enrollment, course: course)
       expect(preference.course).to eq(course)
     end
 
-    it 'can access course camp_occurrence through course association' do
+    it "can access course camp_occurrence through course association" do
       preference = create(:course_preference, enrollment: enrollment, course: course)
       expect(preference.course.camp_occurrence).to eq(session)
     end
   end
 
-  describe 'scopes and queries' do
+  describe "scopes and queries" do
     let!(:camp_config) { create(:camp_configuration, :active, camp_year: Date.current.year) }
-    let!(:session1) { create(:camp_occurrence, camp_configuration: camp_config, active: true, description: 'Session 1') }
-    let!(:session2) { create(:camp_occurrence, camp_configuration: camp_config, active: true, description: 'Session 2') }
+    let!(:session1) { create(:camp_occurrence, camp_configuration: camp_config, active: true, description: "Session 1") }
+    let!(:session2) { create(:camp_occurrence, camp_configuration: camp_config, active: true, description: "Session 2") }
     let!(:course1) { create(:course, camp_occurrence: session1) }
     let!(:course2) { create(:course, camp_occurrence: session2) }
     let!(:enrollment1) { create(:enrollment, campyear: camp_config.camp_year) }
@@ -200,7 +200,7 @@ RSpec.describe CoursePreference, type: :model do
       enrollment2.reload
     end
 
-    it 'can find preferences by enrollment' do
+    it "can find preferences by enrollment" do
       preference1 = create(:course_preference, enrollment: enrollment1, course: course1, ranking: 1)
       preference2 = create(:course_preference, enrollment: enrollment1, course: course2, ranking: 1)
       create(:course_preference, enrollment: enrollment2, course: course1, ranking: 1)
@@ -210,7 +210,7 @@ RSpec.describe CoursePreference, type: :model do
       expect(enrollment1.course_preferences.count).to eq(2)
     end
 
-    it 'can find preferences by course' do
+    it "can find preferences by course" do
       preference1 = create(:course_preference, enrollment: enrollment1, course: course1, ranking: 1)
       preference2 = create(:course_preference, enrollment: enrollment2, course: course1, ranking: 1)
       create(:course_preference, enrollment: enrollment1, course: course2, ranking: 1)
@@ -219,7 +219,7 @@ RSpec.describe CoursePreference, type: :model do
       expect(course1.course_preferences.count).to eq(2)
     end
 
-    it 'can filter preferences by ranking' do
+    it "can filter preferences by ranking" do
       create(:course_preference, enrollment: enrollment1, course: course1, ranking: 1)
       create(:course_preference, enrollment: enrollment1, course: course2, ranking: 1)
       create(:course_preference, enrollment: enrollment1, course: create(:course, camp_occurrence: session1), ranking: nil)
@@ -231,7 +231,7 @@ RSpec.describe CoursePreference, type: :model do
       expect(unranked_preferences.count).to eq(1)
     end
 
-    it 'can order preferences by ranking' do
+    it "can order preferences by ranking" do
       pref1 = create(:course_preference, enrollment: enrollment1, course: course1, ranking: 1)
       pref2 = create(:course_preference, enrollment: enrollment1, course: create(:course, camp_occurrence: session1), ranking: 2)
       pref3 = create(:course_preference, enrollment: enrollment1, course: create(:course, camp_occurrence: session1), ranking: 3)
@@ -242,7 +242,7 @@ RSpec.describe CoursePreference, type: :model do
     end
   end
 
-  describe 'multiple preferences per enrollment' do
+  describe "multiple preferences per enrollment" do
     let!(:camp_config) { create(:camp_configuration, :active, camp_year: Date.current.year) }
     let!(:session) { create(:camp_occurrence, camp_configuration: camp_config, active: true) }
     let!(:enrollment) { create(:enrollment, campyear: camp_config.camp_year) }
@@ -253,7 +253,7 @@ RSpec.describe CoursePreference, type: :model do
       enrollment.reload
     end
 
-    it 'allows multiple preferences for the same enrollment' do
+    it "allows multiple preferences for the same enrollment" do
       course1 = create(:course, camp_occurrence: session)
       course2 = create(:course, camp_occurrence: session)
       course3 = create(:course, camp_occurrence: session)
@@ -267,7 +267,7 @@ RSpec.describe CoursePreference, type: :model do
       expect(enrollment.course_preferences).to include(preference1, preference2, preference3)
     end
 
-    it 'does not allow the same ranking for two courses in the same session' do
+    it "does not allow the same ranking for two courses in the same session" do
       course1 = create(:course, camp_occurrence: session)
       course2 = create(:course, camp_occurrence: session)
 
@@ -275,10 +275,10 @@ RSpec.describe CoursePreference, type: :model do
       preference2 = build(:course_preference, enrollment: enrollment, course: course2, ranking: 1)
 
       expect(preference2).not_to be_valid
-      expect(preference2.errors[:ranking]).to include('must be unique within each camp session')
+      expect(preference2.errors[:ranking]).to include("must be unique within each camp session")
     end
 
-    it 'does not allow gaps above the number of preferences in the session' do
+    it "does not allow gaps above the number of preferences in the session" do
       course1 = create(:course, camp_occurrence: session)
       course2 = create(:course, camp_occurrence: session)
 
@@ -286,10 +286,10 @@ RSpec.describe CoursePreference, type: :model do
       preference2 = build(:course_preference, enrollment: enrollment, course: course2, ranking: 3)
 
       expect(preference2).not_to be_valid
-      expect(preference2.errors[:ranking]).to include('must be between 1 and 2 for this session')
+      expect(preference2.errors[:ranking]).to include("must be between 1 and 2 for this session")
     end
 
-    it 'counts unsaved session preferences when validating the upper bound' do
+    it "counts unsaved session preferences when validating the upper bound" do
       courses = create_list(:course, 3, camp_occurrence: session)
       preferences = courses.each_with_index.map do |course, index|
         enrollment.course_preferences.build(course: course, ranking: index + 1)
@@ -298,18 +298,18 @@ RSpec.describe CoursePreference, type: :model do
       expect(preferences).to all(be_valid)
     end
 
-    it 'checks unsaved session preferences for duplicate ranks' do
+    it "checks unsaved session preferences for duplicate ranks" do
       course1 = create(:course, camp_occurrence: session)
       course2 = create(:course, camp_occurrence: session)
       enrollment.course_preferences.build(course: course1, ranking: 1)
       duplicate = enrollment.course_preferences.build(course: course2, ranking: 1)
 
       expect(duplicate).not_to be_valid
-      expect(duplicate.errors[:ranking]).to include('must be unique within each camp session')
+      expect(duplicate.errors[:ranking]).to include("must be unique within each camp session")
     end
   end
 
-  describe 'edge cases' do
+  describe "edge cases" do
     let!(:camp_config) { create(:camp_configuration, :active, camp_year: Date.current.year) }
     let!(:session) { create(:camp_occurrence, camp_configuration: camp_config, active: true) }
     let!(:course) { create(:course, camp_occurrence: session) }
@@ -320,33 +320,33 @@ RSpec.describe CoursePreference, type: :model do
       enrollment.course_preferences.destroy_all
     end
 
-    it 'rejects very large ranking values' do
+    it "rejects very large ranking values" do
       preference = build(:course_preference, enrollment: enrollment, course: course, ranking: 999)
       expect(preference).not_to be_valid
     end
 
-    it 'rejects negative ranking values' do
+    it "rejects negative ranking values" do
       preference = build(:course_preference, enrollment: enrollment, course: course, ranking: -1)
       expect(preference).not_to be_valid
     end
 
-    it 'rejects zero ranking value' do
+    it "rejects zero ranking value" do
       preference = build(:course_preference, enrollment: enrollment, course: course, ranking: 0)
       expect(preference).not_to be_valid
     end
 
-    it 'can update ranking from nil to a value' do
+    it "can update ranking from nil to a value" do
       preference = create(:course_preference, enrollment: enrollment, course: course, ranking: nil)
       preference.update(ranking: 1)
       expect(preference.reload.ranking).to eq(1)
     end
 
-    it 'can update ranking from a value to nil' do
+    it "can update ranking from a value to nil" do
       preference = create(:course_preference, enrollment: enrollment, course: course, ranking: 1)
       preference.update(ranking: nil)
       expect(preference.reload.ranking).to be_nil
     end
   end
 
-  it_behaves_like 'a model with timestamps'
+  it_behaves_like "a model with timestamps"
 end

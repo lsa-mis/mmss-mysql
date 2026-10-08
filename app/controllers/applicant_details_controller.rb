@@ -30,13 +30,13 @@ class ApplicantDetailsController < ApplicationController
   # POST /applicant_details
   def create
     if current_user.applicant_detail.present?
-      flash[:notice] = 'Applicant Details exist. Click Edit, if you want to change something.'
+      flash[:notice] = "Applicant Details exist. Click Edit, if you want to change something."
       redirect_to(applicant_detail_path(current_user), status: :see_other)
     else
       @applicant_detail = current_user.create_applicant_detail(applicant_detail_params)
 
       if @applicant_detail.save
-        redirect_to root_path, notice: 'Applicant detail was successfully created.', status: :see_other
+        redirect_to root_path, notice: "Applicant detail was successfully created.", status: :see_other
       else
         render :new, status: :unprocessable_content
       end
@@ -46,7 +46,7 @@ class ApplicantDetailsController < ApplicationController
   # PATCH/PUT /applicant_details/1
   def update
     if @applicant_detail.update(applicant_detail_params)
-      redirect_to root_path, notice: 'Applicant detail was successfully updated.', status: :see_other
+      redirect_to root_path, notice: "Applicant detail was successfully updated.", status: :see_other
     else
       render :edit, status: :unprocessable_content
     end
@@ -60,11 +60,11 @@ class ApplicantDetailsController < ApplicationController
     @applicant_detail = current_user&.applicant_detail
     return if @applicant_detail
 
-    redirect_to new_applicant_detail_path, alert: 'Please fill in your applicant details first.', status: :see_other
+    redirect_to new_applicant_detail_path, alert: "Please fill in your applicant details first.", status: :see_other
   end
 
   def citizen_status
-    'You are a US citizen' if @applicant_detail.us_citizen
+    "You are a US citizen" if @applicant_detail.us_citizen
   end
 
   # The owner is always current_user (create_applicant_detail sets it); user_id is never taken

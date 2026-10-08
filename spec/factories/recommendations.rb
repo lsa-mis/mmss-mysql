@@ -49,9 +49,9 @@ FactoryBot.define do
     state { Faker::Address.state_abbr }
     state_non_us { nil }
     postalcode { Faker::Address.zip_code }
-    country { 'US' }
+    country { "US" }
     phone_number { Faker::PhoneNumber.phone_number }
-    best_contact_time { ['Morning', 'Afternoon', 'Evening'].sample }
+    best_contact_time { ["Morning", "Afternoon", "Evening"].sample }
     submitted_recommendation { false }
     date_submitted { nil }
 

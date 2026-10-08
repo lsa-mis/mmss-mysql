@@ -36,16 +36,16 @@ class Admin::BalanceDueQuery
     return [] unless @camp
 
     with_balance.select("enrollments.*, (#{balance_sql}) AS balance_due_cents")
-                .preload(:user, :applicant_detail)
-                .order('applicant_details.lastname, applicant_details.firstname')
-                .limit(limit)
+      .preload(:user, :applicant_detail)
+      .order("applicant_details.lastname, applicant_details.firstname")
+      .limit(limit)
   end
 
   private
 
   def base
     Enrollment.joins(:applicant_detail)
-              .where(campyear: @camp.camp_year, application_status: 'offer accepted')
+      .where(campyear: @camp.camp_year, application_status: "offer accepted")
   end
 
   def with_balance

@@ -26,9 +26,9 @@ module Admin::BatchActionable
     ids = Array(params[:ids]).map(&:presence).compact
 
     if action.nil?
-      return redirect_to redirect_to_path, alert: 'Unknown batch action.', status: :see_other
+      return redirect_to redirect_to_path, alert: "Unknown batch action.", status: :see_other
     elsif ids.empty?
-      return redirect_to redirect_to_path, alert: 'Select at least one record first.', status: :see_other
+      return redirect_to redirect_to_path, alert: "Select at least one record first.", status: :see_other
     end
 
     records = relation.where(id: ids)

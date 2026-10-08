@@ -5,7 +5,7 @@ Sentry.init do |config|
   config.dsn = begin
     Rails.application.credentials.dig(:sentry, :dsn)
   rescue Errno::ENOENT, Errno::EACCES, Errno::EPERM, IOError, ActiveSupport::MessageEncryptor::InvalidMessage, ArgumentError
-    ENV['SENTRY_DSN']
+    ENV["SENTRY_DSN"]
   end
 
   # Only enable in production and staging environments
@@ -43,7 +43,7 @@ Sentry.init do |config|
   rails_filter_terms = Rails.application.config.filter_parameters.select { |f| f.is_a?(String) || f.is_a?(Symbol) || f.is_a?(Regexp) }
   # "referer": the recommender upload page's URL carries a bearer token in its query string
   # (query params are already disabled above; the Referer header would still repeat it).
-  config.data_collection.http_headers.request.terms = (Sentry::DataCollection::PII_HEADER_SNIPPETS + rails_filter_terms + ['referer']).uniq
+  config.data_collection.http_headers.request.terms = (Sentry::DataCollection::PII_HEADER_SNIPPETS + rails_filter_terms + ["referer"]).uniq
   config.data_collection.http_headers.response.terms = (Sentry::DataCollection::PII_HEADER_SNIPPETS + rails_filter_terms).uniq
 
   # Performance monitoring: traces_sampler is the single source of truth (overrides traces_sample_rate)

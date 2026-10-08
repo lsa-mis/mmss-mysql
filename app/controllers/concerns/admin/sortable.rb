@@ -16,10 +16,10 @@ module Admin::Sortable
   def apply_sort(scope, allowed:, default:, default_direction: :asc)
     key = params[:sort].to_s.presence_in(allowed.keys.map(&:to_s)) || default.to_s
     direction = if params[:sort].present? && key == params[:sort].to_s
-                  params[:direction].to_s == 'desc' ? :desc : :asc
-                else
-                  default_direction
-                end
+      (params[:direction].to_s == "desc") ? :desc : :asc
+    else
+      default_direction
+    end
 
     @current_sort = key
     @current_sort_direction = direction

@@ -52,9 +52,9 @@ FactoryBot.define do
     high_school_state { Faker::Address.state_abbr }
     high_school_non_us { nil }
     high_school_postalcode { Faker::Address.zip_code }
-    high_school_country { 'US' }
+    high_school_country { "US" }
 
-    year_in_school { ['Freshman', 'Sophomore', 'Junior', 'Senior'].sample }
+    year_in_school { ["Freshman", "Sophomore", "Junior", "Senior"].sample }
     anticipated_graduation_year { (Date.current.year + rand(1..4)).to_s }
     room_mate_request { [nil, Faker::Name.name].sample }
     personal_statement { Faker::Lorem.paragraph_by_chars(number: 150) }
@@ -73,11 +73,11 @@ FactoryBot.define do
     # Create required session and course registrations before validation
     after(:build) do |enrollment|
       # Ensure test seeds are loaded for basic data
-      load "#{Rails.root}/spec/test_seeds.rb" if Gender.count.zero?
+      load "#{Rails.root.join("spec/test_seeds.rb")}" if Gender.count.zero?
 
       # Find or create camp configuration for the enrollment year
       camp_config = CampConfiguration.find_by(camp_year: enrollment.campyear) ||
-                    CampConfiguration.active.first
+        CampConfiguration.active.first
 
       unless camp_config
         # Deactivate any existing active camp configurations
@@ -93,9 +93,9 @@ FactoryBot.define do
           camper_acceptance_due: Date.new(enrollment.campyear || Date.current.year, 6, 1),
           application_fee_cents: 10_000,
           application_fee_required: true,
-          offer_letter: 'Default offer letter content',
-          reject_letter: 'Default rejection letter content',
-          waitlist_letter: 'Default waitlist letter content'
+          offer_letter: "Default offer letter content",
+          reject_letter: "Default rejection letter content",
+          waitlist_letter: "Default waitlist letter content"
         )
       end
 
@@ -111,7 +111,7 @@ FactoryBot.define do
       # Create courses if they don't exist
       if Course.where(camp_occurrence: camp_config.camp_occurrences.active).empty?
         camp_config.camp_occurrences.active.each do |occurrence|
-          create(:course, camp_occurrence: occurrence, status: 'open')
+          create(:course, camp_occurrence: occurrence, status: "open")
         end
       end
 
@@ -127,17 +127,17 @@ FactoryBot.define do
 
     # Attach a transcript file (only if the file exists and is small enough)
     after(:build) do |enrollment|
-      link_to_default_transcript = "#{Rails.root}/spec/files/test.pdf"
+      link_to_default_transcript = "#{Rails.root.join("spec/files/test.pdf")}"
       if File.exist?(link_to_default_transcript) && File.size(link_to_default_transcript) <= 20.megabytes
         begin
           enrollment.transcript.attach(
             io: File.open(link_to_default_transcript),
-            filename: 'transcript.pdf',
-            content_type: 'application/pdf'
+            filename: "transcript.pdf",
+            content_type: "application/pdf"
           )
         rescue => e
           # Skip transcript attachment if there's an issue
-          Rails.logger.debug "Skipping transcript attachment: #{e.message}"
+          Rails.logger.debug { "Skipping transcript attachment: #{e.message}" }
         end
       end
     end
@@ -147,7 +147,7 @@ FactoryBot.define do
       high_school_country do
         loop do
           country_code = Faker::Address.country_code
-          break country_code unless country_code == 'US'
+          break country_code unless country_code == "US"
         end
       end
       high_school_state { nil }
@@ -156,79 +156,79 @@ FactoryBot.define do
 
     trait :domestic do
       international { false }
-      high_school_country { 'US' }
+      high_school_country { "US" }
       high_school_state { Faker::Address.state_abbr }
       high_school_non_us { nil }
     end
 
     trait :with_partner_program do
-      partner_program { ['Partner A', 'Partner B', 'Partner C'].sample }
+      partner_program { ["Partner A", "Partner B", "Partner C"].sample }
     end
 
     trait :application_complete do
-      application_status { 'application complete' }
+      application_status { "application complete" }
       application_status_updated_on { Date.current }
     end
 
     trait :offered do
-      application_status { 'offered' }
-      offer_status { 'offered' }
+      application_status { "offered" }
+      offer_status { "offered" }
       application_status_updated_on { Date.current }
       application_deadline { 30.days.from_now }
     end
 
     trait :accepted do
-      application_status { 'offer accepted' }
-      offer_status { 'accepted' }
+      application_status { "offer accepted" }
+      offer_status { "accepted" }
       application_status_updated_on { Date.current }
     end
 
     trait :declined do
-      application_status { 'offer declined' }
-      offer_status { 'declined' }
+      application_status { "offer declined" }
+      offer_status { "declined" }
       application_status_updated_on { Date.current }
     end
 
     trait :enrolled do
-      application_status { 'enrolled' }
-      offer_status { 'accepted' }
+      application_status { "enrolled" }
+      offer_status { "accepted" }
       camp_doc_form_completed { true }
       application_status_updated_on { Date.current }
     end
 
     trait :rejected do
-      application_status { 'rejected' }
+      application_status { "rejected" }
       application_status_updated_on { Date.current }
     end
 
     trait :waitlisted do
-      application_status { 'waitlisted' }
+      application_status { "waitlisted" }
       application_status_updated_on { Date.current }
     end
 
     trait :withdrawn do
-      application_status { 'withdrawn' }
+      application_status { "withdrawn" }
       application_status_updated_on { Date.current }
     end
 
     trait :with_student_packet do
       after(:create) do |enrollment|
-        link_to_default_pdf = "#{Rails.root}/spec/files/test.pdf"
+        link_to_default_pdf = "#{Rails.root.join("spec/files/test.pdf")}"
         enrollment.student_packet.attach(
           io: File.open(link_to_default_pdf),
-          filename: 'student_packet.pdf',
-          content_type: 'application/pdf'
+          filename: "student_packet.pdf",
+          content_type: "application/pdf"
         )
       end
     end
 
     trait :with_vaccine_record do
       after(:create) do |enrollment|
-        link_to_default_pdf = "#{Rails.root}/spec/files/test.pdf"
+        link_to_default_pdf = "#{Rails.root.join("spec/files/test.pdf")}"
         enrollment.vaccine_record.attach(
           io: File.open(link_to_default_pdf),
-          filename: 'vaccine_record.pdf',
-          content_type: 'application/pdf'
+          filename: "vaccine_record.pdf",
+          content_type: "application/pdf"
         )
       end
     end

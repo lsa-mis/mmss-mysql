@@ -3,10 +3,10 @@
 class Admin::Reports::EnrolledEventsPerSession < Admin::Reports::Base
   include Admin::Reports::CountryColumn
 
-  self.label = 'Events per Session'
-  self.description = 'Activities chosen by enrolled students for the camp year, per accepted session: one row per ' \
-                     'student and activity with room mate request and home town.'
-  self.csv_title = 'events_per_session_for_enrolled'
+  self.label = "Events per Session"
+  self.description = "Activities chosen by enrolled students for the camp year, per accepted session: one row per " \
+                     "student and activity with room mate request and home town."
+  self.csv_title = "events_per_session_for_enrolled"
   self.sql = <<~SQL
     SELECT ad.country, a.description AS 'Event Activity',
       co.description AS Session,

@@ -26,14 +26,14 @@ class Feedback < ApplicationRecord
 
   # Stored value => label shown to users (the public feedback form offers the same three).
   GENRES = {
-    'page_error' => 'Error on Page',
-    'layout_issue' => 'Layout Issue',
-    'suggestion' => 'Suggestion'
+    "page_error" => "Error on Page",
+    "layout_issue" => "Layout Issue",
+    "suggestion" => "Suggestion"
   }.freeze
 
   validates :genre, presence: true
   validates :message, presence: true
-  validates :message, length: { maximum: MESSAGE_MAX_LENGTH, message: "is too long (maximum is %{count} characters)" }
+  validates :message, length: {maximum: MESSAGE_MAX_LENGTH, message: "is too long (maximum is %{count} characters)"}
 
   def genre_label
     GENRES.fetch(genre, genre)

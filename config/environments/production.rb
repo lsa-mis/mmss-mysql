@@ -22,7 +22,7 @@ Rails.application.configure do
   config.public_file_server.enabled = ENV["RAILS_SERVE_STATIC_FILES"].present?
 
   # Cache assets for far-future expiry since they are all digest stamped.
-  config.public_file_server.headers = { "cache-control" => "public, max-age=#{1.year.to_i}" }
+  config.public_file_server.headers = {"cache-control" => "public, max-age=#{1.year.to_i}"}
 
   # Store uploaded files on Google Cloud Storage (see config/storage.yml for options).
   config.active_storage.service = :google
@@ -37,7 +37,7 @@ Rails.application.configure do
   config.force_ssl = true
 
   # Skip http-to-https redirect for the default health check endpoint.
-  config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
+  config.ssl_options = {redirect: {exclude: ->(request) { request.path == "/up" }}}
 
   # Ensure the session cookies are also set to secure in production
   # Extended timeout (4 hours) to accommodate long forms like enrollment applications
@@ -72,7 +72,7 @@ Rails.application.configure do
   config.action_mailer.perform_deliveries = true
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.delivery_method = :smtp
-  config.action_mailer.default_url_options = { host: "mmss-registration.math.lsa.umich.edu", protocol: "https" }
+  config.action_mailer.default_url_options = {host: "mmss-registration.math.lsa.umich.edu", protocol: "https"}
   config.action_mailer.smtp_settings = {
     address: "smtp.sendgrid.net",
     port: 587,

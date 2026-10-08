@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Admin::CommentsController < Admin::BaseController
-  SORTS = { created_at: 'admin_comments.created_at', resource_type: 'admin_comments.resource_type' }.freeze
+  SORTS = {created_at: "admin_comments.created_at", resource_type: "admin_comments.resource_type"}.freeze
 
   def index
     scope = Admin::Comment.includes(:author, :resource)
@@ -14,7 +14,7 @@ class Admin::CommentsController < Admin::BaseController
     @comment = resource.admin_comments.build(comment_params.merge(author: current_admin))
 
     if @comment.save
-      redirect_back_or_to resource_admin_path(resource), notice: 'Comment added.', status: :see_other
+      redirect_back_or_to resource_admin_path(resource), notice: "Comment added.", status: :see_other
     else
       redirect_back_or_to resource_admin_path(resource), alert: @comment.errors.full_messages.to_sentence, status: :see_other
     end
@@ -23,7 +23,7 @@ class Admin::CommentsController < Admin::BaseController
   def destroy
     comment = Admin::Comment.find(params[:id])
     comment.destroy
-    redirect_back_or_to admin_comments_path, notice: 'Comment deleted.', status: :see_other
+    redirect_back_or_to admin_comments_path, notice: "Comment deleted.", status: :see_other
   end
 
   private

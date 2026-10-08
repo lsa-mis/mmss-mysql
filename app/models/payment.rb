@@ -40,7 +40,7 @@ class Payment < ApplicationRecord
   # total_amount is a whole number of cents stored as a string (what Nelnet sends and what the
   # balance arithmetic casts); anything else — negative, fractional, non-numeric — is refused.
   validates :total_amount, presence: true, unless: :invalid_dollar_input?
-  validates :total_amount, format: { with: /\A\d+\z/, message: 'must be a whole number of cents' }, allow_blank: true
+  validates :total_amount, format: {with: /\A\d+\z/, message: "must be a whole number of cents"}, allow_blank: true
   validate :total_amount_dollars_is_money
   validates :transaction_type, presence: true
   validates :transaction_status, presence: true
@@ -73,8 +73,8 @@ class Payment < ApplicationRecord
     end
   end
 
-  scope :current_camp_payments, -> { where('camp_year = ? ', CampConfiguration.active_camp_year) }
-  scope :status1_current_camp_payments, -> { current_camp_payments.where('transaction_status = ?', '1') }
+  scope :current_camp_payments, -> { where("camp_year = ? ", CampConfiguration.active_camp_year) }
+  scope :status1_current_camp_payments, -> { current_camp_payments.where("transaction_status = ?", "1") }
 
   private
 
@@ -86,11 +86,11 @@ class Payment < ApplicationRecord
   def total_amount_dollars_is_money
     return unless invalid_dollar_input?
 
-    errors.add(:total_amount_dollars, 'must be a non-negative dollar amount with at most two decimals (e.g. 150.25)')
+    errors.add(:total_amount_dollars, "must be a non-negative dollar amount with at most two decimals (e.g. 150.25)")
   end
 
   def set_status
-    return unless transaction_status == '1'
+    return unless transaction_status == "1"
 
     @current_enrollment = user.enrollments.current_camp_year_applications.last
     return unless @current_enrollment
@@ -99,15 +99,15 @@ class Payment < ApplicationRecord
     first_successful_payment = user.payments.status1_current_camp_payments.count == 1
 
     if @current_enrollment.application_fee_required &&
-       first_successful_payment &&
-       @current_enrollment.can_transition_application_status?('submitted')
+        first_successful_payment &&
+        @current_enrollment.can_transition_application_status?("submitted")
       RegistrationMailer.app_complete_email(user).deliver_now
       if @current_enrollment.recommendation.present? && @current_enrollment.recommendation.recupload.present?
-        if @current_enrollment.can_transition_application_status?('application complete')
-          @current_enrollment.transition_application_status!('application complete')
+        if @current_enrollment.can_transition_application_status?("application complete")
+          @current_enrollment.transition_application_status!("application complete")
         end
       else
-        @current_enrollment.transition_application_status!('submitted')
+        @current_enrollment.transition_application_status!("submitted")
       end
     elsif balance_due == 0 && @current_enrollment.camp_doc_form_completed
       @current_enrollment.auto_enroll_if_ready!
