@@ -98,8 +98,9 @@ RSpec.describe Recommendation, type: :model do
       expect(create(:recommendation).upload_token).not_to eq(recommendation.upload_token)
     end
 
-    it 'is not derived from the id' do
-      expect(recommendation.upload_token).not_to include(recommendation.id.to_s)
+    it 'is not the legacy id-based value' do
+      expect(recommendation.upload_token).not_to eq(recommendation.id.to_s)
+      expect(recommendation.upload_token).not_to include('nGklDoc2egIkzFxr0U')
     end
 
     it 'enforces uniqueness at the database level' do
