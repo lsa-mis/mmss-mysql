@@ -328,6 +328,23 @@ RSpec.describe 'Admin recommendations', type: :request do
       expect(received.reload.upload_token).to be_nil
       expect(ActionMailer::Base.deliveries.last.to).to eq([recommendation.email])
     end
+
+    it 'keeps going when one email fails to deliver and reports that recommendation' do
+      failing = create(:recommendation, enrollment: create(:enrollment, user: create(:user, :with_applicant_detail)), email: 'bounce@example.edu')
+      allow_any_instance_of(ActionMailer::MessageDelivery).to receive(:deliver_now).and_wrap_original do |original, *args|
+        raise Net::SMTPFatalError, '550 mailbox unavailable' if original.receiver.message.to == ['bounce@example.edu']
+
+        original.call(*args)
+      end
+
+      expect do
+        post batch_admin_recommendations_path, params: { batch_action: 'resend_request', ids: [failing.id, recommendation.id] }
+      end.to change { ActionMailer::Base.deliveries.size }.by(1)
+
+      expect(response).to redirect_to(admin_recommendations_path)
+      expect(flash[:notice]).to eq("Sent 1 new upload link. Could not email 1 (recommendation #{failing.id}); use \"Resend request\" on those records.")
+      expect(ActionMailer::Base.deliveries.last.to).to eq([recommendation.email])
+    end
   end
 
   describe 'public routes' do

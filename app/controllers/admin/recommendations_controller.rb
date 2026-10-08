@@ -107,19 +107,32 @@ class Admin::RecommendationsController < Admin::BaseController
     RecommendationMailer.with(recommendation: recommendation).request_email.deliver_now
   end
 
-  # Batch "Send new upload link": recommendations whose letter is already in are skipped.
+  # Batch "Send new upload link": recommendations whose letter is already in are skipped. A
+  # delivery failure (production raises delivery errors) must not abort the batch half-way —
+  # every selected row is processed and the ones whose email failed are reported by id, so the
+  # admin resends only those instead of re-running the batch and rotating tokens that were
+  # already emailed successfully.
   def batch_resend_request(records)
     sent = 0
     skipped = 0
+    failed = []
     records.preload(enrollment: %i[user applicant_detail]).find_each do |recommendation|
       send_new_upload_link(recommendation)
       sent += 1
     rescue Recommendation::LetterAlreadyReceived
       skipped += 1
+    rescue StandardError => e
+      Rails.logger.error("Resend of upload link failed for recommendation #{recommendation.id}: #{e.class}: #{e.message}")
+      Sentry.capture_exception(e) if defined?(Sentry)
+      failed << recommendation.id
     end
 
     notice = "Sent #{sent} new upload #{'link'.pluralize(sent)}."
     notice += " Skipped #{skipped} with a letter already received." if skipped.positive?
+    if failed.any?
+      notice += " Could not email #{failed.size} (recommendation #{failed.join(', ')}); " \
+                'use "Resend request" on those records.'
+    end
     notice
   end
 
