@@ -34,14 +34,14 @@ RSpec.describe Admin::PaymentsHelper, type: :helper do
       html = helper.admin_payment_status_badge('1')
 
       expect(html).to include('admin-badge-green')
-      expect(html).to include('1 · Accepted credit card (successful)')
+      expect(html).to include("1 · #{helper.transaction_status_message('1')}")
     end
 
     it 'marks non-success Nelnet statuses as red badges' do
       html = helper.admin_payment_status_badge('2')
 
       expect(html).to include('admin-badge-red')
-      expect(html).to include('2 · Rejected credit card (declined)')
+      expect(html).to include("2 · #{helper.transaction_status_message('2')}")
     end
   end
 

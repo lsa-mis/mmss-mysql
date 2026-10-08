@@ -22,74 +22,76 @@ RSpec.describe Admin::ApplicationsHelper, type: :helper do
     end
   end
 
+  # The enrollment factory registers every active session and course of the camp; these examples
+  # need to control exactly what the application registered for, so they start from a clean slate.
+  let(:application) do
+    create(:enrollment).tap do |enrollment|
+      enrollment.session_activities.delete_all
+      enrollment.course_preferences.delete_all
+      enrollment.reload
+    end
+  end
+  let(:camp_config) { CampConfiguration.find_by!(camp_year: application.campyear) }
+
   describe '#admin_application_session_options' do
     it 'unions session registrations with assigned sessions and sorts by description' do
-      session_a = build_stubbed(:camp_occurrence, description: 'Session B')
-      session_b = build_stubbed(:camp_occurrence, description: 'Session A')
-      assigned = build_stubbed(:camp_occurrence, description: 'Session C')
-      assignment = double('SessionAssignment', camp_occurrence: assigned)
-
-      application = build_stubbed(:enrollment)
-      allow(application).to receive(:session_registrations).and_return([session_a, session_b])
-      allow(application).to receive(:session_assignments).and_return([assignment])
+      session_b = create(:camp_occurrence, camp_configuration: camp_config, description: 'Session B')
+      session_a = create(:camp_occurrence, camp_configuration: camp_config, description: 'Session A')
+      assigned = create(:camp_occurrence, camp_configuration: camp_config, description: 'Session C')
+      create(:session_activity, enrollment: application, camp_occurrence: session_b)
+      create(:session_activity, enrollment: application, camp_occurrence: session_a)
+      create(:session_assignment, enrollment: application, camp_occurrence: assigned)
 
       expect(helper.admin_application_session_options(application)).to eq(
         [
-          ['Session A', session_b.id],
-          ['Session B', session_a.id],
+          ['Session A', session_a.id],
+          ['Session B', session_b.id],
           ['Session C', assigned.id]
         ]
       )
+    end
+
+    it 'does not list an assigned session twice when it was also registered' do
+      session = create(:camp_occurrence, camp_configuration: camp_config, description: 'Session A')
+      create(:session_activity, enrollment: application, camp_occurrence: session)
+      create(:session_assignment, enrollment: application, camp_occurrence: session)
+
+      expect(helper.admin_application_session_options(application)).to eq([['Session A', session.id]])
     end
   end
 
   describe '#admin_application_course_options' do
     it 'annotates ranked courses with session, rank, and remaining seats' do
-      session = build_stubbed(:camp_occurrence, description: 'Session 1')
-      course = build_stubbed(:course, title: 'Number Theory', camp_occurrence: session)
-      allow(course).to receive(:remaining_spaces).and_return(4)
+      session = create(:camp_occurrence, camp_configuration: camp_config, description: 'Session 1')
+      course = create(:course, camp_occurrence: session, title: 'Number Theory', available_spaces: 5)
+      unranked = create(:course, camp_occurrence: session, title: 'Algebra', available_spaces: 3)
+      create(:course_preference, enrollment: application, course: unranked, ranking: nil)
+      create(:course_preference, enrollment: application, course: course, ranking: 2)
+      create(:course_assignment, course: course)
 
-      preference = build_stubbed(:course_preference, course: course, ranking: 2)
-      rankings_relation = double('CoursePreferences')
-      allow(rankings_relation).to receive(:index_by).and_return({ course.id => preference })
-
-      registrations = double('CourseRegistrations')
-      allow(registrations).to receive(:includes).with(:camp_occurrence).and_return(registrations)
-      allow(registrations).to receive(:order).with(:camp_occurrence_id).and_return(registrations)
-      allow(registrations).to receive(:to_a).and_return([course])
-
-      application = build_stubbed(:enrollment)
-      allow(application).to receive(:course_preferences).and_return(rankings_relation)
-      allow(application).to receive(:course_registrations).and_return(registrations)
-      allow(application).to receive(:course_assignments).and_return([])
-
-      expect(helper.admin_application_course_options(application)).to eq(
-        [['Number Theory, Session 1, rank - 2, available - 4', course.id]]
+      expect(helper.admin_application_course_options(application)).to contain_exactly(
+        ['Number Theory, Session 1, rank - 2, available - 4', course.id],
+        ['Algebra, Session 1, rank - —, available - 3', unranked.id]
       )
     end
 
-    it 'includes assigned courses missing from registrations and uses an em dash for unranked courses' do
-      session = build_stubbed(:camp_occurrence, description: 'Session 2')
-      assigned_course = build_stubbed(:course, title: 'Geometry', camp_occurrence: session)
-      allow(assigned_course).to receive(:remaining_spaces).and_return(0)
-      assignment = double('CourseAssignment', course: assigned_course)
-
-      rankings_relation = double('CoursePreferences')
-      allow(rankings_relation).to receive(:index_by).and_return({})
-
-      registrations = double('CourseRegistrations')
-      allow(registrations).to receive(:includes).with(:camp_occurrence).and_return(registrations)
-      allow(registrations).to receive(:order).with(:camp_occurrence_id).and_return(registrations)
-      allow(registrations).to receive(:to_a).and_return([])
-
-      application = build_stubbed(:enrollment)
-      allow(application).to receive(:course_preferences).and_return(rankings_relation)
-      allow(application).to receive(:course_registrations).and_return(registrations)
-      allow(application).to receive(:course_assignments).and_return([assignment])
+    it 'includes assigned courses the applicant never registered for' do
+      session = create(:camp_occurrence, camp_configuration: camp_config, description: 'Session 2')
+      assigned_course = create(:course, camp_occurrence: session, title: 'Geometry', available_spaces: 1)
+      create(:course_assignment, enrollment: application, course: assigned_course)
 
       expect(helper.admin_application_course_options(application)).to eq(
         [['Geometry, Session 2, rank - —, available - 0', assigned_course.id]]
       )
+    end
+
+    it 'does not list an assigned course twice when it was also ranked' do
+      session = create(:camp_occurrence, camp_configuration: camp_config, description: 'Session 3')
+      course = create(:course, camp_occurrence: session, title: 'Topology', available_spaces: 3)
+      create(:course_preference, enrollment: application, course: course, ranking: 1)
+      create(:course_assignment, enrollment: application, course: course)
+
+      expect(helper.admin_application_course_options(application).map(&:last)).to eq([course.id])
     end
   end
 
