@@ -190,7 +190,8 @@ RSpec.describe 'Admin recuploads', type: :request do
     it 'keeps the recommender upload flow and drops the admin-only actions' do
       sign_out admin
 
-      get new_recupload_path, params: { hash: "x_nGklDoc2egIkzFxr0U#{create(:recommendation, enrollment: create(:enrollment, user: create(:user, :with_applicant_detail))).id}" }
+      pending = create(:recommendation, enrollment: create(:enrollment, user: create(:user, :with_applicant_detail)))
+      get new_recupload_path, params: { token: pending.upload_token }
       expect(response).to have_http_status(:ok)
 
       get '/recuploads'

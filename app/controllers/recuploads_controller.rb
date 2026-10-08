@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
-# Recommenders upload their letter through the link in the request email (no login). Everything
-# else about recuploads (listing, viewing, editing, deleting) is admin-only and lives in
-# Admin::RecuploadsController.
+# Recommenders upload their letter through the link in the request email (no login). The link
+# carries the recommendation's random upload token (Recommendation#upload_token): an unknown or
+# missing token is a 404, an expired one a 410 with instructions to ask for a new link, and a
+# token whose letter has already been received is refused. Everything else about recuploads
+# (listing, viewing, editing, deleting) is admin-only and lives in Admin::RecuploadsController.
 class RecuploadsController < ApplicationController
-  before_action :get_recommendation, only: %i[new create]
+  before_action :set_recommendation, only: %i[new create]
 
   def error
   end
@@ -13,11 +15,7 @@ class RecuploadsController < ApplicationController
   end
 
   def new
-    if @recommendation.recupload.present?
-      redirect_to recupload_error_path, alert: 'A recommendation has already been submitted for this user'
-    else
-      @recupload = @recommendation.build_recupload
-    end
+    @recupload = @recommendation.build_recupload
   end
 
   def create
@@ -36,40 +34,35 @@ class RecuploadsController < ApplicationController
 
   private
 
-  def get_recommendation
-    hash_val = params['hash']
+  def set_recommendation
+    @recommendation = Recommendation.find_by_upload_token(params[:token])
 
-    # More robust parsing - look for the pattern anywhere in the hash
-    if hash_val && hash_val.include?('nGklDoc2egIkzFxr0U')
-      rec_id = hash_val.split('nGklDoc2egIkzFxr0U').last.to_i
-    elsif hash_val
-      # Try to extract just the numeric part at the end if the pattern isn't found
-      rec_id = hash_val.gsub(/[^0-9]/, '').to_i
-    else
-      raise 'Missing hash parameter'
+    if @recommendation.nil?
+      Rails.logger.info("Recommender upload link not found (token_present: #{params[:token].present?}, legacy_hash_present: #{params[:hash].present?})")
+      flash.now[:alert] = not_found_message
+      return render :error, status: :not_found
     end
 
-    @recommendation = Recommendation.find(rec_id)
-
-    # Find the student's name
-    if params[:id].present?
-      begin
-        @student = ApplicantDetail.find(params[:id]).full_name
-      rescue ActiveRecord::RecordNotFound
-        # If we can't find the ApplicantDetail, try to get the name from the recommendation
-        @student = @recommendation.applicant_name
-      end
-    else
-      @student = @recommendation.applicant_name
+    if @recommendation.recupload.present?
+      return redirect_to recupload_error_path, alert: 'A recommendation has already been submitted for this user'
     end
-  rescue StandardError => e
-    # Log identifiers only: params carries the recommendation access hash and form fields.
-    Rails.logger.error(
-      "Error in get_recommendation: #{e.class}: #{e.message} " \
-      "(recommendation_id: #{rec_id.inspect}, applicant_detail_id: #{params[:id].inspect}, hash_present: #{params['hash'].present?})"
-    )
-    redirect_to recupload_error_path,
-                alert: 'We could not find the recommendation request. Please contact MMSS admin for assistance.'
+
+    if @recommendation.upload_token_expired?
+      Rails.logger.info("Recommender upload link expired (recommendation_id: #{@recommendation.id})")
+      return render :expired, status: :gone
+    end
+
+    @student = @recommendation.applicant_name
+  end
+
+  # Links sent before the token change carried a `hash` parameter; tell those recipients why
+  # their link stopped working.
+  def not_found_message
+    if params[:hash].present?
+      'This recommendation link is from an older email and no longer works. Please contact MMSS admin for a new link.'
+    else
+      'We could not find the recommendation request. Please contact MMSS admin for assistance.'
+    end
   end
 
   def recupload_params
