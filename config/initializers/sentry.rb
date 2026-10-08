@@ -41,7 +41,9 @@ Sentry.init do |config|
   config.data_collection.graphql.document = false
   config.data_collection.graphql.variables = false
   rails_filter_terms = Rails.application.config.filter_parameters.select { |f| f.is_a?(String) || f.is_a?(Symbol) || f.is_a?(Regexp) }
-  config.data_collection.http_headers.request.terms = (Sentry::DataCollection::PII_HEADER_SNIPPETS + rails_filter_terms).uniq
+  # "referer": the recommender upload page's URL carries a bearer token in its query string
+  # (query params are already disabled above; the Referer header would still repeat it).
+  config.data_collection.http_headers.request.terms = (Sentry::DataCollection::PII_HEADER_SNIPPETS + rails_filter_terms + ['referer']).uniq
   config.data_collection.http_headers.response.terms = (Sentry::DataCollection::PII_HEADER_SNIPPETS + rails_filter_terms).uniq
 
   # Performance monitoring: traces_sampler is the single source of truth (overrides traces_sample_rate)

@@ -180,8 +180,11 @@
               <td>
                 <% if recommendation.recupload.present? %>
                   <%= link_to 'view', admin_recupload_path(recommendation.recupload) %>
-                <% else %>
+                <% elsif recommendation.upload_link_active? %>
                   <span class="text-slate-500">— waiting for response</span>
+                <% else %>
+                  <span class="admin-badge-red">link expired</span>
+                  <%= link_to 'resend', admin_recommendation_path(recommendation), class: 'admin-btn-link' %>
                 <% end %>
               </td>
             </tr>

@@ -153,6 +153,25 @@ RSpec.describe 'Admin recuploads', type: :request do
       expect(response).to have_http_status(:unprocessable_content)
       expect(response.body).to include('must be attached or letter text must be provided')
     end
+
+    it 'renders the validation error, not a 500, when a concurrent create wins the race to the unique index' do
+      pending_rec = create(:recommendation, enrollment: create(:enrollment, user: create(:user, :with_applicant_detail)))
+      allow_any_instance_of(Recupload).to receive(:save).and_raise(ActiveRecord::RecordNotUnique, 'Duplicate entry')
+
+      post admin_recuploads_path, params: { recupload: { recommendation_id: pending_rec.id, authorname: 'Prof. X', studentname: 'Y', letter: 'Hi' } }
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include('already has a letter')
+    end
+
+    it 'refuses a second letter for a recommendation that already has one' do
+      expect do
+        post admin_recuploads_path, params: { recupload: { recommendation_id: recommendation.id, authorname: 'Prof. X', studentname: 'Y', letter: 'Again' } }
+      end.not_to change(Recupload, :count)
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include('already has a letter')
+    end
   end
 
   describe 'edit/update' do
@@ -164,6 +183,24 @@ RSpec.describe 'Admin recuploads', type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('enctype="multipart/form-data"')
       expect(response.body).to include('letter.pdf')
+    end
+
+    it 'shows the recommendation read-only and ignores a submitted recommendation_id on update' do
+      other = create(:recommendation, enrollment: create(:enrollment, user: create(:user, :with_applicant_detail)))
+      other_token = other.upload_token
+
+      get edit_admin_recupload_path(recupload)
+      expect(response.body).not_to include('name="recupload[recommendation_id]"')
+      expect(response.body).to include('cannot be changed on an existing letter')
+
+      patch admin_recupload_path(recupload), params: { recupload: { recommendation_id: other.id, authorname: 'Moved' } }
+
+      expect(response).to redirect_to(admin_recupload_path(recupload))
+      recupload.reload
+      expect(recupload.recommendation).to eq(recommendation)
+      expect(recupload.authorname).to eq('Moved')
+      expect(other.reload.upload_token).to eq(other_token)
+      expect(other).to be_upload_link_active
     end
 
     it 'updates the upload' do
@@ -190,7 +227,8 @@ RSpec.describe 'Admin recuploads', type: :request do
     it 'keeps the recommender upload flow and drops the admin-only actions' do
       sign_out admin
 
-      get new_recupload_path, params: { hash: "x_nGklDoc2egIkzFxr0U#{create(:recommendation, enrollment: create(:enrollment, user: create(:user, :with_applicant_detail))).id}" }
+      pending = create(:recommendation, enrollment: create(:enrollment, user: create(:user, :with_applicant_detail)))
+      get new_recupload_path, params: { token: pending.upload_token }
       expect(response).to have_http_status(:ok)
 
       get '/recuploads'

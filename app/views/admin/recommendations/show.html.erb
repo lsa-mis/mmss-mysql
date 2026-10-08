@@ -1,7 +1,9 @@
 <% admin_page_title "Recommendation ##{@recommendation.id}", subtitle: "#{@recommendation.full_name} · for #{admin_applicant_name(@recommendation.enrollment)}" %>
 <% admin_page_actions do %>
-  <%= button_to 'Resend request', send_request_email_admin_recommendation_path(@recommendation), method: :post, class: 'admin-btn-secondary',
-                form: { data: { turbo_confirm: 'Email the recommendation request to the recommender again?' } } %>
+  <% unless @recommendation.recupload.present? %>
+    <%= button_to 'Resend request', send_request_email_admin_recommendation_path(@recommendation), method: :post, class: 'admin-btn-secondary',
+                  form: { data: { turbo_confirm: 'Email the recommender a new upload link? The previously sent link will stop working.' } } %>
+  <% end %>
   <%= link_to 'Edit', edit_admin_recommendation_path(@recommendation), class: 'admin-btn-primary' %>
   <%= button_to 'Delete', admin_recommendation_path(@recommendation), method: :delete, class: 'admin-btn-danger',
                 form: { data: { turbo_confirm: 'Delete this recommendation? An uploaded letter will be deleted too.' } } %>
@@ -38,6 +40,28 @@
       <% else %>
         <%= admin_empty_state 'Waiting for the recommender to respond.' %>
       <% end %>
+    <% end %>
+
+    <%= admin_panel 'Upload link', body_class: '' do %>
+      <%= admin_attributes @recommendation do |a| %>
+        <% a.row 'Status' do |recommendation| %>
+          <%= admin_recommendation_link_badge(recommendation) %>
+        <% end %>
+        <% if @recommendation.recupload.nil? %>
+          <% a.row 'Expires' do |recommendation| %>
+            <%= admin_format_value(recommendation.upload_token_expires_at) %>
+          <% end %>
+          <% if @recommendation.upload_link_active? %>
+            <% a.row 'Link' do |recommendation| %>
+              <code class="break-all text-xs"><%= new_recupload_url(token: recommendation.upload_token) %></code>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+      <p class="px-4 py-3 text-xs text-slate-500">
+        Links are valid for <%= Recommendation::UPLOAD_TOKEN_TTL.inspect %> and stop working once a letter is received.
+        "Resend request" emails a new link and invalidates the previous one.
+      </p>
     <% end %>
   </div>
 </div>

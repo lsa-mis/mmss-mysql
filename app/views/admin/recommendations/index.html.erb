@@ -13,11 +13,7 @@
         <%= admin_applicant_link(recommendation.enrollment, with_email: true) %>
       <% end %>
       <% t.column 'Letter' do |recommendation| %>
-        <% if recommendation.recupload %>
-          <%= link_to 'received', admin_recupload_path(recommendation.recupload), class: 'admin-badge-green' %>
-        <% else %>
-          <span class="admin-badge-yellow">waiting</span>
-        <% end %>
+        <%= admin_recommendation_link_badge(recommendation) %>
       <% end %>
       <% t.column :email, sort: true %>
       <% t.column :lastname, sort: true %>

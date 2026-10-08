@@ -20,6 +20,13 @@
   <br>
     <%= @url %>
 </div>
+<% if @expires_on %>
+  <p>
+    This link is personal to you and expires on <%= @expires_on.to_date.strftime('%B %-d, %Y') %>. If it has
+    expired, or you need a new one, please contact the student or
+    <%= mail_to 'mmss@umich.edu' %> and a new link will be sent.
+  </p>
+<% end %>
 
 <p>
   Thank you very much for assisting with <%= "#{@student.firstname} #{@student.lastname}" %>'s academic

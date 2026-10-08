@@ -14,7 +14,7 @@
 #
 # Indexes
 #
-#  index_recuploads_on_recommendation_id  (recommendation_id)
+#  index_recuploads_on_recommendation_id_unique  (recommendation_id) UNIQUE
 #
 # Foreign Keys
 #
@@ -247,6 +247,60 @@ RSpec.describe Recupload, type: :model do
     end
   end
 
+  describe 'upload token invalidation' do
+    let(:enrollment) { create(:enrollment, :without_transcript) }
+    let(:recommendation) { create(:recommendation, enrollment: enrollment) }
+
+    before do
+      allow(enrollment).to receive(:validate_transcript_presence)
+      allow(enrollment).to receive(:acceptable_transcript)
+    end
+
+    it 'clears the recommendation token on create' do
+      create(:recupload, recommendation:)
+      expect(recommendation.reload.upload_token).to be_nil
+    end
+
+    it 'takes the recommendation row lock while saving a new letter, and not on unrelated updates' do
+      expect(recommendation).to receive(:lock!).once.and_call_original
+      recupload = create(:recupload, recommendation:)
+
+      recupload.update!(authorname: 'Renamed')
+    end
+
+    it 'validates against a letter committed while waiting for the row lock instead of hitting the unique index' do
+      recupload = build(:recupload, recommendation:)
+      allow(recommendation).to receive(:lock!).and_wrap_original do |original|
+        Recupload.insert!({ recommendation_id: recommendation.id, authorname: 'First', studentname: 'S', letter: 'x',
+                            created_at: Time.current, updated_at: Time.current })
+        original.call
+      end
+
+      expect(recupload.save).to be(false)
+      expect(recupload.errors[:recommendation_id]).to include('already has a letter')
+    end
+
+    it 'clears the destination token when a letter is reassigned to another recommendation' do
+      recupload = create(:recupload, recommendation:)
+      other = create(:recommendation, enrollment: create(:enrollment, :without_transcript))
+      expect(other.upload_token).to be_present
+
+      recupload.update!(recommendation: other)
+
+      expect(other.reload.upload_token).to be_nil
+      expect(other).not_to be_upload_link_active
+    end
+
+    it 'does not touch the recommendation on an unrelated update' do
+      recupload = create(:recupload, recommendation:)
+      recommendation.update_columns(upload_token: 'leftover12345678901234567', upload_token_expires_at: 1.day.from_now)
+
+      recupload.update!(authorname: 'Renamed')
+
+      expect(recommendation.reload.upload_token).to eq('leftover12345678901234567')
+    end
+  end
+
   describe 'database constraints' do
     it 'requires recommendation_id to be present' do
       recupload = build(:recupload, recommendation: nil)
@@ -263,8 +317,9 @@ RSpec.describe Recupload, type: :model do
       create(:recupload, recommendation: recommendation)
       duplicate_recupload = build(:recupload, recommendation: recommendation)
 
-      # This should be prevented by the controller logic, but testing model behavior
-      expect(duplicate_recupload).to be_valid # Model allows it, controller prevents it
+      expect(duplicate_recupload).not_to be_valid
+      expect(duplicate_recupload.errors[:recommendation_id]).to include('already has a letter')
+      expect { duplicate_recupload.save!(validate: false) }.to raise_error(ActiveRecord::RecordNotUnique)
     end
   end
 end

@@ -1,8 +1,5 @@
 <%= form_with(model: recupload, data: { controller: "required-stars submit-toggle" }) do |form| %>
-  <%= hidden_field_tag :id, params[:id] if params[:id] %>
-  <%= hidden_field_tag :hash, params[:hash] if params[:hash] %>
-  <%= hidden_field_tag :yr, params[:yr] if params[:yr] %>
-  <%= hidden_field_tag :email, params[:email] if params[:email] %>
+  <%= hidden_field_tag :token, @recommendation.upload_token %>
 
   <% if recupload.errors.any? %>
     <div id="error_explanation">

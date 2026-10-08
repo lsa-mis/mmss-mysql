@@ -5,8 +5,17 @@
   <%= f.errors_summary %>
 
   <%= f.fieldset 'Recommendation letter', description: 'Either paste the letter text or attach a PDF/JPEG/PNG file (max 20 MB).' do %>
-    <%= f.input :recommendation_id, as: :select, label: 'Applicant Name', include_blank: 'Select an applicant', required: true,
-                                    collection: Admin::RecommendationOptions.current_camp(include: recupload.recommendation) %>
+    <% if recupload.persisted? %>
+      <p class="text-sm">
+        <span class="font-semibold">Applicant:</span>
+        <%= admin_applicant_link(recupload.recommendation.enrollment) %>
+        <span class="text-slate-500">· recommender <%= recupload.recommendation.full_name %></span>
+      </p>
+      <p class="admin-hint">The recommendation cannot be changed on an existing letter (its upload link was consumed by this letter); delete it and enter the letter under the right recommendation instead.</p>
+    <% else %>
+      <%= f.input :recommendation_id, as: :select, label: 'Applicant Name', include_blank: 'Select an applicant', required: true,
+                                      collection: Admin::RecommendationOptions.current_camp(include: recupload.recommendation) %>
+    <% end %>
     <%= f.input :letter, as: :textarea, rows: 8 %>
     <% if recupload.recletter.attached? %>
       <p class="text-sm text-slate-600">Current file: <%= admin_attachment_link(recupload.recletter) %></p>

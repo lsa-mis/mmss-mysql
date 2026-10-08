@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_28_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_08_150000) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -352,7 +352,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_28_160000) do
     t.string "state_non_us"
     t.string "submitted_recommendation"
     t.datetime "updated_at", null: false
+    t.string "upload_token", collation: "utf8mb4_bin"
+    t.datetime "upload_token_expires_at"
     t.index ["enrollment_id"], name: "index_recommendations_on_enrollment_id"
+    t.index ["upload_token"], name: "index_recommendations_on_upload_token", unique: true
   end
 
   create_table "recuploads", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -362,7 +365,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_28_160000) do
     t.bigint "recommendation_id", null: false
     t.string "studentname", null: false
     t.datetime "updated_at", null: false
-    t.index ["recommendation_id"], name: "index_recuploads_on_recommendation_id"
+    t.index ["recommendation_id"], name: "index_recuploads_on_recommendation_id_unique", unique: true
   end
 
   create_table "rejections", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|

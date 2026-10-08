@@ -180,13 +180,13 @@ RSpec.describe 'Applicant-facing controllers scope records to the signed-in user
   describe 'RecuploadsController (recommender token flow, no login)' do
     let!(:recommendation_a) { create(:recommendation, enrollment: enrollment_a) }
     let!(:recommendation_b) { create(:recommendation, enrollment: enrollment_b) }
-    let(:token_for_a) { "x_nGklDoc2egIkzFxr0U#{recommendation_a.id}" }
+    let(:token_for_a) { recommendation_a.upload_token }
 
     before { sign_out user_a }
 
     it 'attaches the letter to the recommendation the emailed link resolves to, ignoring a submitted recommendation_id' do
       expect do
-        post recuploads_path, params: { hash: token_for_a,
+        post recuploads_path, params: { token: token_for_a,
                                         recupload: { recommendation_id: recommendation_b.id, authorname: 'Prof. X', studentname: 'Ada',
                                                      letter: 'A fine student.' } }
       end.to change(Recupload, :count).by(1)
@@ -197,14 +197,22 @@ RSpec.describe 'Applicant-facing controllers scope records to the signed-in user
     end
 
     it 'renders no recommendation_id field on the upload form' do
-      get new_recupload_path, params: { hash: token_for_a }
+      get new_recupload_path, params: { token: token_for_a }
 
       expect(response).to have_http_status(:ok)
       expect(response.body).not_to include('recupload[recommendation_id]')
     end
 
+    it "never resolves another applicant's recommendation from its id (the legacy hash link)" do
+      get new_recupload_path, params: { hash: "x_nGklDoc2egIkzFxr0U#{recommendation_b.id}" }
+      expect(response).to have_http_status(:not_found)
+
+      get new_recupload_path, params: { token: recommendation_b.id.to_s }
+      expect(response).to have_http_status(:not_found)
+    end
+
     it 're-renders the form on validation errors' do
-      post recuploads_path, params: { hash: token_for_a, recupload: { authorname: '', studentname: '', letter: '' } }
+      post recuploads_path, params: { token: token_for_a, recupload: { authorname: '', studentname: '', letter: '' } }
 
       expect(response).to have_http_status(:unprocessable_content)
       expect(Recupload.count).to eq(0)

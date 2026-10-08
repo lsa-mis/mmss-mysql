@@ -94,6 +94,16 @@ RSpec.describe 'Admin recommendations', type: :request do
                                'Best contact time', 'Letter received', 'Created at', 'Updated at'])
       expect(csv.second[1..6]).to eq(['Zimmerman, Ada', user.email, 'grace@navy.example', 'Hopper', 'Grace', 'US Navy'])
       expect(csv.second[16]).to eq('false')
+      expect(response.body).not_to include(recommendation.upload_token)
+    end
+
+    it 'flags pending recommendations whose link has expired' do
+      recommendation.update_columns(upload_token_expires_at: 1.day.ago)
+
+      get admin_recommendations_path
+
+      expect(response.body).to include('link expired')
+      expect(response.body).to include('Send new upload link')
     end
   end
 
@@ -111,13 +121,34 @@ RSpec.describe 'Admin recommendations', type: :request do
       expect(body).to include('resource_type" value="Recommendation"')
     end
 
-    it 'links the uploaded letter when present' do
+    it 'shows the active upload link, its expiry and status' do
+      get admin_recommendation_path(recommendation)
+
+      body = response.body
+      expect(body).to include('Upload link')
+      expect(body).to include('>waiting<')
+      expect(body).to include(new_recupload_url(token: recommendation.upload_token))
+      expect(body).to include(recommendation.upload_token_expires_at.in_time_zone.strftime('%b %-d, %Y'))
+    end
+
+    it 'flags an expired link and hides the URL' do
+      recommendation.update_columns(upload_token_expires_at: 1.day.ago)
+
+      get admin_recommendation_path(recommendation)
+
+      expect(response.body).to include('link expired')
+      expect(response.body).not_to include(recommendation.upload_token)
+      expect(response.body).to include(send_request_email_admin_recommendation_path(recommendation))
+    end
+
+    it 'links the uploaded letter when present and drops the resend button' do
       recupload = create(:recupload, recommendation: recommendation)
 
       get admin_recommendation_path(recommendation)
 
       expect(response.body).to include(admin_recupload_path(recupload))
       expect(response.body).to include('Dr. Test Author')
+      expect(response.body).not_to include(send_request_email_admin_recommendation_path(recommendation))
     end
 
     it 'accepts admin comments' do
@@ -130,14 +161,62 @@ RSpec.describe 'Admin recommendations', type: :request do
   end
 
   describe 'POST /admin/recommendations/:id/send_request_email' do
-    it 'resends the request email and returns to the admin recommendation page' do
+    it 'issues a new upload link, emails it and returns to the admin recommendation page' do
+      recommendation.update_columns(upload_token_expires_at: 2.days.ago)
+      old_token = recommendation.upload_token
+
       expect do
         post send_request_email_admin_recommendation_path(recommendation)
       end.to change { ActionMailer::Base.deliveries.size }.by(1)
 
-      expect(ActionMailer::Base.deliveries.last.to).to include(recommendation.email)
+      recommendation.reload
+      expect(recommendation.upload_token).not_to eq(old_token)
+      expect(recommendation.upload_token_expires_at).to be_within(1.minute).of(Recommendation::UPLOAD_TOKEN_TTL.from_now)
+
+      mail = ActionMailer::Base.deliveries.last
+      expect(mail.to).to include(recommendation.email)
+      expect(mail.body.encoded).to include("token=#{recommendation.upload_token}")
+      expect(mail.body.encoded).not_to include(old_token)
       expect(response).to redirect_to(admin_recommendation_path(recommendation))
-      expect(flash[:notice]).to include('was sent')
+      expect(flash[:notice]).to include('new upload link')
+
+      # The previously emailed link is dead
+      sign_out admin
+      get new_recupload_path(token: old_token)
+      expect(response).to have_http_status(:not_found)
+      get new_recupload_path(token: recommendation.upload_token)
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'refuses once a letter has been received and issues no token' do
+      create(:recupload, recommendation: recommendation)
+
+      expect do
+        post send_request_email_admin_recommendation_path(recommendation)
+      end.not_to change { ActionMailer::Base.deliveries.size }
+
+      expect(response).to redirect_to(admin_recommendation_path(recommendation))
+      expect(flash[:alert]).to include('already been received')
+      expect(recommendation.reload.upload_token).to be_nil
+    end
+
+    it 'does not issue or email a link when a letter lands while the resend waits for the row lock' do
+      sneaked_in = false
+      allow_any_instance_of(Recommendation).to receive(:lock!).and_wrap_original do |original, *args|
+        unless sneaked_in
+          sneaked_in = true
+          create(:recupload, recommendation: Recommendation.find(original.receiver.id))
+        end
+        original.call(*args)
+      end
+
+      expect do
+        post send_request_email_admin_recommendation_path(recommendation)
+      end.not_to change { ActionMailer::Base.deliveries.size }
+
+      expect(response).to redirect_to(admin_recommendation_path(recommendation))
+      expect(flash[:alert]).to include('already been received')
+      expect(recommendation.reload.upload_token).to be_nil
     end
 
     it 'refuses a signed-in applicant without sending anything' do
@@ -237,6 +316,38 @@ RSpec.describe 'Admin recommendations', type: :request do
     it 'destroys the selected recommendations' do
       expect { post batch_admin_recommendations_path, params: { batch_action: 'destroy', ids: [recommendation.id] } }
         .to change(Recommendation, :count).by(-1)
+    end
+
+    it 'sends new upload links to the selected pending recommendations and skips received ones' do
+      received = create(:recommendation, :with_upload, enrollment: create(:enrollment, user: create(:user, :with_applicant_detail)))
+      old_token = recommendation.upload_token
+
+      expect do
+        post batch_admin_recommendations_path, params: { batch_action: 'resend_request', ids: [recommendation.id, received.id] }
+      end.to change { ActionMailer::Base.deliveries.size }.by(1)
+
+      expect(response).to redirect_to(admin_recommendations_path)
+      expect(flash[:notice]).to eq('Sent 1 new upload link. Skipped 1 with a letter already received.')
+      expect(recommendation.reload.upload_token).not_to eq(old_token)
+      expect(received.reload.upload_token).to be_nil
+      expect(ActionMailer::Base.deliveries.last.to).to eq([recommendation.email])
+    end
+
+    it 'keeps going when one email fails to deliver and reports that recommendation' do
+      failing = create(:recommendation, enrollment: create(:enrollment, user: create(:user, :with_applicant_detail)), email: 'bounce@example.edu')
+      allow_any_instance_of(ActionMailer::MessageDelivery).to receive(:deliver_now).and_wrap_original do |original, *args|
+        raise Net::SMTPFatalError, '550 mailbox unavailable' if original.receiver.message.to == ['bounce@example.edu']
+
+        original.call(*args)
+      end
+
+      expect do
+        post batch_admin_recommendations_path, params: { batch_action: 'resend_request', ids: [failing.id, recommendation.id] }
+      end.to change { ActionMailer::Base.deliveries.size }.by(1)
+
+      expect(response).to redirect_to(admin_recommendations_path)
+      expect(flash[:notice]).to eq("Sent 1 new upload link. Could not email 1 (recommendation #{failing.id}); use \"Resend request\" on those records.")
+      expect(ActionMailer::Base.deliveries.last.to).to eq([recommendation.email])
     end
   end
 

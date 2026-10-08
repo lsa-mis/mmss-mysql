@@ -14,7 +14,7 @@
 #
 # Indexes
 #
-#  index_recuploads_on_recommendation_id  (recommendation_id)
+#  index_recuploads_on_recommendation_id_unique  (recommendation_id) UNIQUE
 #
 # Foreign Keys
 #
