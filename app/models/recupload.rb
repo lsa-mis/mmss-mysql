@@ -27,7 +27,9 @@ class Recupload < ApplicationRecord
   # A letter is written under its recommendation's row lock — the same lock RecuploadsController
   # and Recommendation#issue_upload_token! take — so letters, public uploads and admin resends
   # for one recommendation always serialise, whichever controller or console they come from.
-  before_save :lock_recommendation, if: :will_save_change_to_recommendation_id?
+  # Taken before validation (save runs validations inside its transaction) so the uniqueness
+  # check below already sees a concurrently committed letter instead of failing on the index.
+  before_validation :lock_recommendation, if: :will_save_change_to_recommendation_id?
   after_create :update_enrollment_status
   # The emailed upload link is single-use: once a letter is in, the token is cleared. Fires on
   # create and on any (re)assignment of the recommendation, so the owner can never keep a live
@@ -68,7 +70,7 @@ class Recupload < ApplicationRecord
   end
 
   def lock_recommendation
-    recommendation&.lock!
+    recommendation.lock! if recommendation&.persisted?
   end
 
   def invalidate_upload_token

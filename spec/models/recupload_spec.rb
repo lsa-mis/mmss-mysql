@@ -268,6 +268,18 @@ RSpec.describe Recupload, type: :model do
       recupload.update!(authorname: 'Renamed')
     end
 
+    it 'validates against a letter committed while waiting for the row lock instead of hitting the unique index' do
+      recupload = build(:recupload, recommendation:)
+      allow(recommendation).to receive(:lock!).and_wrap_original do |original|
+        Recupload.insert!({ recommendation_id: recommendation.id, authorname: 'First', studentname: 'S', letter: 'x',
+                            created_at: Time.current, updated_at: Time.current })
+        original.call
+      end
+
+      expect(recupload.save).to be(false)
+      expect(recupload.errors[:recommendation_id]).to include('already has a letter')
+    end
+
     it 'clears the destination token when a letter is reassigned to another recommendation' do
       recupload = create(:recupload, recommendation:)
       other = create(:recommendation, enrollment: create(:enrollment, :without_transcript))

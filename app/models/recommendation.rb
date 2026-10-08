@@ -73,20 +73,25 @@ class Recommendation < ApplicationRecord
   # a letter after acquiring it, so a concurrent upload can never have its cleared token restored.
   # Writes the columns directly: issuing a link must not depend on legacy rows passing today's
   # validations.
-  def issue_upload_token!
+  #
+  # With `only_if_missing: true` (the post-deploy sweep) the token is issued only when the row
+  # still has none once the lock is held, so a link an admin has just emailed is never rotated.
+  # Returns true when a token was issued, false when skipped.
+  def issue_upload_token!(only_if_missing: false)
     raise ActiveRecord::RecordNotSaved.new('cannot issue an upload token for an unsaved recommendation', self) unless persisted?
 
-    letter_received = transaction do
+    outcome = transaction do
       lock!
-      next true if recupload.present?
+      next :letter_received if recupload.present?
+      next :skipped if only_if_missing && upload_token.present?
 
       update_columns(upload_token: self.class.generate_unique_secure_token, upload_token_expires_at: UPLOAD_TOKEN_TTL.from_now,
                      updated_at: Time.current)
-      false
+      :issued
     end
-    raise LetterAlreadyReceived, "recommendation #{id} already has a letter" if letter_received
+    raise LetterAlreadyReceived, "recommendation #{id} already has a letter" if outcome == :letter_received
 
-    self
+    outcome == :issued
   end
 
   # Called once a letter is received: the link is dead from then on.

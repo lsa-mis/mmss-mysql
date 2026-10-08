@@ -54,6 +54,10 @@ class Admin::RecuploadsController < Admin::BaseController
     else
       render :new, status: :unprocessable_content
     end
+  rescue ActiveRecord::RecordNotUnique
+    # The model locks the recommendation before validating, so this only remains as a backstop.
+    @recupload.errors.add(:recommendation_id, 'already has a letter')
+    render :new, status: :unprocessable_content
   end
 
   def edit; end

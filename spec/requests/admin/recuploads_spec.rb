@@ -154,6 +154,16 @@ RSpec.describe 'Admin recuploads', type: :request do
       expect(response.body).to include('must be attached or letter text must be provided')
     end
 
+    it 'renders the validation error, not a 500, when a concurrent create wins the race to the unique index' do
+      pending_rec = create(:recommendation, enrollment: create(:enrollment, user: create(:user, :with_applicant_detail)))
+      allow_any_instance_of(Recupload).to receive(:save).and_raise(ActiveRecord::RecordNotUnique, 'Duplicate entry')
+
+      post admin_recuploads_path, params: { recupload: { recommendation_id: pending_rec.id, authorname: 'Prof. X', studentname: 'Y', letter: 'Hi' } }
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include('already has a letter')
+    end
+
     it 'refuses a second letter for a recommendation that already has one' do
       expect do
         post admin_recuploads_path, params: { recupload: { recommendation_id: recommendation.id, authorname: 'Prof. X', studentname: 'Y', letter: 'Again' } }

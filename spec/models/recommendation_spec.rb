@@ -172,6 +172,30 @@ RSpec.describe Recommendation, type: :model do
         expect(recommendation.reload.upload_token).to be_nil
       end
 
+      it 'returns true when issued and, with only_if_missing, false without touching an existing token' do
+        token = recommendation.upload_token
+
+        expect(recommendation.issue_upload_token!(only_if_missing: true)).to be(false)
+        expect(recommendation.reload.upload_token).to eq(token)
+
+        recommendation.update_columns(upload_token: nil, upload_token_expires_at: nil)
+        expect(recommendation.issue_upload_token!(only_if_missing: true)).to be(true)
+        expect(recommendation.reload.upload_token).to be_present
+      end
+
+      it 'with only_if_missing, keeps a token that an admin issued while waiting for the row lock' do
+        recommendation.update_columns(upload_token: nil, upload_token_expires_at: nil)
+        issued_meanwhile = nil
+        allow(recommendation).to receive(:lock!).and_wrap_original do |original|
+          Recommendation.find(recommendation.id).issue_upload_token! unless issued_meanwhile
+          issued_meanwhile ||= Recommendation.find(recommendation.id).upload_token
+          original.call
+        end
+
+        expect(recommendation.issue_upload_token!(only_if_missing: true)).to be(false)
+        expect(recommendation.reload.upload_token).to eq(issued_meanwhile)
+      end
+
       it 'never restores a token cleared by a letter that lands while waiting for the row lock' do
         recommendation.recupload # prime the (empty) association cache, as the admin controller's includes does
         allow(recommendation).to receive(:lock!).and_wrap_original do |original|
