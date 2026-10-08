@@ -30,11 +30,11 @@ class SessionAssignment < ApplicationRecord
   # Course assignments for this session
   has_many :course_assignments, through: :enrollment
   has_many :wait_list_assignments, -> { where(wait_list: true) },
-           through: :enrollment,
-           source: :course_assignments
+    through: :enrollment,
+    source: :course_assignments
 
   scope :current_year_session_assignments, -> { where(enrollment_id: Enrollment.current_camp_year_applications) }
-  scope :accepted, -> { current_year_session_assignments.where(offer_status: 'accepted') }
+  scope :accepted, -> { current_year_session_assignments.where(offer_status: "accepted") }
 
   def accept_offer!(user)
     transaction do

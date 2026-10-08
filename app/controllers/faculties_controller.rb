@@ -1,14 +1,13 @@
 # frozen_string_literal: true
 
 class FacultiesController < ApplicationController
-  layout 'faculty'
+  layout "faculty"
   before_action :authenticate_faculty!
   rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
 
   def index
-    faculty = current_faculty.email.split('@').first
+    faculty = current_faculty.email.split("@").first
     @courses = Course.current_camp.where(faculty_uniqname: faculty)
-
   end
 
   def student_list
@@ -19,7 +18,6 @@ class FacultiesController < ApplicationController
 
   def student_page
     @student = Enrollment.find(params[:id])
-
   end
 
   private

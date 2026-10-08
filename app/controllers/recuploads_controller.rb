@@ -38,7 +38,7 @@ class RecuploadsController < ApplicationController
     when :saved
       RecuploadMailer.with(recupload: @recupload).received_email.deliver_now
       RecuploadMailer.with(recupload: @recupload).applicant_received_email.deliver_now
-      redirect_to recupload_success_path, notice: 'Recommendation was successfully uploaded.', status: :see_other
+      redirect_to recupload_success_path, notice: "Recommendation was successfully uploaded.", status: :see_other
     when :link_used
       redirect_to_already_submitted
     else
@@ -51,11 +51,11 @@ class RecuploadsController < ApplicationController
   private
 
   def suppress_referrer
-    response.set_header('Referrer-Policy', 'no-referrer')
+    response.set_header("Referrer-Policy", "no-referrer")
   end
 
   def redirect_to_already_submitted
-    redirect_to recupload_error_path, alert: 'A recommendation has already been submitted for this user', status: :see_other
+    redirect_to recupload_error_path, alert: "A recommendation has already been submitted for this user", status: :see_other
   end
 
   def set_recommendation
@@ -81,9 +81,9 @@ class RecuploadsController < ApplicationController
   # their link stopped working.
   def not_found_message
     if params[:hash].present?
-      'This recommendation link is from an older email and no longer works. Please contact MMSS admin for a new link.'
+      "This recommendation link is from an older email and no longer works. Please contact MMSS admin for a new link."
     else
-      'We could not find the recommendation request. Please contact MMSS admin for assistance.'
+      "We could not find the recommendation request. Please contact MMSS admin for assistance."
     end
   end
 

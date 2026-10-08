@@ -8,23 +8,23 @@ class Admin::FinancialAidRequestsController < Admin::BaseController
   before_action :set_financial_aid, only: %i[show edit update destroy]
 
   SCOPES = [
-    Admin::Scope.new(:current_camp_requests, label: 'Current camp requests', default: true),
-    Admin::Scope.new(:all, label: 'All')
+    Admin::Scope.new(:current_camp_requests, label: "Current camp requests", default: true),
+    Admin::Scope.new(:all, label: "All")
   ].freeze
 
   SORTS = {
-    id: 'financial_aids.id',
-    enrollment: 'applicant_details.lastname',
-    adjusted_gross_income: 'financial_aids.adjusted_gross_income',
-    amount: 'financial_aids.amount_cents',
-    source: 'financial_aids.source',
-    status: 'financial_aids.status',
-    payments_deadline: 'financial_aids.payments_deadline',
-    created_at: 'financial_aids.created_at',
-    updated_at: 'financial_aids.updated_at'
+    id: "financial_aids.id",
+    enrollment: "applicant_details.lastname",
+    adjusted_gross_income: "financial_aids.adjusted_gross_income",
+    amount: "financial_aids.amount_cents",
+    source: "financial_aids.source",
+    status: "financial_aids.status",
+    payments_deadline: "financial_aids.payments_deadline",
+    created_at: "financial_aids.created_at",
+    updated_at: "financial_aids.updated_at"
   }.freeze
 
-  BATCH_ACTIONS = { destroy: 'Delete selected' }.freeze
+  BATCH_ACTIONS = {destroy: "Delete selected"}.freeze
 
   STATUS_OPTIONS = %w[pending awarded rejected].freeze
 
@@ -37,7 +37,7 @@ class Admin::FinancialAidRequestsController < Admin::BaseController
 
     respond_to do |format|
       format.html { @pagy, @financial_aids = paginate(relation) }
-      format.csv { send_csv(csv_export, relation, filename: 'financial_aid_requests') }
+      format.csv { send_csv(csv_export, relation, filename: "financial_aid_requests") }
     end
   end
 
@@ -56,19 +56,20 @@ class Admin::FinancialAidRequestsController < Admin::BaseController
     @financial_aid = FinancialAid.new(financial_aid_params)
 
     if @financial_aid.save
-      redirect_to admin_financial_aid_request_path(@financial_aid), notice: 'Financial aid request was successfully created.',
-                                                                    status: :see_other
+      redirect_to admin_financial_aid_request_path(@financial_aid), notice: "Financial aid request was successfully created.",
+        status: :see_other
     else
       render :new, status: :unprocessable_content
     end
   end
 
-  def edit; end
+  def edit
+  end
 
   def update
     if @financial_aid.update(financial_aid_params)
-      redirect_to admin_financial_aid_request_path(@financial_aid), notice: 'Financial aid request was successfully updated.',
-                                                                    status: :see_other
+      redirect_to admin_financial_aid_request_path(@financial_aid), notice: "Financial aid request was successfully updated.",
+        status: :see_other
     else
       render :edit, status: :unprocessable_content
     end
@@ -76,7 +77,7 @@ class Admin::FinancialAidRequestsController < Admin::BaseController
 
   def destroy
     @financial_aid.destroy
-    redirect_to admin_financial_aid_requests_path, notice: 'Financial aid request was successfully deleted.', status: :see_other
+    redirect_to admin_financial_aid_requests_path, notice: "Financial aid request was successfully deleted.", status: :see_other
   end
 
   def batch
@@ -91,31 +92,31 @@ class Admin::FinancialAidRequestsController < Admin::BaseController
 
   def base_relation
     FinancialAid.left_joins(enrollment: :applicant_detail)
-                .preload({ taxform_attachment: :blob }, enrollment: %i[user applicant_detail])
+      .preload({taxform_attachment: :blob}, enrollment: %i[user applicant_detail])
   end
 
   # The application is fixed once the request exists: moving it would shift the award to another
   # applicant's balance and email the wrong person from the status callback.
   def financial_aid_params
     permitted = %i[amount source note status payments_deadline taxform adjusted_gross_income]
-    permitted.unshift(:enrollment_id) if action_name == 'create'
+    permitted.unshift(:enrollment_id) if action_name == "create"
     params.require(:financial_aid).permit(*permitted)
   end
 
   def csv_export
     view = helpers
     Admin::CsvExport.define do
-      column('First Name') { |aid| aid.enrollment.applicant_detail&.firstname }
-      column('Last Name') { |aid| aid.enrollment.applicant_detail&.lastname }
-      column('email') { |aid| aid.enrollment.user.email }
-      column('Residency Country') { |aid| aid.enrollment.applicant_detail&.country }
-      column('US Citizenship') { |aid| aid.enrollment.applicant_detail&.us_citizen }
-      column('Partner') { |aid| aid.enrollment.partner_program }
-      column('Offer Status') { |aid| aid.enrollment.offer_status }
-      column('FinAid Status') { |aid| aid.status }
-      column('Funding Amount') { |aid| aid.amount }
-      column('Funding Source') { |aid| aid.source }
-      column('AGI') { |aid| view.admin_agi(aid.adjusted_gross_income) }
+      column("First Name") { |aid| aid.enrollment.applicant_detail&.firstname }
+      column("Last Name") { |aid| aid.enrollment.applicant_detail&.lastname }
+      column("email") { |aid| aid.enrollment.user.email }
+      column("Residency Country") { |aid| aid.enrollment.applicant_detail&.country }
+      column("US Citizenship") { |aid| aid.enrollment.applicant_detail&.us_citizen }
+      column("Partner") { |aid| aid.enrollment.partner_program }
+      column("Offer Status") { |aid| aid.enrollment.offer_status }
+      column("FinAid Status") { |aid| aid.status }
+      column("Funding Amount") { |aid| aid.amount }
+      column("Funding Source") { |aid| aid.source }
+      column("AGI") { |aid| view.admin_agi(aid.adjusted_gross_income) }
       column :updated_at
     end
   end

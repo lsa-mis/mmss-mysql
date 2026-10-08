@@ -20,11 +20,11 @@ RSpec::Matchers.define :include_unescaped do |*expected|
 
   failure_message do |actual|
     missing = expected.reject { |text| CGI.unescapeHTML(actual.to_s).include?(text) }
-    "expected the HTML-unescaped body to include #{missing.map(&:inspect).join(', ')}"
+    "expected the HTML-unescaped body to include #{missing.map(&:inspect).join(", ")}"
   end
 
   failure_message_when_negated do |actual|
     present = expected.select { |text| CGI.unescapeHTML(actual.to_s).include?(text) }
-    "expected the HTML-unescaped body not to include #{present.map(&:inspect).join(', ')}"
+    "expected the HTML-unescaped body not to include #{present.map(&:inspect).join(", ")}"
   end
 end

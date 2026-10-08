@@ -9,13 +9,13 @@ module ApplicationHelper
     if CampConfiguration.active.exists?
       CampConfiguration.active_camp_year_application_open
     else
-      'soon'
+      "soon"
     end
   end
 
   def registration_open?
     if CampConfiguration.active.exists?
-      Date.today >= CampConfiguration.active_camp_year_application_open && Date.today < CampConfiguration.active_camp_year_application_close
+      Date.today >= CampConfiguration.active_camp_year_application_open && Date.today < CampConfiguration.active_camp_year_application_close # standard:disable Rails/Date -- host-clock date is the established registration-window boundary; Date.current would shift it by the Eastern offset
     else
       false
     end
@@ -35,7 +35,7 @@ module ApplicationHelper
 
   def new_registration_closed?
     if CampConfiguration.active.exists?
-      Date.today >= CampConfiguration.active_camp_year_application_close
+      Date.today >= CampConfiguration.active_camp_year_application_close # standard:disable Rails/Date -- same boundary as registration_open?
     else
       false
     end
@@ -66,63 +66,63 @@ module ApplicationHelper
 
   def us_states
     [
-      ['*Non-US*', 'non-us'],
-      ['Alabama', 'AL'],
-      ['Alaska', 'AK'],
-      ['Arizona', 'AZ'],
-      ['Arkansas', 'AR'],
-      ['California', 'CA'],
-      ['Colorado', 'CO'],
-      ['Connecticut', 'CT'],
-      ['Delaware', 'DE'],
-      ['District of Columbia', 'DC'],
-      ['Florida', 'FL'],
-      ['Georgia', 'GA'],
-      ['Hawaii', 'HI'],
-      ['Idaho', 'ID'],
-      ['Illinois', 'IL'],
-      ['Indiana', 'IN'],
-      ['Iowa', 'IA'],
-      ['Kansas', 'KS'],
-      ['Kentucky', 'KY'],
-      ['Louisiana', 'LA'],
-      ['Maine', 'ME'],
-      ['Maryland', 'MD'],
-      ['Massachusetts', 'MA'],
-      ['Michigan', 'MI'],
-      ['Minnesota', 'MN'],
-      ['Mississippi', 'MS'],
-      ['Missouri', 'MO'],
-      ['Montana', 'MT'],
-      ['Nebraska', 'NE'],
-      ['Nevada', 'NV'],
-      ['New Hampshire', 'NH'],
-      ['New Jersey', 'NJ'],
-      ['New Mexico', 'NM'],
-      ['New York', 'NY'],
-      ['North Carolina', 'NC'],
-      ['North Dakota', 'ND'],
-      ['Ohio', 'OH'],
-      ['Oklahoma', 'OK'],
-      ['Oregon', 'OR'],
-      ['Pennsylvania', 'PA'],
-      ['Puerto Rico', 'PR'],
-      ['Rhode Island', 'RI'],
-      ['South Carolina', 'SC'],
-      ['South Dakota', 'SD'],
-      ['Tennessee', 'TN'],
-      ['Texas', 'TX'],
-      ['Utah', 'UT'],
-      ['Vermont', 'VT'],
-      ['Virginia', 'VA'],
-      ['Washington', 'WA'],
-      ['West Virginia', 'WV'],
-      ['Wisconsin', 'WI'],
-      ['Wyoming', 'WY']
+      ["*Non-US*", "non-us"],
+      ["Alabama", "AL"],
+      ["Alaska", "AK"],
+      ["Arizona", "AZ"],
+      ["Arkansas", "AR"],
+      ["California", "CA"],
+      ["Colorado", "CO"],
+      ["Connecticut", "CT"],
+      ["Delaware", "DE"],
+      ["District of Columbia", "DC"],
+      ["Florida", "FL"],
+      ["Georgia", "GA"],
+      ["Hawaii", "HI"],
+      ["Idaho", "ID"],
+      ["Illinois", "IL"],
+      ["Indiana", "IN"],
+      ["Iowa", "IA"],
+      ["Kansas", "KS"],
+      ["Kentucky", "KY"],
+      ["Louisiana", "LA"],
+      ["Maine", "ME"],
+      ["Maryland", "MD"],
+      ["Massachusetts", "MA"],
+      ["Michigan", "MI"],
+      ["Minnesota", "MN"],
+      ["Mississippi", "MS"],
+      ["Missouri", "MO"],
+      ["Montana", "MT"],
+      ["Nebraska", "NE"],
+      ["Nevada", "NV"],
+      ["New Hampshire", "NH"],
+      ["New Jersey", "NJ"],
+      ["New Mexico", "NM"],
+      ["New York", "NY"],
+      ["North Carolina", "NC"],
+      ["North Dakota", "ND"],
+      ["Ohio", "OH"],
+      ["Oklahoma", "OK"],
+      ["Oregon", "OR"],
+      ["Pennsylvania", "PA"],
+      ["Puerto Rico", "PR"],
+      ["Rhode Island", "RI"],
+      ["South Carolina", "SC"],
+      ["South Dakota", "SD"],
+      ["Tennessee", "TN"],
+      ["Texas", "TX"],
+      ["Utah", "UT"],
+      ["Vermont", "VT"],
+      ["Virginia", "VA"],
+      ["Washington", "WA"],
+      ["West Virginia", "WV"],
+      ["Wisconsin", "WI"],
+      ["Wyoming", "WY"]
     ]
   end
 
-  def country_options_with_priority(priority_codes: ['US'])
+  def country_options_with_priority(priority_codes: ["US"])
     priority = priority_codes.filter_map do |code|
       country = ISO3166::Country[code]
       [country.iso_short_name, country.alpha2] if country
@@ -153,38 +153,38 @@ module ApplicationHelper
 
   def show_international(international)
     if international
-      'yes'
+      "yes"
     else
-      'no'
+      "no"
     end
   end
 
   def transportation
-    ['Airplane', 'Bus', 'Train',
-     'Automobile - parent or permitted designee is driving me to the University of Michigan campus',
-     'I am a daily MMSS commuter']
+    ["Airplane", "Bus", "Train",
+      "Automobile - parent or permitted designee is driving me to the University of Michigan campus",
+      "I am a daily MMSS commuter"]
   end
 
   def show_date(field)
-    field.strftime('%A, %d %b %Y') unless field.blank?
+    field.presence&.strftime("%A, %d %b %Y")
   end
 
   def show_time(field)
-    field.strftime('%I:%M %p') unless field.blank?
+    field.presence&.strftime("%I:%M %p")
   end
 
   def transaction_status_message(transaction_status)
     case transaction_status
-    when '1'
-      'Accepted credit card (successful)'
-    when '2'
-      'Rejected credit card (declined)'
-    when '3'
-      'Error credit card (error)'
-    when '4'
-      'Unknown credit card error (unknown)'
+    when "1"
+      "Accepted credit card (successful)"
+    when "2"
+      "Rejected credit card (declined)"
+    when "3"
+      "Error credit card (error)"
+    when "4"
+      "Unknown credit card error (unknown)"
     else
-      'Transaction Status not returned'
+      "Transaction Status not returned"
     end
   end
 
@@ -197,16 +197,9 @@ module ApplicationHelper
     authenticated ||= defined?(faculty_signed_in?) && faculty_signed_in?
     return nil unless authenticated
 
-    # Get session timeout from configuration
-    # Production uses 4.hours, other environments may vary
-    timeout_seconds = if Rails.env.production?
-                        4.hours.to_i
-                      elsif Rails.env.staging?
-                        4.hours.to_i
-                      else
-                        # Development default (no expiry, but set a reasonable default for warning)
-                        4.hours.to_i
-                      end
+    # Session timeout: 4 hours in every environment (production/staging expire the session; development
+    # has no expiry but uses the same value so the warning banner behaves the same).
+    timeout_seconds = 4.hours.to_i
 
     # Try to determine when the session was created so we can calculate the real expiry time.
     session_created_at = nil
@@ -217,7 +210,7 @@ module ApplicationHelper
       if raw_created_at.respond_to?(:to_time)
         session_created_at = raw_created_at.to_time
       elsif raw_created_at.respond_to?(:to_i)
-        session_created_at = Time.at(raw_created_at.to_i)
+        session_created_at = Time.at(raw_created_at.to_i) # standard:disable Rails/TimeZone -- compared with host-clock Time values below; keep the same clock
       end
     end
 
@@ -230,16 +223,16 @@ module ApplicationHelper
 
       if warden_session_entry
         warden_session = warden_session_entry.last
-        raw_created_at = warden_session['session_created_at'] ||
-                         warden_session[:session_created_at] ||
-                         warden_session['created_at'] ||
-                         warden_session[:created_at]
+        raw_created_at = warden_session["session_created_at"] ||
+          warden_session[:session_created_at] ||
+          warden_session["created_at"] ||
+          warden_session[:created_at]
 
         if raw_created_at
           if raw_created_at.respond_to?(:to_time)
             session_created_at = raw_created_at.to_time
           elsif raw_created_at.respond_to?(:to_i)
-            session_created_at = Time.at(raw_created_at.to_i)
+            session_created_at = Time.at(raw_created_at.to_i) # standard:disable Rails/TimeZone -- see above
           end
         end
       end

@@ -47,15 +47,15 @@ class Enrollment < ApplicationRecord
 
   STATUS_TRANSITIONS = {
     nil => :any,
-    'enrolled' => %w[withdrawn],
-    'withdrawn' => []
+    "enrolled" => %w[withdrawn],
+    "withdrawn" => []
   }.freeze
 
   attr_accessor :force_application_status_transition
 
+  before_create :set_application_fee_required
   before_update :if_application_status_changed
   before_update :set_application_deadline
-  before_create :set_application_fee_required
   after_update :send_offer_letter
   after_commit :send_enroll_letter, if: :persisted?
   after_commit :send_rejected_letter, if: :persisted?
@@ -101,12 +101,12 @@ class Enrollment < ApplicationRecord
   validates :year_in_school, presence: true
   validates :anticipated_graduation_year, presence: true
   validates :personal_statement, presence: true
-  validates :personal_statement, length: { minimum: 100 }
+  validates :personal_statement, length: {minimum: 100}
 
   validates :high_school_postalcode, presence: true
   validates :high_school_postalcode,
-            length: { minimum: 1, maximum: 25, message: 'must be between 1 and 25 characters' },
-            format: { with: /\A[a-zA-Z0-9\s\-]+\z/, message: 'can only contain letters, numbers, spaces, and dashes' }
+    length: {minimum: 1, maximum: 25, message: "must be between 1 and 25 characters"},
+    format: {with: /\A[a-zA-Z0-9\s-]+\z/, message: "can only contain letters, numbers, spaces, and dashes"}
 
   validate :at_least_one_session_is_checked
   validate :at_least_one_course_is_checked
@@ -117,9 +117,9 @@ class Enrollment < ApplicationRecord
   validate :acceptable_student_packet
   validate :acceptable_image
 
-  validates :user_id, uniqueness: { scope: :campyear }
+  validates :user_id, uniqueness: {scope: :campyear} # standard:disable Rails/UniqueValidationWithoutIndex -- no DB index yet; adding one is a schema change (see #275 for the payments precedent)
 
-  scope :current_camp_year_applications, -> { where('campyear = ? ', CampConfiguration.active_camp_year) }
+  scope :current_camp_year_applications, -> { where("campyear = ? ", CampConfiguration.active_camp_year) }
   scope :offered, -> { current_camp_year_applications.where("offer_status = 'offered'") }
   scope :accepted, -> { current_camp_year_applications.where("offer_status = 'accepted'") }
   scope :enrolled, -> { current_camp_year_applications.where("application_status = 'enrolled'") }
@@ -127,8 +127,9 @@ class Enrollment < ApplicationRecord
   scope :application_complete, lambda {
     current_camp_year_applications.where("application_status = 'application complete'")
   }
-  scope :application_complete_not_offered, -> { application_complete.where(offer_status: [nil, '']) }
+  scope :application_complete_not_offered, -> { application_complete.where(offer_status: [nil, ""]) }
   scope :no_recomendation, -> { current_camp_year_applications.where.missing(:recommendation) }
+  # standard:disable Rails/PluckInWhere -- pluck keeps the two-query form; an IN (SELECT ...) subquery changes the SQL and NOT IN semantics with NULLs
   scope :no_letter, lambda {
     current_camp_year_applications.where(id: Recommendation.where.missing(:recupload).pluck(:enrollment_id))
   }
@@ -144,6 +145,7 @@ class Enrollment < ApplicationRecord
   scope :no_covid_test_record, lambda {
     enrolled.where.not(id: Enrollment.current_camp_year_applications.joins(:covid_test_record_attachment).pluck(:id))
   }
+  # standard:enable Rails/PluckInWhere
   scope :no_camp_doc_form, -> { current_camp_year_applications.where(camp_doc_form_completed: false) }
 
   def display_name
@@ -189,27 +191,27 @@ class Enrollment < ApplicationRecord
 
     if all_session_assignments_declined?(status_array)
       update!(
-        offer_status: 'declined',
-        application_status: 'offer declined',
+        offer_status: "declined",
+        application_status: "offer declined",
         application_status_updated_on: Date.current
       )
     elsif all_session_assignments_responded?(status_array)
       update!(
-        offer_status: 'accepted',
-        application_status: 'offer accepted',
+        offer_status: "accepted",
+        application_status: "offer accepted",
         application_status_updated_on: Date.current
       )
     end
   end
 
   def auto_enroll_if_ready!
-    return if application_status == 'enrolled'
+    return if application_status == "enrolled"
     return unless camp_doc_form_completed
 
     payment = PaymentState.new(self)
     return unless payment.balance_due.zero?
 
-    transition_application_status!('enrolled', force: true)
+    transition_application_status!("enrolled", force: true)
   end
 
   # Withdraws the enrollment: course assignments are released (they hold seats) and the status
@@ -222,7 +224,7 @@ class Enrollment < ApplicationRecord
         "Course: #{assignment.course.title}, Session: #{assignment.course.camp_occurrence.description}"
       end
       course_assignments.destroy_all
-      transition_application_status!('withdrawn', extra_attrs: extra_attrs.except(:course_assignments_attributes))
+      transition_application_status!("withdrawn", extra_attrs: extra_attrs.except(:course_assignments_attributes))
       released
     end
   end
@@ -252,43 +254,43 @@ class Enrollment < ApplicationRecord
   def at_least_one_session_is_checked
     return unless session_registration_ids.empty?
 
-    errors.add(:base, 'Select at least one session')
+    errors.add(:base, "Select at least one session")
   end
 
   def at_least_one_course_is_checked
     return unless course_registration_ids.empty?
 
-    errors.add(:base, 'Select at least one course')
+    errors.add(:base, "Select at least one course")
   end
 
   def validate_transcript_presence
-    errors.add(:transcript, 'should exist') unless transcript.attached?
+    errors.add(:transcript, "should exist") unless transcript.attached?
   end
 
   def acceptable_transcript
     return unless transcript.attached?
 
     unless transcript.blob.byte_size <= 20.megabyte
-      errors.add(:transcript, 'is too big - file size cannot exceed 20Mbyte')
+      errors.add(:transcript, "is too big - file size cannot exceed 20Mbyte")
     end
 
-    acceptable_types = ['image/png', 'image/jpeg', 'application/pdf']
+    acceptable_types = ["image/png", "image/jpeg", "application/pdf"]
     return if acceptable_types.include?(transcript.content_type)
 
-    errors.add(:transcript, 'must be file type PDF, JPEG or PNG')
+    errors.add(:transcript, "must be file type PDF, JPEG or PNG")
   end
 
   def acceptable_student_packet
     return unless student_packet.attached?
 
     unless student_packet.blob.byte_size <= 20.megabyte
-      errors.add(:student_packet, 'is too big - file size cannot exceed 20Mbyte')
+      errors.add(:student_packet, "is too big - file size cannot exceed 20Mbyte")
     end
 
-    acceptable_types = ['image/png', 'image/jpeg', 'application/pdf']
+    acceptable_types = ["image/png", "image/jpeg", "application/pdf"]
     return if acceptable_types.include?(student_packet.content_type)
 
-    errors.add(:student_packet, 'must be file type PDF, JPEG or PNG')
+    errors.add(:student_packet, "must be file type PDF, JPEG or PNG")
   end
 
   def acceptable_image
@@ -297,37 +299,37 @@ class Enrollment < ApplicationRecord
     [covid_test_record, vaccine_record].compact.each do |image|
       next unless image.attached?
 
-      errors.add(image.name, 'is too big') unless image.blob.byte_size <= 10.megabyte
+      errors.add(image.name, "is too big") unless image.blob.byte_size <= 10.megabyte
 
-      acceptable_types = ['image/png', 'image/jpeg', 'application/pdf']
-      errors.add(image.name, 'incorrect file type') unless acceptable_types.include?(image.content_type)
+      acceptable_types = ["image/png", "image/jpeg", "application/pdf"]
+      errors.add(image.name, "incorrect file type") unless acceptable_types.include?(image.content_type)
     end
   end
 
   def send_offer_letter
     return unless previous_changes[:offer_status]
-    return unless offer_status == 'offered'
+    return unless offer_status == "offered"
 
     OfferMailer.offer_email(user_id).deliver_now
   end
 
   def send_enroll_letter
     return unless previous_changes[:application_status]
-    return unless application_status == 'enrolled'
+    return unless application_status == "enrolled"
 
     RegistrationMailer.app_enrolled_email(user).deliver_now
   end
 
   def send_rejected_letter
     return unless previous_changes[:application_status]
-    return unless application_status == 'rejected'
+    return unless application_status == "rejected"
 
     RejectedMailer.app_rejected_email(self).deliver_now
   end
 
   def send_waitlisted_letter
     return unless previous_changes[:application_status]
-    return unless application_status == 'waitlisted'
+    return unless application_status == "waitlisted"
 
     WaitlistedMailer.app_waitlisted_email(self).deliver_now
   end
@@ -335,7 +337,7 @@ class Enrollment < ApplicationRecord
   def set_application_deadline
     return unless session_assignments.present? && course_assignments.present?
 
-    self.application_deadline = 30.days.from_now unless application_deadline.present?
+    self.application_deadline = 30.days.from_now if application_deadline.blank?
   end
 
   def if_application_status_changed
@@ -366,7 +368,7 @@ class Enrollment < ApplicationRecord
   end
 
   def normalize_status(status)
-    status.present? ? status : nil
+    status.presence
   end
 
   def application_status_before_change
@@ -385,11 +387,11 @@ class Enrollment < ApplicationRecord
     return if allowed_targets == :any
     return if allowed_targets.include?(to_status)
 
-    errors.add(:application_status, "cannot transition from #{from_status || '(none)'} to #{to_status || '(none)'}")
+    errors.add(:application_status, "cannot transition from #{from_status || "(none)"} to #{to_status || "(none)"}")
   end
 
   def all_session_assignments_declined?(status_array)
-    status_array.all? { |status| status == 'declined' }
+    status_array.all? { |status| status == "declined" }
   end
 
   def all_session_assignments_responded?(status_array)

@@ -21,15 +21,14 @@ class Admin::Filter
   PARAM_KEY = :q
   TYPES = %i[text select boolean date_range number].freeze
 
-  Field = Struct.new(:name, :type, :label, :column, :joins, :match, :collection, :datetime, :html,
-                     keyword_init: true) do
+  Field = Struct.new(:name, :type, :label, :column, :joins, :match, :collection, :datetime, :html) do
     def param = name.to_s
 
     def from_param = "#{name}_from"
 
     def to_param = "#{name}_to"
 
-    def params = type == :date_range ? [from_param, to_param] : [param]
+    def params = (type == :date_range) ? [from_param, to_param] : [param]
 
     # Collections may be lazy (a lambda) so the query runs when the form renders, not at boot.
     def options
@@ -66,7 +65,7 @@ class Admin::Filter
 
     def add_field(type, name, label: nil, column: nil, joins: nil, html: {}, **options)
       fields << Field.new(name: name.to_sym, type: type, label: label || name.to_s.humanize,
-                          column: (column || name).to_s, joins: joins, html: html, **options)
+        column: (column || name).to_s, joins: joins, html: html, **options)
     end
   end
 
@@ -76,10 +75,10 @@ class Admin::Filter
     raw = params.respond_to?(:to_unsafe_h) ? params.to_unsafe_h : (params || {})
     # Only scalar values are meaningful (`q[lastname][]=x` or `q[lastname][a]=x` are discarded).
     @values = raw.to_h.stringify_keys
-                 .slice(*permitted_params)
-                 .select { |_key, value| value.is_a?(String) || value.is_a?(Numeric) }
-                 .transform_values { |value| value.to_s.strip }
-                 .compact_blank
+      .slice(*permitted_params)
+      .select { |_key, value| value.is_a?(String) || value.is_a?(Numeric) }
+      .transform_values { |value| value.to_s.strip }
+      .compact_blank
   end
 
   def fields = self.class.fields
@@ -92,7 +91,7 @@ class Admin::Filter
 
   # Query params to carry the active filter across sort/pagination/CSV links.
   def to_params
-    active? ? { PARAM_KEY => values } : {}
+    active? ? {PARAM_KEY => values} : {}
   end
 
   def apply(relation)
@@ -120,7 +119,7 @@ class Admin::Filter
   def apply_select(scope, field)
     scope.where("#{qualified_column(scope, field)} = ?", value(field.param))
   end
-  alias apply_number apply_select
+  alias_method :apply_number, :apply_select
 
   def apply_boolean(scope, field)
     truthy = ActiveModel::Type::Boolean.new.cast(value(field.param))
@@ -149,11 +148,11 @@ class Admin::Filter
   end
 
   def qualified_column(scope, field)
-    field.column.include?('.') ? field.column : "#{scope.model.table_name}.#{field.column}"
+    field.column.include?(".") ? field.column : "#{scope.model.table_name}.#{field.column}"
   end
 
   def datetime_column?(scope, field)
-    return false if field.column.include?('.')
+    return false if field.column.include?(".")
 
     scope.model.columns_hash[field.column]&.type == :datetime
   end

@@ -7,22 +7,22 @@ class Admin::ApplicantDetailsController < Admin::BaseController
   before_action :set_applicant_detail, only: %i[show edit update]
 
   SCOPES = [
-    Admin::Scope.new(:all, label: 'All', group: :application_status, default: true),
-    Admin::Scope.new(:current_camp_enrolled, label: 'Current camp enrolled', group: :application_status)
+    Admin::Scope.new(:all, label: "All", group: :application_status, default: true),
+    Admin::Scope.new(:current_camp_enrolled, label: "Current camp enrolled", group: :application_status)
   ].freeze
 
   SORTS = {
-    fullname: 'applicant_details.lastname',
-    email: 'users.email',
-    us_citizen: 'applicant_details.us_citizen',
-    birthdate: 'applicant_details.birthdate',
-    shirt_size: 'applicant_details.shirt_size',
-    city: 'applicant_details.city',
-    state: 'applicant_details.state',
-    postalcode: 'applicant_details.postalcode',
-    country: 'applicant_details.country',
-    created_at: 'applicant_details.created_at',
-    updated_at: 'applicant_details.updated_at'
+    fullname: "applicant_details.lastname",
+    email: "users.email",
+    us_citizen: "applicant_details.us_citizen",
+    birthdate: "applicant_details.birthdate",
+    shirt_size: "applicant_details.shirt_size",
+    city: "applicant_details.city",
+    state: "applicant_details.state",
+    postalcode: "applicant_details.postalcode",
+    country: "applicant_details.country",
+    created_at: "applicant_details.created_at",
+    updated_at: "applicant_details.updated_at"
   }.freeze
 
   def index
@@ -36,7 +36,7 @@ class Admin::ApplicantDetailsController < Admin::BaseController
 
     respond_to do |format|
       format.html { @pagy, @applicant_details = paginate(relation) }
-      format.csv { send_csv(csv_export, relation, filename: 'applicant_details') }
+      format.csv { send_csv(csv_export, relation, filename: "applicant_details") }
     end
   end
 
@@ -53,19 +53,20 @@ class Admin::ApplicantDetailsController < Admin::BaseController
     @applicant_detail = ApplicantDetail.new(applicant_detail_params(:user_id))
 
     if @applicant_detail.save
-      redirect_to admin_applicant_detail_path(@applicant_detail), notice: 'Applicant detail was successfully created.',
-                                                                  status: :see_other
+      redirect_to admin_applicant_detail_path(@applicant_detail), notice: "Applicant detail was successfully created.",
+        status: :see_other
     else
       render :new, status: :unprocessable_content
     end
   end
 
-  def edit; end
+  def edit
+  end
 
   def update
     if @applicant_detail.update(applicant_detail_params)
-      redirect_to admin_applicant_detail_path(@applicant_detail), notice: 'Applicant detail was successfully updated.',
-                                                                  status: :see_other
+      redirect_to admin_applicant_detail_path(@applicant_detail), notice: "Applicant detail was successfully updated.",
+        status: :see_other
     else
       render :edit, status: :unprocessable_content
     end
@@ -86,8 +87,8 @@ class Admin::ApplicantDetailsController < Admin::BaseController
   # The email column links to the applicant's latest application; computing its id in SQL avoids
   # loading every enrollment of every row. Added after scope_counts (see Admin::BalanceDueQuery).
   def with_latest_enrollment_id(relation)
-    relation.select('applicant_details.*',
-                    '(SELECT MAX(enrollments.id) FROM enrollments WHERE enrollments.user_id = applicant_details.user_id) AS latest_enrollment_id')
+    relation.select("applicant_details.*",
+      "(SELECT MAX(enrollments.id) FROM enrollments WHERE enrollments.user_id = applicant_details.user_id) AS latest_enrollment_id")
   end
 
   # `gender` stores the Gender id as a string; one lookup for the whole page instead of a query
@@ -112,8 +113,8 @@ class Admin::ApplicantDetailsController < Admin::BaseController
     Admin::CsvExport.define do
       column :lastname
       column :firstname
-      column('email') { |detail| detail.user.email }
-      column('demographic') { |detail| detail.formatted_demographic }
+      column("email") { |detail| detail.user.email }
+      column("demographic") { |detail| detail.formatted_demographic }
       column :us_citizen
       column :birthdate
       column :diet_restrictions

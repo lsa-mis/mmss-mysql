@@ -25,7 +25,7 @@ class RecommendationsController < ApplicationController
 
   # GET /recommendations/1/edit
   def edit
-    return unless @recommendation.recupload.present?
+    return if @recommendation.recupload.blank?
 
     redirect_to root_path
   end
@@ -39,9 +39,9 @@ class RecommendationsController < ApplicationController
       RecommendationMailer.with(recommendation: @recommendation).request_email.deliver_now
       unless @enrollment.application_fee_required
         RegistrationMailer.app_complete_email(current_user).deliver_now
-        @enrollment.transition_application_status!('submitted')
+        @enrollment.transition_application_status!("submitted")
       end
-      redirect_to root_path, notice: 'Recommendation was successfully created and the email was sent.', status: :see_other
+      redirect_to root_path, notice: "Recommendation was successfully created and the email was sent.", status: :see_other
     else
       render :new, status: :unprocessable_content
     end
@@ -50,7 +50,7 @@ class RecommendationsController < ApplicationController
   # PATCH/PUT /recommendations/1
   def update
     if @recommendation.update(recommendation_params)
-      redirect_to @recommendation, notice: 'Recommendation was successfully updated.', status: :see_other
+      redirect_to @recommendation, notice: "Recommendation was successfully updated.", status: :see_other
     else
       render :edit, status: :unprocessable_content
     end
@@ -68,7 +68,7 @@ class RecommendationsController < ApplicationController
     if params[:enrollment_id].present?
       current_user.enrollments.find(params[:enrollment_id])
     else
-      @current_enrollment || raise(ActiveRecord::RecordNotFound, 'No current application')
+      @current_enrollment || raise(ActiveRecord::RecordNotFound, "No current application")
     end
   end
 
@@ -82,6 +82,6 @@ class RecommendationsController < ApplicationController
   # enrollment_id comes from the route (owned by current_user), never from the form.
   def recommendation_params
     params.require(:recommendation).permit(:email, :lastname, :firstname, :organization, :address1, :address2, :city,
-                                           :state, :state_non_us, :postalcode, :country, :phone_number, :best_contact_time)
+      :state, :state_non_us, :postalcode, :country, :phone_number, :best_contact_time)
   end
 end

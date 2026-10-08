@@ -28,21 +28,21 @@ FactoryBot.define do
 
     title { "#{Faker::Educator.subject}: #{Faker::Educator.course_name}" }
     available_spaces { 16 }
-    status { 'open' }
+    status { "open" }
     faculty_name { Faker::Name.name }
-    faculty_uniqname { Faker::Internet.username(specifier: faculty_name, separators: ['']) }
+    faculty_uniqname { Faker::Internet.username(specifier: faculty_name, separators: [""]) }
 
     trait :open do
-      status { 'open' }
+      status { "open" }
     end
 
     trait :closed do
-      status { 'closed' }
+      status { "closed" }
     end
 
     trait :full do
       available_spaces { 0 }
-      status { 'closed' }
+      status { "closed" }
     end
 
     trait :large_class do

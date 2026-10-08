@@ -23,109 +23,109 @@
 #
 #  fk_rails_...  (enrollment_id => enrollments.id)
 #
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe FinancialAid, type: :model do
-  describe 'associations' do
+  describe "associations" do
     it { is_expected.to belong_to(:enrollment) }
   end
 
-  describe 'validations' do
+  describe "validations" do
     subject { build(:financial_aid) }
 
     it { is_expected.to validate_presence_of(:status) }
     it { is_expected.to validate_presence_of(:adjusted_gross_income) }
     it { is_expected.to validate_numericality_of(:adjusted_gross_income).is_greater_than_or_equal_to(0) }
 
-    it 'refuses a negative award' do
+    it "refuses a negative award" do
       aid = build(:financial_aid, amount_cents: -5)
       expect(aid).not_to be_valid
-      expect(aid.errors[:amount]).to include('must be greater than or equal to 0')
+      expect(aid.errors[:amount]).to include("must be greater than or equal to 0")
     end
   end
 
-  describe '#amount= (admin dollar input)' do
-    it 'stores whole cents for plain and formatted input and treats blank as no amount' do
-      expect(build(:financial_aid, amount: '150.25').amount_cents).to eq(15_025)
-      expect(build(:financial_aid, amount: '$1,500.5').amount_cents).to eq(150_050)
-      expect(build(:financial_aid, amount: '').amount_cents).to eq(0)
-      expect(build(:financial_aid, amount: '')).to be_valid
+  describe "#amount= (admin dollar input)" do
+    it "stores whole cents for plain and formatted input and treats blank as no amount" do
+      expect(build(:financial_aid, amount: "150.25").amount_cents).to eq(15_025)
+      expect(build(:financial_aid, amount: "$1,500.5").amount_cents).to eq(150_050)
+      expect(build(:financial_aid, amount: "").amount_cents).to eq(0)
+      expect(build(:financial_aid, amount: "")).to be_valid
     end
 
-    it 'refuses negative, non-numeric, non-finite and over-precise input' do
-      ['-50', 'abc', 'Infinity', 'NaN', '1e3', '12.345', '1,2,3', '12,34.5'].each do |bad|
+    it "refuses negative, non-numeric, non-finite and over-precise input" do
+      ["-50", "abc", "Infinity", "NaN", "1e3", "12.345", "1,2,3", "12,34.5"].each do |bad|
         aid = build(:financial_aid, amount: bad)
         expect(aid).not_to be_valid, "#{bad.inspect} was accepted"
         expect(aid.errors[:amount].size).to eq(1), "#{bad.inspect}: #{aid.errors[:amount].inspect}"
       end
     end
 
-    describe 'source validation' do
-      context 'when status is awarded and amount is assigned' do
-        it 'requires source to be present' do
-          aid = build(:financial_aid, status: 'awarded', amount_cents: 100000, source: nil)
+    describe "source validation" do
+      context "when status is awarded and amount is assigned" do
+        it "requires source to be present" do
+          aid = build(:financial_aid, status: "awarded", amount_cents: 100000, source: nil)
           expect(aid).not_to be_valid
           expect(aid.errors[:source]).to include("is required when status is awarded and an amount is assigned")
         end
 
-        it 'is valid when source is present' do
-          aid = build(:financial_aid, status: 'awarded', amount_cents: 100000, source: 'Scholarship')
+        it "is valid when source is present" do
+          aid = build(:financial_aid, status: "awarded", amount_cents: 100000, source: "Scholarship")
           expect(aid).to be_valid
         end
       end
 
-      context 'when status is not awarded' do
-        it 'does not require source' do
-          aid = build(:financial_aid, status: 'pending', source: nil)
+      context "when status is not awarded" do
+        it "does not require source" do
+          aid = build(:financial_aid, status: "pending", source: nil)
           expect(aid).to be_valid
         end
       end
 
-      context 'when status is awarded but amount is zero' do
-        it 'does not require source' do
-          aid = build(:financial_aid, status: 'awarded', amount_cents: 0, source: nil)
+      context "when status is awarded but amount is zero" do
+        it "does not require source" do
+          aid = build(:financial_aid, status: "awarded", amount_cents: 0, source: nil)
           expect(aid).not_to be_valid
         end
       end
     end
   end
 
-  describe 'monetize' do
-    it 'monetizes amount' do
+  describe "monetize" do
+    it "monetizes amount" do
       aid = create(:financial_aid, amount_cents: 100000)
       expect(aid.amount.cents).to eq(100000)
-      expect(aid.amount.currency).to eq(Money::Currency.new('USD'))
+      expect(aid.amount.currency).to eq(Money::Currency.new("USD"))
     end
   end
 
-  describe 'attachments' do
+  describe "attachments" do
     it { is_expected.to have_one_attached(:taxform) }
   end
 
-  describe 'factory' do
-    it 'has a valid factory' do
+  describe "factory" do
+    it "has a valid factory" do
       aid = build(:financial_aid)
       expect(aid).to be_valid
     end
 
-    it 'creates approved aid with trait' do
+    it "creates approved aid with trait" do
       aid = create(:financial_aid, :approved)
-      expect(aid.status).to eq('approved')
+      expect(aid.status).to eq("approved")
     end
 
-    it 'creates full scholarship with trait' do
+    it "creates full scholarship with trait" do
       aid = create(:financial_aid, :full_scholarship)
       expect(aid.amount_cents).to eq(200000)
-      expect(aid.status).to eq('approved')
+      expect(aid.status).to eq("approved")
     end
 
-    it 'creates aid with taxform using trait' do
+    it "creates aid with taxform using trait" do
       aid = create(:financial_aid, :with_taxform)
       expect(aid.taxform).to be_attached
     end
   end
 
-  describe 'scopes' do
+  describe "scopes" do
     let(:camp_config) do
       CampConfiguration.find_or_create_by!(camp_year: Date.current.year) do |cc|
         cc.application_open = Date.current - 30.days
@@ -135,9 +135,9 @@ RSpec.describe FinancialAid, type: :model do
         cc.camper_acceptance_due = Date.current + 75.days
         cc.application_fee_cents = 10_000
         cc.active = true
-        cc.offer_letter = 'Default offer letter'
-        cc.reject_letter = 'Default reject letter'
-        cc.waitlist_letter = 'Default waitlist letter'
+        cc.offer_letter = "Default offer letter"
+        cc.reject_letter = "Default reject letter"
+        cc.waitlist_letter = "Default waitlist letter"
       end
     end
     let(:enrollment) { create(:enrollment, campyear: Date.current.year) }
@@ -153,15 +153,15 @@ RSpec.describe FinancialAid, type: :model do
       allow(CampConfiguration).to receive(:active_camp_year).and_return(camp_config.camp_year)
     end
 
-    describe '.current_camp_requests' do
-      it 'returns financial aid for current camp year' do
+    describe ".current_camp_requests" do
+      it "returns financial aid for current camp year" do
         expect(FinancialAid.current_camp_requests).to include(current_aid)
         expect(FinancialAid.current_camp_requests).not_to include(old_aid)
       end
     end
   end
 
-  describe 'status change emails and auto-enroll' do
+  describe "status change emails and auto-enroll" do
     let!(:camp_config) { create(:camp_configuration, :active, camp_year: Date.current.year, application_fee_cents: 0) }
     let(:user) { create(:user, :with_applicant_detail) }
     let(:enrollment) do
@@ -169,7 +169,7 @@ RSpec.describe FinancialAid, type: :model do
         :enrollment,
         user: user,
         campyear: camp_config.camp_year,
-        application_status: 'submitted',
+        application_status: "submitted",
         application_fee_required: false,
         camp_doc_form_completed: false
       )
@@ -183,17 +183,17 @@ RSpec.describe FinancialAid, type: :model do
       camp_config.update!(active: true)
       allow(CampConfiguration).to receive(:active_camp_year).and_return(camp_config.camp_year)
       allow(CampConfiguration).to receive(:active).and_return(CampConfiguration.where(id: camp_config.id))
-      create(:session_assignment, enrollment: enrollment, camp_occurrence: accepted_session, offer_status: 'accepted')
+      create(:session_assignment, enrollment: enrollment, camp_occurrence: accepted_session, offer_status: "accepted")
       # Mark docs complete only after session cost exists so balance is non-zero and
       # enrollment callbacks do not auto-enroll before the award under test.
-      enrollment.update!(camp_doc_form_completed: true, application_status: 'submitted')
+      enrollment.update!(camp_doc_form_completed: true, application_status: "submitted")
     end
 
-    it 'sends awarded email and auto-enrolls when documents are complete and balance reaches zero' do
+    it "sends awarded email and auto-enrolls when documents are complete and balance reaches zero" do
       mail_message = instance_double(ActionMailer::MessageDelivery, deliver_now: true)
       expect(FinaidMailer).to receive(:fin_aid_awarded_email) do |aid, balance|
         expect(aid).to be_a(FinancialAid)
-        expect(aid.status).to eq('awarded')
+        expect(aid.status).to eq("awarded")
         expect(balance).to eq(0)
         mail_message
       end
@@ -202,15 +202,15 @@ RSpec.describe FinancialAid, type: :model do
         create(
           :financial_aid,
           enrollment: enrollment,
-          status: 'awarded',
+          status: "awarded",
           amount_cents: 5_000,
-          source: 'Scholarship',
+          source: "Scholarship",
           payments_deadline: 30.days.from_now
         )
-      }.to change { enrollment.reload.application_status }.from('submitted').to('enrolled')
+      }.to change { enrollment.reload.application_status }.from("submitted").to("enrolled")
     end
 
-    it 'sends rejected email and does not change enrollment status' do
+    it "sends rejected email and does not change enrollment status" do
       mail_message = instance_double(ActionMailer::MessageDelivery, deliver_now: true)
       expect(FinaidMailer).to receive(:fin_aid_rejected_email).and_return(mail_message)
 
@@ -218,7 +218,7 @@ RSpec.describe FinancialAid, type: :model do
         create(
           :financial_aid,
           enrollment: enrollment,
-          status: 'rejected',
+          status: "rejected",
           amount_cents: 0,
           source: nil,
           payments_deadline: 30.days.from_now
@@ -226,13 +226,13 @@ RSpec.describe FinancialAid, type: :model do
       }.not_to change { enrollment.reload.application_status }
     end
 
-    it 'does not send status emails for pending requests' do
+    it "does not send status emails for pending requests" do
       expect(FinaidMailer).not_to receive(:fin_aid_awarded_email)
       expect(FinaidMailer).not_to receive(:fin_aid_rejected_email)
 
-      create(:financial_aid, enrollment: enrollment, status: 'pending')
+      create(:financial_aid, enrollment: enrollment, status: "pending")
     end
   end
 
-  it_behaves_like 'a model with timestamps'
+  it_behaves_like "a model with timestamps"
 end

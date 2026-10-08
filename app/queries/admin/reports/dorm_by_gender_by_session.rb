@@ -7,10 +7,10 @@
 class Admin::Reports::DormByGenderBySession < Admin::Reports::Base
   include Admin::Reports::CountryColumn
 
-  self.label = 'Enrolled with Dormitories'
-  self.description = 'Enrolled students for the camp year who chose the dormitory / residential stay activity of ' \
-                     'an accepted session, with gender and room mate request.'
-  self.csv_title = 'dorm_by_gender_by_session'
+  self.label = "Enrolled with Dormitories"
+  self.description = "Enrolled students for the camp year who chose the dormitory / residential stay activity of " \
+                     "an accepted session, with gender and room mate request."
+  self.csv_title = "dorm_by_gender_by_session"
   self.sql = <<~SQL
     SELECT ad.country, a.description AS 'Event Activity', co.description AS Session, ad.lastname,
       ad.firstname, u.email,

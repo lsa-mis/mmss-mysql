@@ -7,20 +7,20 @@ class Admin::FacultiesController < Admin::BaseController
   before_action :set_faculty, only: %i[show destroy]
 
   SORTS = {
-    email: 'faculties.email',
-    current_sign_in_at: 'faculties.current_sign_in_at',
-    sign_in_count: 'faculties.sign_in_count',
-    created_at: 'faculties.created_at'
+    email: "faculties.email",
+    current_sign_in_at: "faculties.current_sign_in_at",
+    sign_in_count: "faculties.sign_in_count",
+    created_at: "faculties.created_at"
   }.freeze
 
-  BATCH_ACTIONS = { destroy: 'Delete selected' }.freeze
+  BATCH_ACTIONS = {destroy: "Delete selected"}.freeze
 
   def index
     relation = apply_sort(Faculty.all, allowed: SORTS, default: :email)
 
     respond_to do |format|
       format.html { @pagy, @faculties = paginate(relation) }
-      format.csv { send_csv(csv_export, relation, filename: 'faculties') }
+      format.csv { send_csv(csv_export, relation, filename: "faculties") }
     end
   end
 
@@ -30,7 +30,7 @@ class Admin::FacultiesController < Admin::BaseController
 
   def destroy
     @faculty.destroy
-    redirect_to admin_faculties_path, notice: 'Faculty was successfully deleted.', status: :see_other
+    redirect_to admin_faculties_path, notice: "Faculty was successfully deleted.", status: :see_other
   end
 
   def batch

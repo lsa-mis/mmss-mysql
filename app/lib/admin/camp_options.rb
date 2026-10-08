@@ -8,7 +8,7 @@
 class Admin::CampOptions
   def self.courses(include: nil)
     courses = Course.where(camp_occurrence_id: CampOccurrence.active)
-                    .includes(:camp_occurrence).order(:camp_occurrence_id, :title).to_a
+      .includes(:camp_occurrence).order(:camp_occurrence_id, :title).to_a
     with_included(courses, include).map { |course| [course.display_name, course.id] }
   end
 
@@ -19,7 +19,7 @@ class Admin::CampOptions
 
   def self.activities(include: nil)
     activities = Activity.where(camp_occurrence_id: CampOccurrence.active)
-                         .includes(:camp_occurrence).order(:camp_occurrence_id, :description).to_a
+      .includes(:camp_occurrence).order(:camp_occurrence_id, :description).to_a
     with_included(activities, include).map { |activity| [activity.display_name, activity.id] }
   end
 

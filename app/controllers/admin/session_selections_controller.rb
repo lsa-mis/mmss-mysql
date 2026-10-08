@@ -6,19 +6,19 @@ class Admin::SessionSelectionsController < Admin::BaseController
   before_action :set_session_selection, only: %i[show edit update destroy]
 
   SORTS = {
-    enrollment: 'applicant_details.lastname',
-    session: 'camp_occurrences.description',
-    created_at: 'session_activities.created_at',
-    updated_at: 'session_activities.updated_at'
+    enrollment: "applicant_details.lastname",
+    session: "camp_occurrences.description",
+    created_at: "session_activities.created_at",
+    updated_at: "session_activities.updated_at"
   }.freeze
 
-  BATCH_ACTIONS = { destroy: 'Delete selected' }.freeze
+  BATCH_ACTIONS = {destroy: "Delete selected"}.freeze
 
   CSV_EXPORT = Admin::CsvExport.define do
     column :id
-    column('Name') { |selection| selection.enrollment.applicant_detail&.full_name }
-    column('email') { |selection| selection.enrollment.user.email }
-    column('Session') { |selection| selection.camp_occurrence.display_name }
+    column("Name") { |selection| selection.enrollment.applicant_detail&.full_name }
+    column("email") { |selection| selection.enrollment.user.email }
+    column("Session") { |selection| selection.camp_occurrence.display_name }
     column :created_at
     column :updated_at
   end
@@ -30,11 +30,12 @@ class Admin::SessionSelectionsController < Admin::BaseController
 
     respond_to do |format|
       format.html { @pagy, @session_selections = paginate(relation) }
-      format.csv { send_csv(CSV_EXPORT, relation, filename: 'session-selections') }
+      format.csv { send_csv(CSV_EXPORT, relation, filename: "session-selections") }
     end
   end
 
-  def show; end
+  def show
+  end
 
   def new
     @session_selection = SessionActivity.new
@@ -44,19 +45,20 @@ class Admin::SessionSelectionsController < Admin::BaseController
     @session_selection = SessionActivity.new(session_selection_params)
 
     if @session_selection.save
-      redirect_to admin_session_selection_path(@session_selection), notice: 'Session selection was successfully created.',
-                                                                   status: :see_other
+      redirect_to admin_session_selection_path(@session_selection), notice: "Session selection was successfully created.",
+        status: :see_other
     else
       render :new, status: :unprocessable_content
     end
   end
 
-  def edit; end
+  def edit
+  end
 
   def update
     if @session_selection.update(session_selection_params)
-      redirect_to admin_session_selection_path(@session_selection), notice: 'Session selection was successfully updated.',
-                                                                   status: :see_other
+      redirect_to admin_session_selection_path(@session_selection), notice: "Session selection was successfully updated.",
+        status: :see_other
     else
       render :edit, status: :unprocessable_content
     end
@@ -64,7 +66,7 @@ class Admin::SessionSelectionsController < Admin::BaseController
 
   def destroy
     @session_selection.destroy
-    redirect_to admin_session_selections_path, notice: 'Session selection was successfully deleted.', status: :see_other
+    redirect_to admin_session_selections_path, notice: "Session selection was successfully deleted.", status: :see_other
   end
 
   def batch
@@ -79,7 +81,7 @@ class Admin::SessionSelectionsController < Admin::BaseController
 
   def base_relation
     SessionActivity.left_joins(:camp_occurrence).left_joins(enrollment: :applicant_detail)
-                   .preload(:camp_occurrence, enrollment: %i[user applicant_detail])
+      .preload(:camp_occurrence, enrollment: %i[user applicant_detail])
   end
 
   def session_selection_params

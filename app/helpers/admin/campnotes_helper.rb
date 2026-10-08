@@ -20,6 +20,6 @@ module Admin::CampnotesHelper
   def admin_campnote_type_badge(notetype)
     return admin_empty_value if notetype.blank?
 
-    tag.span(notetype.to_s, class: notetype.to_s == 'alert' ? 'admin-badge-yellow' : 'admin-badge-blue')
+    tag.span(notetype.to_s, class: (notetype.to_s == "alert") ? "admin-badge-yellow" : "admin-badge-blue")
   end
 end

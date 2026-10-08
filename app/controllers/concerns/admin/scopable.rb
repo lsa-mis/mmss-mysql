@@ -17,8 +17,8 @@ module Admin::Scopable
 
   def apply_scope(relation, scopes)
     @current_scope = scopes.find { |scope| scope.param == params[:scope].to_s } ||
-                     scopes.find(&:default?) ||
-                     scopes.first
+      scopes.find(&:default?) ||
+      scopes.first
     @current_scope ? @current_scope.apply(relation) : relation
   end
 

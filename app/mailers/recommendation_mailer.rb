@@ -7,7 +7,7 @@ class RecommendationMailer < ApplicationMailer
   # expired or already-used token never goes out in an email.
   def request_email
     @recommendation = params[:recommendation]
-    raise ArgumentError, 'recommendation has no active upload token' unless @recommendation.upload_link_active?
+    raise ArgumentError, "recommendation has no active upload token" unless @recommendation.upload_link_active?
 
     @enrollment = Enrollment.find(@recommendation.enrollment_id)
     @student = ApplicantDetail.find_by(user_id: @enrollment.user_id)
@@ -15,9 +15,9 @@ class RecommendationMailer < ApplicationMailer
     @url = new_recupload_url(token: @recommendation.upload_token)
 
     # Disable Sendgrid click tracking for this email
-    headers['X-SMTPAPI'] = '{"filters":{"clicktrack":{"settings":{"enable":0}}}}'
+    headers["X-SMTPAPI"] = '{"filters":{"clicktrack":{"settings":{"enable":0}}}}'
 
     mail(to: @recommendation.email,
-         subject: "University of Michigan - Michigan Math and Science Scholars: Recommendation Request for #{@student.firstname} #{@student.lastname}")
+      subject: "University of Michigan - Michigan Math and Science Scholars: Recommendation Request for #{@student.firstname} #{@student.lastname}")
   end
 end

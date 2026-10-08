@@ -28,25 +28,25 @@
 # new admin writes NAMESPACE and reads every namespace, so nothing is hidden. The column stays
 # (and stays NOT blank) only so old rows keep their provenance; nothing filters on it.
 class Admin::Comment < ApplicationRecord
-  self.table_name = 'admin_comments'
+  self.table_name = "admin_comments"
 
-  NAMESPACE = 'admin'
+  NAMESPACE = "admin"
 
   # Models that accept admin comments (they must `include AdminCommentable`). Add an entry when
   # a resource's show page renders the comments partial. Lambdas keep
   # autoloading lazy, and looking classes up here means user input is never constantized.
   COMMENTABLE_MODELS = {
-    'Enrollment' => -> { Enrollment },
-    'CampOccurrence' => -> { CampOccurrence },
-    'Activity' => -> { Activity },
-    'Course' => -> { Course },
-    'CourseAssignment' => -> { CourseAssignment },
-    'SessionActivity' => -> { SessionActivity },
-    'SessionAssignment' => -> { SessionAssignment },
-    'Recommendation' => -> { Recommendation },
-    'Recupload' => -> { Recupload },
-    'ApplicantDetail' => -> { ApplicantDetail },
-    'FinancialAid' => -> { FinancialAid }
+    "Enrollment" => -> { Enrollment },
+    "CampOccurrence" => -> { CampOccurrence },
+    "Activity" => -> { Activity },
+    "Course" => -> { Course },
+    "CourseAssignment" => -> { CourseAssignment },
+    "SessionActivity" => -> { SessionActivity },
+    "SessionAssignment" => -> { SessionAssignment },
+    "Recommendation" => -> { Recommendation },
+    "Recupload" => -> { Recupload },
+    "ApplicantDetail" => -> { ApplicantDetail },
+    "FinancialAid" => -> { FinancialAid }
   }.freeze
 
   def self.commentable_class(type)

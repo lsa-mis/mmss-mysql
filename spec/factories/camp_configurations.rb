@@ -40,9 +40,9 @@ FactoryBot.define do
     application_fee_cents { 10_000 }
     application_fee_required { true }
     active { false }
-    offer_letter { 'Default offer letter content' }
-    reject_letter { 'Default rejection letter content' }
-    waitlist_letter { 'Default waitlist letter content' }
+    offer_letter { "Default offer letter content" }
+    reject_letter { "Default rejection letter content" }
+    waitlist_letter { "Default waitlist letter content" }
 
     trait :active do
       active { true }

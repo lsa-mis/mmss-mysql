@@ -30,27 +30,29 @@ class Course < ApplicationRecord
   has_many :course_assignments, dependent: :destroy
   has_many :enrolled_users, through: :course_preferences, source: :enrollment
 
-  validates :faculty_uniqname, format: { with: /\A[\w.-]+\z/,
-    message: "usernames or uniqnames only - do not include domain" }
+  validates :faculty_uniqname, format: {with: /\A[\w.-]+\z/,
+                                        message: "usernames or uniqnames only - do not include domain"}
   validates :title, presence: true
-  validates :available_spaces, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+  validates :available_spaces, presence: true, numericality: {only_integer: true, greater_than_or_equal_to: 0}
 
+  # standard:disable Rails/DuplicateScope -- both names are used by callers; kept as aliases
   scope :is_open, -> { where(status: "open") }
   scope :open, -> { where(status: "open") }
+  # standard:enable Rails/DuplicateScope
   scope :current_camp, -> { where(camp_occurrence_id: CampOccurrence.active) }
 
   # Adds confirmed/wait-list assignment counts as select columns so list pages and CSV exports
   # get remaining_spaces / wait_list_count without two queries per row.
   scope :with_seat_counts, lambda {
     select(
-      'courses.*',
-      '(SELECT COUNT(*) FROM course_assignments ca WHERE ca.course_id = courses.id AND ca.wait_list = FALSE) AS confirmed_assignments_count',
-      '(SELECT COUNT(*) FROM course_assignments ca WHERE ca.course_id = courses.id AND ca.wait_list = TRUE) AS wait_list_count'
+      "courses.*",
+      "(SELECT COUNT(*) FROM course_assignments ca WHERE ca.course_id = courses.id AND ca.wait_list = FALSE) AS confirmed_assignments_count",
+      "(SELECT COUNT(*) FROM course_assignments ca WHERE ca.course_id = courses.id AND ca.wait_list = TRUE) AS wait_list_count"
     )
   }
 
   def display_name
-    "#{self.title} - #{self.camp_occurrence.description}" # or whatever column you want
+    "#{title} - #{camp_occurrence.description}" # or whatever column you want
   end
 
   def remaining_spaces

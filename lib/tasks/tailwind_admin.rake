@@ -8,27 +8,27 @@ namespace :tailwindcss do
   admin_command = lambda do |debug: false, watch: false|
     command = [
       Tailwindcss::Ruby.executable,
-      '-i', Rails.root.join('app/assets/tailwind/admin.css').to_s,
-      '-o', Rails.root.join('app/assets/builds/admin.css').to_s
+      "-i", Rails.root.join("app/assets/tailwind/admin.css").to_s,
+      "-o", Rails.root.join("app/assets/builds/admin.css").to_s
     ]
-    command << '--minify' unless debug
-    command << '-w' if watch
+    command << "--minify" unless debug
+    command << "-w" if watch
     command
   end
 
   namespace :build do
-    desc 'Build the admin Tailwind CSS (app/assets/builds/admin.css)'
+    desc "Build the admin Tailwind CSS (app/assets/builds/admin.css)"
     task admin: :environment do |_, args|
-      system(*admin_command.call(debug: args.extras.include?('debug')), exception: true)
+      system(*admin_command.call(debug: args.extras.include?("debug")), exception: true)
     end
   end
 
   namespace :watch do
-    desc 'Watch and build the admin Tailwind CSS on file changes'
+    desc "Watch and build the admin Tailwind CSS on file changes"
     task admin: :environment do |_, args|
-      system(*admin_command.call(debug: args.extras.include?('debug'), watch: true))
+      system(*admin_command.call(debug: args.extras.include?("debug"), watch: true))
     end
   end
 end
 
-Rake::Task['tailwindcss:build'].enhance(['tailwindcss:build:admin'])
+Rake::Task["tailwindcss:build"].enhance(["tailwindcss:build:admin"])

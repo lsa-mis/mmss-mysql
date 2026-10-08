@@ -4,30 +4,30 @@ class Admin::CoursesController < Admin::BaseController
   before_action :set_course, only: %i[show edit update destroy]
 
   SCOPES = [
-    Admin::Scope.new(:current_camp, label: 'Current Camp Courses', default: true),
-    Admin::Scope.new(:all, label: 'All')
+    Admin::Scope.new(:current_camp, label: "Current Camp Courses", default: true),
+    Admin::Scope.new(:all, label: "All")
   ].freeze
 
   SORTS = {
-    session: 'camp_occurrences.description',
-    title: 'courses.title',
-    available_spaces: 'courses.available_spaces',
-    faculty_uniqname: 'courses.faculty_uniqname',
-    faculty_name: 'courses.faculty_name',
-    status: 'courses.status',
-    created_at: 'courses.created_at',
-    updated_at: 'courses.updated_at'
+    session: "camp_occurrences.description",
+    title: "courses.title",
+    available_spaces: "courses.available_spaces",
+    faculty_uniqname: "courses.faculty_uniqname",
+    faculty_name: "courses.faculty_name",
+    status: "courses.status",
+    created_at: "courses.created_at",
+    updated_at: "courses.updated_at"
   }.freeze
 
-  BATCH_ACTIONS = { destroy: 'Delete selected', toggle_status: 'Toggle open/closed' }.freeze
+  BATCH_ACTIONS = {destroy: "Delete selected", toggle_status: "Toggle open/closed"}.freeze
 
   CSV_EXPORT = Admin::CsvExport.define do
     column :id
-    column('Session') { |course| course.camp_occurrence.description }
+    column("Session") { |course| course.camp_occurrence.description }
     column :title
     column :available_spaces
-    column('Open spaces', &:remaining_spaces)
-    column('Wait list', &:wait_list_count)
+    column("Open spaces", &:remaining_spaces)
+    column("Wait list", &:wait_list_count)
     column :status
     column :faculty_uniqname
     column :faculty_name
@@ -44,35 +44,36 @@ class Admin::CoursesController < Admin::BaseController
 
     respond_to do |format|
       format.html { @pagy, @courses = paginate(relation) }
-      format.csv { send_csv(CSV_EXPORT, relation, filename: 'courses') }
+      format.csv { send_csv(CSV_EXPORT, relation, filename: "courses") }
     end
   end
 
   def show
     @course_assignments = @course.course_assignments
-                                 .includes(enrollment: %i[user applicant_detail])
-                                 .order(:wait_list, :id)
+      .includes(enrollment: %i[user applicant_detail])
+      .order(:wait_list, :id)
   end
 
   def new
-    @course = Course.new(status: 'open')
+    @course = Course.new(status: "open")
   end
 
   def create
     @course = Course.new(course_params)
 
     if @course.save
-      redirect_to admin_course_path(@course), notice: 'Course was successfully created.', status: :see_other
+      redirect_to admin_course_path(@course), notice: "Course was successfully created.", status: :see_other
     else
       render :new, status: :unprocessable_content
     end
   end
 
-  def edit; end
+  def edit
+  end
 
   def update
     if @course.update(course_params)
-      redirect_to admin_course_path(@course), notice: 'Course was successfully updated.', status: :see_other
+      redirect_to admin_course_path(@course), notice: "Course was successfully updated.", status: :see_other
     else
       render :edit, status: :unprocessable_content
     end
@@ -80,7 +81,7 @@ class Admin::CoursesController < Admin::BaseController
 
   def destroy
     @course.destroy
-    redirect_to admin_courses_path, notice: 'Course was successfully deleted.', status: :see_other
+    redirect_to admin_courses_path, notice: "Course was successfully deleted.", status: :see_other
   end
 
   def batch
@@ -90,8 +91,8 @@ class Admin::CoursesController < Admin::BaseController
   private
 
   def batch_toggle_status(records)
-    toggled = records.to_a.count { |course| course.update(status: course.status == 'open' ? 'closed' : 'open') }
-    "Toggled status for #{toggled} #{'course'.pluralize(toggled)}."
+    toggled = records.to_a.count { |course| course.update(status: (course.status == "open") ? "closed" : "open") }
+    "Toggled status for #{toggled} #{"course".pluralize(toggled)}."
   end
 
   def set_course

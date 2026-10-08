@@ -6,6 +6,6 @@ module AdminCommentable
   extend ActiveSupport::Concern
 
   included do
-    has_many :admin_comments, class_name: 'Admin::Comment', as: :resource, dependent: :destroy
+    has_many :admin_comments, class_name: "Admin::Comment", as: :resource, dependent: :destroy
   end
 end

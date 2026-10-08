@@ -17,8 +17,8 @@ FactoryBot.define do
   factory :nelnet_callback_log do
     sequence(:transaction_id) { |n| "NLN#{100_000 + n}" }
     sequence(:order_number) { |n| "user#{n}-#{n}" }
-    transaction_status { '1' }
-    transaction_total_amount { '25000' }
-    raw_params { { 'transactionId' => transaction_id, 'orderNumber' => order_number, 'transactionStatus' => transaction_status }.to_json }
+    transaction_status { "1" }
+    transaction_total_amount { "25000" }
+    raw_params { {"transactionId" => transaction_id, "orderNumber" => order_number, "transactionStatus" => transaction_status}.to_json }
   end
 end

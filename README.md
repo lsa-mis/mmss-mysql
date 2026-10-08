@@ -203,8 +203,13 @@ directly. Staging also still reads the legacy `STAGING_ALLOWED_HOSTS` variable.
   production log forensics: [LOG_INVESTIGATION_GUIDE.md](LOG_INVESTIGATION_GUIDE.md).
 - **Code style (Standard Ruby)**
   ```bash
-  bundle exec standardrb          # not enforced in CI yet; see TESTING_STRATEGY.md
+  bin/lint                        # = bundle exec standardrb; CI `lint` job fails on any offense
+  bin/lint --fix                  # apply safe autocorrections before committing
   ```
+  Configuration lives in `.standard.yml` (`standard` + `standard-rails`; `db/schema.rb`,
+  legacy migrations under `db/migrate`, `bin`, `vendor` and `tmp` are ignored). Prefer a
+  targeted `# standard:disable Cop/Name -- reason` over a behaviour change when a cop
+  cannot be satisfied by formatting alone.
 
 ---
 

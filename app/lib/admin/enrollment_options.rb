@@ -22,15 +22,15 @@ class Admin::EnrollmentOptions
   def self.label(enrollment)
     name = enrollment.applicant_detail&.full_name
     email = enrollment.user&.email
-    [name, email].compact_blank.join(' - ').presence || "Application ##{enrollment.id}"
+    [name, email].compact_blank.join(" - ").presence || "Application ##{enrollment.id}"
   end
 
   def self.build(include:)
     enrollments = Enrollment.current_camp_year_applications.preload(:user, :applicant_detail).to_a
     enrollments << include if include && enrollments.none? { |enrollment| enrollment.id == include.id }
     enrollments.map { |enrollment| [label(enrollment), yield(enrollment)] }
-               .uniq(&:last)
-               .sort_by { |label, _id| label.downcase }
+      .uniq(&:last)
+      .sort_by { |label, _id| label.downcase }
   end
   private_class_method :build
 end

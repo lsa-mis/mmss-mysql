@@ -2,9 +2,9 @@ class DeviseMailerPreview < ActionMailer::Preview
   def password_change
     # Create a test user
     user = User.first || User.create!(
-      email: 'test@example.com',
-      password: 'password123',
-      password_confirmation: 'password123'
+      email: "test@example.com",
+      password: "password123",
+      password_confirmation: "password123"
     )
 
     # Call the Devise mailer with the test user
@@ -14,9 +14,9 @@ class DeviseMailerPreview < ActionMailer::Preview
   def reset_password_instructions
     # Create a test user
     user = User.first || User.create!(
-      email: 'test@example.com',
-      password: 'password123',
-      password_confirmation: 'password123'
+      email: "test@example.com",
+      password: "password123",
+      password_confirmation: "password123"
     )
 
     # Generate a reset password token

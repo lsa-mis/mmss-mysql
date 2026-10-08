@@ -39,7 +39,7 @@ class Recupload < ApplicationRecord
   # validates :letter, length: { minimum: 50 }
   # One letter per recommendation (backed by a unique index; RecuploadsController serialises the
   # public submission under a row lock so the emailed link really is single-use).
-  validates :recommendation_id, uniqueness: { message: 'already has a letter' }
+  validates :recommendation_id, uniqueness: {message: "already has a letter"}
   validates :authorname, presence: true
   validates :studentname, presence: true
 
@@ -51,21 +51,21 @@ class Recupload < ApplicationRecord
 
   def validate_recletter
     if recletter.attached?
-      errors.add(:recletter, 'is too big - file size cannot exceed 20Mbyte') if recletter.blob.byte_size > 20.megabytes
+      errors.add(:recletter, "is too big - file size cannot exceed 20Mbyte") if recletter.blob.byte_size > 20.megabytes
 
-      acceptable_types = ['image/png', 'image/jpeg', 'application/pdf']
+      acceptable_types = ["image/png", "image/jpeg", "application/pdf"]
       unless acceptable_types.include?(recletter.content_type)
-        errors.add(:recletter, 'must be file type PDF, JPEG or PNG')
+        errors.add(:recletter, "must be file type PDF, JPEG or PNG")
       end
     elsif letter.blank?
-      errors.add(:recletter, 'must be attached or letter text must be provided')
+      errors.add(:recletter, "must be attached or letter text must be provided")
     end
   end
 
   def update_enrollment_status
     enrollment = Recommendation.find(recommendation_id).enrollment
     if !enrollment.application_fee_required || Payment.where(user_id: enrollment.user_id).status1_current_camp_payments.exists?
-      enrollment.transition_application_status!('application complete')
+      enrollment.transition_application_status!("application complete")
     end
   end
 

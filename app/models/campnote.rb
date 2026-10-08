@@ -22,7 +22,7 @@ class Campnote < ApplicationRecord
   # previous Ruby `present?` checks).
   scope :currently_open, lambda {
     now = Time.current
-    where.not(opendate: nil).where.not(closedate: nil).where('opendate <= ? AND closedate >= ?', now, now)
+    where.not(opendate: nil).where.not(closedate: nil).where("opendate <= ? AND closedate >= ?", now, now)
   }
 
   private

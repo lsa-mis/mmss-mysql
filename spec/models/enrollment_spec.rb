@@ -40,12 +40,12 @@
 #
 #  fk_rails_...  (user_id => users.id)
 #
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe Enrollment, type: :model do
   before { setup_basic_test_data }
 
-  describe 'associations' do
+  describe "associations" do
     it { is_expected.to belong_to(:user) }
     it { is_expected.to have_one(:applicant_detail).through(:user) }
     it { is_expected.to have_many(:enrollment_activities).dependent(:destroy) }
@@ -59,7 +59,7 @@ RSpec.describe Enrollment, type: :model do
     it { is_expected.to have_one(:rejection).dependent(:destroy) }
   end
 
-  describe 'validations' do
+  describe "validations" do
     subject { build(:enrollment) }
 
     it { is_expected.to validate_presence_of(:high_school_name) }
@@ -72,172 +72,172 @@ RSpec.describe Enrollment, type: :model do
     it { is_expected.to validate_length_of(:personal_statement).is_at_least(100) }
     it { is_expected.to validate_presence_of(:high_school_postalcode) }
 
-    describe 'high_school_postalcode validation' do
+    describe "high_school_postalcode validation" do
       let(:enrollment) { build(:enrollment) }
 
-      it 'is valid with a postal code between 1 and 25 characters' do
-        enrollment.high_school_postalcode = '12345'
+      it "is valid with a postal code between 1 and 25 characters" do
+        enrollment.high_school_postalcode = "12345"
         expect(enrollment).to be_valid
       end
 
-      it 'is valid with alphanumeric characters, spaces, and dashes' do
-        enrollment.high_school_postalcode = 'SW1A 1AA'
+      it "is valid with alphanumeric characters, spaces, and dashes" do
+        enrollment.high_school_postalcode = "SW1A 1AA"
         expect(enrollment).to be_valid
       end
 
-      it 'is valid with a dash in postal code' do
-        enrollment.high_school_postalcode = '12345-6789'
+      it "is valid with a dash in postal code" do
+        enrollment.high_school_postalcode = "12345-6789"
         expect(enrollment).to be_valid
       end
 
-      it 'is valid with a single character' do
-        enrollment.high_school_postalcode = 'A'
+      it "is valid with a single character" do
+        enrollment.high_school_postalcode = "A"
         expect(enrollment).to be_valid
       end
 
-      it 'is valid with exactly 25 characters' do
-        enrollment.high_school_postalcode = 'A' * 25
+      it "is valid with exactly 25 characters" do
+        enrollment.high_school_postalcode = "A" * 25
         expect(enrollment).to be_valid
       end
 
-      it 'is invalid when blank' do
+      it "is invalid when blank" do
         enrollment.high_school_postalcode = nil
         expect(enrollment).not_to be_valid
         expect(enrollment.errors[:high_school_postalcode]).to include("can't be blank")
       end
 
-      it 'is invalid when empty string' do
-        enrollment.high_school_postalcode = ''
+      it "is invalid when empty string" do
+        enrollment.high_school_postalcode = ""
         expect(enrollment).not_to be_valid
         expect(enrollment.errors[:high_school_postalcode]).to include("can't be blank")
       end
 
-      it 'is invalid with more than 25 characters' do
-        enrollment.high_school_postalcode = 'A' * 26
+      it "is invalid with more than 25 characters" do
+        enrollment.high_school_postalcode = "A" * 26
         expect(enrollment).not_to be_valid
-        expect(enrollment.errors[:high_school_postalcode]).to include('must be between 1 and 25 characters')
+        expect(enrollment.errors[:high_school_postalcode]).to include("must be between 1 and 25 characters")
       end
 
-      it 'is invalid with special characters other than spaces and dashes' do
-        enrollment.high_school_postalcode = '12345@678'
+      it "is invalid with special characters other than spaces and dashes" do
+        enrollment.high_school_postalcode = "12345@678"
         expect(enrollment).not_to be_valid
-        expect(enrollment.errors[:high_school_postalcode]).to include('can only contain letters, numbers, spaces, and dashes')
+        expect(enrollment.errors[:high_school_postalcode]).to include("can only contain letters, numbers, spaces, and dashes")
       end
 
-      it 'is invalid with invalid characters like underscores' do
-        enrollment.high_school_postalcode = '12345_678'
+      it "is invalid with invalid characters like underscores" do
+        enrollment.high_school_postalcode = "12345_678"
         expect(enrollment).not_to be_valid
-        expect(enrollment.errors[:high_school_postalcode]).to include('can only contain letters, numbers, spaces, and dashes')
+        expect(enrollment.errors[:high_school_postalcode]).to include("can only contain letters, numbers, spaces, and dashes")
       end
     end
   end
 
-  describe 'attachments' do
+  describe "attachments" do
     it { is_expected.to have_one_attached(:transcript) }
     it { is_expected.to have_one_attached(:student_packet) }
     it { is_expected.to have_one_attached(:vaccine_record) }
     it { is_expected.to have_one_attached(:covid_test_record) }
   end
 
-  describe 'factory' do
-    it 'has a valid factory' do
+  describe "factory" do
+    it "has a valid factory" do
       enrollment = build(:enrollment)
       expect(enrollment).to be_valid
     end
 
-    it 'creates international enrollment with trait' do
+    it "creates international enrollment with trait" do
       enrollment = create(:enrollment, :international)
       expect(enrollment.international).to be true
-      expect(enrollment.high_school_country).not_to eq('US')
+      expect(enrollment.high_school_country).not_to eq("US")
     end
 
-    it 'creates enrollment with different statuses' do
-      expect(create(:enrollment, :offered).offer_status).to eq('offered')
-      expect(create(:enrollment, :accepted).offer_status).to eq('accepted')
-      expect(create(:enrollment, :enrolled).application_status).to eq('enrolled')
+    it "creates enrollment with different statuses" do
+      expect(create(:enrollment, :offered).offer_status).to eq("offered")
+      expect(create(:enrollment, :accepted).offer_status).to eq("accepted")
+      expect(create(:enrollment, :enrolled).application_status).to eq("enrolled")
     end
   end
 
-  describe '#display_name' do
+  describe "#display_name" do
     let(:user) { create(:user) }
-    let!(:applicant_detail) { create(:applicant_detail, user: user, firstname: 'John', lastname: 'Doe') }
+    let!(:applicant_detail) { create(:applicant_detail, user: user, firstname: "John", lastname: "Doe") }
     let(:enrollment) { create(:enrollment, user: user) }
 
-    it 'returns full name and email' do
+    it "returns full name and email" do
       expect(enrollment.display_name).to eq("Doe, John - #{user.email}")
     end
   end
 
-  describe 'status transitions' do
-    describe '#can_transition_application_status?' do
-      context 'when current status is nil' do
+  describe "status transitions" do
+    describe "#can_transition_application_status?" do
+      context "when current status is nil" do
         let(:enrollment) { create(:enrollment, application_status: nil) }
 
-        it 'allows transition to any status' do
-          expect(enrollment.can_transition_application_status?('enrolled')).to be true
-          expect(enrollment.can_transition_application_status?('submitted')).to be true
+        it "allows transition to any status" do
+          expect(enrollment.can_transition_application_status?("enrolled")).to be true
+          expect(enrollment.can_transition_application_status?("submitted")).to be true
         end
       end
 
-      context 'when current status is enrolled' do
+      context "when current status is enrolled" do
         let(:enrollment) { create(:enrollment, :enrolled) }
 
-        it 'allows transition to withdrawn' do
-          expect(enrollment.can_transition_application_status?('withdrawn')).to be true
+        it "allows transition to withdrawn" do
+          expect(enrollment.can_transition_application_status?("withdrawn")).to be true
         end
 
-        it 'disallows transition to submitted' do
-          expect(enrollment.can_transition_application_status?('submitted')).to be false
+        it "disallows transition to submitted" do
+          expect(enrollment.can_transition_application_status?("submitted")).to be false
         end
       end
     end
 
-    describe '#transition_application_status!' do
+    describe "#transition_application_status!" do
       let(:enrollment) { create(:enrollment, :enrolled) }
 
-      it 'transitions to withdrawn when allowed' do
-        enrollment.transition_application_status!('withdrawn')
+      it "transitions to withdrawn when allowed" do
+        enrollment.transition_application_status!("withdrawn")
         enrollment.reload
 
-        expect(enrollment.application_status).to eq('withdrawn')
+        expect(enrollment.application_status).to eq("withdrawn")
         expect(enrollment.application_status_updated_on).to eq(Date.current)
       end
 
-      it 'does not transition when not allowed and leaves status unchanged' do
+      it "does not transition when not allowed and leaves status unchanged" do
         expect {
-          enrollment.transition_application_status!('submitted')
+          enrollment.transition_application_status!("submitted")
         }.to raise_error(ActiveRecord::RecordInvalid, /cannot transition/)
 
-        expect(enrollment.reload.application_status).to eq('enrolled')
+        expect(enrollment.reload.application_status).to eq("enrolled")
       end
     end
 
-    describe '#auto_enroll_if_ready!' do
-      let(:enrollment) { create(:enrollment, application_status: 'submitted', camp_doc_form_completed: false) }
+    describe "#auto_enroll_if_ready!" do
+      let(:enrollment) { create(:enrollment, application_status: "submitted", camp_doc_form_completed: false) }
 
-      it 'promotes to enrolled when documents complete and balance is zero' do
+      it "promotes to enrolled when documents complete and balance is zero" do
         enrollment.camp_doc_form_completed = true
         allow(PaymentState).to receive(:new).with(enrollment).and_return(instance_double(PaymentState, balance_due: 0))
 
         enrollment.auto_enroll_if_ready!
         enrollment.reload
 
-        expect(enrollment.application_status).to eq('enrolled')
+        expect(enrollment.application_status).to eq("enrolled")
         expect(enrollment.application_status_updated_on).to eq(Date.current)
       end
 
-      it 'does not change status when a balance remains' do
+      it "does not change status when a balance remains" do
         enrollment.camp_doc_form_completed = true
         allow(PaymentState).to receive(:new).with(enrollment).and_return(instance_double(PaymentState, balance_due: 100))
 
         enrollment.auto_enroll_if_ready!
 
-        expect(enrollment.application_status).to eq('submitted')
+        expect(enrollment.application_status).to eq("submitted")
       end
     end
   end
 
-  describe 'scopes' do
+  describe "scopes" do
     let(:camp_config) { create(:camp_configuration, :active, camp_year: Date.current.year) }
 
     before do
@@ -246,49 +246,49 @@ RSpec.describe Enrollment, type: :model do
       allow(CampConfiguration).to receive(:active_camp_year).and_return(camp_config.camp_year)
     end
 
-    describe '.current_camp_year_applications' do
+    describe ".current_camp_year_applications" do
       let!(:current_enrollment) { create(:enrollment, campyear: camp_config.camp_year) }
       let!(:old_enrollment) { create(:enrollment, campyear: camp_config.camp_year - 1) }
 
-      it 'returns enrollments for current camp year' do
+      it "returns enrollments for current camp year" do
         expect(Enrollment.current_camp_year_applications).to include(current_enrollment)
         expect(Enrollment.current_camp_year_applications).not_to include(old_enrollment)
       end
     end
 
-    describe '.offered' do
+    describe ".offered" do
       let!(:offered_enrollment) { create(:enrollment, :offered, campyear: camp_config.camp_year) }
       let!(:regular_enrollment) { create(:enrollment, campyear: camp_config.camp_year) }
 
-      it 'returns offered enrollments' do
+      it "returns offered enrollments" do
         expect(Enrollment.offered).to include(offered_enrollment)
         expect(Enrollment.offered).not_to include(regular_enrollment)
       end
     end
 
-    describe '.enrolled' do
+    describe ".enrolled" do
       let!(:enrolled_enrollment) { create(:enrollment, :enrolled, campyear: camp_config.camp_year) }
       let!(:offered_enrollment) { create(:enrollment, :offered, campyear: camp_config.camp_year) }
 
-      it 'returns enrolled students' do
+      it "returns enrolled students" do
         expect(Enrollment.enrolled).to include(enrolled_enrollment)
         expect(Enrollment.enrolled).not_to include(offered_enrollment)
       end
     end
 
-    describe '.withdrawn' do
-      let!(:withdrawn_enrollment) { create(:enrollment, application_status: 'withdrawn', campyear: camp_config.camp_year) }
+    describe ".withdrawn" do
+      let!(:withdrawn_enrollment) { create(:enrollment, application_status: "withdrawn", campyear: camp_config.camp_year) }
       let!(:enrolled_enrollment) { create(:enrollment, :enrolled, campyear: camp_config.camp_year) }
 
-      it 'returns withdrawn enrollments' do
+      it "returns withdrawn enrollments" do
         expect(Enrollment.withdrawn).to include(withdrawn_enrollment)
         expect(Enrollment.withdrawn).not_to include(enrolled_enrollment)
       end
     end
   end
 
-  describe 'callbacks' do
-    describe 'setting application_fee_required' do
+  describe "callbacks" do
+    describe "setting application_fee_required" do
       let(:camp_config) { create(:camp_configuration, :active, application_fee_required: false, camp_year: Date.current.year) }
 
       before do
@@ -296,77 +296,77 @@ RSpec.describe Enrollment, type: :model do
         camp_config.update(active: true)
       end
 
-      it 'sets application_fee_required based on active camp configuration' do
+      it "sets application_fee_required based on active camp configuration" do
         enrollment = create(:enrollment)
         expect(enrollment.application_fee_required).to be false
       end
     end
 
-    describe 'email notifications' do
+    describe "email notifications" do
       let(:user) { create(:user) }
       let!(:applicant_detail) { create(:applicant_detail, user: user) }
       let(:enrollment) { create(:enrollment, user: user) }
 
-      it 'sends offer email when offer_status changes to offered' do
+      it "sends offer email when offer_status changes to offered" do
         expect(OfferMailer).to receive(:offer_email).with(user.id).and_return(double(deliver_now: true))
-        enrollment.update(offer_status: 'offered')
+        enrollment.update(offer_status: "offered")
       end
 
-      it 'sends enrolled email when application_status changes to enrolled' do
+      it "sends enrolled email when application_status changes to enrolled" do
         expect(RegistrationMailer).to receive(:app_enrolled_email).with(user).and_return(double(deliver_now: true))
-        enrollment.update(application_status: 'enrolled')
+        enrollment.update(application_status: "enrolled")
       end
 
-      it 'sends rejected email when application_status changes to rejected' do
+      it "sends rejected email when application_status changes to rejected" do
         expect(RejectedMailer).to receive(:app_rejected_email).with(enrollment).and_return(double(deliver_now: true))
-        enrollment.update(application_status: 'rejected')
+        enrollment.update(application_status: "rejected")
       end
 
-      it 'sends waitlisted email when application_status changes to waitlisted' do
+      it "sends waitlisted email when application_status changes to waitlisted" do
         expect(WaitlistedMailer).to receive(:app_waitlisted_email).with(enrollment).and_return(double(deliver_now: true))
-        enrollment.update(application_status: 'waitlisted')
+        enrollment.update(application_status: "waitlisted")
       end
     end
   end
 
-  describe '#update_status_based_on_session_assignments!' do
+  describe "#update_status_based_on_session_assignments!" do
     let(:enrollment) { create(:enrollment) }
     let(:session1) { create(:camp_occurrence) }
     let(:session2) { create(:camp_occurrence) }
 
-    context 'when all assignments are declined' do
+    context "when all assignments are declined" do
       before do
-        create(:session_assignment, enrollment: enrollment, camp_occurrence: session1, offer_status: 'declined')
-        create(:session_assignment, enrollment: enrollment, camp_occurrence: session2, offer_status: 'declined')
+        create(:session_assignment, enrollment: enrollment, camp_occurrence: session1, offer_status: "declined")
+        create(:session_assignment, enrollment: enrollment, camp_occurrence: session2, offer_status: "declined")
       end
 
-      it 'updates enrollment to declined status' do
+      it "updates enrollment to declined status" do
         enrollment.update_status_based_on_session_assignments!
-        expect(enrollment.offer_status).to eq('declined')
-        expect(enrollment.application_status).to eq('offer declined')
+        expect(enrollment.offer_status).to eq("declined")
+        expect(enrollment.application_status).to eq("offer declined")
       end
     end
 
-    context 'when all assignments are accepted' do
+    context "when all assignments are accepted" do
       before do
-        create(:session_assignment, enrollment: enrollment, camp_occurrence: session1, offer_status: 'accepted')
-        create(:session_assignment, enrollment: enrollment, camp_occurrence: session2, offer_status: 'accepted')
+        create(:session_assignment, enrollment: enrollment, camp_occurrence: session1, offer_status: "accepted")
+        create(:session_assignment, enrollment: enrollment, camp_occurrence: session2, offer_status: "accepted")
       end
 
-      it 'updates enrollment to accepted status' do
+      it "updates enrollment to accepted status" do
         enrollment.update_status_based_on_session_assignments!
-        expect(enrollment.offer_status).to eq('accepted')
-        expect(enrollment.application_status).to eq('offer accepted')
+        expect(enrollment.offer_status).to eq("accepted")
+        expect(enrollment.application_status).to eq("offer accepted")
       end
     end
 
-    context 'when assignments have mixed statuses' do
+    context "when assignments have mixed statuses" do
       before do
-        create(:session_assignment, enrollment: enrollment, camp_occurrence: session1, offer_status: 'accepted')
+        create(:session_assignment, enrollment: enrollment, camp_occurrence: session1, offer_status: "accepted")
         create(:session_assignment, enrollment: enrollment, camp_occurrence: session2, offer_status: nil)
       end
 
-      it 'does not update enrollment status' do
+      it "does not update enrollment status" do
         original_status = enrollment.offer_status
         enrollment.update_status_based_on_session_assignments!
         expect(enrollment.offer_status).to eq(original_status)
@@ -374,9 +374,9 @@ RSpec.describe Enrollment, type: :model do
     end
   end
 
-  describe '#course_rankings_complete?' do
+  describe "#course_rankings_complete?" do
     let!(:camp_config) { create(:camp_configuration, :active, camp_year: Date.current.year) }
-    let!(:session) { create(:camp_occurrence, camp_configuration: camp_config, active: true, description: 'Session 1') }
+    let!(:session) { create(:camp_occurrence, camp_configuration: camp_config, active: true, description: "Session 1") }
     let!(:course1) { create(:course, camp_occurrence: session) }
     let!(:course2) { create(:course, camp_occurrence: session) }
     let!(:user) { create(:user) }
@@ -387,14 +387,14 @@ RSpec.describe Enrollment, type: :model do
       camp_config.update!(active: true)
     end
 
-    it 'returns false when any course preference has a nil ranking' do
+    it "returns false when any course preference has a nil ranking" do
       enrollment.course_preferences.destroy_all
       create(:course_preference, enrollment: enrollment, course: course1, ranking: 1)
       create(:course_preference, enrollment: enrollment, course: course2, ranking: nil)
       expect(enrollment.reload.course_rankings_complete?).to be false
     end
 
-    it 'returns false when two preferences in the same session share a rank' do
+    it "returns false when two preferences in the same session share a rank" do
       enrollment.course_preferences.destroy_all
       p1 = create(:course_preference, enrollment: enrollment, course: course1, ranking: 1)
       p2 = create(:course_preference, enrollment: enrollment, course: course2, ranking: 2)
@@ -402,7 +402,7 @@ RSpec.describe Enrollment, type: :model do
       expect(enrollment.reload.course_rankings_complete?).to be false
     end
 
-    it 'returns true when every preference has a valid unique rank per session' do
+    it "returns true when every preference has a valid unique rank per session" do
       enrollment.course_preferences.destroy_all
       create(:course_preference, enrollment: enrollment, course: course1, ranking: 1)
       create(:course_preference, enrollment: enrollment, course: course2, ranking: 2)
@@ -410,9 +410,9 @@ RSpec.describe Enrollment, type: :model do
     end
   end
 
-  describe '#payment_portal_ready?' do
+  describe "#payment_portal_ready?" do
     let!(:camp_config) { create(:camp_configuration, :active, camp_year: Date.current.year) }
-    let!(:session) { create(:camp_occurrence, camp_configuration: camp_config, active: true, description: 'Session 1') }
+    let!(:session) { create(:camp_occurrence, camp_configuration: camp_config, active: true, description: "Session 1") }
     let!(:course1) { create(:course, camp_occurrence: session) }
     let!(:course2) { create(:course, camp_occurrence: session) }
     let!(:user) { create(:user, :with_applicant_detail) }
@@ -426,16 +426,16 @@ RSpec.describe Enrollment, type: :model do
       create(:course_preference, enrollment: enrollment, course: course2, ranking: 2)
     end
 
-    it 'returns false until a recommendation has been requested' do
+    it "returns false until a recommendation has been requested" do
       expect(enrollment.reload.payment_portal_ready?).to be false
     end
 
-    it 'returns true once the recommendation request exists and rankings are complete' do
+    it "returns true once the recommendation request exists and rankings are complete" do
       create(:recommendation, enrollment: enrollment)
 
       expect(enrollment.reload.payment_portal_ready?).to be true
     end
   end
 
-  it_behaves_like 'a model with timestamps'
+  it_behaves_like "a model with timestamps"
 end

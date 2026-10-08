@@ -29,11 +29,11 @@ FactoryBot.define do
     offer_status { nil }
 
     trait :accepted do
-      offer_status { 'accepted' }
+      offer_status { "accepted" }
     end
 
     trait :declined do
-      offer_status { 'declined' }
+      offer_status { "declined" }
     end
 
     trait :pending do

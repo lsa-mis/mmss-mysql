@@ -26,7 +26,7 @@ class FinaidMailerPreview < ActionMailer::Preview
       source: "Test Source",
       note: "Test financial aid",
       status: "awarded",
-      payments_deadline: Date.today + 30.days
+      payments_deadline: Date.today + 30.days # standard:disable Rails/Date -- preview data, host clock is fine
     )
   end
 
@@ -34,7 +34,7 @@ class FinaidMailerPreview < ActionMailer::Preview
     user = User.first || create_test_user
     Enrollment.create!(
       user: user,
-      campyear: Time.now.year,
+      campyear: Time.now.year, # standard:disable Rails/TimeZone -- preview data, host clock is fine
       application_status: "submitted"
     )
   end

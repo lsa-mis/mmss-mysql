@@ -5,7 +5,7 @@
 # these classes.
 module Admin::Reports
   GROUPS = {
-    'Applications' => [
+    "Applications" => [
       Admin::Reports::AllCompleteApps,
       Admin::Reports::RegisteredButNotApplied,
       Admin::Reports::PendingCourseAssignmentsWithStudents,
@@ -16,7 +16,7 @@ module Admin::Reports
       Admin::Reports::CompleteAppsDemographicReport,
       Admin::Reports::OfferAcceptedWithBalanceDue
     ],
-    'Enrolled students' => [
+    "Enrolled students" => [
       Admin::Reports::EnrolledWithAddresses,
       Admin::Reports::EnrolledStudentDemographicReport,
       Admin::Reports::EnrolledEventsPerSession,

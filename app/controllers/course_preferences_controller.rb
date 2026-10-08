@@ -11,15 +11,16 @@ class CoursePreferencesController < ApplicationController
     load_course_preference_sessions
   end
 
-  def show; end
+  def show
+  end
 
   def new
     @course_preference = CoursePreference.new
-    @current_enrollment_session1 = @current_enrollment.session_registrations.find_by(description: 'Session 1')
+    @current_enrollment_session1 = @current_enrollment.session_registrations.find_by(description: "Session 1")
     @current_enrollment_session1_courses = @current_enrollment.course_registrations.where(camp_occurrence: @current_enrollment_session1)
-    @current_enrollment_session2 = @current_enrollment.session_registrations.find_by(description: 'Session 2')
+    @current_enrollment_session2 = @current_enrollment.session_registrations.find_by(description: "Session 2")
     @current_enrollment_session2_courses = @current_enrollment.course_registrations.where(camp_occurrence: @current_enrollment_session2)
-    @current_enrollment_session3 = @current_enrollment.session_registrations.find_by(description: 'Session 3')
+    @current_enrollment_session3 = @current_enrollment.session_registrations.find_by(description: "Session 3")
     @current_enrollment_session3_courses = @current_enrollment.course_registrations.where(camp_occurrence: @current_enrollment_session3)
   end
 
@@ -27,7 +28,7 @@ class CoursePreferencesController < ApplicationController
     @course_preference = CoursePreference.new(cp_params)
 
     if @course_preference.save
-      redirect_to enrollment_course_preferences_path(@current_enrollment), notice: 'Course Preference was successfully edited.', status: :see_other
+      redirect_to enrollment_course_preferences_path(@current_enrollment), notice: "Course Preference was successfully edited.", status: :see_other
     else
       render :new, status: :unprocessable_content
     end
@@ -35,13 +36,13 @@ class CoursePreferencesController < ApplicationController
 
   def edit
     redirect_to enrollment_course_preferences_path(@current_enrollment),
-                notice: 'Rank all of your selected courses on one page. Drag courses to reorder, or use the rank menus, then click Save rankings.'
+      notice: "Rank all of your selected courses on one page. Drag courses to reorder, or use the rank menus, then click Save rankings."
   end
 
   def bulk_update
     unless @current_enrollment.course_rankings_editable?
       redirect_to enrollment_course_preferences_path(@current_enrollment),
-                  alert: 'Course rankings cannot be changed after your application has been processed.', status: :see_other
+        alert: "Course rankings cannot be changed after your application has been processed.", status: :see_other
       return
     end
 
@@ -49,7 +50,7 @@ class CoursePreferencesController < ApplicationController
     allowed_ids = @current_enrollment.course_preferences.pluck(:id).map(&:to_s).to_set
     if rankings.blank? || rankings.keys.to_set != allowed_ids || rankings.values.any?(&:blank?)
       load_course_preference_sessions
-      flash.now[:alert] = 'Please choose a rank for every selected course.'
+      flash.now[:alert] = "Please choose a rank for every selected course."
       render :index, status: :unprocessable_content
       return
     end
@@ -62,11 +63,11 @@ class CoursePreferencesController < ApplicationController
           cp.update!(ranking: rankings[cp.id.to_s].to_s.to_i)
         end
       end
-      redirect_to root_path, notice: 'Course rankings were successfully saved.', status: :see_other
+      redirect_to root_path, notice: "Course rankings were successfully saved.", status: :see_other
     rescue ActiveRecord::RecordInvalid => e
       load_course_preference_sessions
       flash.now[:alert] = e.record.errors.full_messages.to_sentence.presence ||
-        'Unable to save rankings. Each session needs unique ranks within the allowed range.'
+        "Unable to save rankings. Each session needs unique ranks within the allowed range."
       render :index, status: :unprocessable_content
     end
   end
@@ -75,9 +76,9 @@ class CoursePreferencesController < ApplicationController
     @course_preference = @current_enrollment.course_preferences.find(params[:id])
     if @course_preference.update(cp_params)
       if !@current_enrollment.reload.course_rankings_complete?
-        redirect_to course_preferences_path, notice: 'Course Preference was successfully updated.', status: :see_other
+        redirect_to course_preferences_path, notice: "Course Preference was successfully updated.", status: :see_other
       else
-        redirect_to root_path, notice: 'Course Preference was successfully updated.', status: :see_other
+        redirect_to root_path, notice: "Course Preference was successfully updated.", status: :see_other
       end
     else
       @course_camp = @course_preference.course.camp_occurrence
@@ -91,7 +92,7 @@ class CoursePreferencesController < ApplicationController
   def prepare_show
     @course_pref = CoursePreference.find(params[:id])
     if @course_pref.enrollment.user_id != current_user.id
-      redirect_to root_path, alert: 'Not authorized.', status: :see_other
+      redirect_to root_path, alert: "Not authorized.", status: :see_other
       return
     end
 
@@ -103,8 +104,8 @@ class CoursePreferencesController < ApplicationController
     @current_enrollment = enrollment_from_params_or_current_year
     return if @current_enrollment.present?
 
-    redirect_to root_path, alert: 'No current enrollment found.', status: :see_other
-    return
+    redirect_to root_path, alert: "No current enrollment found.", status: :see_other
+    nil
   end
 
   def enrollment_from_params_or_current_year
@@ -117,18 +118,18 @@ class CoursePreferencesController < ApplicationController
 
   def load_course_preference_sessions
     @current_enrollment_course_preferences_all = @current_enrollment.course_preferences.includes(course: :camp_occurrence)
-    @current_enrollment_session1 = @current_enrollment.session_registrations.find_by(description: 'Session 1')
-    @current_enrollment_session2 = @current_enrollment.session_registrations.find_by(description: 'Session 2')
-    @current_enrollment_session3 = @current_enrollment.session_registrations.find_by(description: 'Session 3')
+    @current_enrollment_session1 = @current_enrollment.session_registrations.find_by(description: "Session 1")
+    @current_enrollment_session2 = @current_enrollment.session_registrations.find_by(description: "Session 2")
+    @current_enrollment_session3 = @current_enrollment.session_registrations.find_by(description: "Session 3")
 
     @current_enrollment_session1_courses = @current_enrollment.course_registrations.where(camp_occurrence: @current_enrollment_session1)
     @current_enrollment_session2_courses = @current_enrollment.course_registrations.where(camp_occurrence: @current_enrollment_session2)
     @current_enrollment_session3_courses = @current_enrollment.course_registrations.where(camp_occurrence: @current_enrollment_session3)
 
     @ranking_sessions = [
-      { label: 'Session 1', session: @current_enrollment_session1, courses: @current_enrollment_session1_courses },
-      { label: 'Session 2', session: @current_enrollment_session2, courses: @current_enrollment_session2_courses },
-      { label: 'Session 3', session: @current_enrollment_session3, courses: @current_enrollment_session3_courses }
+      {label: "Session 1", session: @current_enrollment_session1, courses: @current_enrollment_session1_courses},
+      {label: "Session 2", session: @current_enrollment_session2, courses: @current_enrollment_session2_courses},
+      {label: "Session 3", session: @current_enrollment_session3, courses: @current_enrollment_session3_courses}
     ].filter_map do |row|
       next if row[:session].blank? || row[:courses].blank?
 
@@ -138,7 +139,7 @@ class CoursePreferencesController < ApplicationController
 
       max_rank = [preferences.size, CoursePreference::MAX_RANKING].min
 
-      { label: row[:label], session: row[:session], preferences: preferences, max_rank: max_rank }
+      {label: row[:label], session: row[:session], preferences: preferences, max_rank: max_rank}
     end
   end
 
@@ -178,5 +179,4 @@ class CoursePreferencesController < ApplicationController
       {}
     end
   end
-
 end
