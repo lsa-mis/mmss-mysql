@@ -65,9 +65,13 @@ class Recommendation < ApplicationRecord
     find_by(upload_token: token)
   end
 
-  # A new link for the recommender; any previously emailed link stops working.
+  # A new link for the recommender; any previously emailed link stops working. Writes the columns
+  # directly: issuing a link must not depend on legacy rows passing today's validations.
   def issue_upload_token!
-    update!(upload_token: self.class.generate_unique_secure_token, upload_token_expires_at: UPLOAD_TOKEN_TTL.from_now)
+    raise ActiveRecord::RecordNotSaved.new('cannot issue an upload token for an unsaved recommendation', self) unless persisted?
+
+    update_columns(upload_token: self.class.generate_unique_secure_token, upload_token_expires_at: UPLOAD_TOKEN_TTL.from_now,
+                   updated_at: Time.current)
   end
 
   # Called once a letter is received: the link is dead from then on.

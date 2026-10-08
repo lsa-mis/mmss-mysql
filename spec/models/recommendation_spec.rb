@@ -152,6 +152,17 @@ RSpec.describe Recommendation, type: :model do
         expect(recommendation.upload_token_expires_at).to be_within(1.minute).of(Recommendation::UPLOAD_TOKEN_TTL.from_now)
         expect(Recommendation.find_by_upload_token(old_token)).to be_nil
       end
+
+      it 'works for legacy rows that no longer pass validation' do
+        recommendation.update_columns(organization: nil)
+
+        expect { recommendation.issue_upload_token! }.not_to raise_error
+        expect(recommendation.reload.upload_token).to be_present
+      end
+
+      it 'refuses an unsaved recommendation' do
+        expect { build(:recommendation).issue_upload_token! }.to raise_error(ActiveRecord::RecordNotSaved)
+      end
     end
 
     describe '#invalidate_upload_token!' do
