@@ -33,18 +33,25 @@ set :linked_files,
 # capistrano-rails adds public/assets (Propshaft output, including the Tailwind builds) to linked_dirs.
 set :linked_dirs, %w[log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system]
 
+# pumactl runs through `execute :bundle, ...` rather than a raw string so SSHKit applies
+# :default_env and the `bundle` command map (capistrano-asdf points it at shared/asdf-wrapper).
+# The repo no longer ships a bin/bundle binstub (Rails 8.1 dropped it).
 namespace :puma do
   desc 'Stop the PUMA service'
   task :stop do
     on roles(:app) do
-      execute "cd #{fetch(:deploy_to)}/current; bin/bundle exec pumactl -P ~/apps/#{fetch(:application)}/current/tmp/pids/puma.pid stop"
+      within current_path do
+        execute :bundle, :exec, :pumactl, '-P', "#{current_path}/tmp/pids/puma.pid", :stop
+      end
     end
   end
 
   desc 'Restart the PUMA service'
   task :restart do
     on roles(:app) do
-      execute "cd #{fetch(:deploy_to)}/current; bin/bundle exec pumactl -P ~/apps/#{fetch(:application)}/current/tmp/pids/puma.pid restart"
+      within current_path do
+        execute :bundle, :exec, :pumactl, '-P', "#{current_path}/tmp/pids/puma.pid", :restart
+      end
     end
   end
 
