@@ -5,16 +5,23 @@
 # pass validation (PaymentsController#payment_receipt does find_by then create). Some local databases
 # already carry this index, added by hand; the guards keep the migration a no-op there.
 #
-# Before running against production, check for duplicates, which would make add_index fail:
-#   SELECT transaction_id, COUNT(*) FROM payments GROUP BY transaction_id HAVING COUNT(*) > 1;
+# Before running against production, check for duplicates, which would make add_index fail. NULLs are
+# excluded because MySQL allows any number of NULLs in a unique index:
+#   SELECT transaction_id, COUNT(*) FROM payments
+#   WHERE transaction_id IS NOT NULL GROUP BY transaction_id HAVING COUNT(*) > 1;
 class AddUniqueIndexToPaymentsTransactionId < ActiveRecord::Migration[8.1]
+  INDEX_NAME = 'index_payments_on_transaction_id'
+
   def up
     return if index_exists?(:payments, :transaction_id, unique: true)
 
-    add_index :payments, :transaction_id, unique: true
+    add_index :payments, :transaction_id, unique: true, name: INDEX_NAME
   end
 
+  # Only ever drop the index this migration adds, never another index that happens to cover the column.
   def down
-    remove_index :payments, :transaction_id if index_exists?(:payments, :transaction_id)
+    return unless index_exists?(:payments, :transaction_id, unique: true, name: INDEX_NAME)
+
+    remove_index :payments, name: INDEX_NAME
   end
 end
