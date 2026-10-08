@@ -20,15 +20,11 @@ class FeedbacksController < ApplicationController
   def create
     @feedback = current_user.feedbacks.new(feedback_params)
 
-    respond_to do |format|
-      if @feedback.save
-        format.html { redirect_to root_path, notice: 'Feedback was successfully created.', status: :see_other }
-        format.json { render :show, status: :created, location: @feedback }
-        FeedbackMailer.with(feedback: @feedback).feedback_email.deliver_now
-      else
-        format.html { render :new, status: :unprocessable_content }
-        format.json { render json: @feedback.errors, status: :unprocessable_content }
-      end
+    if @feedback.save
+      FeedbackMailer.with(feedback: @feedback).feedback_email.deliver_now
+      redirect_to root_path, notice: 'Feedback was successfully created.', status: :see_other
+    else
+      render :new, status: :unprocessable_content
     end
   end
 

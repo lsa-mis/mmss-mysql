@@ -12,7 +12,6 @@ class EnrollmentsController < ApplicationController
   before_action :set_activities_sessions
 
   # GET /enrollments/1
-  # GET /enrollments/1.json
   def show
     @registration_activities = @current_enrollment.registration_activities.order(camp_occurrence_id: :asc)
     @session_registrations = @current_enrollment.session_registrations.order(description: :asc)
@@ -30,51 +29,35 @@ class EnrollmentsController < ApplicationController
   end
 
   # POST /enrollments
-  # POST /enrollments.json
   def create
     @enrollment = current_user.enrollments.create(enrollment_params)
 
-    respond_to do |format|
-      if @enrollment.save
-        if @enrollment.course_rankings_complete?
-          format.html { redirect_to root_path, notice: 'Application was successfully created.', status: :see_other }
-        else
-          format.html do
-            redirect_to enrollment_course_preferences_path(@enrollment),
-                        notice: 'Application was saved. Next, rank the courses you selected for each session (1 = highest interest).', status: :see_other
-          end
-        end
-        format.json { render :show, status: :created, location: @enrollment }
+    if @enrollment.save
+      if @enrollment.course_rankings_complete?
+        redirect_to root_path, notice: 'Application was successfully created.', status: :see_other
       else
-        format.html { render :new, status: :unprocessable_content }
-        format.json { render json: @enrollment.errors, status: :unprocessable_content }
+        redirect_to enrollment_course_preferences_path(@enrollment),
+                    notice: 'Application was saved. Next, rank the courses you selected for each session (1 = highest interest).', status: :see_other
       end
+    else
+      render :new, status: :unprocessable_content
     end
   end
 
   # PATCH/PUT /enrollments/1
-  # PATCH/PUT /enrollments/1.json
   def update
-    respond_to do |format|
-      if @current_enrollment.update(enrollment_params)
-        @current_enrollment.auto_enroll_if_ready!
-        if @current_enrollment.course_rankings_complete?
-          format.html { redirect_to root_path, notice: 'Application was successfully updated.', status: :see_other }
-        else
-          format.html do
-            redirect_to enrollment_course_preferences_path(@current_enrollment),
-                        notice: 'Application was updated. When you are ready, rank the courses you selected for each session.', status: :see_other
-          end
-        end
-        format.json { render :show, status: :ok, location: @current_enrollment }
+    if @current_enrollment.update(enrollment_params)
+      @current_enrollment.auto_enroll_if_ready!
+      if @current_enrollment.course_rankings_complete?
+        redirect_to root_path, notice: 'Application was successfully updated.', status: :see_other
       else
-        if @current_enrollment.errors.include?(:student_packet) || @current_enrollment.errors.include?(:vaccine_record) || @current_enrollment.errors.include?(:covid_test_record)
-          format.html { redirect_to root_path, alert: @current_enrollment.errors.full_messages.to_sentence, status: :see_other }
-        else
-          format.html { render :edit, status: :unprocessable_content }
-          format.json { render json: @current_enrollment.errors, status: :unprocessable_content }
-        end
+        redirect_to enrollment_course_preferences_path(@current_enrollment),
+                    notice: 'Application was updated. When you are ready, rank the courses you selected for each session.', status: :see_other
       end
+    elsif @current_enrollment.errors.include?(:student_packet) || @current_enrollment.errors.include?(:vaccine_record) || @current_enrollment.errors.include?(:covid_test_record)
+      redirect_to root_path, alert: @current_enrollment.errors.full_messages.to_sentence, status: :see_other
+    else
+      render :edit, status: :unprocessable_content
     end
   end
 

@@ -10,7 +10,6 @@ class RecommendationsController < ApplicationController
   before_action :set_recommendation, only: %i[show edit update]
 
   # GET /recommendations/1
-  # GET /recommendations/1.json
   def show
   end
 
@@ -32,38 +31,28 @@ class RecommendationsController < ApplicationController
   end
 
   # POST /enrollments/:enrollment_id/recommendations
-  # POST /enrollments/:enrollment_id/recommendations.json
   def create
     @enrollment = owned_enrollment
     @recommendation = @enrollment.build_recommendation(recommendation_params)
 
-    respond_to do |format|
-      if @recommendation.save
-        format.html { redirect_to root_path, notice: 'Recommendation was successfully created and the email was sent.', status: :see_other }
-        format.json { render :show, status: :created, location: @recommendation }
-        RecommendationMailer.with(recommendation: @recommendation).request_email.deliver_now
-        unless @enrollment.application_fee_required
-          RegistrationMailer.app_complete_email(current_user).deliver_now
-          @enrollment.transition_application_status!('submitted')
-        end
-      else
-        format.html { render :new, status: :unprocessable_content }
-        format.json { render json: @recommendation.errors, status: :unprocessable_content }
+    if @recommendation.save
+      RecommendationMailer.with(recommendation: @recommendation).request_email.deliver_now
+      unless @enrollment.application_fee_required
+        RegistrationMailer.app_complete_email(current_user).deliver_now
+        @enrollment.transition_application_status!('submitted')
       end
+      redirect_to root_path, notice: 'Recommendation was successfully created and the email was sent.', status: :see_other
+    else
+      render :new, status: :unprocessable_content
     end
   end
 
   # PATCH/PUT /recommendations/1
-  # PATCH/PUT /recommendations/1.json
   def update
-    respond_to do |format|
-      if @recommendation.update(recommendation_params)
-        format.html { redirect_to @recommendation, notice: 'Recommendation was successfully updated.', status: :see_other }
-        format.json { render :show, status: :ok, location: @recommendation }
-      else
-        format.html { render :edit, status: :unprocessable_content }
-        format.json { render json: @recommendation.errors, status: :unprocessable_content }
-      end
+    if @recommendation.update(recommendation_params)
+      redirect_to @recommendation, notice: 'Recommendation was successfully updated.', status: :see_other
+    else
+      render :edit, status: :unprocessable_content
     end
   end
 

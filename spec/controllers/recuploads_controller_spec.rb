@@ -89,10 +89,6 @@ RSpec.describe RecuploadsController, type: :controller do
         expect_any_instance_of(RecuploadMailer).to receive(:applicant_received_email).and_return(double(deliver_now: true))
         post :create, params: valid_params
       end
-
-      # Note: JSON response test removed due to missing show template
-      # The controller tries to render :show but there's no template available
-      # This would need a proper show.json.jbuilder template to work correctly
     end
 
     context 'with invalid parameters' do
@@ -118,12 +114,6 @@ RSpec.describe RecuploadsController, type: :controller do
       it 'renders new template' do
         post :create, params: invalid_params
         expect(response).to render_template(:new)
-      end
-
-      it 'responds with JSON error' do
-        post :create, params: invalid_params.merge(format: :json)
-        expect(response).to have_http_status(:unprocessable_content)
-        expect(response.content_type).to include('application/json')
       end
     end
   end
