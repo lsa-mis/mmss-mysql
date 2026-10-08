@@ -200,6 +200,21 @@ RSpec.describe 'Admin recommendations', type: :request do
       expect(recommendation.reload.upload_token).to be_nil
     end
 
+    it 'does not issue or email a link when a letter lands while the resend waits for the row lock' do
+      allow_any_instance_of(Recommendation).to receive(:lock!).and_wrap_original do |original, *args|
+        create(:recupload, recommendation: Recommendation.find(original.receiver.id))
+        original.call(*args)
+      end
+
+      expect do
+        post send_request_email_admin_recommendation_path(recommendation)
+      end.not_to change { ActionMailer::Base.deliveries.size }
+
+      expect(response).to redirect_to(admin_recommendation_path(recommendation))
+      expect(flash[:alert]).to include('already been received')
+      expect(recommendation.reload.upload_token).to be_nil
+    end
+
     it 'refuses a signed-in applicant without sending anything' do
       sign_out admin
       sign_in create(:user)

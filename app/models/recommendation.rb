@@ -65,13 +65,28 @@ class Recommendation < ApplicationRecord
     find_by(upload_token: token)
   end
 
-  # A new link for the recommender; any previously emailed link stops working. Writes the columns
-  # directly: issuing a link must not depend on legacy rows passing today's validations.
+  # Raised by #issue_upload_token! when a letter has (just) been received: no link may be issued.
+  class LetterAlreadyReceived < StandardError; end
+
+  # A new link for the recommender; any previously emailed link stops working. Runs under the
+  # recommendation's row lock (the same lock RecuploadsController#create takes) and re-checks for
+  # a letter after acquiring it, so a concurrent upload can never have its cleared token restored.
+  # Writes the columns directly: issuing a link must not depend on legacy rows passing today's
+  # validations.
   def issue_upload_token!
     raise ActiveRecord::RecordNotSaved.new('cannot issue an upload token for an unsaved recommendation', self) unless persisted?
 
-    update_columns(upload_token: self.class.generate_unique_secure_token, upload_token_expires_at: UPLOAD_TOKEN_TTL.from_now,
-                   updated_at: Time.current)
+    letter_received = transaction do
+      lock!
+      next true if recupload.present?
+
+      update_columns(upload_token: self.class.generate_unique_secure_token, upload_token_expires_at: UPLOAD_TOKEN_TTL.from_now,
+                     updated_at: Time.current)
+      false
+    end
+    raise LetterAlreadyReceived, "recommendation #{id} already has a letter" if letter_received
+
+    self
   end
 
   # Called once a letter is received: the link is dead from then on.

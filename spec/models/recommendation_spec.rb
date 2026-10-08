@@ -164,6 +164,24 @@ RSpec.describe Recommendation, type: :model do
       it 'refuses an unsaved recommendation' do
         expect { build(:recommendation).issue_upload_token! }.to raise_error(ActiveRecord::RecordNotSaved)
       end
+
+      it 'refuses once a letter has been received' do
+        create(:recupload, recommendation: recommendation)
+
+        expect { recommendation.issue_upload_token! }.to raise_error(Recommendation::LetterAlreadyReceived)
+        expect(recommendation.reload.upload_token).to be_nil
+      end
+
+      it 'never restores a token cleared by a letter that lands while waiting for the row lock' do
+        recommendation.recupload # prime the (empty) association cache, as the admin controller's includes does
+        allow(recommendation).to receive(:lock!).and_wrap_original do |original|
+          create(:recupload, recommendation: Recommendation.find(recommendation.id))
+          original.call
+        end
+
+        expect { recommendation.issue_upload_token! }.to raise_error(Recommendation::LetterAlreadyReceived)
+        expect(recommendation.reload.upload_token).to be_nil
+      end
     end
 
     describe '#invalidate_upload_token!' do

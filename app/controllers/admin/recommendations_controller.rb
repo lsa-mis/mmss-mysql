@@ -91,17 +91,17 @@ class Admin::RecommendationsController < Admin::BaseController
   # received. Admin-only POST; the public GET on RecommendationsController was removed in the
   # foundation PR.
   def send_request_email
-    if @recommendation.recupload.present?
-      return redirect_to admin_recommendation_path(@recommendation), status: :see_other,
-                                                                     alert: 'A letter has already been received for this recommendation; no new link was sent.'
-    end
-
     send_new_upload_link(@recommendation)
     redirect_to admin_recommendation_path(@recommendation), notice: 'Recommendation request was sent with a new upload link!', status: :see_other
+  rescue Recommendation::LetterAlreadyReceived
+    redirect_to admin_recommendation_path(@recommendation), status: :see_other,
+                                                            alert: 'A letter has already been received for this recommendation; no new link was sent.'
   end
 
   private
 
+  # Issues the token under the recommendation's row lock (raises LetterAlreadyReceived if a letter
+  # is in, including one that landed concurrently), then emails the fresh link.
   def send_new_upload_link(recommendation)
     recommendation.issue_upload_token!
     RecommendationMailer.with(recommendation: recommendation).request_email.deliver_now
@@ -109,11 +109,17 @@ class Admin::RecommendationsController < Admin::BaseController
 
   # Batch "Send new upload link": recommendations whose letter is already in are skipped.
   def batch_resend_request(records)
-    pending, received = records.includes(:recupload, enrollment: %i[user applicant_detail]).partition { |r| r.recupload.nil? }
-    pending.each { |recommendation| send_new_upload_link(recommendation) }
+    sent = 0
+    skipped = 0
+    records.preload(enrollment: %i[user applicant_detail]).find_each do |recommendation|
+      send_new_upload_link(recommendation)
+      sent += 1
+    rescue Recommendation::LetterAlreadyReceived
+      skipped += 1
+    end
 
-    notice = "Sent #{pending.size} new upload #{'link'.pluralize(pending.size)}."
-    notice += " Skipped #{received.size} with a letter already received." if received.any?
+    notice = "Sent #{sent} new upload #{'link'.pluralize(sent)}."
+    notice += " Skipped #{skipped} with a letter already received." if skipped.positive?
     notice
   end
 
