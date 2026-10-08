@@ -65,7 +65,10 @@ class PaymentsController < ApplicationController
     end
 
     if payment.nil? || (!payment.persisted? && payment.errors.of_kind?(:transaction_id, :taken))
-      payment = Payment.find_by(transaction_id: tid)
+      # Bypass the per-request query cache: the same find_by above was cached as nil, and in the
+      # :taken case nothing has written through this connection since, so a cached lookup would
+      # replay that nil and report "Unable to record payment" for a transaction that is on file.
+      payment = Payment.uncached { Payment.find_by(transaction_id: tid) }
     end
 
     unless payment&.persisted?
