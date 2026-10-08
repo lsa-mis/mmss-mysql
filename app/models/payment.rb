@@ -24,8 +24,7 @@
 #
 # Indexes
 #
-#  index_payments_on_transaction_id  (transaction_id) UNIQUE
-#  index_payments_on_user_id         (user_id)
+#  index_payments_on_user_id  (user_id)
 #
 # Foreign Keys
 #

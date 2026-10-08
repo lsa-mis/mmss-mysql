@@ -41,31 +41,27 @@ class PaymentsController < ApplicationController
       return
     end
 
-    payment = begin
-      Payment.create(
-        transaction_type: params['transactionType'],
-        transaction_status: params['transactionStatus'],
-        transaction_id: tid,
-        total_amount: params['transactionTotalAmount'],
-        transaction_date: params['transactionDate'],
-        account_type: params['transactionAcountType'],
-        result_code: params['transactionResultCode'],
-        result_message: params['transactionResultMessage'],
-        user_account: params['orderNumber'],
-        payer_identity: payment_receipt_user.email,
-        timestamp: params['timestamp'],
-        transaction_hash: params['hash'],
-        user_id: payment_receipt_user.id,
-        camp_year: CampConfiguration.active_camp_year
-      )
-    rescue ActiveRecord::RecordNotUnique
-      # A concurrent receipt for the same transactionId committed between find_by and create; the
-      # unique index (index_payments_on_transaction_id) rejected this row, so reuse the winner's.
-      nil
-    end
+    payment = Payment.create(
+      transaction_type: params['transactionType'],
+      transaction_status: params['transactionStatus'],
+      transaction_id: tid,
+      total_amount: params['transactionTotalAmount'],
+      transaction_date: params['transactionDate'],
+      account_type: params['transactionAcountType'],
+      result_code: params['transactionResultCode'],
+      result_message: params['transactionResultMessage'],
+      user_account: params['orderNumber'],
+      payer_identity: payment_receipt_user.email,
+      timestamp: params['timestamp'],
+      transaction_hash: params['hash'],
+      user_id: payment_receipt_user.id,
+      camp_year: CampConfiguration.active_camp_year
+    )
 
-    if payment.nil? || (!payment.persisted? && payment.errors.of_kind?(:transaction_id, :taken))
-      payment = Payment.find_by(transaction_id: tid)
+    unless payment.persisted?
+      if payment.errors.of_kind?(:transaction_id, :taken)
+        payment = Payment.find_by(transaction_id: tid)
+      end
     end
 
     unless payment&.persisted?

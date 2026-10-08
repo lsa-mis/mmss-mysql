@@ -24,8 +24,7 @@
 #
 # Indexes
 #
-#  index_payments_on_transaction_id  (transaction_id) UNIQUE
-#  index_payments_on_user_id         (user_id)
+#  index_payments_on_user_id  (user_id)
 #
 # Foreign Keys
 #
@@ -73,14 +72,6 @@ RSpec.describe Payment, type: :model do
     it { is_expected.to validate_presence_of(:transaction_type) }
     it { is_expected.to validate_presence_of(:transaction_status) }
     it { is_expected.to validate_presence_of(:camp_year) }
-
-    it 'backs the transaction_id uniqueness validation with a unique index' do
-      existing = create(:payment)
-      duplicate = build(:payment, transaction_id: existing.transaction_id)
-
-      expect(duplicate).not_to be_valid
-      expect { duplicate.save!(validate: false) }.to raise_error(ActiveRecord::RecordNotUnique)
-    end
 
     it 'requires total_amount to be a whole number of cents' do
       %w[-100 10.5 abc].each do |bad|
