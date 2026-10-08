@@ -21,12 +21,15 @@
 #  best_contact_time        :string(255)
 #  submitted_recommendation :string(255)
 #  date_submitted           :datetime
+#  upload_token             :string(255)
+#  upload_token_expires_at  :datetime
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
 #
 # Indexes
 #
 #  index_recommendations_on_enrollment_id  (enrollment_id)
+#  index_recommendations_on_upload_token   (upload_token) UNIQUE
 #
 # Foreign Keys
 #
@@ -66,7 +69,12 @@ FactoryBot.define do
     trait :with_upload do
       after(:create) do |recommendation|
         create(:recupload, recommendation: recommendation)
+        recommendation.reload
       end
+    end
+
+    trait :expired_link do
+      upload_token_expires_at { 1.day.ago }
     end
   end
 end

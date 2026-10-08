@@ -25,6 +25,8 @@ class Recupload < ApplicationRecord
 
   belongs_to :recommendation
   after_create :update_enrollment_status
+  # The emailed upload link is single-use: once a letter is in, the token is cleared.
+  after_create :invalidate_upload_token
 
   # validates :letter, length: { minimum: 50 }
   validates :authorname, presence: true
@@ -54,5 +56,9 @@ class Recupload < ApplicationRecord
     if !enrollment.application_fee_required || Payment.where(user_id: enrollment.user_id).status1_current_camp_payments.exists?
       enrollment.transition_application_status!('application complete')
     end
+  end
+
+  def invalidate_upload_token
+    recommendation.invalidate_upload_token!
   end
 end
