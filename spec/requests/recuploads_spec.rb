@@ -17,7 +17,7 @@ RSpec.describe 'Recommender uploads (token link)', type: :request do
       get new_recupload_path(token: token)
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include(user.applicant_detail.full_name)
+      expect(CGI.unescapeHTML(response.body)).to include(user.applicant_detail.full_name)
       expect(response.body).to include(%(name="token" id="token" value="#{token}"))
       expect(response.body).not_to include('recupload[recommendation_id]')
       expect(response.body).not_to include('name="hash"')
@@ -45,7 +45,7 @@ RSpec.describe 'Recommender uploads (token link)', type: :request do
 
       expect(response).to have_http_status(:not_found)
       expect(response.body).to include('from an older email and no longer works')
-      expect(response.body).not_to include(user.applicant_detail.full_name)
+      expect(CGI.unescapeHTML(response.body)).not_to include(user.applicant_detail.full_name)
     end
 
     it 'cannot be reached by guessing: the token never contains the recommendation id' do
