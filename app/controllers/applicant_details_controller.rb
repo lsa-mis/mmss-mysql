@@ -8,7 +8,6 @@ class ApplicantDetailsController < ApplicationController
   before_action :set_applicant_detail, only: %i[show edit update]
 
   # GET /applicant_details/1
-  # GET /applicant_details/1.json
   def show
     @us_citizen = citizen_status
     return unless current_user.enrollments.current_camp_year_applications.present?
@@ -29,7 +28,6 @@ class ApplicantDetailsController < ApplicationController
   end
 
   # POST /applicant_details
-  # POST /applicant_details.json
   def create
     if current_user.applicant_detail.present?
       flash[:notice] = 'Applicant Details exist. Click Edit, if you want to change something.'
@@ -37,29 +35,20 @@ class ApplicantDetailsController < ApplicationController
     else
       @applicant_detail = current_user.create_applicant_detail(applicant_detail_params)
 
-      respond_to do |format|
-        if @applicant_detail.save
-          format.html { redirect_to root_path, notice: 'Applicant detail was successfully created.', status: :see_other }
-          format.json { render :show, status: :created, location: @applicant_detail }
-        else
-          format.html { render :new, status: :unprocessable_content }
-          format.json { render json: @applicant_detail.errors, status: :unprocessable_content }
-        end
+      if @applicant_detail.save
+        redirect_to root_path, notice: 'Applicant detail was successfully created.', status: :see_other
+      else
+        render :new, status: :unprocessable_content
       end
     end
   end
 
   # PATCH/PUT /applicant_details/1
-  # PATCH/PUT /applicant_details/1.json
   def update
-    respond_to do |format|
-      if @applicant_detail.update(applicant_detail_params)
-        format.html { redirect_to root_path, notice: 'Applicant detail was successfully updated.', status: :see_other }
-        format.json { render :show, status: :ok, location: @applicant_detail }
-      else
-        format.html { render :edit, status: :unprocessable_content }
-        format.json { render json: @applicant_detail.errors, status: :unprocessable_content }
-      end
+    if @applicant_detail.update(applicant_detail_params)
+      redirect_to root_path, notice: 'Applicant detail was successfully updated.', status: :see_other
+    else
+      render :edit, status: :unprocessable_content
     end
   end
 

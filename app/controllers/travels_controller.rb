@@ -23,27 +23,19 @@ class TravelsController < ApplicationController
   # POST /enrollments/:enrollment_id/travels
   def create
     @travel = @current_enrollment.travels.new(travel_params)
-    respond_to do |format|
-      if @travel.save
-        format.html { redirect_to root_path, notice: 'Travel was successfully created.', status: :see_other }
-        format.json { render :show, status: :created, location: @travel }
-      else
-        format.html { render :new, status: :unprocessable_content }
-        format.json { render json: @travel.errors, status: :unprocessable_content }
-      end
+    if @travel.save
+      redirect_to root_path, notice: 'Travel was successfully created.', status: :see_other
+    else
+      render :new, status: :unprocessable_content
     end
   end
 
   # PATCH/PUT /enrollments/:enrollment_id/travels/1
   def update
-    respond_to do |format|
-      if @travel.update(travel_params)
-        format.html { redirect_to root_path, notice: 'Travel was successfully updated.', status: :see_other }
-        format.json { render :show, status: :ok, location: @travel }
-      else
-        format.html { render :edit, status: :unprocessable_content }
-        format.json { render json: @travel.errors, status: :unprocessable_content }
-      end
+    if @travel.update(travel_params)
+      redirect_to root_path, notice: 'Travel was successfully updated.', status: :see_other
+    else
+      render :edit, status: :unprocessable_content
     end
   end
 

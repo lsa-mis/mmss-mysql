@@ -26,14 +26,10 @@ class CoursePreferencesController < ApplicationController
   def create
     @course_preference = CoursePreference.new(cp_params)
 
-    respond_to do |format|
-      if @course_preference.save
-        format.html { redirect_to enrollment_course_preferences_path(@current_enrollment), notice: 'Course Preference was successfully edited.', status: :see_other }
-        format.json { render :show, status: :created, location: @course_preference }
-      else
-        format.html { render :new, status: :unprocessable_content }
-        format.json { render json: @course_preference.errors, status: :unprocessable_content }
-      end
+    if @course_preference.save
+      redirect_to enrollment_course_preferences_path(@current_enrollment), notice: 'Course Preference was successfully edited.', status: :see_other
+    else
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -77,21 +73,16 @@ class CoursePreferencesController < ApplicationController
 
   def update
     @course_preference = @current_enrollment.course_preferences.find(params[:id])
-    respond_to do |format|
-      if @course_preference.update(cp_params)
-        if !@current_enrollment.reload.course_rankings_complete?
-          format.html { redirect_to course_preferences_path, notice: 'Course Preference was successfully updated.', status: :see_other }
-          format.json { render :show, status: :ok, location: course_preferences_path }
-        else
-          format.html { redirect_to root_path, notice: 'Course Preference was successfully updated.', status: :see_other }
-          format.json { render :show, status: :ok, location: root_path }
-        end
+    if @course_preference.update(cp_params)
+      if !@current_enrollment.reload.course_rankings_complete?
+        redirect_to course_preferences_path, notice: 'Course Preference was successfully updated.', status: :see_other
       else
-        @course_camp = @course_preference.course.camp_occurrence
-        @remaining_selections = get_rankings_available(@course_camp)
-        format.html { render :edit, status: :unprocessable_content }
-        format.json { render json: @course_preference.errors, status: :unprocessable_content }
+        redirect_to root_path, notice: 'Course Preference was successfully updated.', status: :see_other
       end
+    else
+      @course_camp = @course_preference.course.camp_occurrence
+      @remaining_selections = get_rankings_available(@course_camp)
+      render :edit, status: :unprocessable_content
     end
   end
 

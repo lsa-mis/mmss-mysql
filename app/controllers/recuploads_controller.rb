@@ -25,16 +25,12 @@ class RecuploadsController < ApplicationController
     # caller-supplied recommendation_id.
     @recupload = @recommendation.build_recupload(recupload_params)
 
-    respond_to do |format|
-      if @recupload.save
-        format.html { redirect_to recupload_success_path, notice: 'Recommendation was successfully uploaded.', status: :see_other }
-        format.json { render json: { id: @recupload.id }, status: :created }
-        RecuploadMailer.with(recupload: @recupload).received_email.deliver_now
-        RecuploadMailer.with(recupload: @recupload).applicant_received_email.deliver_now
-      else
-        format.html { render :new, status: :unprocessable_content }
-        format.json { render json: @recupload.errors, status: :unprocessable_content }
-      end
+    if @recupload.save
+      RecuploadMailer.with(recupload: @recupload).received_email.deliver_now
+      RecuploadMailer.with(recupload: @recupload).applicant_received_email.deliver_now
+      redirect_to recupload_success_path, notice: 'Recommendation was successfully uploaded.', status: :see_other
+    else
+      render :new, status: :unprocessable_content
     end
   end
 

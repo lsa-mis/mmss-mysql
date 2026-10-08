@@ -9,7 +9,6 @@ class FinancialAidsController < ApplicationController
   before_action :set_financial_aid, only: [:show, :edit, :update]
 
   # GET /financial_aids/1
-  # GET /financial_aids/1.json
   def show
     @financial_aids = FinancialAid.where(enrollment_id: @current_enrollment)
   end
@@ -24,32 +23,22 @@ class FinancialAidsController < ApplicationController
   end
 
   # POST /financial_aids
-  # POST /financial_aids.json
   def create
     @financial_aid =  @current_enrollment.financial_aids.create(financial_aid_params)
 
-    respond_to do |format|
-      if @financial_aid.save
-        format.html { redirect_to all_payments_path, notice: 'Financial aid was successfully created.', status: :see_other }
-        format.json { render :show, status: :created, location: @financial_aid }
-      else
-        format.html { render :new, status: :unprocessable_content }
-        format.json { render json: @financial_aid.errors, status: :unprocessable_content }
-      end
+    if @financial_aid.save
+      redirect_to all_payments_path, notice: 'Financial aid was successfully created.', status: :see_other
+    else
+      render :new, status: :unprocessable_content
     end
   end
 
   # PATCH/PUT /financial_aids/1
-  # PATCH/PUT /financial_aids/1.json
   def update
-    respond_to do |format|
-      if @financial_aid.update(financial_aid_params)
-        format.html { redirect_to all_payments_path, notice: 'Financial aid was successfully updated.', status: :see_other }
-        format.json { render :show, status: :ok, location: @financial_aid }
-      else
-        format.html { render :edit, status: :unprocessable_content }
-        format.json { render json: @financial_aid.errors, status: :unprocessable_content }
-      end
+    if @financial_aid.update(financial_aid_params)
+      redirect_to all_payments_path, notice: 'Financial aid was successfully updated.', status: :see_other
+    else
+      render :edit, status: :unprocessable_content
     end
   end
 
