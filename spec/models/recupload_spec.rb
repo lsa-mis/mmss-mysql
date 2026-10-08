@@ -247,6 +247,41 @@ RSpec.describe Recupload, type: :model do
     end
   end
 
+  describe 'upload token invalidation' do
+    let(:enrollment) { create(:enrollment, :without_transcript) }
+    let(:recommendation) { create(:recommendation, enrollment: enrollment) }
+
+    before do
+      allow(enrollment).to receive(:validate_transcript_presence)
+      allow(enrollment).to receive(:acceptable_transcript)
+    end
+
+    it 'clears the recommendation token on create' do
+      create(:recupload, recommendation:)
+      expect(recommendation.reload.upload_token).to be_nil
+    end
+
+    it 'clears the destination token when a letter is reassigned to another recommendation' do
+      recupload = create(:recupload, recommendation:)
+      other = create(:recommendation, enrollment: create(:enrollment, :without_transcript))
+      expect(other.upload_token).to be_present
+
+      recupload.update!(recommendation: other)
+
+      expect(other.reload.upload_token).to be_nil
+      expect(other).not_to be_upload_link_active
+    end
+
+    it 'does not touch the recommendation on an unrelated update' do
+      recupload = create(:recupload, recommendation:)
+      recommendation.update_columns(upload_token: 'leftover12345678901234567', upload_token_expires_at: 1.day.from_now)
+
+      recupload.update!(authorname: 'Renamed')
+
+      expect(recommendation.reload.upload_token).to eq('leftover12345678901234567')
+    end
+  end
+
   describe 'database constraints' do
     it 'requires recommendation_id to be present' do
       recupload = build(:recupload, recommendation: nil)

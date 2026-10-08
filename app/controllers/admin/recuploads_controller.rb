@@ -58,8 +58,10 @@ class Admin::RecuploadsController < Admin::BaseController
 
   def edit; end
 
+  # The owning recommendation is create-only: moving a letter would leave the destination's
+  # upload link usable and the source without one (see Recupload#invalidate_upload_token).
   def update
-    if @recupload.update(recupload_params)
+    if @recupload.update(recupload_params.except(:recommendation_id))
       redirect_to admin_recupload_path(@recupload), notice: 'Recupload was successfully updated.', status: :see_other
     else
       render :edit, status: :unprocessable_content

@@ -25,8 +25,10 @@ class Recupload < ApplicationRecord
 
   belongs_to :recommendation
   after_create :update_enrollment_status
-  # The emailed upload link is single-use: once a letter is in, the token is cleared.
-  after_create :invalidate_upload_token
+  # The emailed upload link is single-use: once a letter is in, the token is cleared. Fires on
+  # create and on any (re)assignment of the recommendation, so the owner can never keep a live
+  # link while holding a letter.
+  after_save :invalidate_upload_token, if: :saved_change_to_recommendation_id?
 
   # validates :letter, length: { minimum: 50 }
   # One letter per recommendation (backed by a unique index; RecuploadsController serialises the

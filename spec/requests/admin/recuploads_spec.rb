@@ -175,6 +175,24 @@ RSpec.describe 'Admin recuploads', type: :request do
       expect(response.body).to include('letter.pdf')
     end
 
+    it 'shows the recommendation read-only and ignores a submitted recommendation_id on update' do
+      other = create(:recommendation, enrollment: create(:enrollment, user: create(:user, :with_applicant_detail)))
+      other_token = other.upload_token
+
+      get edit_admin_recupload_path(recupload)
+      expect(response.body).not_to include('name="recupload[recommendation_id]"')
+      expect(response.body).to include('cannot be changed on an existing letter')
+
+      patch admin_recupload_path(recupload), params: { recupload: { recommendation_id: other.id, authorname: 'Moved' } }
+
+      expect(response).to redirect_to(admin_recupload_path(recupload))
+      recupload.reload
+      expect(recupload.recommendation).to eq(recommendation)
+      expect(recupload.authorname).to eq('Moved')
+      expect(other.reload.upload_token).to eq(other_token)
+      expect(other).to be_upload_link_active
+    end
+
     it 'updates the upload' do
       patch admin_recupload_path(recupload), params: { recupload: { authorname: 'Rear Admiral Hopper' } }
 
