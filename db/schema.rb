@@ -352,7 +352,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_08_150000) do
     t.string "state_non_us"
     t.string "submitted_recommendation"
     t.datetime "updated_at", null: false
-    t.string "upload_token"
+    t.string "upload_token", collation: "utf8mb4_bin"
     t.datetime "upload_token_expires_at"
     t.index ["enrollment_id"], name: "index_recommendations_on_enrollment_id"
     t.index ["upload_token"], name: "index_recommendations_on_upload_token", unique: true

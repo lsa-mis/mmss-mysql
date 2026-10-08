@@ -124,6 +124,14 @@ RSpec.describe Recommendation, type: :model do
       it 'returns nil for an unknown token' do
         expect(Recommendation.find_by_upload_token('nope')).to be_nil
       end
+
+      it 'is case-sensitive (binary collation)' do
+        recommendation.update_columns(upload_token: 'AbCdEfGhJkLmNpQrStUvWxYz')
+
+        expect(Recommendation.find_by_upload_token('AbCdEfGhJkLmNpQrStUvWxYz')).to eq(recommendation)
+        expect(Recommendation.find_by_upload_token('abcdefghjklmnpqrstuvwxyz')).to be_nil
+        expect(Recommendation.find_by_upload_token('ABCDEFGHJKLMNPQRSTUVWXYZ')).to be_nil
+      end
     end
 
     describe '#upload_token_expired?' do
