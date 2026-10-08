@@ -201,6 +201,17 @@ RSpec.describe 'Recommender uploads (token link)', type: :request do
     end
   end
 
+  it 'tells the browser never to send the token-bearing URL as a Referer' do
+    get new_recupload_path(token: token)
+    expect(response.headers['Referrer-Policy']).to eq('no-referrer')
+
+    post recuploads_path, params: { token: token, recupload: { authorname: '', studentname: '', letter: '' } }
+    expect(response.headers['Referrer-Policy']).to eq('no-referrer')
+
+    get new_recupload_path(token: 'unknown')
+    expect(response.headers['Referrer-Policy']).to eq('no-referrer')
+  end
+
   describe 'static pages' do
     it 'serves the success and error pages without a token' do
       get recupload_success_path

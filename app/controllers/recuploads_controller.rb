@@ -6,6 +6,9 @@
 # token whose letter has already been received is refused. Everything else about recuploads
 # (listing, viewing, editing, deleting) is admin-only and lives in Admin::RecuploadsController.
 class RecuploadsController < ApplicationController
+  # The upload page's URL carries the bearer token; never let the browser pass it on as a
+  # Referer (form POST, the success/error redirects, mailto/external links on the page).
+  before_action :suppress_referrer
   before_action :set_recommendation, only: %i[new create]
 
   def error
@@ -46,6 +49,10 @@ class RecuploadsController < ApplicationController
   end
 
   private
+
+  def suppress_referrer
+    response.set_header('Referrer-Policy', 'no-referrer')
+  end
 
   def redirect_to_already_submitted
     redirect_to recupload_error_path, alert: 'A recommendation has already been submitted for this user', status: :see_other

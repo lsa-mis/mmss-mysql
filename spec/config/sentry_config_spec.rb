@@ -56,6 +56,7 @@ RSpec.describe 'Sentry configuration', type: :request do
       'HTTP_X_API_KEY' => 'APIKEY123',
       'HTTP_X_FORWARDED_FOR' => '203.0.113.9',
       'HTTP_X_OTP' => 'OTP654321',
+      'HTTP_REFERER' => 'https://mmss.example/recuploads/new?token=UPLOADTOKEN123',
       'HTTP_ACCEPT_LANGUAGE' => 'en-US'
     )
     event = Sentry::ErrorEvent.new(configuration: Sentry.configuration)
@@ -63,6 +64,7 @@ RSpec.describe 'Sentry configuration', type: :request do
     headers = event.to_h.dig(:request, :headers)
 
     expect(headers.values).not_to include('Bearer SECRETBEARER', 'APIKEY123', 'OTP654321', '203.0.113.9')
+    expect(headers.values.join).not_to include('UPLOADTOKEN123')
     expect(headers['Accept-Language']).to eq('en-US')
     # The client IP still arrives through the (intended) user context, not through headers.
     expect(event.user[:ip_address]).to eq('203.0.113.9')
