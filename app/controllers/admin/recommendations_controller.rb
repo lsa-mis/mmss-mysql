@@ -16,7 +16,7 @@ class Admin::RecommendationsController < Admin::BaseController
     updated_at: 'recommendations.updated_at'
   }.freeze
 
-  BATCH_ACTIONS = { destroy: 'Delete selected' }.freeze
+  BATCH_ACTIONS = { resend_request: 'Send new upload link', destroy: 'Delete selected' }.freeze
 
   CSV_EXPORT = Admin::CsvExport.define do
     column :id
@@ -86,14 +86,36 @@ class Admin::RecommendationsController < Admin::BaseController
     perform_batch_action(Recommendation.all, BATCH_ACTIONS, redirect_to_path: admin_recommendations_path)
   end
 
-  # "Resend request" (the show page's mail action). Admin-only POST; the public GET on
-  # RecommendationsController was removed in the foundation PR.
+  # "Resend request" (the show page's mail action). Issues a fresh upload token (the previously
+  # emailed link stops working) and emails it to the recommender. Refused once a letter has been
+  # received. Admin-only POST; the public GET on RecommendationsController was removed in the
+  # foundation PR.
   def send_request_email
-    RecommendationMailer.with(recommendation: @recommendation).request_email.deliver_now
-    redirect_to admin_recommendation_path(@recommendation), notice: 'Recommendation request was sent!', status: :see_other
+    if @recommendation.recupload.present?
+      return redirect_to admin_recommendation_path(@recommendation), status: :see_other,
+                                                                     alert: 'A letter has already been received for this recommendation; no new link was sent.'
+    end
+
+    send_new_upload_link(@recommendation)
+    redirect_to admin_recommendation_path(@recommendation), notice: 'Recommendation request was sent with a new upload link!', status: :see_other
   end
 
   private
+
+  def send_new_upload_link(recommendation)
+    recommendation.issue_upload_token!
+    RecommendationMailer.with(recommendation: recommendation).request_email.deliver_now
+  end
+
+  # Batch "Send new upload link": recommendations whose letter is already in are skipped.
+  def batch_resend_request(records)
+    pending, received = records.includes(:recupload, enrollment: %i[user applicant_detail]).partition { |r| r.recupload.nil? }
+    pending.each { |recommendation| send_new_upload_link(recommendation) }
+
+    notice = "Sent #{pending.size} new upload #{'link'.pluralize(pending.size)}."
+    notice += " Skipped #{received.size} with a letter already received." if received.any?
+    notice
+  end
 
   def set_recommendation
     @recommendation = Recommendation.includes(:recupload, enrollment: %i[user applicant_detail]).find(params[:id])
