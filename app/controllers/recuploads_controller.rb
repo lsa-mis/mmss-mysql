@@ -20,19 +20,36 @@ class RecuploadsController < ApplicationController
 
   def create
     # Always attach to the recommendation the emailed link resolved to, never to a
-    # caller-supplied recommendation_id.
-    @recupload = @recommendation.build_recupload(recupload_params)
+    # caller-supplied recommendation_id. The token check and the insert run under a row lock on
+    # the recommendation so two simultaneous submissions of one link cannot both succeed; the
+    # unique index on recuploads.recommendation_id is the backstop.
+    outcome = Recommendation.transaction do
+      @recommendation.lock!
+      next :link_used unless @recommendation.upload_link_active? && @recommendation.upload_token == params[:token].to_s
 
-    if @recupload.save
+      @recupload = @recommendation.build_recupload(recupload_params)
+      @recupload.save ? :saved : :invalid
+    end
+
+    case outcome
+    when :saved
       RecuploadMailer.with(recupload: @recupload).received_email.deliver_now
       RecuploadMailer.with(recupload: @recupload).applicant_received_email.deliver_now
       redirect_to recupload_success_path, notice: 'Recommendation was successfully uploaded.', status: :see_other
+    when :link_used
+      redirect_to_already_submitted
     else
       render :new, status: :unprocessable_content
     end
+  rescue ActiveRecord::RecordNotUnique
+    redirect_to_already_submitted
   end
 
   private
+
+  def redirect_to_already_submitted
+    redirect_to recupload_error_path, alert: 'A recommendation has already been submitted for this user', status: :see_other
+  end
 
   def set_recommendation
     @recommendation = Recommendation.find_by_upload_token(params[:token])
@@ -43,9 +60,7 @@ class RecuploadsController < ApplicationController
       return render :error, status: :not_found
     end
 
-    if @recommendation.recupload.present?
-      return redirect_to recupload_error_path, alert: 'A recommendation has already been submitted for this user'
-    end
+    return redirect_to_already_submitted if @recommendation.recupload.present?
 
     if @recommendation.upload_token_expired?
       Rails.logger.info("Recommender upload link expired (recommendation_id: #{@recommendation.id})")

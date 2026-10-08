@@ -153,6 +153,15 @@ RSpec.describe 'Admin recuploads', type: :request do
       expect(response).to have_http_status(:unprocessable_content)
       expect(response.body).to include('must be attached or letter text must be provided')
     end
+
+    it 'refuses a second letter for a recommendation that already has one' do
+      expect do
+        post admin_recuploads_path, params: { recupload: { recommendation_id: recommendation.id, authorname: 'Prof. X', studentname: 'Y', letter: 'Again' } }
+      end.not_to change(Recupload, :count)
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include('already has a letter')
+    end
   end
 
   describe 'edit/update' do

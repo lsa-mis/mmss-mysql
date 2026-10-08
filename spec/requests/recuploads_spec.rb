@@ -116,6 +116,46 @@ RSpec.describe 'Recommender uploads (token link)', type: :request do
       expect(response).to have_http_status(:not_found)
     end
 
+    it 'is single-use under concurrency: a letter that lands while this request waits for the row lock wins' do
+      # Simulate a second submission of the same link committing between the token check in the
+      # before_action and the locked re-check inside create.
+      allow_any_instance_of(Recommendation).to receive(:lock!).and_wrap_original do |original, *args|
+        create(:recupload, recommendation: Recommendation.find(original.receiver.id), authorname: 'First', studentname: 'S', letter: 'First letter')
+        original.call(*args)
+      end
+
+      expect do
+        post recuploads_path, params: { token: token, recupload: letter_params }
+      end.to change(Recupload, :count).by(1)
+
+      expect(response).to redirect_to(recupload_error_path)
+      expect(flash[:alert]).to eq('A recommendation has already been submitted for this user')
+      expect(recommendation.reload.recupload.authorname).to eq('First')
+      expect(ActionMailer::Base.deliveries).to be_empty
+    end
+
+    it 'treats a database uniqueness conflict as an already-used link' do
+      allow_any_instance_of(Recupload).to receive(:save).and_raise(ActiveRecord::RecordNotUnique, 'Duplicate entry')
+
+      expect { post recuploads_path, params: { token: token, recupload: letter_params } }.not_to change(Recupload, :count)
+
+      expect(response).to redirect_to(recupload_error_path)
+      expect(flash[:alert]).to eq('A recommendation has already been submitted for this user')
+    end
+
+    it 'refuses when an admin reissued the link between the token lookup and the locked insert' do
+      allow(Recommendation).to receive(:find_by_upload_token).and_wrap_original do |original, value|
+        found = original.call(value)
+        found&.issue_upload_token! # "Resend request" lands right after the lookup
+        found
+      end
+
+      expect { post recuploads_path, params: { token: token, recupload: letter_params } }.not_to change(Recupload, :count)
+
+      expect(response).to redirect_to(recupload_error_path)
+      expect(recommendation.reload.upload_token).not_to eq(token)
+    end
+
     it 'ignores a submitted recommendation_id' do
       other = create(:recommendation, enrollment: create(:enrollment, user: create(:user, :with_applicant_detail)))
 

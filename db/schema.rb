@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_08_140100) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_08_150000) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -365,7 +365,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_08_140100) do
     t.bigint "recommendation_id", null: false
     t.string "studentname", null: false
     t.datetime "updated_at", null: false
-    t.index ["recommendation_id"], name: "index_recuploads_on_recommendation_id"
+    t.index ["recommendation_id"], name: "index_recuploads_on_recommendation_id_unique", unique: true
   end
 
   create_table "rejections", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|

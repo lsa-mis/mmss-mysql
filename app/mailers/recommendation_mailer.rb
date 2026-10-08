@@ -2,11 +2,12 @@
 
 class RecommendationMailer < ApplicationMailer
   # The upload link carries only the recommendation's random upload token; the recommender needs
-  # no login. Callers must make sure a token has been issued (it is on create, and
-  # Recommendation#issue_upload_token! mints a fresh one for "Resend request").
+  # no login. Callers must make sure a usable token has been issued (it is on create, and
+  # Recommendation#issue_upload_token! mints a fresh one for "Resend request"): a missing,
+  # expired or already-used token never goes out in an email.
   def request_email
     @recommendation = params[:recommendation]
-    raise ArgumentError, 'recommendation has no active upload token' if @recommendation.upload_token.blank?
+    raise ArgumentError, 'recommendation has no active upload token' unless @recommendation.upload_link_active?
 
     @enrollment = Enrollment.find(@recommendation.enrollment_id)
     @student = ApplicantDetail.find_by(user_id: @enrollment.user_id)

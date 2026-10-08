@@ -38,6 +38,24 @@ RSpec.describe RecommendationMailer, type: :mailer do
     # rather than an email with a broken link.
     it 'refuses to build a link for a recommendation without an active token' do
       recommendation.invalidate_upload_token!
+
+      expect_no_link_built
+    end
+
+    it 'refuses to build a link for an expired token' do
+      recommendation.update_columns(upload_token_expires_at: 1.minute.ago)
+
+      expect_no_link_built
+    end
+
+    it 'refuses to build a link once a letter has been received, even with a stale token left in place' do
+      create(:recupload, recommendation: recommendation)
+      recommendation.update_columns(upload_token: 'stale12345678901234567890')
+
+      expect_no_link_built
+    end
+
+    def expect_no_link_built
       logged = []
       allow(Rails.logger).to receive(:error) { |msg| logged << msg }
 

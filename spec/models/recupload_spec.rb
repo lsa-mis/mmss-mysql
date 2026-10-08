@@ -14,7 +14,7 @@
 #
 # Indexes
 #
-#  index_recuploads_on_recommendation_id  (recommendation_id)
+#  index_recuploads_on_recommendation_id_unique  (recommendation_id) UNIQUE
 #
 # Foreign Keys
 #
@@ -263,8 +263,9 @@ RSpec.describe Recupload, type: :model do
       create(:recupload, recommendation: recommendation)
       duplicate_recupload = build(:recupload, recommendation: recommendation)
 
-      # This should be prevented by the controller logic, but testing model behavior
-      expect(duplicate_recupload).to be_valid # Model allows it, controller prevents it
+      expect(duplicate_recupload).not_to be_valid
+      expect(duplicate_recupload.errors[:recommendation_id]).to include('already has a letter')
+      expect { duplicate_recupload.save!(validate: false) }.to raise_error(ActiveRecord::RecordNotUnique)
     end
   end
 end

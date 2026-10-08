@@ -14,7 +14,7 @@
 #
 # Indexes
 #
-#  index_recuploads_on_recommendation_id  (recommendation_id)
+#  index_recuploads_on_recommendation_id_unique  (recommendation_id) UNIQUE
 #
 # Foreign Keys
 #
@@ -29,6 +29,9 @@ class Recupload < ApplicationRecord
   after_create :invalidate_upload_token
 
   # validates :letter, length: { minimum: 50 }
+  # One letter per recommendation (backed by a unique index; RecuploadsController serialises the
+  # public submission under a row lock so the emailed link really is single-use).
+  validates :recommendation_id, uniqueness: { message: 'already has a letter' }
   validates :authorname, presence: true
   validates :studentname, presence: true
 
