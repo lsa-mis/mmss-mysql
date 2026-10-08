@@ -58,7 +58,10 @@ group :development, :test do
   gem 'rspec-rails', '~> 8.0'
   gem 'selenium-webdriver', '~> 4.40'
   gem 'shoulda-matchers', '~> 8.0'
-  gem 'standard'
+  # Code style: `bundle exec standardrb` (CI `lint` job). standard pulls in standard-performance;
+  # standard-rails adds the rubocop-rails cops Standard has vetted. Config: .standard.yml.
+  gem 'standard', '~> 1.57'
+  gem 'standard-rails', '~> 1.6'
   # webdrivers gem is deprecated - Selenium 4.11+ includes Selenium Manager
   # gem 'webdrivers', '~> 5.3'
 end
