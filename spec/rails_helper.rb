@@ -27,7 +27,7 @@ require "money-rails/test_helpers"
 # require only the support files necessary.
 #
 # Load support files in a specific order to avoid dependency issues
-support_files = Dir[Rails.root.join("spec/support/**/*.rb")]
+support_files = Dir[Rails.root.join("spec/support/**/*.rb")] # standard:disable Rails/RootPathnameMethods -- the list is filtered with String#include? below; Rails.root.glob returns Pathnames
 # Load feature helpers first, then configuration files
 feature_files = support_files.select { |f| f.include?("features/") }
 other_files = support_files.reject { |f| f.include?("features/") }
@@ -43,7 +43,7 @@ rescue ActiveRecord::PendingMigrationError => e
 end
 RSpec.configure do |config|
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
-  config.fixture_paths = ["#{Rails.root.join("spec/fixtures")}"]
+  config.fixture_paths = [Rails.root.join("spec/fixtures").to_s]
 
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false

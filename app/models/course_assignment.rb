@@ -27,8 +27,10 @@ class CourseAssignment < ApplicationRecord
   belongs_to :enrollment
   belongs_to :course
 
+  # standard:disable Rails/RedundantPresenceValidationOnBelongsTo -- keeps the "can't be blank" error the model specs assert; belongs_to alone reports "must exist"
   validates :enrollment_id, presence: true
   validates :course_id, presence: true
+  # standard:enable Rails/RedundantPresenceValidationOnBelongsTo
 
   scope :for_session, ->(session_id) { joins(:course).where(courses: {camp_occurrence_id: session_id}) }
   scope :wait_list, -> { where(wait_list: true) }

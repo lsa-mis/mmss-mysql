@@ -7,7 +7,7 @@ require "rails_helper"
 
 RSpec.describe "Host authorization and SSL configuration" do
   def environment_file(name)
-    File.read(Rails.root.join("config", "environments", "#{name}.rb"))
+    Rails.root.join("config", "environments", "#{name}.rb").read
   end
 
   describe "production.rb" do

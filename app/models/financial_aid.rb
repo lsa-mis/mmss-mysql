@@ -47,7 +47,7 @@ class FinancialAid < ApplicationRecord
   end
   prepend BlankAmountIsZero
 
-  validates :note, presence: :true
+  validates :note, presence: true
   validates :status, presence: true
   validates :adjusted_gross_income, presence: true, numericality: {greater_than_or_equal_to: 0}
   validate :source_required_when_awarded

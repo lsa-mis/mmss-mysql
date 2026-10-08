@@ -3,8 +3,8 @@
 # Sidebar navigation for the admin layout: four menu groups (Applicant Info, Camp Setup, Logins
 # Info, Reports). Each item names a route helper.
 class Admin::Menu
-  Item = Struct.new(:label, :route, :match, keyword_init: true)
-  Group = Struct.new(:label, :items, keyword_init: true)
+  Item = Struct.new(:label, :route, :match)
+  Group = Struct.new(:label, :items)
 
   GROUPS = [
     Group.new(label: nil, items: [

@@ -97,7 +97,7 @@ RSpec.describe "Admin feedbacks", type: :request do
 
       get admin_feedbacks_path(format: :csv)
 
-      messages = CSV.parse(response.body).drop(1).map { |row| row[2] }
+      messages = CSV.parse(response.body).drop(1).pluck(2)
       expect(messages).to include(%q('=HYPERLINK("https://evil.example","Click me")))
       expect(messages).to include("The submit button does nothing")
       expect(messages).not_to include('=HYPERLINK("https://evil.example","Click me")')

@@ -15,7 +15,7 @@ module ApplicationHelper
 
   def registration_open?
     if CampConfiguration.active.exists?
-      Date.today >= CampConfiguration.active_camp_year_application_open && Date.today < CampConfiguration.active_camp_year_application_close
+      Date.today >= CampConfiguration.active_camp_year_application_open && Date.today < CampConfiguration.active_camp_year_application_close # standard:disable Rails/Date -- host-clock date is the established registration-window boundary; Date.current would shift it by the Eastern offset
     else
       false
     end
@@ -35,7 +35,7 @@ module ApplicationHelper
 
   def new_registration_closed?
     if CampConfiguration.active.exists?
-      Date.today >= CampConfiguration.active_camp_year_application_close
+      Date.today >= CampConfiguration.active_camp_year_application_close # standard:disable Rails/Date -- same boundary as registration_open?
     else
       false
     end
@@ -197,16 +197,9 @@ module ApplicationHelper
     authenticated ||= defined?(faculty_signed_in?) && faculty_signed_in?
     return nil unless authenticated
 
-    # Get session timeout from configuration
-    # Production uses 4.hours, other environments may vary
-    timeout_seconds = if Rails.env.production?
-      4.hours.to_i
-    elsif Rails.env.staging?
-      4.hours.to_i
-    else
-      # Development default (no expiry, but set a reasonable default for warning)
-      4.hours.to_i
-    end
+    # Session timeout: 4 hours in every environment (production/staging expire the session; development
+    # has no expiry but uses the same value so the warning banner behaves the same).
+    timeout_seconds = 4.hours.to_i
 
     # Try to determine when the session was created so we can calculate the real expiry time.
     session_created_at = nil
@@ -217,7 +210,7 @@ module ApplicationHelper
       if raw_created_at.respond_to?(:to_time)
         session_created_at = raw_created_at.to_time
       elsif raw_created_at.respond_to?(:to_i)
-        session_created_at = Time.at(raw_created_at.to_i)
+        session_created_at = Time.at(raw_created_at.to_i) # standard:disable Rails/TimeZone -- compared with host-clock Time values below; keep the same clock
       end
     end
 
@@ -239,7 +232,7 @@ module ApplicationHelper
           if raw_created_at.respond_to?(:to_time)
             session_created_at = raw_created_at.to_time
           elsif raw_created_at.respond_to?(:to_i)
-            session_created_at = Time.at(raw_created_at.to_i)
+            session_created_at = Time.at(raw_created_at.to_i) # standard:disable Rails/TimeZone -- see above
           end
         end
       end

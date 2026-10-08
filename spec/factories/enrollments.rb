@@ -73,7 +73,7 @@ FactoryBot.define do
     # Create required session and course registrations before validation
     after(:build) do |enrollment|
       # Ensure test seeds are loaded for basic data
-      load "#{Rails.root.join("spec/test_seeds.rb")}" if Gender.count.zero?
+      load Rails.root.join("spec/test_seeds.rb").to_s if Gender.count.zero?
 
       # Find or create camp configuration for the enrollment year
       camp_config = CampConfiguration.find_by(camp_year: enrollment.campyear) ||
@@ -127,7 +127,7 @@ FactoryBot.define do
 
     # Attach a transcript file (only if the file exists and is small enough)
     after(:build) do |enrollment|
-      link_to_default_transcript = "#{Rails.root.join("spec/files/test.pdf")}"
+      link_to_default_transcript = Rails.root.join("spec/files/test.pdf").to_s
       if File.exist?(link_to_default_transcript) && File.size(link_to_default_transcript) <= 20.megabytes
         begin
           enrollment.transcript.attach(
@@ -213,7 +213,7 @@ FactoryBot.define do
 
     trait :with_student_packet do
       after(:create) do |enrollment|
-        link_to_default_pdf = "#{Rails.root.join("spec/files/test.pdf")}"
+        link_to_default_pdf = Rails.root.join("spec/files/test.pdf").to_s
         enrollment.student_packet.attach(
           io: File.open(link_to_default_pdf),
           filename: "student_packet.pdf",
@@ -224,7 +224,7 @@ FactoryBot.define do
 
     trait :with_vaccine_record do
       after(:create) do |enrollment|
-        link_to_default_pdf = "#{Rails.root.join("spec/files/test.pdf")}"
+        link_to_default_pdf = Rails.root.join("spec/files/test.pdf").to_s
         enrollment.vaccine_record.attach(
           io: File.open(link_to_default_pdf),
           filename: "vaccine_record.pdf",

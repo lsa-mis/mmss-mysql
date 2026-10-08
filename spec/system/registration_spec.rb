@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe "Registration process", type: :system do
   before :each do
     driven_by(:rack_test)
-    load "#{Rails.root.join("spec/test_seeds.rb")}"
+    load Rails.root.join("spec/test_seeds.rb").to_s
     @password = "SecurePassword123!"
     @user = FactoryBot.create(:user, password: @password, password_confirmation: @password)
     # Ensure an active camp exists so auth links render

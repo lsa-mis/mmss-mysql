@@ -60,7 +60,7 @@ RSpec.describe "Admin admins", type: :request do
       expect(response.headers["Content-Disposition"]).to include("MMSS-admins-")
       csv = CSV.parse(response.body)
       expect(csv.first).to eq(["Id", "Email", "Current sign in at", "Last sign in at", "Sign in count", "Locked at", "Created at", "Updated at"])
-      expect(csv.map { |row| row[1] }).to include("colleague@example.com", "me@example.com")
+      expect(csv.pluck(1)).to include("colleague@example.com", "me@example.com")
       expect(response.body).not_to include("encrypted_password")
     end
   end

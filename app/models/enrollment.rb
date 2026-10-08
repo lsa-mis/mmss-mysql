@@ -117,7 +117,7 @@ class Enrollment < ApplicationRecord
   validate :acceptable_student_packet
   validate :acceptable_image
 
-  validates :user_id, uniqueness: {scope: :campyear}
+  validates :user_id, uniqueness: {scope: :campyear} # standard:disable Rails/UniqueValidationWithoutIndex -- no DB index yet; adding one is a schema change (see #275 for the payments precedent)
 
   scope :current_camp_year_applications, -> { where("campyear = ? ", CampConfiguration.active_camp_year) }
   scope :offered, -> { current_camp_year_applications.where("offer_status = 'offered'") }
@@ -129,6 +129,7 @@ class Enrollment < ApplicationRecord
   }
   scope :application_complete_not_offered, -> { application_complete.where(offer_status: [nil, ""]) }
   scope :no_recomendation, -> { current_camp_year_applications.where.missing(:recommendation) }
+  # standard:disable Rails/PluckInWhere -- pluck keeps the two-query form; an IN (SELECT ...) subquery changes the SQL and NOT IN semantics with NULLs
   scope :no_letter, lambda {
     current_camp_year_applications.where(id: Recommendation.where.missing(:recupload).pluck(:enrollment_id))
   }
@@ -144,6 +145,7 @@ class Enrollment < ApplicationRecord
   scope :no_covid_test_record, lambda {
     enrolled.where.not(id: Enrollment.current_camp_year_applications.joins(:covid_test_record_attachment).pluck(:id))
   }
+  # standard:enable Rails/PluckInWhere
   scope :no_camp_doc_form, -> { current_camp_year_applications.where(camp_doc_form_completed: false) }
 
   def display_name
@@ -335,7 +337,7 @@ class Enrollment < ApplicationRecord
   def set_application_deadline
     return unless session_assignments.present? && course_assignments.present?
 
-    self.application_deadline = 30.days.from_now unless application_deadline.present?
+    self.application_deadline = 30.days.from_now if application_deadline.blank?
   end
 
   def if_application_status_changed

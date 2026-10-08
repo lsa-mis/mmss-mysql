@@ -56,7 +56,7 @@ class ApplicantDetail < ApplicationRecord
 
   before_validation :clear_demographic_other_if_not_other
 
-  validates :user_id, uniqueness: true
+  validates :user_id, uniqueness: true # standard:disable Rails/UniqueValidationWithoutIndex -- no DB index yet; adding one is a schema change (see #275 for the payments precedent)
   validates :firstname, presence: true
   validates :lastname, presence: true
   validates :gender, presence: true

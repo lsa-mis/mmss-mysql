@@ -35,8 +35,10 @@ class Course < ApplicationRecord
   validates :title, presence: true
   validates :available_spaces, presence: true, numericality: {only_integer: true, greater_than_or_equal_to: 0}
 
+  # standard:disable Rails/DuplicateScope -- both names are used by callers; kept as aliases
   scope :is_open, -> { where(status: "open") }
   scope :open, -> { where(status: "open") }
+  # standard:enable Rails/DuplicateScope
   scope :current_camp, -> { where(camp_occurrence_id: CampOccurrence.active) }
 
   # Adds confirmed/wait-list assignment counts as select columns so list pages and CSV exports

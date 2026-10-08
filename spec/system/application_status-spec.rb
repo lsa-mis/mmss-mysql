@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe "Application status application_status_updated_on", type: :system do
   before :each do
-    load "#{Rails.root.join("spec/system/test_seeds.rb")}"
+    load Rails.root.join("spec/system/test_seeds.rb").to_s
     @user = FactoryBot.create(:user)
     login_as(@user)
   end

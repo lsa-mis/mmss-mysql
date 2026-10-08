@@ -162,7 +162,7 @@ class PaymentsController < ApplicationController
     }
 
     # Sample Hash Creation
-    hash_to_be_encoded = initial_hash.values.map { |v| "#{v}" }.join("")
+    hash_to_be_encoded = initial_hash.values.join("")
     encoded_hash = Digest::SHA256.hexdigest hash_to_be_encoded
 
     # Final URL

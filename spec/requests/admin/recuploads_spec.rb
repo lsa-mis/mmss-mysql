@@ -176,7 +176,7 @@ RSpec.describe "Admin recuploads", type: :request do
 
   describe "edit/update" do
     it "renders the edit form with the current file link" do
-      recupload.recletter.attach(io: File.open(Rails.root.join("spec/files/test.pdf")), filename: "letter.pdf", content_type: "application/pdf")
+      recupload.recletter.attach(io: Rails.root.join("spec/files/test.pdf").open, filename: "letter.pdf", content_type: "application/pdf")
 
       get edit_admin_recupload_path(recupload)
 

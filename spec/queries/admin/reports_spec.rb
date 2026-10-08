@@ -22,7 +22,7 @@ RSpec.describe Admin::Reports, :admin_reports do
     expect(described_class.find(nil)).to be_nil
   end
 
-  described_class.all.each do |report_class|
+  described_class.all.each do |report_class| # standard:disable Rails/FindEach -- Admin::Reports.all is an Array of classes, not a relation
     describe report_class.name do
       it "declares its metadata and one camp-year parameter" do
         expect(report_class.label).to be_present
@@ -56,7 +56,7 @@ RSpec.describe Admin::Reports, :admin_reports do
     let(:camp) { fixtures.camp }
 
     it "returns at least one row from every report" do
-      described_class.all.each do |report_class|
+      described_class.all.each do |report_class| # standard:disable Rails/FindEach -- Admin::Reports.all is an Array of classes, not a relation
         expect(report_class.new(camp).rows.size).to be >= 1, "#{report_class.key} returned no rows"
       end
     end
@@ -64,7 +64,7 @@ RSpec.describe Admin::Reports, :admin_reports do
     it "only sees the selected camp year" do
       other_camp = create(:camp_configuration, camp_year: camp.camp_year - 1)
 
-      described_class.all.each do |report_class|
+      described_class.all.each do |report_class| # standard:disable Rails/FindEach -- Admin::Reports.all is an Array of classes, not a relation
         rows = report_class.new(other_camp).rows
         if report_class == Admin::Reports::RegisteredButNotApplied
           # Nobody applied for the other year, so every registered user is listed.
@@ -112,7 +112,7 @@ RSpec.describe Admin::Reports, :admin_reports do
       csv = CSV.parse(Admin::Reports::AllCompleteApps.new(camp).to_csv)
       amount = csv[2].index("FIN AID AMOUNT")
 
-      expect(csv.drop(3).map { |row| row[amount] }).to contain_exactly("$1,234.50", nil)
+      expect(csv.drop(3).pluck(amount)).to contain_exactly("$1,234.50", nil)
     end
   end
 end

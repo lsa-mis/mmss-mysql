@@ -63,7 +63,7 @@ FactoryBot.define do
 
     trait :with_taxform do
       after(:create) do |financial_aid|
-        link_to_default_pdf = "#{Rails.root.join("spec/files/test.pdf")}"
+        link_to_default_pdf = Rails.root.join("spec/files/test.pdf").to_s
         financial_aid.taxform.attach(
           io: File.open(link_to_default_pdf),
           filename: "taxform.pdf",

@@ -58,7 +58,7 @@ namespace :puma do
   desc "Start the PUMA service"
   task :start do
     on roles(:app) do
-      puts "You must intially start the puma service using sudo on the server"
+      puts "You must intially start the puma service using sudo on the server" # standard:disable Rails/Output -- Capistrano task output, runs outside Rails
     end
   end
 end
@@ -68,9 +68,11 @@ namespace :deploy do
   task :check_revision do
     on roles(:app) do
       unless `git rev-parse HEAD` == `git rev-parse origin/main`
+        # standard:disable Rails/Output, Rails/Exit -- Capistrano task, runs on the operator's machine outside Rails
         puts "WARNING: HEAD is not the same as origin/main"
         puts "Run `git push` to sync changes."
         exit
+        # standard:enable Rails/Output, Rails/Exit
       end
     end
   end

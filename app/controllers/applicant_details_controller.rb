@@ -10,7 +10,7 @@ class ApplicantDetailsController < ApplicationController
   # GET /applicant_details/1
   def show
     @us_citizen = citizen_status
-    return unless current_user.enrollments.current_camp_year_applications.present?
+    return if current_user.enrollments.current_camp_year_applications.blank?
 
     @current_enrollment = current_user.enrollments.current_camp_year_applications.last
   end
@@ -22,7 +22,7 @@ class ApplicantDetailsController < ApplicationController
 
   # GET /applicant_details/1/edit
   def edit
-    return unless current_user.enrollments.current_camp_year_applications.present?
+    return if current_user.enrollments.current_camp_year_applications.blank?
 
     @current_enrollment = current_user.enrollments.current_camp_year_applications.last
   end

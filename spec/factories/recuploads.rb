@@ -29,7 +29,7 @@ FactoryBot.define do
 
     trait :with_file do
       after(:build) do |recupload|
-        link_to_default_pdf = "#{Rails.root.join("spec/files/test.pdf")}"
+        link_to_default_pdf = Rails.root.join("spec/files/test.pdf").to_s
         recupload.recletter.attach(
           io: File.open(link_to_default_pdf),
           filename: "recommendation_letter.pdf",

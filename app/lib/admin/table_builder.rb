@@ -2,7 +2,7 @@
 
 # Collects the column definitions for Admin::TableHelper#admin_table. See that helper for usage.
 class Admin::TableBuilder
-  Column = Struct.new(:label, :sort_key, :block, :html_class, keyword_init: true) do
+  Column = Struct.new(:label, :sort_key, :block, :html_class) do
     def sortable? = sort_key.present?
   end
 

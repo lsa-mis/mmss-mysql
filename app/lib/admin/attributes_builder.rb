@@ -2,7 +2,7 @@
 
 # Collects the rows for Admin::PanelHelper#admin_attributes (a show-page attribute list).
 class Admin::AttributesBuilder
-  Row = Struct.new(:label, :block, keyword_init: true)
+  Row = Struct.new(:label, :block)
 
   attr_reader :rows
 

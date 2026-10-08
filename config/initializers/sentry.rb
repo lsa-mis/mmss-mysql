@@ -13,7 +13,7 @@ Sentry.init do |config|
 
   # Release for deploy tracking and suspect commits (set by Capistrano REVISION file or ENV)
   config.release = ENV["SENTRY_RELEASE"].presence ||
-    (File.read(Rails.root.join("REVISION")).strip if Rails.root.join("REVISION").exist?)
+    (Rails.root.join("REVISION").read.strip if Rails.root.join("REVISION").exist?)
 
   # sentry-ruby 7.0 enables Sentry Logs by default and sentry-rails would forward Rails
   # controller/Active Record events to it. That is a capture surface the app never had, so it

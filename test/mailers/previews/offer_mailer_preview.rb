@@ -5,7 +5,7 @@ class OfferMailerPreview < ActionMailer::Preview
       CampConfiguration.create!(
         active: true,
         offer_letter: "This is a sample offer letter for preview purposes.",
-        camp_year: Date.today.year,
+        camp_year: Date.today.year, # standard:disable Rails/Date -- preview data, host clock is fine
         student_packet_url: "https://example.com/packet.pdf"
       )
 

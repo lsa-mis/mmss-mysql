@@ -32,7 +32,7 @@ module FactoryHelpers
   def load_test_seeds_if_needed
     return if @test_seeds_loaded
 
-    load "#{Rails.root.join("spec/test_seeds.rb")}" if Gender.count.zero?
+    load Rails.root.join("spec/test_seeds.rb").to_s if Gender.count.zero?
     @test_seeds_loaded = true
   end
 

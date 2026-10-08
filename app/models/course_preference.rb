@@ -27,7 +27,7 @@ class CoursePreference < ApplicationRecord
   belongs_to :enrollment
   belongs_to :course
 
-  validates :course_id, uniqueness: {scope: :enrollment_id}
+  validates :course_id, uniqueness: {scope: :enrollment_id} # standard:disable Rails/UniqueValidationWithoutIndex -- no DB index yet; adding one is a schema change (see #275 for the payments precedent)
   validates :ranking,
     numericality: {
       only_integer: true,
@@ -40,7 +40,8 @@ class CoursePreference < ApplicationRecord
   private
 
   def ranking_upper_bound
-    return MAX_RANKING unless course && (enrollment || enrollment_id)
+    return MAX_RANKING unless course
+    return MAX_RANKING unless enrollment || enrollment_id
 
     [session_course_preferences.size, MAX_RANKING].min
   end

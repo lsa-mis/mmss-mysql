@@ -45,7 +45,7 @@ module AdminReportFixtures
   }.freeze
 
   ReportFixtures = Struct.new(:camp, :sessions, :courses, :dorm_activity, :complete, :formula, :waitlisted,
-    :accepted, :enrolled, :enrolled_two_sessions, :not_applied, keyword_init: true)
+    :accepted, :enrolled, :enrolled_two_sessions, :not_applied)
 
   def build_report_fixtures(camp_year: Date.current.year)
     CampConfiguration.where(active: true).update_all(active: false)

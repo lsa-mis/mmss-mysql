@@ -28,13 +28,13 @@ class Rejection < ApplicationRecord
 
   def set_rejection_status
     if CourseAssignment.where(enrollment_id: enrollment).present?
-      CourseAssignment.where(enrollment_id: enrollment).each do |ca|
+      CourseAssignment.where(enrollment_id: enrollment).each do |ca| # standard:disable Rails/FindEach -- find_each reorders by id and batches; keep plain iteration
         ca.destroy
       end
     end
 
     if SessionAssignment.where(enrollment_id: enrollment).present?
-      SessionAssignment.where(enrollment_id: enrollment).each do |sa|
+      SessionAssignment.where(enrollment_id: enrollment).each do |sa| # standard:disable Rails/FindEach -- find_each reorders by id and batches; keep plain iteration
         sa.destroy
       end
     end

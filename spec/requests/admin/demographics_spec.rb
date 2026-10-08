@@ -36,7 +36,7 @@ RSpec.describe "Admin demographics", type: :request do
       expect(response.media_type).to eq("text/csv")
       csv = CSV.parse(response.body)
       expect(csv.first).to eq(["Id", "Name", "Description", "Protected", "Created at", "Updated at"])
-      expect(csv.map { |row| row[1] }).to include("Hispanic Or Latino", "Other")
+      expect(csv.pluck(1)).to include("Hispanic Or Latino", "Other")
     end
   end
 

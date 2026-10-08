@@ -49,7 +49,7 @@ class CampOccurrence < ApplicationRecord
 
   def description_with_date
     if description == "Any Session"
-      "#{description}"
+      description.to_s
     else
       "#{description} -- #{begin_date} until #{end_date}"
     end
@@ -57,7 +57,7 @@ class CampOccurrence < ApplicationRecord
 
   def description_with_date_and_price
     if description == "Any Session"
-      "#{description}"
+      description.to_s
     else
       "#{description} -- #{begin_date} until #{end_date} -- #{humanized_money_with_symbol(cost)}"
     end

@@ -25,7 +25,7 @@ class RecommendationsController < ApplicationController
 
   # GET /recommendations/1/edit
   def edit
-    return unless @recommendation.recupload.present?
+    return if @recommendation.recupload.blank?
 
     redirect_to root_path
   end

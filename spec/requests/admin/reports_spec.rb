@@ -37,7 +37,7 @@ RSpec.describe "Admin reports", type: :request do
         expect(body).to include("#{camp.camp_year} camp · 18 CSV reports")
         expect(body).to include("Applications", "Enrolled students")
 
-        Admin::Reports.all.each do |report|
+        Admin::Reports.all.each do |report| # standard:disable Rails/FindEach -- Admin::Reports.all is an Array of classes, not a relation
           expect(body).to include(%(id="report_#{report.key}"))
           expect(body).to include(report.label)
           expect(body).to include(report.description)
@@ -89,7 +89,7 @@ RSpec.describe "Admin reports", type: :request do
     end
 
     describe "GET /admin/reports/:id" do
-      Admin::Reports.all.each do |report_class|
+      Admin::Reports.all.each do |report_class| # standard:disable Rails/FindEach -- Admin::Reports.all is an Array of classes, not a relation
         it "downloads #{report_class.key} with the legacy title, count and header rows and at least one data row" do
           get admin_report_path(report_class.key)
 
@@ -113,9 +113,9 @@ RSpec.describe "Admin reports", type: :request do
         name = csv[2].index("NAME")
         amount = csv[2].index("FIN AID AMOUNT")
         rows = csv.drop(3)
-        expect(rows.map { |row| row[name] }).to include("Ada Lovelace")
+        expect(rows.pluck(name)).to include("Ada Lovelace")
         expect(rows.find { |row| row[name] == "Ada Lovelace" }[amount]).to eq("$1,234.50")
-        expect(rows.map { |row| row[name] }).not_to include("Grace Hopper", "Mary Cartwright")
+        expect(rows.pluck(name)).not_to include("Grace Hopper", "Mary Cartwright")
       end
 
       it "computes the balance due in dollars" do
@@ -130,7 +130,7 @@ RSpec.describe "Admin reports", type: :request do
         get admin_report_path("registered_but_not_applied")
 
         csv = CSV.parse(response.body)
-        expect(csv.drop(3).map { |row| row[1] }).to eq(["lurker@example.com"])
+        expect(csv.drop(3).pluck(1)).to eq(["lurker@example.com"])
       end
 
       it "renders country names and blanked class-list repeats" do
@@ -147,8 +147,8 @@ RSpec.describe "Admin reports", type: :request do
         get admin_report_path("enrolled_for_more_than_one_session")
 
         rows = CSV.parse(response.body).drop(3)
-        expect(rows.map { |row| row[2] }.uniq).to eq(["Kovalevskaya"])
-        expect(rows.map { |row| row[5] }).to eq(["Session A", "Session B"])
+        expect(rows.pluck(2).uniq).to eq(["Kovalevskaya"])
+        expect(rows.pluck(5)).to eq(["Session A", "Session B"])
       end
 
       it "downloads the selected camp year instead of the active one" do
@@ -171,7 +171,7 @@ RSpec.describe "Admin reports", type: :request do
       it "neutralises formula-leading cells" do
         get admin_report_path("complete_applications_with_course_preferences")
 
-        firstnames = CSV.parse(response.body).drop(3).map { |row| row[2] }
+        firstnames = CSV.parse(response.body).drop(3).pluck(2)
         expect(firstnames).to include(%q('=HYPERLINK("https://evil.example","x")))
         expect(firstnames).not_to include('=HYPERLINK("https://evil.example","x")')
         expect(firstnames).to include("Ada")

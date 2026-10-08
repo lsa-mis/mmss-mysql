@@ -21,8 +21,7 @@ class Admin::Filter
   PARAM_KEY = :q
   TYPES = %i[text select boolean date_range number].freeze
 
-  Field = Struct.new(:name, :type, :label, :column, :joins, :match, :collection, :datetime, :html,
-    keyword_init: true) do
+  Field = Struct.new(:name, :type, :label, :column, :joins, :match, :collection, :datetime, :html) do
     def param = name.to_s
 
     def from_param = "#{name}_from"

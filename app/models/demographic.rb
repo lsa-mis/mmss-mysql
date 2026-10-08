@@ -14,8 +14,10 @@
 class Demographic < ApplicationRecord
   before_validation :normalize_name
 
+  # standard:disable Rails/UniqueValidationWithoutIndex -- no DB index yet; adding one is a schema change (see #275 for the payments precedent)
   validates :name, presence: true, uniqueness: {case_sensitive: false}
   validates :description, presence: true, uniqueness: {case_sensitive: false}, length: {maximum: 2250}
+  # standard:enable Rails/UniqueValidationWithoutIndex
 
   scope :modifiable, -> { where(protected: false) }
 
@@ -37,7 +39,7 @@ class Demographic < ApplicationRecord
   end
 
   def name_format
-    return unless name.present?
+    return if name.blank?
 
     errors.add(:name, "cannot contain punctuation") if /[[:punct:]]/.match?(name)
 
