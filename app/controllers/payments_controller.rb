@@ -149,7 +149,7 @@ class PaymentsController < ApplicationController
     }
 
     redirect_url = redirect_urls[url_to_use]
-    current_epoch_time = DateTime.now.strftime("%Q").to_i
+    current_epoch_time = (Time.current.to_f * 1000).to_i
     initial_hash = {
       "orderNumber" => user_account,
       "orderType" => "MMSS Univ of Michigan",

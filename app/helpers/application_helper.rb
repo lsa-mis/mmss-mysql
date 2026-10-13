@@ -15,7 +15,7 @@ module ApplicationHelper
 
   def registration_open?
     if CampConfiguration.active.exists?
-      Date.today >= CampConfiguration.active_camp_year_application_open && Date.today < CampConfiguration.active_camp_year_application_close # standard:disable Rails/Date -- host-clock date is the established registration-window boundary; Date.current would shift it by the Eastern offset
+      Date.current >= CampConfiguration.active_camp_year_application_open && Date.current < CampConfiguration.active_camp_year_application_close
     else
       false
     end
@@ -35,7 +35,7 @@ module ApplicationHelper
 
   def new_registration_closed?
     if CampConfiguration.active.exists?
-      Date.today >= CampConfiguration.active_camp_year_application_close # standard:disable Rails/Date -- same boundary as registration_open?
+      Date.current >= CampConfiguration.active_camp_year_application_close
     else
       false
     end
@@ -210,7 +210,7 @@ module ApplicationHelper
       if raw_created_at.respond_to?(:to_time)
         session_created_at = raw_created_at.to_time
       elsif raw_created_at.respond_to?(:to_i)
-        session_created_at = Time.at(raw_created_at.to_i) # standard:disable Rails/TimeZone -- compared with host-clock Time values below; keep the same clock
+        session_created_at = Time.zone.at(raw_created_at.to_i)
       end
     end
 
@@ -232,7 +232,7 @@ module ApplicationHelper
           if raw_created_at.respond_to?(:to_time)
             session_created_at = raw_created_at.to_time
           elsif raw_created_at.respond_to?(:to_i)
-            session_created_at = Time.at(raw_created_at.to_i) # standard:disable Rails/TimeZone -- see above
+            session_created_at = Time.zone.at(raw_created_at.to_i)
           end
         end
       end
