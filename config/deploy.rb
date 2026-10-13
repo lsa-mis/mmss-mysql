@@ -1,9 +1,5 @@
 lock "~> 3.17"
 
-set :default_env, {
-  "PATH" => "$HOME/.asdf/shims:$HOME/.asdf/bin:$PATH"
-}
-
 # The asdf shims resolve the Ruby pinned in the release's .tool-versions (4.0.6), so that
 # version must be installed on the host (`asdf install ruby 4.0.6`) before deploying.
 SSHKit.config.command_map[:bundle] = "/home/deployer/.asdf/shims/bundle"
@@ -24,8 +20,23 @@ set :ssh_options, {
   keys: %w[~/.ssh/id_ed25519],
   auth_methods: %w[publickey]
 }
+# Capistrano/SSHKit scratch dir for uploading remote scripts (not Rails/Bun TMPDIR).
 set :tmp_dir, "/home/deployer/tmp"
 set :keep_releases, 3
+
+# tailwindcss-ruby ships a Bun-compiled standalone CLI. Bun extracts native `.node`
+# addons into TMPDIR and dlopens them. Production hosts often mount /tmp noexec
+# (CIS hardening), which yields:
+#   error: /tmp/.….node: failed to map segment from shared object
+#   code: "ERR_DLOPEN_FAILED"
+# Point TMPDIR (and BUN_TMPDIR) at shared/tmp on the app filesystem, which is executable.
+# Confirm on the host: `findmnt -no OPTIONS /tmp` or `mount | grep ' /tmp '`
+set :bun_tmpdir, "#{fetch(:deploy_to)}/shared/tmp"
+set :default_env, {
+  "PATH" => "$HOME/.asdf/shims:$HOME/.asdf/bin:$PATH",
+  "TMPDIR" => fetch(:bun_tmpdir),
+  "BUN_TMPDIR" => fetch(:bun_tmpdir)
+}
 
 # Default value for :linked_files and linked_dirs is []
 set :linked_files,
@@ -84,6 +95,15 @@ namespace :deploy do
     end
   end
   after "deploy:updating", "deploy:write_revision"
+
+  # Ensure Bun/Tailwind can extract native addons under an executable TMPDIR.
+  # linked_dirs already create shared/tmp/{pids,cache,sockets}; mkdir -p is idempotent.
+  task :ensure_bun_tmpdir do
+    on roles(:app) do
+      execute :mkdir, "-p", fetch(:bun_tmpdir)
+    end
+  end
+  before "deploy:assets:precompile", "deploy:ensure_bun_tmpdir"
 
   desc "Upload to shared/config"
   task :upload do
