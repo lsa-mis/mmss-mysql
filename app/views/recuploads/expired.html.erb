@@ -1,0 +1,13 @@
+<p class="text-lg">
+  <span class="text-red-700">This recommendation link has expired.</span>
+  <br><br>
+  For the applicant's protection, recommendation links are valid for
+  <%= Recommendation::UPLOAD_TOKEN_TTL.inspect %> after they are sent, and this one is past that date.
+  <br><br>
+  Please ask the student, or the Michigan Math & Science Scholars at
+  <%= mail_to "mmss@umich.edu" %>, to send you a new link. Include the following information:
+  <ul class="list-disc ml-8 mt-2">
+    <li>The student's name</li>
+    <li>Your name and email address</li>
+  </ul>
+</p>

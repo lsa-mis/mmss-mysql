@@ -1,2 +1,0 @@
-json.extract! enrollment, :id, :user_id, :international, :high_school_name, :high_school_address1, :high_school_address2, :high_school_city, :high_school_state, :high_school_non_us, :high_school_postalcode, :high_school_country, :year_in_school, :anticipated_graduation_year, :room_mate_request, :personal_statement, :shirt_size, :notes, :application_status, :offer_status, :partner_program, :created_at, :updated_at
-json.url enrollment_url(enrollment, format: :json)

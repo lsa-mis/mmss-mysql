@@ -30,14 +30,14 @@
 #
 #  fk_rails_...  (enrollment_id => enrollments.id)
 #
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe Travel, type: :model do
-  describe 'associations' do
+  describe "associations" do
     it { is_expected.to belong_to(:enrollment) }
   end
 
-  describe 'validations' do
+  describe "validations" do
     subject { build(:travel) }
 
     it { is_expected.to validate_presence_of(:arrival_transport) }
@@ -46,22 +46,5 @@ RSpec.describe Travel, type: :model do
     it { is_expected.to validate_presence_of(:depart_session) }
   end
 
-  describe '.ransackable_attributes' do
-    it 'lists attributes allowed for admin search' do
-      attrs = described_class.ransackable_attributes
-      expect(attrs).to include('arrival_transport', 'depart_transport', 'enrollment_id', 'note')
-    end
-
-    it 'accepts optional auth object' do
-      expect { described_class.ransackable_attributes(nil) }.not_to raise_error
-    end
-  end
-
-  describe '.ransackable_associations' do
-    it 'includes enrollment' do
-      expect(described_class.ransackable_associations).to eq(['enrollment'])
-    end
-  end
-
-  it_behaves_like 'a model with timestamps'
+  it_behaves_like "a model with timestamps"
 end

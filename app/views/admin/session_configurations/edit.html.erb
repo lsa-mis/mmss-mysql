@@ -1,0 +1,6 @@
+<% admin_page_title "Edit Session Configuration ##{@session_configuration.id}", subtitle: @session_configuration.description %>
+<% admin_page_actions do %>
+  <%= link_to 'View session configuration', admin_session_configuration_path(@session_configuration), class: 'admin-btn-secondary' %>
+<% end %>
+
+<%= render 'admin/session_configurations/form', session_configuration: @session_configuration %>

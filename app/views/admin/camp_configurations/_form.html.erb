@@ -1,0 +1,32 @@
+<%# locals: camp_configuration %>
+<%= admin_form_with model: camp_configuration,
+                    url: (camp_configuration.persisted? ? admin_camp_configuration_path(camp_configuration) : admin_camp_configurations_path),
+                    class: 'grid gap-5' do |f| %>
+  <%= f.errors_summary %>
+
+  <div class="grid gap-5 xl:grid-cols-2">
+    <%= f.fieldset 'Camp' do %>
+      <%= f.input :camp_year, as: :number, required: true %>
+      <%= f.input :active, hint: 'Only one camp can be active at a time.' %>
+      <%= f.input :application_fee, as: :number, step: 0.01, min: 0, label: 'Application fee ($)' %>
+      <%= f.input :application_fee_required, label: 'Require Application Fee' %>
+      <%= f.input :student_packet_url, label: 'Student packet URL', hint: 'Sent to campers who accept their offer.' %>
+    <% end %>
+
+    <%= f.fieldset 'Dates' do %>
+      <%= f.input :application_open, required: true %>
+      <%= f.input :application_close, required: true %>
+      <%= f.input :priority, required: true %>
+      <%= f.input :application_materials_due, required: true %>
+      <%= f.input :camper_acceptance_due, required: true %>
+    <% end %>
+  </div>
+
+  <%= f.fieldset 'Letters', description: 'Plain text. Each letter is emailed to applicants when their status changes.' do %>
+    <%= f.input :offer_letter, as: :textarea, rows: 8, required: true %>
+    <%= f.input :reject_letter, as: :textarea, rows: 8, required: true, label: 'Rejection letter' %>
+    <%= f.input :waitlist_letter, as: :textarea, rows: 8, required: true, label: 'Wait list letter' %>
+  <% end %>
+
+  <%= f.actions cancel: (camp_configuration.persisted? ? admin_camp_configuration_path(camp_configuration) : admin_camp_configurations_path) %>
+<% end %>

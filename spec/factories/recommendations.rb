@@ -21,12 +21,15 @@
 #  best_contact_time        :string(255)
 #  submitted_recommendation :string(255)
 #  date_submitted           :datetime
+#  upload_token             :string(255)
+#  upload_token_expires_at  :datetime
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
 #
 # Indexes
 #
 #  index_recommendations_on_enrollment_id  (enrollment_id)
+#  index_recommendations_on_upload_token   (upload_token) UNIQUE
 #
 # Foreign Keys
 #
@@ -46,9 +49,9 @@ FactoryBot.define do
     state { Faker::Address.state_abbr }
     state_non_us { nil }
     postalcode { Faker::Address.zip_code }
-    country { 'US' }
+    country { "US" }
     phone_number { Faker::PhoneNumber.phone_number }
-    best_contact_time { ['Morning', 'Afternoon', 'Evening'].sample }
+    best_contact_time { ["Morning", "Afternoon", "Evening"].sample }
     submitted_recommendation { false }
     date_submitted { nil }
 
@@ -58,7 +61,8 @@ FactoryBot.define do
     end
 
     trait :international do
-      country { Faker::Address.country_code }
+      # Faker::Address.country_code can return 'US', which the trait's specs assert against.
+      country { %w[CA GB DE FR JP IN BR].sample }
       state { nil }
       state_non_us { Faker::Address.state }
     end
@@ -66,7 +70,12 @@ FactoryBot.define do
     trait :with_upload do
       after(:create) do |recommendation|
         create(:recupload, recommendation: recommendation)
+        recommendation.reload
       end
+    end
+
+    trait :expired_link do
+      upload_token_expires_at { 1.day.ago }
     end
   end
 end

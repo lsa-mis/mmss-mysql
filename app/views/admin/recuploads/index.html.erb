@@ -1,0 +1,34 @@
+<% admin_page_title 'Recuploads', subtitle: "#{number_with_delimiter(@pagy.count)} #{'recommendation letter'.pluralize(@pagy.count)}" %>
+<% admin_page_actions do %>
+  <%= admin_csv_link %>
+  <%= link_to 'New Recupload', new_admin_recupload_path, class: 'admin-btn-primary' %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-4">
+  <div class="grid gap-4 xl:col-span-3">
+    <%= admin_table @recuploads, pagy: @pagy,
+                    batch_actions: Admin::RecuploadsController::BATCH_ACTIONS, batch_url: batch_admin_recuploads_path,
+                    actions: ->(recupload) { [admin_recupload_path(recupload), edit_admin_recupload_path(recupload), admin_recupload_path(recupload)] } do |t| %>
+      <% t.column 'Recommendation', sort: 'recommendation_id' do |recupload| %>
+        <%= link_to "##{recupload.recommendation_id}", admin_recommendation_path(recupload.recommendation_id) %>
+      <% end %>
+      <% t.column 'Applicant', sort: 'applicant' do |recupload| %>
+        <%= admin_applicant_link(recupload.recommendation.enrollment, with_email: true) %>
+      <% end %>
+      <% t.column 'Author / Recommender', sort: 'authorname' do |recupload| %>
+        <%= recupload.authorname %>
+      <% end %>
+      <% t.column :letter do |recupload| %>
+        <span class="block max-w-md truncate" title="<%= recupload.letter %>"><%= recupload.letter.presence || admin_empty_value %></span>
+      <% end %>
+      <% t.column 'Attached File' do |recupload| %>
+        <%= admin_attachment_link(recupload.recletter) %>
+      <% end %>
+      <% t.column :created_at, sort: true %>
+    <% end %>
+  </div>
+
+  <div class="xl:col-span-1">
+    <%= admin_filter_form @filter, url: admin_recuploads_path %>
+  </div>
+</div>

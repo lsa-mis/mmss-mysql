@@ -1,0 +1,26 @@
+<% admin_page_title "Session Assignment ##{@session_assignment.id}", subtitle: "#{admin_applicant_name(@session_assignment.enrollment)} · #{@session_assignment.camp_occurrence.description}" %>
+<% admin_page_actions do %>
+  <%= link_to 'Edit', edit_admin_session_assignment_path(@session_assignment), class: 'admin-btn-primary' %>
+  <%= button_to 'Delete', admin_session_assignment_path(@session_assignment), method: :delete, class: 'admin-btn-danger',
+                form: { data: { turbo_confirm: 'Delete this session assignment?' } } %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-3">
+  <div class="grid gap-5 xl:col-span-2">
+    <%= admin_panel 'Session Assignment', body_class: '' do %>
+      <%= admin_attributes @session_assignment do |a| %>
+        <% a.row 'Applicant' do |assignment| %>
+          <%= admin_applicant_link(assignment.enrollment) %>
+          <span class="text-slate-500"><%= assignment.enrollment.user.email %></span>
+        <% end %>
+        <% a.row 'Session' do |assignment| %>
+          <%= admin_resource_link(assignment.camp_occurrence) %>
+        <% end %>
+        <% a.row :created_at, :updated_at %>
+        <% a.row :offer_status do |assignment| %><%= admin_status_badge(assignment.offer_status) %><% end %>
+      <% end %>
+    <% end %>
+
+    <%= render 'admin/comments/comments', resource: @session_assignment %>
+  </div>
+</div>

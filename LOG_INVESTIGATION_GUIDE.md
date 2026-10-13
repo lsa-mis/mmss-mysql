@@ -246,13 +246,35 @@ When you find the error, look for:
 4. **Review the enrollment form** - ensure CSRF token is included
 5. **Check for JavaScript errors** that might prevent token submission
 
-## Additional Debugging
+## "Blocked hosts" 403s
 
-If you need more context, you can temporarily increase log verbosity:
+Production and staging only answer requests whose `Host` header is the public hostname (plus anything in
+`RAILS_ALLOWED_HOSTS`; see `lib/allowed_hosts.rb`). A request addressed to the node by IP or by an internal
+name gets a plain 403 and one log line:
 
-```bash
-# Check current log level (should be :info in production)
-grep "log_level" /home/deployer/apps/mmss-mysql/current/config/environments/production.rb
+```
+[ActionDispatch::HostAuthorization::DefaultResponseApp] Blocked hosts: node3.internal.umich.edu
 ```
 
-Note: The log level is set to `:info` in production, which should capture CSRF errors.
+`/up` is exempt, so health checks keep working. If a legitimate name shows up here, add it to
+`RAILS_ALLOWED_HOSTS` (comma-separated; a leading dot allows a whole domain, e.g. `.lsa.umich.edu`) in the
+service environment and restart Puma — no deploy needed.
+
+## Staging (Hatchbox)
+
+Staging logs to STDOUT (`RAILS_LOG_TO_STDOUT`), so use the Hatchbox log viewer instead of the paths above.
+Staging mail is not delivered; it is browsable at `/letter_opener` (HTTP basic auth via
+`LETTER_OPENER_WEB_HTTP_BASIC_USER` / `_PASSWORD`).
+
+## Additional Debugging
+
+The log level defaults to `info` in production and staging and is read from the environment, so it can be
+raised without a deploy:
+
+```bash
+# in the Puma service environment, then restart Puma
+RAILS_LOG_LEVEL=debug
+```
+
+`info` already captures CSRF failures and host-authorization blocks. Health-check requests to `/up` are
+silenced (`config.silence_healthcheck_path`), so they never appear in the logs.

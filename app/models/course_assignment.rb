@@ -22,13 +22,17 @@
 #  fk_rails_...  (enrollment_id => enrollments.id)
 #
 class CourseAssignment < ApplicationRecord
+  include AdminCommentable
+
   belongs_to :enrollment
   belongs_to :course
 
+  # standard:disable Rails/RedundantPresenceValidationOnBelongsTo -- keeps the "can't be blank" error the model specs assert; belongs_to alone reports "must exist"
   validates :enrollment_id, presence: true
   validates :course_id, presence: true
+  # standard:enable Rails/RedundantPresenceValidationOnBelongsTo
 
-  scope :for_session, ->(session_id) { joins(:course).where(courses: { camp_occurrence_id: session_id }) }
+  scope :for_session, ->(session_id) { joins(:course).where(courses: {camp_occurrence_id: session_id}) }
   scope :wait_list, -> { where(wait_list: true) }
   scope :confirmed, -> { where(wait_list: false) }
 
@@ -66,15 +70,6 @@ class CourseAssignment < ApplicationRecord
     OfferMailer.offer_declined_email(user.id, session_assignment, course_assignment).deliver_now
   end
 
-  scope :number_of_assignments, ->(course_id="") {where(course_id: course_id, wait_list: false).size}
-  scope :wait_list_number, -> (course_id="") { where(course_id: course_id, wait_list: true).size }
-
-  def self.ransackable_associations(auth_object = nil)
-    ["course", "enrollment"]
-  end
-
-  def self.ransackable_attributes(auth_object = nil)
-    ["course_id", "created_at", "enrollment_id", "id", "updated_at", "wait_list"]
-  end
-
+  scope :number_of_assignments, ->(course_id = "") { where(course_id: course_id, wait_list: false).size }
+  scope :wait_list_number, ->(course_id = "") { where(course_id: course_id, wait_list: true).size }
 end

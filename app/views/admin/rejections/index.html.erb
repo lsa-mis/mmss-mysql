@@ -1,0 +1,29 @@
+<% admin_page_title 'Rejections', subtitle: "#{number_with_delimiter(@pagy.count)} #{'rejection'.pluralize(@pagy.count)}" %>
+<% admin_page_actions do %>
+  <%= admin_csv_link %>
+  <%= link_to 'New Rejection', new_admin_rejection_path, class: 'admin-btn-primary' %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-4">
+  <div class="grid gap-4 xl:col-span-3">
+    <%= admin_table @rejections, pagy: @pagy,
+                    batch_actions: Admin::RejectionsController::BATCH_ACTIONS, batch_url: batch_admin_rejections_path,
+                    actions: ->(rejection) { [admin_rejection_path(rejection), edit_admin_rejection_path(rejection), admin_rejection_path(rejection)] } do |t| %>
+      <% t.column :id, sort: true do |rejection| %>
+        <%= link_to rejection.id, admin_rejection_path(rejection), class: 'font-medium' %>
+      <% end %>
+      <% t.column 'Enrollment', sort: 'enrollment' do |rejection| %>
+        <%= admin_applicant_link(rejection.enrollment, with_email: true) %>
+      <% end %>
+      <% t.column :reason do |rejection| %>
+        <span class="block max-w-md truncate" title="<%= rejection.reason %>"><%= rejection.reason.presence || admin_empty_value %></span>
+      <% end %>
+      <% t.column :created_at, sort: true %>
+      <% t.column :updated_at, sort: true %>
+    <% end %>
+  </div>
+
+  <div class="xl:col-span-1">
+    <%= admin_filter_form @filter, url: admin_rejections_path %>
+  </div>
+</div>

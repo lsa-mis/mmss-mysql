@@ -24,6 +24,8 @@
 #
 class CampOccurrence < ApplicationRecord
   include MoneyRails::ActionViewExtension
+  include AdminCommentable
+
   belongs_to :camp_configuration
   has_many :activities, dependent: :destroy
   has_many :courses, dependent: :destroy
@@ -34,20 +36,20 @@ class CampOccurrence < ApplicationRecord
   has_many :session_assignments, dependent: :destroy
 
   validates :description, presence: true
-  validates :begin_date, presence: true, format: { with: ConstantData::VALID_DATE_REGEX }
-  validates :end_date, presence: true, format: { with: ConstantData::VALID_DATE_REGEX }
-  validates :cost_cents, presence: true, numericality: { only_integer: true }
+  validates :begin_date, presence: true, format: {with: ConstantData::VALID_DATE_REGEX}
+  validates :end_date, presence: true, format: {with: ConstantData::VALID_DATE_REGEX}
+  validates :cost_cents, presence: true, numericality: {only_integer: true}
 
   monetize :cost_cents
 
   scope :active, -> { where(active: true).order(description: :asc) }
   scope :no_any_session, -> { where.not(description: "Any Session") }
 
-  scope :session_description, ->(description="") { where(description: description).active.first}
+  scope :session_description, ->(description = "") { where(description: description).active.first }
 
   def description_with_date
     if description == "Any Session"
-      "#{description}"
+      description.to_s
     else
       "#{description} -- #{begin_date} until #{end_date}"
     end
@@ -55,26 +57,17 @@ class CampOccurrence < ApplicationRecord
 
   def description_with_date_and_price
     if description == "Any Session"
-      "#{description}"
+      description.to_s
     else
-      "#{description} -- #{begin_date} until #{end_date} -- #{humanized_money_with_symbol(self.cost)}"
+      "#{description} -- #{begin_date} until #{end_date} -- #{humanized_money_with_symbol(cost)}"
     end
   end
 
   def display_name
-    "#{self.description} - #{self.begin_date} to #{self.end_date}" # or whatever column you want
+    "#{description} - #{begin_date} to #{end_date}" # or whatever column you want
   end
 
   def description_with_month_and_day
-    "#{self.description}: #{self.begin_date.strftime('%B %d')} to #{self.end_date.strftime('%B %d')}"
+    "#{description}: #{begin_date.strftime("%B %d")} to #{end_date.strftime("%B %d")}"
   end
-
-  def self.ransackable_associations(auth_object = nil)
-    ["activities", "camp_configuration", "courses", "enrollments", "session_activities", "session_assignments"]
-  end
-
-  def self.ransackable_attributes(auth_object = nil)
-    ["active", "begin_date", "camp_configuration_id", "cost_cents", "created_at", "description", "end_date", "id", "updated_at"]
-  end
-
 end

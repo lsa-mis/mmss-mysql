@@ -1,0 +1,40 @@
+<% admin_page_title 'Travels', subtitle: "#{number_with_delimiter(@pagy.count)} #{'travel record'.pluralize(@pagy.count)}" %>
+<% admin_page_actions do %>
+  <%= admin_csv_link %>
+  <%= link_to 'New Travel', new_admin_travel_path, class: 'admin-btn-primary' %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-4">
+  <div class="grid gap-4 xl:col-span-3">
+    <%= admin_table @travels, pagy: @pagy,
+                    batch_actions: Admin::TravelsController::BATCH_ACTIONS, batch_url: batch_admin_travels_path,
+                    actions: ->(travel) { [admin_travel_path(travel), edit_admin_travel_path(travel), admin_travel_path(travel)] } do |t| %>
+      <% t.column 'Applicant', sort: 'applicant' do |travel| %>
+        <%= admin_applicant_link(travel.enrollment, with_email: true) %>
+      <% end %>
+      <% t.column :arrival_session, sort: true %>
+      <% t.column :depart_session, sort: true %>
+      <% t.column :arrival_transport, sort: true do |travel| %>
+        <span class="block max-w-xs truncate" title="<%= travel.arrival_transport %>"><%= travel.arrival_transport.presence || admin_empty_value %></span>
+      <% end %>
+      <% t.column :arrival_carrier %>
+      <% t.column :arrival_route_num %>
+      <% t.column :arrival_date, sort: true do |travel| %><%= admin_travel_date(travel.arrival_date) %><% end %>
+      <% t.column :arrival_time, sort: true do |travel| %><%= admin_travel_time(travel.arrival_time) %><% end %>
+      <% t.column :depart_transport, sort: true do |travel| %>
+        <span class="block max-w-xs truncate" title="<%= travel.depart_transport %>"><%= travel.depart_transport.presence || admin_empty_value %></span>
+      <% end %>
+      <% t.column :depart_carrier %>
+      <% t.column :depart_route_num %>
+      <% t.column :depart_date, sort: true do |travel| %><%= admin_travel_date(travel.depart_date) %><% end %>
+      <% t.column :depart_time, sort: true do |travel| %><%= admin_travel_time(travel.depart_time) %><% end %>
+      <% t.column :note do |travel| %>
+        <span class="block max-w-xs truncate" title="<%= travel.note %>"><%= travel.note.presence || admin_empty_value %></span>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="xl:col-span-1">
+    <%= admin_filter_form @filter, url: admin_travels_path %>
+  </div>
+</div>

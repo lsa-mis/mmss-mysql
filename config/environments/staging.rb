@@ -1,7 +1,9 @@
+require_relative "../../lib/allowed_hosts"
+
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
-  config.cache_classes = true
+  config.enable_reloading = false
   config.eager_load = true
 
   config.consider_all_requests_local = false
@@ -10,22 +12,30 @@ Rails.application.configure do
   # config.require_master_key = true
 
   config.public_file_server.enabled = ENV["RAILS_SERVE_STATIC_FILES"].present?
-
-  config.assets.compile = false
+  config.public_file_server.headers = {"cache-control" => "public, max-age=#{1.year.to_i}"}
 
   # Local disk only (no GCS on staging).
   config.active_storage.service = :local
 
-  config.force_ssl = ActiveModel::Type::Boolean.new.cast(ENV.fetch("STAGING_FORCE_SSL", "true"))
+  # STAGING_FORCE_SSL=false runs staging over plain HTTP; the session cookie must then not be
+  # marked Secure, or browsers would never send it back and every request would look logged out.
+  staging_force_ssl = ActiveModel::Type::Boolean.new.cast(ENV.fetch("STAGING_FORCE_SSL", "true"))
+  # Hatchbox terminates TLS at its proxy; treat every request as HTTPS (secure cookies, https
+  # URLs) whenever staging runs over SSL at all.
+  config.assume_ssl = staging_force_ssl
+  config.force_ssl = staging_force_ssl
+  config.ssl_options = {redirect: {exclude: ->(request) { request.path == "/up" }}}
 
   # Match production session behavior on HTTPS staging (secure cookies).
-  Rails.application.config.session_store :cookie_store,
+  config.session_store :cookie_store,
     key: "mmss_security_session",
-    secure: true,
+    secure: staging_force_ssl,
     expire_after: 4.hours
 
-  config.log_level = :info
+  config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")
   config.log_tags = [:request_id]
+  config.silence_healthcheck_path = "/up"
+  config.active_record.attributes_for_inspect = [:id]
 
   config.action_mailer.perform_caching = false
   config.action_mailer.perform_deliveries = true
@@ -36,22 +46,18 @@ Rails.application.configure do
   config.action_mailer.default_url_options = {host: staging_host, protocol: staging_protocol}
 
   config.i18n.fallbacks = true
-  config.active_support.deprecation = :notify
+  config.active_support.report_deprecations = false
 
-  if ENV["RAILS_LOG_TO_STDOUT"].present?
-    logger = ActiveSupport::Logger.new($stdout)
-    logger.formatter = config.log_formatter
-    config.logger = ActiveSupport::TaggedLogging.new(logger)
-  end
+  # Hatchbox collects STDOUT; set RAILS_LOG_TO_STDOUT there.
+  config.logger = ActiveSupport::TaggedLogging.logger($stdout) if ENV["RAILS_LOG_TO_STDOUT"].present?
 
   config.active_record.dump_schema_after_migration = false
 
-  # HostAuthorization behind reverse proxies: set STAGING_ALLOWED_HOSTS=comma,separated,hosts
-  if (hosts = ENV["STAGING_ALLOWED_HOSTS"].presence)
-    hosts.split(",").map(&:strip).reject(&:empty?).each do |host|
-      config.hosts << host
-    end
-  end
+  # Host header protection: the public staging hostname plus RAILS_ALLOWED_HOSTS (comma-separated;
+  # STAGING_ALLOWED_HOSTS is still read for Hatchbox apps configured before the rename). /up stays
+  # reachable from any host for health checks. See lib/allowed_hosts.rb.
+  AllowedHosts.configure(config, "mmss-registration-staging.lsa.umich.edu",
+    env_keys: [AllowedHosts::ENV_KEY, "STAGING_ALLOWED_HOSTS"])
 
   require Rails.root.join("lib/middleware/letter_opener_web_basic_auth")
   config.middleware.use LetterOpenerWebBasicAuth

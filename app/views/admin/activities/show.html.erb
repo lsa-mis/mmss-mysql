@@ -1,0 +1,29 @@
+<% admin_page_title @activity.description, subtitle: "Activity ##{@activity.id} · #{@activity.camp_occurrence.description}" %>
+<% admin_page_actions do %>
+  <%= link_to 'Edit', edit_admin_activity_path(@activity), class: 'admin-btn-primary' %>
+  <%= button_to 'Delete', admin_activity_path(@activity), method: :delete, class: 'admin-btn-danger',
+                form: { data: { turbo_confirm: 'Delete this activity? Applicant selections of it will be deleted too.' } } %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-3">
+  <div class="grid gap-5 xl:col-span-2">
+    <%= admin_panel 'Activity', body_class: '' do %>
+      <%= admin_attributes @activity do |a| %>
+        <% a.row 'Session' do |activity| %>
+          <%= link_to activity.camp_occurrence.display_name, admin_session_configuration_path(activity.camp_occurrence) %>
+        <% end %>
+        <% a.row :description %>
+        <% a.row 'Cost' do |activity| %><%= humanized_money_with_symbol(activity.cost) %><% end %>
+        <% a.row :date_occurs, :active, :created_at, :updated_at %>
+      <% end %>
+    <% end %>
+
+    <%= render 'admin/comments/comments', resource: @activity %>
+  </div>
+
+  <div class="grid gap-5 self-start">
+    <%= admin_panel 'Related' do %>
+      <%= admin_stat 'Applicants who selected this activity', @activity.enrollment_activities.count %>
+    <% end %>
+  </div>
+</div>

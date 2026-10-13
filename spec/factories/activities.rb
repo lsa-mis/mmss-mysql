@@ -39,7 +39,7 @@ FactoryBot.define do
     end
 
     trait :residential do
-      description { 'Residential Stay' }
+      description { "Residential Stay" }
       cost_cents { 50000 }
     end
 

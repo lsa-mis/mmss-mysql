@@ -30,12 +30,6 @@
 # ignore db dump files
 /dump/*
 
-/public/packs
-/public/packs-test
-/node_modules
-/yarn-error.log
-yarn-debug.log*
-.yarn-integrity
 .vscode
 .cursor
 .notes
@@ -54,3 +48,6 @@ puma-prod.rb
 
 coverage/*
 *copy.erb
+
+/app/assets/builds/*
+!/app/assets/builds/.keep

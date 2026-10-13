@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
 class FeedbacksController < ApplicationController
-  devise_group :logged_in, contains: [:user, :admin, :faculty]
-  before_action :authenticate_logged_in!
-
-  # InheritedResources::Base
-  # see https://railsguides.net/clean-up-controllers-with-inherited-resources/
+  # Feedback belongs to an applicant account (current_user.feedbacks); the footer only offers the
+  # link to signed-in users.
+  before_action :authenticate_user!
 
   def index
     redirect_to root_path
@@ -22,22 +20,17 @@ class FeedbacksController < ApplicationController
   def create
     @feedback = current_user.feedbacks.new(feedback_params)
 
-    respond_to do |format|
-      if @feedback.save
-        format.html { redirect_to root_path, notice: 'Feedback was successfully created.' }
-        format.json { render :show, status: :created, location: @feedback }
-        FeedbackMailer.with(feedback: @feedback).feedback_email.deliver_now
-      else
-        format.html { render :new }
-        format.json { render json: @feedback.errors, status: :unprocessable_entity }
-      end
+    if @feedback.save
+      FeedbackMailer.with(feedback: @feedback).feedback_email.deliver_now
+      redirect_to root_path, notice: "Feedback was successfully created.", status: :see_other
+    else
+      render :new, status: :unprocessable_content
     end
   end
 
   private
 
-    def feedback_params
-      params.require(:feedback).permit(:user_id, :genre, :message)
-    end
-
+  def feedback_params
+    params.require(:feedback).permit(:user_id, :genre, :message)
+  end
 end

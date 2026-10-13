@@ -1,0 +1,33 @@
+<% admin_page_title 'Camp Configurations', subtitle: "#{number_with_delimiter(@pagy.count)} #{'camp'.pluralize(@pagy.count)}" %>
+<% admin_page_actions do %>
+  <%= admin_csv_link %>
+  <%= link_to 'New Camp Configuration', new_admin_camp_configuration_path, class: 'admin-btn-primary' %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-4">
+  <div class="xl:col-span-3">
+    <%= admin_table @camp_configurations, pagy: @pagy,
+                    batch_actions: Admin::CampConfigurationsController::BATCH_ACTIONS, batch_url: batch_admin_camp_configurations_path,
+                    actions: ->(camp) { [admin_camp_configuration_path(camp), edit_admin_camp_configuration_path(camp), admin_camp_configuration_path(camp)] } do |t| %>
+      <% t.column :camp_year, sort: true do |camp| %>
+        <%= link_to camp.camp_year, admin_camp_configuration_path(camp), class: 'font-medium' %>
+      <% end %>
+      <% t.column :application_open, sort: true %>
+      <% t.column :application_close, sort: true %>
+      <% t.column :priority, sort: true %>
+      <% t.column :application_materials_due, sort: true %>
+      <% t.column :camper_acceptance_due, sort: true %>
+      <% t.column :active, sort: true %>
+      <% t.column 'Application Fee', sort: 'application_fee' do |camp| %>
+        <%= humanized_money_with_symbol(camp.application_fee) %>
+      <% end %>
+      <% t.column 'Fee Required', sort: 'application_fee_required' do |camp| %>
+        <%= admin_boolean(camp.application_fee_required) %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="xl:col-span-1">
+    <%= admin_filter_form @filter, url: admin_camp_configurations_path %>
+  </div>
+</div>

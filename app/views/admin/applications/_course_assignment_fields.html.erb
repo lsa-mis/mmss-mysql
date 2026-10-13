@@ -1,0 +1,13 @@
+<%# locals: f, application %>
+<div class="flex flex-wrap items-end gap-3 rounded-md border border-slate-200 bg-slate-50 p-3"
+     data-nested-form-target="row" data-persisted="<%= f.object.persisted? %>">
+  <%= f.hidden_field :_destroy, value: '0' %>
+  <div class="min-w-48 flex-1">
+    <%= f.input :course_id, as: :select, label: 'Course', include_blank: 'Select a course',
+                            collection: admin_application_course_options(application) %>
+  </div>
+  <div class="pb-2">
+    <%= f.input :wait_list %>
+  </div>
+  <button type="button" class="admin-btn-secondary admin-btn-sm text-red-700" data-action="nested-form#remove">Remove</button>
+</div>

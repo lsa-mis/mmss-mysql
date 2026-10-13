@@ -1,0 +1,47 @@
+<% admin_page_title 'Applicant Details', subtitle: "#{number_with_delimiter(@pagy.count)} #{'applicant'.pluralize(@pagy.count)} · #{current_scope.label}" %>
+<% admin_page_actions do %>
+  <%= admin_csv_link %>
+  <%= link_to 'New Applicant Detail', new_admin_applicant_detail_path, class: 'admin-btn-primary' %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-4">
+  <div class="grid gap-4 xl:col-span-3">
+    <%= admin_scope_tabs Admin::ApplicantDetailsController::SCOPES, counts: @scope_counts %>
+
+    <%= admin_table @applicant_details, pagy: @pagy,
+                    actions: ->(detail) { [admin_applicant_detail_path(detail), edit_admin_applicant_detail_path(detail), nil] } do |t| %>
+      <% t.column 'Fullname', sort: 'fullname' do |detail| %>
+        <%= link_to detail.full_name, admin_applicant_detail_path(detail), class: 'font-medium' %>
+      <% end %>
+      <% t.column 'Email', sort: 'email' do |detail| %>
+        <%= admin_applicant_detail_email(detail) %>
+      <% end %>
+      <% t.column :gender do |detail| %>
+        <%= admin_applicant_gender_name(detail) %>
+      <% end %>
+      <% t.column :us_citizen, sort: true %>
+      <% t.column :demographic do |detail| %>
+        <%= detail.formatted_demographic %>
+      <% end %>
+      <% t.column :birthdate, sort: true %>
+      <% t.column :diet_restrictions do |detail| %>
+        <span class="block max-w-xs truncate" title="<%= detail.diet_restrictions %>"><%= detail.diet_restrictions.presence || admin_empty_value %></span>
+      <% end %>
+      <% t.column :shirt_size, sort: true %>
+      <% t.column :address1 %>
+      <% t.column :address2 %>
+      <% t.column :city, sort: true %>
+      <% t.column :state, sort: true %>
+      <% t.column :state_non_us %>
+      <% t.column :postalcode, sort: true %>
+      <% t.column :country, sort: true %>
+      <% t.column :phone %>
+      <% t.column :created_at, sort: true %>
+      <% t.column :updated_at, sort: true %>
+    <% end %>
+  </div>
+
+  <div class="xl:col-span-1">
+    <%= admin_filter_form @filter, url: admin_applicant_details_path %>
+  </div>
+</div>

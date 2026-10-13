@@ -22,16 +22,16 @@ Devise.setup do |config|
   # NOTE: this is set in the application_mailer.rb file
 
   # Configure the class responsible to send e-mails.
-  config.mailer = 'Devise::Mailer'
+  config.mailer = "Devise::Mailer"
 
   # Configure the parent class responsible to send e-mails.
-  config.parent_mailer = 'ApplicationMailer'
+  config.parent_mailer = "ApplicationMailer"
 
   # ==> ORM configuration
   # Load and configure the ORM. Supports :active_record (default) and
   # :mongoid (bson_ext recommended) by default. Other ORMs may be
   # available as additional gems.
-  require 'devise/orm/active_record'
+  require "devise/orm/active_record"
 
   # ==> Configuration for any authentication mechanism
   # Configure which keys are used when authenticating a user. The default is
@@ -285,12 +285,11 @@ Devise.setup do |config|
   # so you need to do it manually. For the users scope, it would be:
   # config.omniauth_path_prefix = '/my_engine/users/auth'
 
-  # ==> Turbolinks configuration
-  # If your app is using Turbolinks, Turbolinks::Controller needs to be included to make redirection work correctly:
-  #
-  # ActiveSupport.on_load(:devise_failure_app) do
-  #   include Turbolinks::Controller
-  # end
+  # ==> Hotwire/Turbo configuration
+  # Turbo Drive only renders form responses that carry an error status and only
+  # follows redirects after non-GET submissions when they use 303 See Other.
+  config.responder.error_status = :unprocessable_content
+  config.responder.redirect_status = :see_other
 
   # ==> Configuration for :registerable
 

@@ -1,0 +1,14 @@
+<%# locals: gender_type %>
+<%= admin_form_with model: gender_type, scope: :gender,
+                    url: (gender_type.persisted? ? admin_gender_type_path(gender_type) : admin_gender_types_path),
+                    class: 'grid gap-5' do |f| %>
+  <%= f.errors_summary %>
+
+  <%= f.fieldset 'Gender Type' do %>
+    <%= f.input :name, required: true %>
+    <%= f.input :description %>
+  <% end %>
+
+  <%= f.actions(gender_type.persisted? ? 'Update Gender Type' : 'Create Gender Type',
+                cancel: (gender_type.persisted? ? admin_gender_type_path(gender_type) : admin_gender_types_path)) %>
+<% end %>

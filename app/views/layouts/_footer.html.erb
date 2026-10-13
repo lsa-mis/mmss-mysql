@@ -21,7 +21,7 @@
             <%= link_to 'Admin Dashboard', admin_root_path, class: "mt-2 pr-4" %>
           </li>
           <li>
-            <%= link_to destroy_admin_session_path, method: :delete do  %>
+            <%= link_to destroy_admin_session_path, data: { turbo_method: :delete } do  %>
               <%= render :partial => 'svg/open_padlock' %>
               <span>Admin Sign_out</span>
             <% end %>

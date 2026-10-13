@@ -1,0 +1,52 @@
+<%# locals: pagy %>
+<nav class="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 bg-white px-4 py-2 text-sm" aria-label="Pagination">
+  <p class="text-slate-600">
+    <% if pagy.count.zero? %>
+      No records
+    <% else %>
+      Showing <span class="font-medium"><%= pagy.from %></span>–<span class="font-medium"><%= pagy.to %></span>
+      of <span class="font-medium"><%= number_with_delimiter(pagy.count) %></span>
+    <% end %>
+  </p>
+
+  <div class="flex items-center gap-3">
+    <%= form_with url: admin_index_path(page: nil, limit: nil), method: :get, class: 'flex items-center gap-1', data: { turbo_frame: '_top', controller: 'auto-submit' } do |f| %>
+      <%= admin_index_hidden_fields(except: %i[page limit]) %>
+      <label for="per_page" class="text-xs text-slate-500">Per page</label>
+      <%= select_tag :limit, options_for_select([30, 50, 100, 200], pagy.limit), id: 'per_page',
+                     class: 'admin-input mt-0 w-auto py-1 text-xs', data: { action: 'change->auto-submit#submit' } %>
+    <% end %>
+
+    <% if pagy.pages > 1 %>
+      <ul class="flex items-center gap-1">
+        <li>
+          <% if pagy.previous %>
+            <%= link_to '‹ Prev', pagy.page_url(:previous), class: 'admin-btn-secondary admin-btn-sm', rel: 'prev' %>
+          <% else %>
+            <span class="admin-btn-secondary admin-btn-sm opacity-50">‹ Prev</span>
+          <% end %>
+        </li>
+        <%# Pagy 43 marks #series protected (it is meant for its own nav helpers); #page_url is public. %>
+        <% pagy.send(:series).each do |item| %>
+          <li>
+            <% case item %>
+            <% when Integer %>
+              <%= link_to item, pagy.page_url(item), class: 'admin-btn-secondary admin-btn-sm' %>
+            <% when String %>
+              <span class="admin-btn-primary admin-btn-sm" aria-current="page"><%= item %></span>
+            <% else %>
+              <span class="px-1 text-slate-400">…</span>
+            <% end %>
+          </li>
+        <% end %>
+        <li>
+          <% if pagy.next %>
+            <%= link_to 'Next ›', pagy.page_url(:next), class: 'admin-btn-secondary admin-btn-sm', rel: 'next' %>
+          <% else %>
+            <span class="admin-btn-secondary admin-btn-sm opacity-50">Next ›</span>
+          <% end %>
+        </li>
+      </ul>
+    <% end %>
+  </div>
+</nav>

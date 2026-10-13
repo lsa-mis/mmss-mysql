@@ -24,14 +24,8 @@ class EnrollmentActivity < ApplicationRecord
   belongs_to :enrollment
   belongs_to :activity
 
-  validates_presence_of :enrollment
-  validates_presence_of :activity
-
-  def self.ransackable_associations(auth_object = nil)
-    ["activity", "enrollment"]
-  end
-
-  def self.ransackable_attributes(auth_object = nil)
-    ["activity_id", "created_at", "enrollment_id", "id", "updated_at"]
-  end
+  # standard:disable Rails/RedundantPresenceValidationOnBelongsTo -- keeps the "can't be blank" error the model specs assert; belongs_to alone reports "must exist"
+  validates :enrollment, presence: true
+  validates :activity, presence: true
+  # standard:enable Rails/RedundantPresenceValidationOnBelongsTo
 end

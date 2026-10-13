@@ -1,0 +1,6 @@
+<% admin_page_title "Edit Course Preference ##{@course_preference.id}", subtitle: admin_applicant_name(@course_preference.enrollment) %>
+<% admin_page_actions do %>
+  <%= link_to 'View course preference', admin_course_preference_path(@course_preference), class: 'admin-btn-secondary' %>
+<% end %>
+
+<%= render 'admin/course_preferences/form', course_preference: @course_preference %>

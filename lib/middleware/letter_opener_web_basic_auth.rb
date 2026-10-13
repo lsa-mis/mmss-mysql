@@ -45,9 +45,9 @@ class LetterOpenerWebBasicAuth
     [
       401,
       {
-        "Content-Type" => "text/plain",
-        "Content-Length" => body.bytesize.to_s,
-        "WWW-Authenticate" => 'Basic realm="Letter Opener Web"'
+        "content-type" => "text/plain",
+        "content-length" => body.bytesize.to_s,
+        "www-authenticate" => 'Basic realm="Letter Opener Web"'
       },
       [body]
     ]

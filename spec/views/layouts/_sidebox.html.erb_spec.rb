@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require "rails_helper"
 
-RSpec.describe 'layouts/_sidebox.html.erb', type: :view do
+RSpec.describe "layouts/_sidebox.html.erb", type: :view do
   let!(:camp_config) { create(:camp_configuration, :active, camp_year: Date.current.year, application_fee_required: true) }
   let(:user) { create(:user, :with_applicant_detail) }
   let!(:enrollment) { create(:enrollment, user: user, campyear: camp_config.camp_year) }
@@ -25,11 +25,11 @@ RSpec.describe 'layouts/_sidebox.html.erb', type: :view do
     assign(:current_enrollment, enrollment)
   end
 
-  it 'does not render Account Summary before the application fee is paid' do
-    render partial: 'layouts/sidebox'
+  it "does not render Account Summary before the application fee is paid" do
+    render partial: "layouts/sidebox"
 
-    expect(rendered).to include('Progress Window')
-    expect(rendered).to include('Applicant Details')
-    expect(rendered).not_to include('Account Summary')
+    expect(rendered).to include("Progress Window")
+    expect(rendered).to include("Applicant Details")
+    expect(rendered).not_to include("Account Summary")
   end
 end

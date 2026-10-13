@@ -24,25 +24,17 @@
 
     <div class="inline-block bg-gray-100 rounded-lg px-3 py-1 text-sm text-gray-700 mr-2 mb-2">
       Letter status:
-        <% if @current_enrollment.recommendation.recupload.present? %>
+        <% if @recommendation.recupload.present? %>
           <br>
-          <span class="text-green-800 pl-2">Received on <%= @current_enrollment.recommendation.recupload.created_at.strftime("%b %d, %Y") %></span>
+          <span class="text-green-800 pl-2">Received on <%= @recommendation.recupload.created_at.strftime("%b %d, %Y") %></span>
         <% else %>
           requested
         <% end %>
     </div>
   </div>
 </div>
-<% if admin_signed_in? %>
-<h2>========== Administrative area ==========</h2>
-  <p>
-    <strong>Enrollment:</strong>
-    <%= @recommendation.enrollment_id %>
-  </p>
-<% end %>
-
 <div class="mt-2">
-  <% if @current_enrollment.recommendation.recupload.blank? %>
+  <% if @recommendation.recupload.blank? %>
     <%= link_to 'Edit', edit_recommendation_path(@recommendation), class: "btn btn-blue" %> |
   <% end %>
   <%= link_to 'Home', root_path, class: "btn btn-blue" %>

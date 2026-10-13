@@ -1,0 +1,25 @@
+<% admin_page_title "Course Preference ##{@course_preference.id}", subtitle: "#{admin_applicant_name(@course_preference.enrollment)} · #{@course_preference.course.title}" %>
+<% admin_page_actions do %>
+  <%= link_to 'Edit', edit_admin_course_preference_path(@course_preference), class: 'admin-btn-primary' %>
+  <%= button_to 'Delete', admin_course_preference_path(@course_preference), method: :delete, class: 'admin-btn-danger',
+                form: { data: { turbo_confirm: 'Delete this course preference?' } } %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-3">
+  <div class="grid gap-5 xl:col-span-2">
+    <%= admin_panel 'Course Preference', body_class: '' do %>
+      <%= admin_attributes @course_preference do |a| %>
+        <% a.row :id %>
+        <% a.row 'Enrollment' do |preference| %>
+          <%= admin_applicant_link(preference.enrollment) %>
+          <span class="text-slate-500"><%= preference.enrollment.user.email %></span>
+        <% end %>
+        <% a.row('Session') { |preference| preference.course.camp_occurrence.description } %>
+        <% a.row 'Course' do |preference| %>
+          <%= admin_resource_link(preference.course, preference.course.title) %>
+        <% end %>
+        <% a.row :ranking, :created_at, :updated_at %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

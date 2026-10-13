@@ -19,37 +19,29 @@
 #  fk_rails_...  (enrollment_id => enrollments.id)
 #
 class Rejection < ApplicationRecord
-  after_commit :set_rejection_status, if: :persisted?
+  # Recording a rejection releases the applicant's assignments and rejects the application.
+  # Create only: editing the reason later must not touch the enrollment again.
+  after_create_commit :set_rejection_status
   belongs_to :enrollment
 
   validates :reason, presence: true
 
-
   def set_rejection_status
     if CourseAssignment.where(enrollment_id: enrollment).present?
-      CourseAssignment.where(enrollment_id: enrollment).each do |ca|
+      CourseAssignment.where(enrollment_id: enrollment).each do |ca| # standard:disable Rails/FindEach -- find_each reorders by id and batches; keep plain iteration
         ca.destroy
       end
     end
 
     if SessionAssignment.where(enrollment_id: enrollment).present?
-      SessionAssignment.where(enrollment_id: enrollment).each do |sa|
+      SessionAssignment.where(enrollment_id: enrollment).each do |sa| # standard:disable Rails/FindEach -- find_each reorders by id and batches; keep plain iteration
         sa.destroy
       end
     end
 
     Enrollment.find(enrollment_id).transition_application_status!(
-      'rejected',
-      extra_attrs: { offer_status: '' }
+      "rejected",
+      extra_attrs: {offer_status: ""}
     )
   end
-
-  def self.ransackable_associations(auth_object = nil)
-    ["enrollment"]
-  end
-
-  def self.ransackable_attributes(auth_object = nil)
-    ["created_at", "enrollment_id", "id", "reason", "updated_at"]
-  end
-
 end

@@ -1,0 +1,25 @@
+<% admin_page_title 'Users', subtitle: "#{number_with_delimiter(@pagy.count)} #{'user'.pluralize(@pagy.count)}" %>
+<% admin_page_actions do %>
+  <%= admin_csv_link %>
+  <%= link_to 'New User', new_admin_user_path, class: 'admin-btn-primary' %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-4">
+  <div class="xl:col-span-3">
+    <%= admin_table @users, pagy: @pagy,
+                    batch_actions: Admin::UsersController::BATCH_ACTIONS, batch_url: batch_admin_users_path,
+                    actions: ->(user) { [admin_user_path(user), edit_admin_user_path(user), admin_user_path(user)] } do |t| %>
+      <% t.column :id, sort: true %>
+      <% t.column :email, sort: true do |user| %>
+        <%= link_to user.email, admin_user_path(user), class: 'font-medium' %>
+      <% end %>
+      <% t.column :current_sign_in_at, sort: true %>
+      <% t.column :sign_in_count, sort: true %>
+      <% t.column :created_at, sort: true %>
+    <% end %>
+  </div>
+
+  <div class="xl:col-span-1">
+    <%= admin_filter_form @filter, url: admin_users_path %>
+  </div>
+</div>

@@ -26,7 +26,7 @@ class FinaidMailerPreview < ActionMailer::Preview
       source: "Test Source",
       note: "Test financial aid",
       status: "awarded",
-      payments_deadline: Date.today + 30.days
+      payments_deadline: Date.current + 30.days
     )
   end
 
@@ -34,7 +34,7 @@ class FinaidMailerPreview < ActionMailer::Preview
     user = User.first || create_test_user
     Enrollment.create!(
       user: user,
-      campyear: Time.now.year,
+      campyear: Time.current.year,
       application_status: "submitted"
     )
   end

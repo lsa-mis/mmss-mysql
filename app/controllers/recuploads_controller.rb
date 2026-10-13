@@ -1,20 +1,15 @@
 # frozen_string_literal: true
 
-class RecuploadsController < InheritedResources::Base
-  # devise_group :logged_in, contains: [:user, :admin]
-  # before_action :authenticate_logged_in!
-  # before_action :authenticate_admin!, only: [:index, :destroy]
-
-  before_action :authenticate_admin!, except: %i[success error new create]
-  before_action :set_recupload, only: %i[show edit update destroy]
-  before_action :get_recommendation, only: %i[new create]
-
-  def index
-    redirect_to root_path unless admin_signed_in?
-  end
-
-  def show
-  end
+# Recommenders upload their letter through the link in the request email (no login). The link
+# carries the recommendation's random upload token (Recommendation#upload_token): an unknown or
+# missing token is a 404, an expired one a 410 with instructions to ask for a new link, and a
+# token whose letter has already been received is refused. Everything else about recuploads
+# (listing, viewing, editing, deleting) is admin-only and lives in Admin::RecuploadsController.
+class RecuploadsController < ApplicationController
+  # The upload page's URL carries the bearer token; never let the browser pass it on as a
+  # Referer (form POST, the success/error redirects, mailto/external links on the page).
+  before_action :suppress_referrer
+  before_action :set_recommendation, only: %i[new create]
 
   def error
   end
@@ -23,85 +18,76 @@ class RecuploadsController < InheritedResources::Base
   end
 
   def new
-    if @recommendation.recupload.present?
-      redirect_to recupload_error_path, alert: 'A recommendation has already been submitted for this user'
-    else
-      @recupload = @recommendation.build_recupload
-    end
-  end
-
-  def edit
+    @recupload = @recommendation.build_recupload
   end
 
   def create
-    @recupload = Recupload.new(recupload_params)
+    # Always attach to the recommendation the emailed link resolved to, never to a
+    # caller-supplied recommendation_id. The token check and the insert run under a row lock on
+    # the recommendation so two simultaneous submissions of one link cannot both succeed; the
+    # unique index on recuploads.recommendation_id is the backstop.
+    outcome = Recommendation.transaction do
+      @recommendation.lock!
+      next :link_used unless @recommendation.upload_link_active? && @recommendation.upload_token == params[:token].to_s
 
-    respond_to do |format|
-      if @recupload.save
-        format.html { redirect_to recupload_success_path, notice: 'Recommendation was successfully uploaded.' }
-        format.json { render :show, status: :created, location: @recupload }
-        RecuploadMailer.with(recupload: @recupload).received_email.deliver_now
-        RecuploadMailer.with(recupload: @recupload).applicant_received_email.deliver_now
-      else
-        @student = ApplicantDetail.find(params[:id]).full_name if params[:id]
-        @recommendation = Recommendation.find(@recupload.recommendation_id) if @recupload.recommendation_id
-        format.html { render :new }
-        format.json { render json: @recupload.errors, status: :unprocessable_entity }
-      end
+      @recupload = @recommendation.build_recupload(recupload_params)
+      @recupload.save ? :saved : :invalid
     end
-  end
 
-  def update
-  end
-
-  def destroy
-    @recupload.destroy
-    respond_to do |format|
-      format.html { redirect_to recuploads_url, notice: 'Recommendation was successfully destroyed.' }
-      format.json { head :no_content }
+    case outcome
+    when :saved
+      RecuploadMailer.with(recupload: @recupload).received_email.deliver_now
+      RecuploadMailer.with(recupload: @recupload).applicant_received_email.deliver_now
+      redirect_to recupload_success_path, notice: "Recommendation was successfully uploaded.", status: :see_other
+    when :link_used
+      redirect_to_already_submitted
+    else
+      render :new, status: :unprocessable_content
     end
+  rescue ActiveRecord::RecordNotUnique
+    redirect_to_already_submitted
   end
 
   private
 
-  def set_recupload
-    @recupload = Recupload.find(params[:id])
+  def suppress_referrer
+    response.set_header("Referrer-Policy", "no-referrer")
   end
 
-  def get_recommendation
-    hash_val = params['hash']
+  def redirect_to_already_submitted
+    redirect_to recupload_error_path, alert: "A recommendation has already been submitted for this user", status: :see_other
+  end
 
-    # More robust parsing - look for the pattern anywhere in the hash
-    if hash_val && hash_val.include?('nGklDoc2egIkzFxr0U')
-      rec_id = hash_val.split('nGklDoc2egIkzFxr0U').last.to_i
-    elsif hash_val
-      # Try to extract just the numeric part at the end if the pattern isn't found
-      rec_id = hash_val.gsub(/[^0-9]/, '').to_i
-    else
-      raise 'Missing hash parameter'
+  def set_recommendation
+    @recommendation = Recommendation.find_by_upload_token(params[:token])
+
+    if @recommendation.nil?
+      Rails.logger.info("Recommender upload link not found (token_present: #{params[:token].present?}, legacy_hash_present: #{params[:hash].present?})")
+      flash.now[:alert] = not_found_message
+      return render :error, status: :not_found
     end
 
-    @recommendation = Recommendation.find(rec_id)
+    return redirect_to_already_submitted if @recommendation.recupload.present?
 
-    # Find the student's name
-    if params[:id].present?
-      begin
-        @student = ApplicantDetail.find(params[:id]).full_name
-      rescue ActiveRecord::RecordNotFound
-        # If we can't find the ApplicantDetail, try to get the name from the recommendation
-        @student = @recommendation.applicant_name
-      end
-    else
-      @student = @recommendation.applicant_name
+    if @recommendation.upload_token_expired?
+      Rails.logger.info("Recommender upload link expired (recommendation_id: #{@recommendation.id})")
+      return render :expired, status: :gone
     end
-  rescue StandardError => e
-    # Log the error
-    Rails.logger.error("Error in get_recommendation: #{e.message}, params: #{params.inspect}")
-    redirect_to recupload_error_path,
-                alert: 'We could not find the recommendation request. Please contact MMSS admin for assistance.'
+
+    @student = @recommendation.applicant_name
+  end
+
+  # Links sent before the token change carried a `hash` parameter; tell those recipients why
+  # their link stopped working.
+  def not_found_message
+    if params[:hash].present?
+      "This recommendation link is from an older email and no longer works. Please contact MMSS admin for a new link."
+    else
+      "We could not find the recommendation request. Please contact MMSS admin for assistance."
+    end
   end
 
   def recupload_params
-    params.require(:recupload).permit(:letter, :authorname, :studentname, :recommendation_id, :rechash, :recletter)
+    params.require(:recupload).permit(:letter, :authorname, :studentname, :recletter)
   end
 end

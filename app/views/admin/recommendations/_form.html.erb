@@ -1,0 +1,38 @@
+<%# locals: recommendation %>
+<%= admin_form_with model: recommendation,
+                    url: (recommendation.persisted? ? admin_recommendation_path(recommendation) : admin_recommendations_path),
+                    class: 'grid gap-5' do |f| %>
+  <%= f.errors_summary %>
+
+  <div class="grid gap-5 xl:grid-cols-2">
+    <%= f.fieldset 'Applicant' do %>
+      <%= f.input :enrollment_id, as: :select, label: 'Enrollment', include_blank: 'Select an applicant', required: true,
+                                  collection: Admin::EnrollmentOptions.current_camp(include: recommendation.enrollment) %>
+    <% end %>
+
+    <%= f.fieldset 'Recommender' do %>
+      <%= f.input :email, as: :email, required: true %>
+      <div class="grid gap-4 md:grid-cols-2">
+        <%= f.input :firstname, required: true %>
+        <%= f.input :lastname, required: true %>
+      </div>
+      <%= f.input :organization, required: true %>
+      <%= f.input :phone_number %>
+      <%= f.input :best_contact_time %>
+    <% end %>
+  </div>
+
+  <%= f.fieldset 'Address' do %>
+    <div class="grid gap-4 md:grid-cols-2">
+      <%= f.input :address1, label: 'Address line 1' %>
+      <%= f.input :address2, label: 'Address line 2' %>
+      <%= f.input :city %>
+      <%= f.input :state, as: :select, collection: us_states %>
+      <%= f.input :state_non_us, label: 'State / province (non-US)' %>
+      <%= f.input :postalcode %>
+      <%= f.input :country, as: :select, collection: country_options_with_priority %>
+    </div>
+  <% end %>
+
+  <%= f.actions cancel: (recommendation.persisted? ? admin_recommendation_path(recommendation) : admin_recommendations_path) %>
+<% end %>

@@ -1,0 +1,50 @@
+<%# locals: payment, enrollment %>
+<%= admin_form_with model: payment, url: (payment.persisted? ? admin_payment_path(payment) : admin_payments_path),
+                    class: 'grid gap-5' do |f| %>
+  <%= f.errors_summary %>
+
+  <%= f.fieldset 'Manual payment', description: 'Records a payment received outside the Nelnet portal (check, wire, waiver). A successful payment updates the application status the same way an online payment does.' do %>
+    <% if payment.persisted? %>
+      <div>
+        <span class="admin-label">Applicant</span>
+        <p class="mt-1 text-sm"><%= admin_payment_user(payment) %></p>
+        <p class="admin-hint">The payer is fixed once the payment is recorded.</p>
+      </div>
+    <% elsif enrollment %>
+      <p class="text-sm">
+        <span class="font-semibold">Application:</span>
+        <%= link_to enrollment.applicant_detail&.full_name || enrollment.user.email, admin_application_path(enrollment), class: 'font-medium' %>
+        <span class="text-slate-500"><%= enrollment.user.email %></span>
+      </p>
+      <%= f.input :user_id, as: :hidden %>
+      <%= hidden_field_tag :enrollment_id, enrollment.id, id: nil %>
+    <% else %>
+      <%= f.input :user_id, as: :select, label: 'Applicant', include_blank: 'Select an applicant', required: true,
+                            collection: admin_payment_user_options(payment) %>
+    <% end %>
+    <%= f.input :total_amount_dollars, as: :text, label: 'Total amount ($)', required: true, inputmode: 'decimal',
+                                       hint: 'Dollars with up to two decimals, e.g. 150.25.' %>
+    <%= f.input :transaction_id, label: 'Transaction id', required: true, hint: 'Receipt / check number; must be unique.' %>
+    <%= f.input :account_type, hint: 'e.g. check, wire, waiver' %>
+    <%= f.input :result_message %>
+  <% end %>
+
+  <%= f.fieldset 'Transaction', description: (payment.new_record? ? 'Defaults record a successful payment for the active camp.' : 'Fixed once the payment is recorded.') do %>
+    <% if payment.new_record? %>
+      <div class="grid gap-4 md:grid-cols-2">
+        <%= f.input :transaction_type, required: true %>
+        <%= f.input :transaction_status, required: true, hint: '1 = successful; anything else does not count towards the balance.' %>
+        <%= f.input :transaction_date, required: true, hint: 'YYYYMMDDHHMM' %>
+        <%= f.input :camp_year, as: :number, required: true %>
+      </div>
+    <% else %>
+      <%= admin_attributes payment do |a| %>
+        <% a.row :transaction_type %>
+        <% a.row :transaction_status do |record| %><%= admin_payment_status_badge(record.transaction_status) %><% end %>
+        <% a.row :transaction_date, :camp_year %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <%= f.actions cancel: (payment.persisted? ? admin_payment_path(payment) : admin_payments_path) %>
+<% end %>

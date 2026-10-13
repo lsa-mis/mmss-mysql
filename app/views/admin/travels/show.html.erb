@@ -1,0 +1,47 @@
+<% admin_page_title "Travel ##{@travel.id}", subtitle: admin_applicant_name(@travel.enrollment) %>
+<% admin_page_actions do %>
+  <%= link_to 'Edit', edit_admin_travel_path(@travel), class: 'admin-btn-primary' %>
+  <%= button_to 'Delete', admin_travel_path(@travel), method: :delete, class: 'admin-btn-danger',
+                form: { data: { turbo_confirm: 'Delete this travel record?' } } %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-3">
+  <div class="grid gap-5 xl:col-span-2">
+    <%= admin_panel 'Travel', body_class: '' do %>
+      <%= admin_attributes @travel do |a| %>
+        <% a.row 'Applicant' do |travel| %>
+          <%= admin_applicant_link(travel.enrollment) %>
+          <span class="text-slate-500"><%= travel.enrollment.user.email %></span>
+        <% end %>
+        <% a.row :note do |travel| %>
+          <p class="admin-prose whitespace-pre-line"><%= travel.note.presence || admin_empty_value %></p>
+        <% end %>
+        <% a.row :created_at, :updated_at %>
+      <% end %>
+    <% end %>
+
+    <div class="grid gap-5 md:grid-cols-2">
+      <%= admin_panel 'Arrival', body_class: '' do %>
+        <%= admin_attributes @travel do |a| %>
+          <% a.row('Session', &:arrival_session) %>
+          <% a.row('Transport', &:arrival_transport) %>
+          <% a.row('Carrier', &:arrival_carrier) %>
+          <% a.row('Route number', &:arrival_route_num) %>
+          <% a.row('Date') { |travel| admin_travel_date(travel.arrival_date) } %>
+          <% a.row('Time') { |travel| admin_travel_time(travel.arrival_time) } %>
+        <% end %>
+      <% end %>
+
+      <%= admin_panel 'Departure', body_class: '' do %>
+        <%= admin_attributes @travel do |a| %>
+          <% a.row('Session', &:depart_session) %>
+          <% a.row('Transport', &:depart_transport) %>
+          <% a.row('Carrier', &:depart_carrier) %>
+          <% a.row('Route number', &:depart_route_num) %>
+          <% a.row('Date') { |travel| admin_travel_date(travel.depart_date) } %>
+          <% a.row('Time') { |travel| admin_travel_time(travel.depart_time) } %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,6 @@
+<% admin_page_title 'New Activity' %>
+<% admin_page_actions do %>
+  <%= link_to 'Back to activities', admin_activities_path, class: 'admin-btn-secondary' %>
+<% end %>
+
+<%= render 'admin/activities/form', activity: @activity %>

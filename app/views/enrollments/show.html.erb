@@ -89,32 +89,6 @@
 <% end %>
 
 
-<% if admin_signed_in? %>
-  <h2>========== Administrative area ==========</h2>
-  <p>
-    <small>User_id:
-    <%= @current_enrollment.user_id %>
-    </small>
-  </p>
-  <p>
-    <strong>Notes:</strong>
-    <%= @current_enrollment.notes %>
-  </p>
-  <p>
-    <strong>Application status:</strong>
-    <%= @current_enrollment.application_status %>
-  </p>
-
-  <p>
-    <strong>Offer status:</strong>
-    <%= @current_enrollment.offer_status %>
-  </p>
-
-  <p>
-    <strong>Partner program:</strong>
-    <%= @current_enrollment.partner_program %>
-  </p>
-<% end %>
 </div>
 <div class="mt-2">
   <% if @current_enrollment.application_status == "" || @current_enrollment.application_status == nil %>

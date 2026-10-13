@@ -1,0 +1,51 @@
+<% admin_page_title 'Applications', subtitle: "#{number_with_delimiter(@pagy.count)} #{'application'.pluralize(@pagy.count)} · #{current_scope.label}" %>
+<% admin_page_actions do %>
+  <%= admin_csv_link %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-4">
+  <div class="grid gap-4 xl:col-span-3">
+    <%= admin_scope_tabs Admin::ApplicationsController::SCOPES, counts: @scope_counts %>
+
+    <%= admin_table @applications, pagy: @pagy,
+                    batch_actions: Admin::ApplicationsController::BATCH_ACTIONS, batch_url: batch_admin_applications_path,
+                    actions: ->(app) { [admin_application_path(app), edit_admin_application_path(app), admin_application_path(app)] } do |t| %>
+      <% t.column :updated_at, sort: true %>
+      <% t.column 'Applicant', sort: 'applicant' do |app| %>
+        <%= link_to app.applicant_detail&.full_name || app.user.email, admin_application_path(app), class: 'font-medium' %>
+        <div class="text-xs text-slate-500"><%= app.user.email %></div>
+      <% end %>
+      <% t.column 'Transcript' do |app| %>
+        <%= admin_attachment_link(app.transcript, text: 'view') %>
+      <% end %>
+      <% t.column :camp_doc_form_completed, sort: true %>
+      <% t.column :offer_status, sort: true do |app| %>
+        <%= admin_status_badge(app.offer_status) %>
+      <% end %>
+      <% t.column :application_deadline, sort: true %>
+      <% t.column :application_status, sort: true do |app| %>
+        <%= admin_status_badge(app.application_status) %>
+      <% end %>
+      <% t.column :application_status_updated_on, sort: true %>
+      <% t.column :international, sort: true %>
+      <% t.column :year_in_school, sort: true %>
+      <% t.column :anticipated_graduation_year, sort: true %>
+      <% t.column :room_mate_request %>
+      <% t.column :notes do |app| %>
+        <span class="block max-w-xs truncate" title="<%= app.notes %>"><%= app.notes.presence || admin_empty_value %></span>
+      <% end %>
+      <% t.column :partner_program, sort: true %>
+      <% t.column :application_fee_required, sort: true %>
+      <% t.column 'Balance Due' do |app| %>
+        <%= admin_money_from_cents(app.balance_due_cents) %>
+      <% end %>
+      <% t.column 'Camp Year', sort: 'campyear' do |app| %>
+        <%= app.campyear %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="xl:col-span-1">
+    <%= admin_filter_form @filter, url: admin_applications_path %>
+  </div>
+</div>

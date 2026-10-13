@@ -1,7 +1,0 @@
-<h4>Number of applicants who were assigned to each session</h4>
-
-<% CampOccurrence.active.each do |co| %>
-  <% unless co.description == "Any Session" %>
-    <li><%= co.description %> has <%= pluralize(SessionAssignment.where(camp_occurrence_id: co.id).count, 'applicant') %>.
-  <% end %>
-<% end %>

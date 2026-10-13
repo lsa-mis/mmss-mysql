@@ -1,0 +1,26 @@
+<% admin_page_title 'Session Selection', subtitle: "#{number_with_delimiter(@pagy.count)} #{'session selection'.pluralize(@pagy.count)}" %>
+<% admin_page_actions do %>
+  <%= admin_csv_link %>
+  <%= link_to 'New Session Selection', new_admin_session_selection_path, class: 'admin-btn-primary' %>
+<% end %>
+
+<div class="grid gap-5 xl:grid-cols-4">
+  <div class="grid gap-4 xl:col-span-3">
+    <%= admin_table @session_selections, pagy: @pagy,
+                    batch_actions: Admin::SessionSelectionsController::BATCH_ACTIONS, batch_url: batch_admin_session_selections_path,
+                    actions: ->(selection) { [admin_session_selection_path(selection), edit_admin_session_selection_path(selection), admin_session_selection_path(selection)] } do |t| %>
+      <% t.column 'Enrollment', sort: 'enrollment' do |selection| %>
+        <%= admin_applicant_link(selection.enrollment, with_email: true) %>
+      <% end %>
+      <% t.column 'Session', sort: 'session' do |selection| %>
+        <%= selection.camp_occurrence.display_name %>
+      <% end %>
+      <% t.column :created_at, sort: true %>
+      <% t.column :updated_at, sort: true %>
+    <% end %>
+  </div>
+
+  <div class="xl:col-span-1">
+    <%= admin_filter_form @filter, url: admin_session_selections_path %>
+  </div>
+</div>

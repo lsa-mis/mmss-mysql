@@ -1,0 +1,23 @@
+<% admin_page_title 'Admins', subtitle: "#{number_with_delimiter(@pagy.count)} #{'admin account'.pluralize(@pagy.count)}" %>
+<% admin_page_actions do %>
+  <%= admin_csv_link %>
+  <%= link_to 'New Admin', new_admin_admin_path, class: 'admin-btn-primary' %>
+<% end %>
+
+<%= admin_table @admins, pagy: @pagy,
+                batch_actions: Admin::AdminsController::BATCH_ACTIONS, batch_url: batch_admin_admins_path,
+                actions: ->(admin) { [admin_admin_path(admin), edit_admin_admin_path(admin), (admin_admin_path(admin) unless admin == current_admin)] } do |t| %>
+  <% t.column :id, sort: true %>
+  <% t.column :email, sort: true do |admin| %>
+    <%= link_to admin.email, admin_admin_path(admin), class: 'font-medium' %>
+    <% if admin == current_admin %>
+      <span class="admin-badge-blue ml-1">you</span>
+    <% end %>
+    <% if admin.access_locked? %>
+      <span class="admin-badge-red ml-1">locked</span>
+    <% end %>
+  <% end %>
+  <% t.column :current_sign_in_at, sort: true %>
+  <% t.column :sign_in_count, sort: true %>
+  <% t.column :created_at, sort: true %>
+<% end %>

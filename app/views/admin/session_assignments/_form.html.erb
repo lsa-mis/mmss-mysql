@@ -1,0 +1,17 @@
+<%# locals: session_assignment %>
+<%= admin_form_with model: session_assignment,
+                    url: (session_assignment.persisted? ? admin_session_assignment_path(session_assignment) : admin_session_assignments_path),
+                    class: 'grid gap-5' do |f| %>
+  <%= f.errors_summary %>
+
+  <%= f.fieldset 'Session Assignment' do %>
+    <%= f.input :enrollment_id, as: :select, label: 'Enrollment', include_blank: 'Select an applicant', required: true,
+                                collection: Admin::EnrollmentOptions.current_camp(include: session_assignment.enrollment) %>
+    <%= f.input :camp_occurrence_id, as: :select, label: 'Session', include_blank: 'Select a session', required: true,
+                                     collection: Admin::CampOptions.sessions(include: session_assignment.camp_occurrence) %>
+    <%= f.input :offer_status, as: :select, collection: admin_session_assignment_offer_status_options(session_assignment),
+                               include_blank: 'Pending', hint: 'Left blank while the offer is pending.' %>
+  <% end %>
+
+  <%= f.actions cancel: (session_assignment.persisted? ? admin_session_assignment_path(session_assignment) : admin_session_assignments_path) %>
+<% end %>
