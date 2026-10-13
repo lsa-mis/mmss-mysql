@@ -309,9 +309,12 @@ RSpec.describe "Applicant-facing controllers scope records to the signed-in user
 
   describe "EnrollmentsController" do
     it "ignores the owner and the admin-only status columns in the application form" do
+      original_campyear = enrollment_a.campyear
+
       patch enrollment_path(enrollment_a), params: {
         enrollment: {room_mate_request: "Sam", user_id: user_b.id, application_status: "enrolled",
-                     offer_status: "accepted", notes: "self-note", partner_program: "VIP"}
+                     offer_status: "accepted", notes: "self-note", partner_program: "VIP",
+                     camp_doc_form_completed: true, campyear: original_campyear - 1}
       }
 
       enrollment_a.reload
@@ -321,6 +324,8 @@ RSpec.describe "Applicant-facing controllers scope records to the signed-in user
       expect(enrollment_a.offer_status).to be_nil
       expect(enrollment_a.notes).to be_nil
       expect(enrollment_a.partner_program).to be_nil
+      expect(enrollment_a.camp_doc_form_completed).to be(false)
+      expect(enrollment_a.campyear).to eq(original_campyear)
     end
 
     it "has no index or destroy (the admin listing is /admin/applications)" do
