@@ -226,6 +226,15 @@ RSpec.describe "Admin applications", type: :request do
       expect(response.body).to include("Application was successfully updated.")
     end
 
+    it "allows staff to set camp_doc_form_completed (applicant forms cannot)" do
+      expect(enrollment.camp_doc_form_completed).to be(false)
+
+      patch admin_application_path(enrollment), params: {enrollment: {camp_doc_form_completed: true}}
+
+      expect(response).to redirect_to(admin_application_path(enrollment))
+      expect(enrollment.reload.camp_doc_form_completed).to be(true)
+    end
+
     it "keeps a status that is not in the standard list (e.g. waitlisted) when the form is submitted unchanged" do
       waitlisted = create(:enrollment, :waitlisted, user: create(:user, :with_applicant_detail))
       create(:session_assignment, enrollment: waitlisted, camp_occurrence: CampOccurrence.active.first)

@@ -159,10 +159,6 @@
   <h2 class= "section-header">Applicant School History</h2>
 
   <div class="field">
-    <%= form.hidden_field :campyear, value: current_camp_year %>
-  </div>
-
-  <div class="field">
     <%= form.label :year_in_school, "What grade year are you in at school?" %>
     <%= form.select :year_in_school, year_in_school, { include_blank: "Select" }, { required: true } %>
   </div>

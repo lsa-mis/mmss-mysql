@@ -30,7 +30,9 @@ class EnrollmentsController < ApplicationController
 
   # POST /enrollments
   def create
-    @enrollment = current_user.enrollments.create(enrollment_params)
+    @enrollment = current_user.enrollments.build(enrollment_params)
+    # Camp year is never applicant-writable (hidden form fields are forgeable).
+    @enrollment.campyear = CampConfiguration.active_camp_year
 
     if @enrollment.save
       if @enrollment.course_rankings_complete?
@@ -107,8 +109,9 @@ class EnrollmentsController < ApplicationController
   end
 
   # The owner is always current_user (create goes through current_user.enrollments) and the
-  # admin-only columns (notes, application/offer status, partner program) are set through
-  # Admin::ApplicationsController, so none of them is accepted here.
+  # admin-only columns (notes, application/offer status, partner program, camp_doc_form_completed,
+  # campyear) are set through Admin::ApplicationsController, so none of them is accepted here.
+  # campyear is assigned server-side on create from CampConfiguration.active_camp_year.
   def enrollment_params
     params.require(:enrollment).permit(
       :international, :high_school_name,
@@ -118,8 +121,7 @@ class EnrollmentsController < ApplicationController
       :high_school_country, :year_in_school,
       :anticipated_graduation_year, :room_mate_request,
       :personal_statement, :shirt_size, :transcript,
-      :student_packet, :campyear, :camp_doc_form_completed,
-      :vaccine_record, :covid_test_record,
+      :student_packet, :vaccine_record, :covid_test_record,
       registration_activity_ids: [],
       session_registration_ids: [],
       course_registration_ids: []
