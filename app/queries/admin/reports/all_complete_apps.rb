@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 class Admin::Reports::AllCompleteApps < Admin::Reports::Base
-  self.label = 'All Complete Applications'
+  self.label = "All Complete Applications"
   self.description = 'Every application with status "application complete" for the camp year: applicant, ' \
-                     'contact and parent details, high school, statement, recommender and financial aid request.'
-  self.csv_title = 'all_complete_applications'
+                     "contact and parent details, high school, statement, recommender and financial aid request."
+  self.csv_title = "all_complete_applications"
   self.sql = <<~SQL
     SELECT DATE_FORMAT(e.updated_at, '%Y-%m-%d') AS 'Last Update',
       CONCAT(REPLACE(ad.firstname, ',', ' '), ' ', REPLACE(ad.lastname, ',', ' ')) AS name,

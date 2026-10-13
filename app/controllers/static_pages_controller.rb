@@ -2,6 +2,7 @@
 
 class StaticPagesController < ApplicationController
   include ApplicantState
+
   before_action :set_current_enrollment
 
   def index
@@ -23,10 +24,10 @@ class StaticPagesController < ApplicationController
   end
 
   private
-    def set_current_enrollment
-      if user_signed_in?
-        @current_enrollment = current_user.enrollments.current_camp_year_applications.last
-      end
-    end
 
+  def set_current_enrollment
+    if user_signed_in?
+      @current_enrollment = current_user.enrollments.current_camp_year_applications.last
+    end
+  end
 end

@@ -4,25 +4,25 @@ class Admin::CoursePreferencesController < Admin::BaseController
   before_action :set_course_preference, only: %i[show edit update destroy]
 
   SORTS = {
-    id: 'course_preferences.id',
-    enrollment: 'applicant_details.lastname',
-    session: 'camp_occurrences.description',
-    course: 'courses.title',
-    ranking: 'course_preferences.ranking',
-    created_at: 'course_preferences.created_at',
-    updated_at: 'course_preferences.updated_at'
+    id: "course_preferences.id",
+    enrollment: "applicant_details.lastname",
+    session: "camp_occurrences.description",
+    course: "courses.title",
+    ranking: "course_preferences.ranking",
+    created_at: "course_preferences.created_at",
+    updated_at: "course_preferences.updated_at"
   }.freeze
 
-  BATCH_ACTIONS = { destroy: 'Delete selected' }.freeze
+  BATCH_ACTIONS = {destroy: "Delete selected"}.freeze
 
   RANKINGS = (1..CoursePreference::MAX_RANKING).to_a.freeze
 
   CSV_EXPORT = Admin::CsvExport.define do
     column :id
-    column('Name') { |preference| preference.enrollment.applicant_detail&.full_name }
-    column('email') { |preference| preference.enrollment.user.email }
-    column('Session') { |preference| preference.course.camp_occurrence.description }
-    column('Course') { |preference| preference.course.title }
+    column("Name") { |preference| preference.enrollment.applicant_detail&.full_name }
+    column("email") { |preference| preference.enrollment.user.email }
+    column("Session") { |preference| preference.course.camp_occurrence.description }
+    column("Course") { |preference| preference.course.title }
     column :ranking
     column :created_at
     column :updated_at
@@ -35,11 +35,12 @@ class Admin::CoursePreferencesController < Admin::BaseController
 
     respond_to do |format|
       format.html { @pagy, @course_preferences = paginate(relation) }
-      format.csv { send_csv(CSV_EXPORT, relation, filename: 'course-preferences') }
+      format.csv { send_csv(CSV_EXPORT, relation, filename: "course-preferences") }
     end
   end
 
-  def show; end
+  def show
+  end
 
   def new
     @course_preference = CoursePreference.new
@@ -49,19 +50,20 @@ class Admin::CoursePreferencesController < Admin::BaseController
     @course_preference = CoursePreference.new(course_preference_params)
 
     if @course_preference.save
-      redirect_to admin_course_preference_path(@course_preference), notice: 'Course preference was successfully created.',
-                                                                   status: :see_other
+      redirect_to admin_course_preference_path(@course_preference), notice: "Course preference was successfully created.",
+        status: :see_other
     else
       render :new, status: :unprocessable_content
     end
   end
 
-  def edit; end
+  def edit
+  end
 
   def update
     if @course_preference.update(course_preference_params)
-      redirect_to admin_course_preference_path(@course_preference), notice: 'Course preference was successfully updated.',
-                                                                   status: :see_other
+      redirect_to admin_course_preference_path(@course_preference), notice: "Course preference was successfully updated.",
+        status: :see_other
     else
       render :edit, status: :unprocessable_content
     end
@@ -69,7 +71,7 @@ class Admin::CoursePreferencesController < Admin::BaseController
 
   def destroy
     @course_preference.destroy
-    redirect_to admin_course_preferences_path, notice: 'Course preference was successfully deleted.', status: :see_other
+    redirect_to admin_course_preferences_path, notice: "Course preference was successfully deleted.", status: :see_other
   end
 
   def batch
@@ -84,7 +86,7 @@ class Admin::CoursePreferencesController < Admin::BaseController
 
   def base_relation
     CoursePreference.left_joins(course: :camp_occurrence).left_joins(enrollment: :applicant_detail)
-                    .preload(enrollment: %i[user applicant_detail], course: :camp_occurrence)
+      .preload(enrollment: %i[user applicant_detail], course: :camp_occurrence)
   end
 
   def course_preference_params

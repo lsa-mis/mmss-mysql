@@ -6,21 +6,21 @@ class Admin::SessionConfigurationsController < Admin::BaseController
   before_action :set_session_configuration, only: %i[show edit update destroy]
 
   SORTS = {
-    camp_year: 'camp_configurations.camp_year',
-    description: 'camp_occurrences.description',
-    cost: 'camp_occurrences.cost_cents',
-    begin_date: 'camp_occurrences.begin_date',
-    end_date: 'camp_occurrences.end_date',
-    active: 'camp_occurrences.active',
-    created_at: 'camp_occurrences.created_at',
-    updated_at: 'camp_occurrences.updated_at'
+    camp_year: "camp_configurations.camp_year",
+    description: "camp_occurrences.description",
+    cost: "camp_occurrences.cost_cents",
+    begin_date: "camp_occurrences.begin_date",
+    end_date: "camp_occurrences.end_date",
+    active: "camp_occurrences.active",
+    created_at: "camp_occurrences.created_at",
+    updated_at: "camp_occurrences.updated_at"
   }.freeze
 
-  BATCH_ACTIONS = { destroy: 'Delete selected', toggle_active: 'Toggle active' }.freeze
+  BATCH_ACTIONS = {destroy: "Delete selected", toggle_active: "Toggle active"}.freeze
 
   CSV_EXPORT = Admin::CsvExport.define do
     column :id
-    column('Camp year') { |session| session.camp_configuration.camp_year }
+    column("Camp year") { |session| session.camp_configuration.camp_year }
     column :description
     column :cost
     column :begin_date
@@ -37,11 +37,12 @@ class Admin::SessionConfigurationsController < Admin::BaseController
 
     respond_to do |format|
       format.html { @pagy, @session_configurations = paginate(relation) }
-      format.csv { send_csv(CSV_EXPORT, relation, filename: 'session-configurations') }
+      format.csv { send_csv(CSV_EXPORT, relation, filename: "session-configurations") }
     end
   end
 
-  def show; end
+  def show
+  end
 
   def new
     @session_configuration = CampOccurrence.new
@@ -51,19 +52,20 @@ class Admin::SessionConfigurationsController < Admin::BaseController
     @session_configuration = CampOccurrence.new(session_configuration_params)
 
     if @session_configuration.save
-      redirect_to admin_session_configuration_path(@session_configuration), notice: 'Session configuration was successfully created.',
-                                                                             status: :see_other
+      redirect_to admin_session_configuration_path(@session_configuration), notice: "Session configuration was successfully created.",
+        status: :see_other
     else
       render :new, status: :unprocessable_content
     end
   end
 
-  def edit; end
+  def edit
+  end
 
   def update
     if @session_configuration.update(session_configuration_params)
-      redirect_to admin_session_configuration_path(@session_configuration), notice: 'Session configuration was successfully updated.',
-                                                                             status: :see_other
+      redirect_to admin_session_configuration_path(@session_configuration), notice: "Session configuration was successfully updated.",
+        status: :see_other
     else
       render :edit, status: :unprocessable_content
     end
@@ -71,7 +73,7 @@ class Admin::SessionConfigurationsController < Admin::BaseController
 
   def destroy
     @session_configuration.destroy
-    redirect_to admin_session_configurations_path, notice: 'Session configuration was successfully deleted.', status: :see_other
+    redirect_to admin_session_configurations_path, notice: "Session configuration was successfully deleted.", status: :see_other
   end
 
   def batch
@@ -82,7 +84,7 @@ class Admin::SessionConfigurationsController < Admin::BaseController
 
   def batch_toggle_active(records)
     toggled = records.to_a.count { |record| record.update(active: !record.active) }
-    "Toggled active status for #{toggled} #{'session configuration'.pluralize(toggled)}."
+    "Toggled active status for #{toggled} #{"session configuration".pluralize(toggled)}."
   end
 
   def set_session_configuration

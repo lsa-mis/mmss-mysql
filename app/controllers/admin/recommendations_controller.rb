@@ -4,24 +4,24 @@ class Admin::RecommendationsController < Admin::BaseController
   before_action :set_recommendation, only: %i[show edit update destroy send_request_email]
 
   SORTS = {
-    enrollment_id: 'applicant_details.lastname',
-    email: 'recommendations.email',
-    lastname: 'recommendations.lastname',
-    firstname: 'recommendations.firstname',
-    organization: 'recommendations.organization',
-    city: 'recommendations.city',
-    state: 'recommendations.state',
-    country: 'recommendations.country',
-    created_at: 'recommendations.created_at',
-    updated_at: 'recommendations.updated_at'
+    enrollment_id: "applicant_details.lastname",
+    email: "recommendations.email",
+    lastname: "recommendations.lastname",
+    firstname: "recommendations.firstname",
+    organization: "recommendations.organization",
+    city: "recommendations.city",
+    state: "recommendations.state",
+    country: "recommendations.country",
+    created_at: "recommendations.created_at",
+    updated_at: "recommendations.updated_at"
   }.freeze
 
-  BATCH_ACTIONS = { resend_request: 'Send new upload link', destroy: 'Delete selected' }.freeze
+  BATCH_ACTIONS = {resend_request: "Send new upload link", destroy: "Delete selected"}.freeze
 
   CSV_EXPORT = Admin::CsvExport.define do
     column :id
-    column('Applicant') { |recommendation| recommendation.enrollment.applicant_detail&.full_name }
-    column('Applicant email') { |recommendation| recommendation.enrollment.user.email }
+    column("Applicant") { |recommendation| recommendation.enrollment.applicant_detail&.full_name }
+    column("Applicant email") { |recommendation| recommendation.enrollment.user.email }
     column :email
     column :lastname
     column :firstname
@@ -35,7 +35,7 @@ class Admin::RecommendationsController < Admin::BaseController
     column :country
     column :phone_number
     column :best_contact_time
-    column('Letter received') { |recommendation| recommendation.recupload.present? }
+    column("Letter received") { |recommendation| recommendation.recupload.present? }
     column :created_at
     column :updated_at
   end
@@ -47,11 +47,12 @@ class Admin::RecommendationsController < Admin::BaseController
 
     respond_to do |format|
       format.html { @pagy, @recommendations = paginate(relation) }
-      format.csv { send_csv(CSV_EXPORT, relation, filename: 'recommendations') }
+      format.csv { send_csv(CSV_EXPORT, relation, filename: "recommendations") }
     end
   end
 
-  def show; end
+  def show
+  end
 
   def new
     @recommendation = Recommendation.new
@@ -61,17 +62,18 @@ class Admin::RecommendationsController < Admin::BaseController
     @recommendation = Recommendation.new(recommendation_params)
 
     if @recommendation.save
-      redirect_to admin_recommendation_path(@recommendation), notice: 'Recommendation was successfully created.', status: :see_other
+      redirect_to admin_recommendation_path(@recommendation), notice: "Recommendation was successfully created.", status: :see_other
     else
       render :new, status: :unprocessable_content
     end
   end
 
-  def edit; end
+  def edit
+  end
 
   def update
     if @recommendation.update(recommendation_params)
-      redirect_to admin_recommendation_path(@recommendation), notice: 'Recommendation was successfully updated.', status: :see_other
+      redirect_to admin_recommendation_path(@recommendation), notice: "Recommendation was successfully updated.", status: :see_other
     else
       render :edit, status: :unprocessable_content
     end
@@ -79,7 +81,7 @@ class Admin::RecommendationsController < Admin::BaseController
 
   def destroy
     @recommendation.destroy
-    redirect_to admin_recommendations_path, notice: 'Recommendation was successfully deleted.', status: :see_other
+    redirect_to admin_recommendations_path, notice: "Recommendation was successfully deleted.", status: :see_other
   end
 
   def batch
@@ -92,10 +94,10 @@ class Admin::RecommendationsController < Admin::BaseController
   # foundation PR.
   def send_request_email
     send_new_upload_link(@recommendation)
-    redirect_to admin_recommendation_path(@recommendation), notice: 'Recommendation request was sent with a new upload link!', status: :see_other
+    redirect_to admin_recommendation_path(@recommendation), notice: "Recommendation request was sent with a new upload link!", status: :see_other
   rescue Recommendation::LetterAlreadyReceived
     redirect_to admin_recommendation_path(@recommendation), status: :see_other,
-                                                            alert: 'A letter has already been received for this recommendation; no new link was sent.'
+      alert: "A letter has already been received for this recommendation; no new link was sent."
   end
 
   private
@@ -121,16 +123,16 @@ class Admin::RecommendationsController < Admin::BaseController
       sent += 1
     rescue Recommendation::LetterAlreadyReceived
       skipped += 1
-    rescue StandardError => e
+    rescue => e
       Rails.logger.error("Resend of upload link failed for recommendation #{recommendation.id}: #{e.class}: #{e.message}")
       Sentry.capture_exception(e) if defined?(Sentry)
       failed << recommendation.id
     end
 
-    notice = "Sent #{sent} new upload #{'link'.pluralize(sent)}."
+    notice = "Sent #{sent} new upload #{"link".pluralize(sent)}."
     notice += " Skipped #{skipped} with a letter already received." if skipped.positive?
     if failed.any?
-      notice += " Could not email #{failed.size} (recommendation #{failed.join(', ')}); " \
+      notice += " Could not email #{failed.size} (recommendation #{failed.join(", ")}); " \
                 'use "Resend request" on those records.'
     end
     notice
@@ -146,6 +148,6 @@ class Admin::RecommendationsController < Admin::BaseController
 
   def recommendation_params
     params.require(:recommendation).permit(:enrollment_id, :email, :lastname, :firstname, :organization, :address1, :address2,
-                                           :city, :state, :state_non_us, :postalcode, :country, :phone_number, :best_contact_time)
+      :city, :state, :state_non_us, :postalcode, :country, :phone_number, :best_contact_time)
   end
 end

@@ -22,16 +22,16 @@
 #
 #  fk_rails_...  (camp_occurrence_id => camp_occurrences.id)
 #
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe Course, type: :model do
-  describe 'associations' do
+  describe "associations" do
     it { is_expected.to belong_to(:camp_occurrence) }
     it { is_expected.to have_many(:course_preferences).dependent(:destroy) }
     it { is_expected.to have_many(:course_assignments).dependent(:destroy) }
   end
 
-  describe 'validations' do
+  describe "validations" do
     subject { build(:course) }
 
     it { is_expected.to validate_presence_of(:title) }
@@ -39,49 +39,49 @@ RSpec.describe Course, type: :model do
     it { is_expected.to validate_numericality_of(:available_spaces).is_greater_than_or_equal_to(0) }
   end
 
-  describe 'factory' do
-    it 'has a valid factory' do
+  describe "factory" do
+    it "has a valid factory" do
       course = build(:course)
       expect(course).to be_valid
     end
 
-    it 'creates open course using trait' do
+    it "creates open course using trait" do
       course = create(:course, :open)
-      expect(course.status).to eq('open')
+      expect(course.status).to eq("open")
     end
 
-    it 'creates closed course using trait' do
+    it "creates closed course using trait" do
       course = create(:course, :closed)
-      expect(course.status).to eq('closed')
+      expect(course.status).to eq("closed")
     end
 
-    it 'creates full course using trait' do
+    it "creates full course using trait" do
       course = create(:course, :full)
       expect(course.available_spaces).to eq(0)
-      expect(course.status).to eq('closed')
+      expect(course.status).to eq("closed")
     end
   end
 
-  describe 'scopes' do
+  describe "scopes" do
     let(:camp_config) { create(:camp_configuration, :active, camp_year: Date.current.year) }
     let(:camp_occurrence) { create(:camp_occurrence, camp_configuration: camp_config, active: true) }
-    let!(:current_course) { create(:course, camp_occurrence: camp_occurrence, status: 'open') }
+    let!(:current_course) { create(:course, camp_occurrence: camp_occurrence, status: "open") }
 
     let(:old_camp_config) { create(:camp_configuration, camp_year: Date.current.year - 1) }
     let(:old_occurrence) { create(:camp_occurrence, camp_configuration: old_camp_config, active: false) }
     let!(:old_course) { create(:course, camp_occurrence: old_occurrence) }
 
-    describe '.current_camp' do
-      it 'returns courses for the current camp year' do
+    describe ".current_camp" do
+      it "returns courses for the current camp year" do
         expect(Course.current_camp).to include(current_course)
         expect(Course.current_camp).not_to include(old_course)
       end
     end
 
-    describe '.open' do
-      let!(:closed_course) { create(:course, camp_occurrence: camp_occurrence, status: 'closed') }
+    describe ".open" do
+      let!(:closed_course) { create(:course, camp_occurrence: camp_occurrence, status: "closed") }
 
-      it 'returns only open courses' do
+      it "returns only open courses" do
         expect(Course.open).to include(current_course)
         expect(Course.open).not_to include(closed_course)
       end
@@ -89,7 +89,7 @@ RSpec.describe Course, type: :model do
 
     # Admin index/CSV use this scope so remaining_spaces and wait_list_count are select
     # columns instead of two association queries per row. Wrong SQL would overstate seats.
-    describe '.with_seat_counts' do
+    describe ".with_seat_counts" do
       let!(:course) { create(:course, camp_occurrence: camp_occurrence, available_spaces: 10) }
 
       before do
@@ -97,7 +97,7 @@ RSpec.describe Course, type: :model do
         create_list(:course_assignment, 3, course: course, wait_list: true)
       end
 
-      it 'loads confirmed and wait-list counts as select attributes used by seat helpers' do
+      it "loads confirmed and wait-list counts as select attributes used by seat helpers" do
         loaded = Course.with_seat_counts.find(course.id)
 
         # The count helpers fall back to association COUNT queries when the aliases are not
@@ -107,7 +107,7 @@ RSpec.describe Course, type: :model do
 
         queries = []
         callback = ->(*, payload) { queries << payload[:sql] }
-        ActiveSupport::Notifications.subscribed(callback, 'sql.active_record') do
+        ActiveSupport::Notifications.subscribed(callback, "sql.active_record") do
           expect(loaded.confirmed_assignments_count).to eq(2)
           expect(loaded.wait_list_count).to eq(3)
           expect(loaded.remaining_spaces).to eq(8)
@@ -118,48 +118,48 @@ RSpec.describe Course, type: :model do
     end
   end
 
-  describe '#display_name' do
-    let(:camp_occurrence) { create(:camp_occurrence, description: 'Session 12') }
-    let(:course) { build(:course, title: 'Introduction to Physics', camp_occurrence: camp_occurrence) }
+  describe "#display_name" do
+    let(:camp_occurrence) { create(:camp_occurrence, description: "Session 12") }
+    let(:course) { build(:course, title: "Introduction to Physics", camp_occurrence: camp_occurrence) }
 
-    it 'returns the title as display name' do
-      expect(course.display_name).to eq('Introduction to Physics - Session 12')
+    it "returns the title as display name" do
+      expect(course.display_name).to eq("Introduction to Physics - Session 12")
     end
   end
 
-  describe '#remaining_spaces' do
+  describe "#remaining_spaces" do
     let(:course) { create(:course, available_spaces: 10) }
 
-    context 'with no assignments' do
-      it 'returns available spaces' do
+    context "with no assignments" do
+      it "returns available spaces" do
         expect(course.remaining_spaces).to eq(10)
       end
     end
 
-    context 'with assignments' do
+    context "with assignments" do
       before do
         create_list(:course_assignment, 3, course: course, wait_list: false)
       end
 
-      it 'returns available spaces minus assignments' do
+      it "returns available spaces minus assignments" do
         expect(course.remaining_spaces).to eq(7)
       end
     end
 
-    context 'with waitlisted assignments' do
+    context "with waitlisted assignments" do
       before do
         create_list(:course_assignment, 2, course: course, wait_list: false)
         create_list(:course_assignment, 3, course: course, wait_list: true)
       end
 
-      it 'does not count waitlisted assignments' do
+      it "does not count waitlisted assignments" do
         expect(course.remaining_spaces).to eq(8)
       end
     end
   end
 
-  describe '#available_spaces' do
-    it 'returns the stored capacity' do
+  describe "#available_spaces" do
+    it "returns the stored capacity" do
       course = create(:course, available_spaces: 10)
       create_list(:course_assignment, 3, course: course, wait_list: false)
 
@@ -167,5 +167,5 @@ RSpec.describe Course, type: :model do
     end
   end
 
-  it_behaves_like 'a model with timestamps'
+  it_behaves_like "a model with timestamps"
 end

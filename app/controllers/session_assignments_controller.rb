@@ -8,22 +8,23 @@ class SessionAssignmentsController < ApplicationController
 
   def accept_session_offer
     if @session_assignment.accept_offer!(current_user)
-      redirect_to all_payments_path, notice: 'Session assignment was successfully accepted.', status: :see_other
+      redirect_to all_payments_path, notice: "Session assignment was successfully accepted.", status: :see_other
     else
-      redirect_to root_path, notice: 'There was a problem processing the offer.', status: :see_other
+      redirect_to root_path, notice: "There was a problem processing the offer.", status: :see_other
     end
   end
 
   def decline_session_offer
     if @session_assignment.decline_offer!(current_user)
-      redirect_to root_path, notice: 'Session assignment was declined.', status: :see_other
+      redirect_to root_path, notice: "Session assignment was declined.", status: :see_other
     else
-      redirect_to root_path, notice: 'There was a problem processing the offer.', status: :see_other
+      redirect_to root_path, notice: "There was a problem processing the offer.", status: :see_other
     end
   end
 
   private
-    def set_session_assignment
-      @session_assignment = SessionAssignment.where(enrollment_id: current_user.enrollments.select(:id)).find(params[:id])
-    end
+
+  def set_session_assignment
+    @session_assignment = SessionAssignment.where(enrollment_id: current_user.enrollments.select(:id)).find(params[:id])
+  end
 end

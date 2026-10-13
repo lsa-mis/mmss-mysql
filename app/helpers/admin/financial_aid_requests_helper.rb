@@ -5,7 +5,7 @@ module Admin::FinancialAidRequestsHelper
   def admin_agi(amount)
     return nil if amount.blank?
 
-    number_to_currency(amount, unit: '$', separator: '.', delimiter: ',')
+    number_to_currency(amount, unit: "$", separator: ".", delimiter: ",")
   end
 
   # pending / awarded / rejected, plus whatever the record already holds so the select never
@@ -22,9 +22,9 @@ module Admin::FinancialAidRequestsHelper
     return admin_empty_value if enrollment.nil?
 
     name = enrollment.applicant_detail&.full_name || enrollment.user.email
-    link = link_to(name, admin_application_path(enrollment), class: 'font-medium')
+    link = link_to(name, admin_application_path(enrollment), class: "font-medium")
     return link unless with_email
 
-    safe_join([link, tag.div(enrollment.user.email, class: 'text-xs text-slate-500')])
+    safe_join([link, tag.div(enrollment.user.email, class: "text-xs text-slate-500")])
   end
 end

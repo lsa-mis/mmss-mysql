@@ -7,14 +7,14 @@ class Admin::UsersController < Admin::BaseController
   before_action :set_user, only: %i[show edit update destroy]
 
   SORTS = {
-    id: 'users.id',
-    email: 'users.email',
-    current_sign_in_at: 'users.current_sign_in_at',
-    sign_in_count: 'users.sign_in_count',
-    created_at: 'users.created_at'
+    id: "users.id",
+    email: "users.email",
+    current_sign_in_at: "users.current_sign_in_at",
+    sign_in_count: "users.sign_in_count",
+    created_at: "users.created_at"
   }.freeze
 
-  BATCH_ACTIONS = { destroy: 'Delete selected' }.freeze
+  BATCH_ACTIONS = {destroy: "Delete selected"}.freeze
 
   def index
     @filter = Admin::UsersFilter.new(params[Admin::Filter::PARAM_KEY])
@@ -23,7 +23,7 @@ class Admin::UsersController < Admin::BaseController
 
     respond_to do |format|
       format.html { @pagy, @users = paginate(relation) }
-      format.csv { send_csv(csv_export, relation, filename: 'users') }
+      format.csv { send_csv(csv_export, relation, filename: "users") }
     end
   end
 
@@ -39,17 +39,18 @@ class Admin::UsersController < Admin::BaseController
     @user = User.new(account_params(:user))
 
     if @user.save
-      redirect_to admin_user_path(@user), notice: 'User was successfully created.', status: :see_other
+      redirect_to admin_user_path(@user), notice: "User was successfully created.", status: :see_other
     else
       render :new, status: :unprocessable_content
     end
   end
 
-  def edit; end
+  def edit
+  end
 
   def update
     if @user.update(account_params_for_update(:user))
-      redirect_to admin_user_path(@user), notice: 'User was successfully updated.', status: :see_other
+      redirect_to admin_user_path(@user), notice: "User was successfully updated.", status: :see_other
     else
       render :edit, status: :unprocessable_content
     end
@@ -57,10 +58,10 @@ class Admin::UsersController < Admin::BaseController
 
   def destroy
     if @user.destroy
-      redirect_to admin_users_path, notice: 'User was successfully deleted.', status: :see_other
+      redirect_to admin_users_path, notice: "User was successfully deleted.", status: :see_other
     else
       redirect_to admin_user_path(@user), alert: "User could not be deleted: #{@user.errors.full_messages.to_sentence}",
-                                          status: :see_other
+        status: :see_other
     end
   end
 
@@ -78,7 +79,7 @@ class Admin::UsersController < Admin::BaseController
   # instead of failing the whole batch.
   def batch_destroy(records)
     destroyed, kept = records.to_a.partition(&:destroy)
-    notice = "Deleted #{destroyed.size} #{'user'.pluralize(destroyed.size)}."
+    notice = "Deleted #{destroyed.size} #{"user".pluralize(destroyed.size)}."
     if kept.any?
       notice += " Skipped #{kept.size} with payments or payment requests: #{kept.map(&:email).to_sentence}."
     end

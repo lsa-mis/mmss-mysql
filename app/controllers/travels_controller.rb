@@ -10,7 +10,8 @@ class TravelsController < ApplicationController
   before_action :set_list_of_sessions, only: %i[new edit create update]
 
   # GET /enrollments/:enrollment_id/travels/1
-  def show; end
+  def show
+  end
 
   # GET /enrollments/:enrollment_id/travels/new
   def new
@@ -18,13 +19,14 @@ class TravelsController < ApplicationController
   end
 
   # GET /enrollments/:enrollment_id/travels/1/edit
-  def edit; end
+  def edit
+  end
 
   # POST /enrollments/:enrollment_id/travels
   def create
     @travel = @current_enrollment.travels.new(travel_params)
     if @travel.save
-      redirect_to root_path, notice: 'Travel was successfully created.', status: :see_other
+      redirect_to root_path, notice: "Travel was successfully created.", status: :see_other
     else
       render :new, status: :unprocessable_content
     end
@@ -33,7 +35,7 @@ class TravelsController < ApplicationController
   # PATCH/PUT /enrollments/:enrollment_id/travels/1
   def update
     if @travel.update(travel_params)
-      redirect_to root_path, notice: 'Travel was successfully updated.', status: :see_other
+      redirect_to root_path, notice: "Travel was successfully updated.", status: :see_other
     else
       render :edit, status: :unprocessable_content
     end
@@ -56,7 +58,7 @@ class TravelsController < ApplicationController
   # enrollment_id comes from the route (and is owned by current_user), never from the form.
   def travel_params
     params.require(:travel).permit(:arrival_session, :depart_session,
-                                   :arrival_transport, :arrival_carrier, :arrival_route_num, :arrival_date, :arrival_time,
-                                   :depart_transport, :depart_carrier, :depart_route_num, :depart_date, :depart_time, :note)
+      :arrival_transport, :arrival_carrier, :arrival_route_num, :arrival_date, :arrival_time,
+      :depart_transport, :depart_carrier, :depart_route_num, :depart_date, :depart_time, :note)
   end
 end

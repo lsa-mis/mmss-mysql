@@ -6,25 +6,25 @@ class Admin::RecuploadsController < Admin::BaseController
   before_action :set_recupload, only: %i[show edit update destroy]
 
   SORTS = {
-    recommendation_id: 'recuploads.recommendation_id',
-    applicant: 'applicant_details.lastname',
-    authorname: 'recuploads.authorname',
-    studentname: 'recuploads.studentname',
-    created_at: 'recuploads.created_at',
-    updated_at: 'recuploads.updated_at'
+    recommendation_id: "recuploads.recommendation_id",
+    applicant: "applicant_details.lastname",
+    authorname: "recuploads.authorname",
+    studentname: "recuploads.studentname",
+    created_at: "recuploads.created_at",
+    updated_at: "recuploads.updated_at"
   }.freeze
 
-  BATCH_ACTIONS = { destroy: 'Delete selected' }.freeze
+  BATCH_ACTIONS = {destroy: "Delete selected"}.freeze
 
   CSV_EXPORT = Admin::CsvExport.define do
     column :id
     column :recommendation_id
-    column('Applicant') { |recupload| recupload.recommendation.enrollment.applicant_detail&.full_name }
-    column('Applicant email') { |recupload| recupload.recommendation.enrollment.user.email }
+    column("Applicant") { |recupload| recupload.recommendation.enrollment.applicant_detail&.full_name }
+    column("Applicant email") { |recupload| recupload.recommendation.enrollment.user.email }
     column :authorname
     column :studentname
-    column('Letter') { |recupload| recupload.letter }
-    column('Attached file') { |recupload| recupload.recletter.filename.to_s if recupload.recletter.attached? }
+    column("Letter") { |recupload| recupload.letter }
+    column("Attached file") { |recupload| recupload.recletter.filename.to_s if recupload.recletter.attached? }
     column :created_at
     column :updated_at
   end
@@ -36,11 +36,12 @@ class Admin::RecuploadsController < Admin::BaseController
 
     respond_to do |format|
       format.html { @pagy, @recuploads = paginate(relation) }
-      format.csv { send_csv(CSV_EXPORT, relation, filename: 'recuploads') }
+      format.csv { send_csv(CSV_EXPORT, relation, filename: "recuploads") }
     end
   end
 
-  def show; end
+  def show
+  end
 
   def new
     @recupload = Recupload.new
@@ -50,23 +51,24 @@ class Admin::RecuploadsController < Admin::BaseController
     @recupload = Recupload.new(recupload_params)
 
     if @recupload.save
-      redirect_to admin_recupload_path(@recupload), notice: 'Recupload was successfully created.', status: :see_other
+      redirect_to admin_recupload_path(@recupload), notice: "Recupload was successfully created.", status: :see_other
     else
       render :new, status: :unprocessable_content
     end
   rescue ActiveRecord::RecordNotUnique
     # The model locks the recommendation before validating, so this only remains as a backstop.
-    @recupload.errors.add(:recommendation_id, 'already has a letter')
+    @recupload.errors.add(:recommendation_id, "already has a letter")
     render :new, status: :unprocessable_content
   end
 
-  def edit; end
+  def edit
+  end
 
   # The owning recommendation is create-only: moving a letter would leave the destination's
   # upload link usable and the source without one (see Recupload#invalidate_upload_token).
   def update
     if @recupload.update(recupload_params.except(:recommendation_id))
-      redirect_to admin_recupload_path(@recupload), notice: 'Recupload was successfully updated.', status: :see_other
+      redirect_to admin_recupload_path(@recupload), notice: "Recupload was successfully updated.", status: :see_other
     else
       render :edit, status: :unprocessable_content
     end
@@ -74,7 +76,7 @@ class Admin::RecuploadsController < Admin::BaseController
 
   def destroy
     @recupload.destroy
-    redirect_to admin_recuploads_path, notice: 'Recupload was successfully deleted.', status: :see_other
+    redirect_to admin_recuploads_path, notice: "Recupload was successfully deleted.", status: :see_other
   end
 
   def batch
@@ -84,13 +86,13 @@ class Admin::RecuploadsController < Admin::BaseController
   private
 
   def set_recupload
-    @recupload = Recupload.with_attached_recletter.includes(recommendation: { enrollment: %i[user applicant_detail] }).find(params[:id])
+    @recupload = Recupload.with_attached_recletter.includes(recommendation: {enrollment: %i[user applicant_detail]}).find(params[:id])
   end
 
   def base_relation
-    Recupload.left_joins(recommendation: { enrollment: :applicant_detail })
-             .with_attached_recletter
-             .preload(recommendation: { enrollment: %i[user applicant_detail] })
+    Recupload.left_joins(recommendation: {enrollment: :applicant_detail})
+      .with_attached_recletter
+      .preload(recommendation: {enrollment: %i[user applicant_detail]})
   end
 
   def recupload_params

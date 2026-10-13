@@ -20,22 +20,22 @@
 #  fk_rails_...  (activity_id => activities.id)
 #  fk_rails_...  (enrollment_id => enrollments.id)
 #
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe EnrollmentActivity, type: :model do
-  describe 'associations' do
+  describe "associations" do
     it { is_expected.to belong_to(:enrollment) }
     it { is_expected.to belong_to(:activity) }
   end
 
-  describe 'validations' do
+  describe "validations" do
     subject { build(:enrollment_activity) }
 
     it { is_expected.to validate_presence_of(:enrollment) }
     it { is_expected.to validate_presence_of(:activity) }
   end
 
-  describe 'database columns' do
+  describe "database columns" do
     it { is_expected.to have_db_column(:id).of_type(:integer) }
     it { is_expected.to have_db_column(:enrollment_id).of_type(:integer) }
     it { is_expected.to have_db_column(:activity_id).of_type(:integer) }
@@ -43,18 +43,18 @@ RSpec.describe EnrollmentActivity, type: :model do
     it { is_expected.to have_db_column(:updated_at).of_type(:datetime) }
   end
 
-  describe 'database indexes' do
+  describe "database indexes" do
     it { is_expected.to have_db_index(:enrollment_id) }
     it { is_expected.to have_db_index(:activity_id) }
   end
 
-  describe 'factory' do
-    it 'has a valid factory' do
+  describe "factory" do
+    it "has a valid factory" do
       enrollment_activity = build(:enrollment_activity)
       expect(enrollment_activity).to be_valid
     end
 
-    it 'creates an enrollment_activity with enrollment and activity' do
+    it "creates an enrollment_activity with enrollment and activity" do
       enrollment_activity = create(:enrollment_activity)
       expect(enrollment_activity.enrollment).to be_present
       expect(enrollment_activity.activity).to be_present
@@ -62,11 +62,11 @@ RSpec.describe EnrollmentActivity, type: :model do
     end
   end
 
-  describe 'creation and persistence' do
+  describe "creation and persistence" do
     let(:enrollment) { create(:enrollment) }
     let(:activity) { create(:activity) }
 
-    it 'can be created with valid enrollment and activity' do
+    it "can be created with valid enrollment and activity" do
       enrollment_activity = EnrollmentActivity.create(
         enrollment: enrollment,
         activity: activity
@@ -75,59 +75,59 @@ RSpec.describe EnrollmentActivity, type: :model do
       expect(enrollment_activity).to be_valid
     end
 
-    it 'cannot be created without an enrollment' do
+    it "cannot be created without an enrollment" do
       enrollment_activity = EnrollmentActivity.new(activity: activity)
       expect(enrollment_activity).not_to be_valid
       expect(enrollment_activity.errors[:enrollment]).to include("can't be blank")
     end
 
-    it 'cannot be created without an activity' do
+    it "cannot be created without an activity" do
       enrollment_activity = EnrollmentActivity.new(enrollment: enrollment)
       expect(enrollment_activity).not_to be_valid
       expect(enrollment_activity.errors[:activity]).to include("can't be blank")
     end
   end
 
-  describe 'associations behavior' do
+  describe "associations behavior" do
     let(:enrollment) { create(:enrollment) }
     let(:activity) { create(:activity) }
     let(:enrollment_activity) { create(:enrollment_activity, enrollment: enrollment, activity: activity) }
 
-    it 'belongs to the correct enrollment' do
+    it "belongs to the correct enrollment" do
       expect(enrollment_activity.enrollment).to eq(enrollment)
       expect(enrollment.enrollment_activities).to include(enrollment_activity)
     end
 
-    it 'belongs to the correct activity' do
+    it "belongs to the correct activity" do
       expect(enrollment_activity.activity).to eq(activity)
       expect(activity.enrollment_activities).to include(enrollment_activity)
     end
 
-    it 'can access enrollment through association' do
+    it "can access enrollment through association" do
       expect(enrollment_activity.enrollment).to be_a(Enrollment)
       expect(enrollment_activity.enrollment.id).to eq(enrollment.id)
     end
 
-    it 'can access activity through association' do
+    it "can access activity through association" do
       expect(enrollment_activity.activity).to be_a(Activity)
       expect(enrollment_activity.activity.id).to eq(activity.id)
     end
   end
 
-  describe 'timestamps' do
+  describe "timestamps" do
     let(:enrollment_activity) { create(:enrollment_activity) }
 
-    it 'sets created_at on creation' do
+    it "sets created_at on creation" do
       expect(enrollment_activity.created_at).to be_present
       expect(enrollment_activity.created_at).to be_within(1.second).of(Time.current)
     end
 
-    it 'sets updated_at on creation' do
+    it "sets updated_at on creation" do
       expect(enrollment_activity.updated_at).to be_present
       expect(enrollment_activity.updated_at).to be_within(1.second).of(Time.current)
     end
 
-    it 'updates updated_at when record is modified' do
+    it "updates updated_at when record is modified" do
       original_updated_at = enrollment_activity.updated_at
       sleep(1) # Ensure time difference
       enrollment_activity.touch
@@ -135,12 +135,12 @@ RSpec.describe EnrollmentActivity, type: :model do
     end
   end
 
-  describe 'multiple enrollment_activities' do
+  describe "multiple enrollment_activities" do
     let(:enrollment) { create(:enrollment) }
     let(:activity1) { create(:activity) }
     let(:activity2) { create(:activity) }
 
-    it 'allows an enrollment to have multiple activities' do
+    it "allows an enrollment to have multiple activities" do
       ea1 = create(:enrollment_activity, enrollment: enrollment, activity: activity1)
       ea2 = create(:enrollment_activity, enrollment: enrollment, activity: activity2)
 
@@ -148,7 +148,7 @@ RSpec.describe EnrollmentActivity, type: :model do
       expect(enrollment.enrollment_activities).to include(ea1, ea2)
     end
 
-    it 'allows an activity to be associated with multiple enrollments' do
+    it "allows an activity to be associated with multiple enrollments" do
       enrollment1 = create(:enrollment)
       enrollment2 = create(:enrollment)
 
@@ -160,26 +160,26 @@ RSpec.describe EnrollmentActivity, type: :model do
     end
   end
 
-  describe 'dependent associations' do
+  describe "dependent associations" do
     let(:enrollment) { create(:enrollment) }
     let(:activity) { create(:activity) }
 
-    it 'is destroyed when enrollment is destroyed' do
+    it "is destroyed when enrollment is destroyed" do
       enrollment_activity = create(:enrollment_activity, enrollment: enrollment, activity: activity)
-      enrollment_id = enrollment.id
+      enrollment.id
       enrollment.destroy
 
       expect(EnrollmentActivity.find_by(id: enrollment_activity.id)).to be_nil
     end
 
-    it 'is destroyed when activity is destroyed' do
+    it "is destroyed when activity is destroyed" do
       enrollment_activity = create(:enrollment_activity, enrollment: enrollment, activity: activity)
-      activity_id = activity.id
+      activity.id
       activity.destroy
 
       expect(EnrollmentActivity.find_by(id: enrollment_activity.id)).to be_nil
     end
   end
 
-  it_behaves_like 'a model with timestamps'
+  it_behaves_like "a model with timestamps"
 end

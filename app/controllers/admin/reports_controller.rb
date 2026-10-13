@@ -21,7 +21,7 @@ class Admin::ReportsController < Admin::BaseController
     raise ActiveRecord::RecordNotFound unless @camp
 
     report = report_class.new(@camp)
-    send_data report.to_csv, type: 'text/csv; charset=utf-8', disposition: 'attachment', filename: report.filename
+    send_data report.to_csv, type: "text/csv; charset=utf-8", disposition: "attachment", filename: report.filename
   end
 
   private
@@ -30,16 +30,16 @@ class Admin::ReportsController < Admin::BaseController
   # unselected form field (empty string), the active camp. Anything else is rejected.
   def set_camp
     camp_year = params[:camp_year]
-    @camp = if camp_year.nil? || camp_year == ''
-              CampConfiguration.active.last
-            elsif camp_year.is_a?(String) && camp_year.match?(CAMP_YEAR_FORMAT)
-              CampConfiguration.find_by!(camp_year: Integer(camp_year, 10))
-            else
-              raise ActiveRecord::RecordNotFound
-            end
+    @camp = if camp_year.nil? || camp_year == ""
+      CampConfiguration.active.last
+    elsif camp_year.is_a?(String) && camp_year.match?(CAMP_YEAR_FORMAT)
+      CampConfiguration.find_by!(camp_year: Integer(camp_year, 10))
+    else
+      raise ActiveRecord::RecordNotFound
+    end
   end
 
   def report_not_found
-    redirect_to admin_reports_path, alert: 'Unknown report or camp year.', status: :see_other
+    redirect_to admin_reports_path, alert: "Unknown report or camp year.", status: :see_other
   end
 end

@@ -32,8 +32,8 @@ class Activity < ApplicationRecord
   monetize :cost_cents
 
   validates :description, presence: true
-  validates :date_occurs, presence: true, format: { with: ConstantData::VALID_DATE_REGEX }
-  validates :cost_cents, presence: true, numericality: { only_integer: true }
+  validates :date_occurs, presence: true, format: {with: ConstantData::VALID_DATE_REGEX}
+  validates :cost_cents, presence: true, numericality: {only_integer: true}
 
   def description_with_cost
     "#{description} -- #{humanized_money_with_symbol(cost)}"

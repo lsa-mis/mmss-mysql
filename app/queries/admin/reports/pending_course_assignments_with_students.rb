@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 class Admin::Reports::PendingCourseAssignmentsWithStudents < Admin::Reports::Base
-  self.label = 'Pending Course Assignments with Students'
-  self.description = 'Every course assignment for the camp year (whatever the offer status), by session and course, ' \
-                     'with the assigned student.'
-  self.csv_title = 'pending_course_assignments_with_students'
+  self.label = "Pending Course Assignments with Students"
+  self.description = "Every course assignment for the camp year (whatever the offer status), by session and course, " \
+                     "with the assigned student."
+  self.csv_title = "pending_course_assignments_with_students"
   self.sql = <<~SQL
     SELECT co.description, cor.title, en.user_id, REPLACE(ad.lastname, ',', ' ') AS lastname,
       REPLACE(ad.firstname, ',', ' ') AS firstname, u.email

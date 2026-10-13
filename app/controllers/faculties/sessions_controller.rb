@@ -1,22 +1,21 @@
 # frozen_string_literal: true
 
 class Faculties::SessionsController < Devise::SessionsController
-
   # POST /resource/sign_in
   def create
     faculty = Faculty.find_by(email: params[:faculty][:email].downcase)
-    if faculty 
-      uniqname = faculty.email.split('@').first
+    if faculty
+      uniqname = faculty.email.split("@").first
       if Course.current_camp.pluck(:faculty_uniqname).uniq.compact.include?(uniqname)
         sign_in faculty
         # Set session creation time for accurate expiry calculation
         session[:session_created_at] = Time.current.to_i
         redirect_to faculty_path, status: :see_other
       else
-        redirect_to root_path, :alert => "You don't have any courses, please contact the administrator", status: :see_other
+        redirect_to root_path, alert: "You don't have any courses, please contact the administrator", status: :see_other
       end
     else
-      redirect_to new_faculty_session_path, :alert => "Please sign up first!", status: :see_other
+      redirect_to new_faculty_session_path, alert: "Please sign up first!", status: :see_other
     end
   end
 
@@ -30,13 +29,12 @@ class Faculties::SessionsController < Devise::SessionsController
 
   private
 
-    def respond_to_on_destroy
-      # We actually need to hardcode this as Rails default responder doesn't
-      # support returning empty response on GET request
-      respond_to do |format|
-        format.all { head :no_content }
-        format.any(*navigational_formats) { redirect_to faculty_login_path, status: :see_other }
-      end
+  def respond_to_on_destroy
+    # We actually need to hardcode this as Rails default responder doesn't
+    # support returning empty response on GET request
+    respond_to do |format|
+      format.all { head :no_content }
+      format.any(*navigational_formats) { redirect_to faculty_login_path, status: :see_other }
     end
-
+  end
 end

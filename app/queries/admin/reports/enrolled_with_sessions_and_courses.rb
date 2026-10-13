@@ -3,10 +3,10 @@
 class Admin::Reports::EnrolledWithSessionsAndCourses < Admin::Reports::Base
   include Admin::Reports::CountryColumn
 
-  self.label = 'Enrolled Students with Sessions and Courses'
-  self.description = 'Course assignments of enrolled students for the camp year, by session and course, with year ' \
-                     'in school and home state.'
-  self.csv_title = 'enrolled_students_with_sessions_and_courses'
+  self.label = "Enrolled Students with Sessions and Courses"
+  self.description = "Course assignments of enrolled students for the camp year, by session and course, with year " \
+                     "in school and home state."
+  self.csv_title = "enrolled_students_with_sessions_and_courses"
   self.sql = <<~SQL
     SELECT ad.country, co.description AS session, cor.title AS course, en.user_id,
       REPLACE(ad.lastname, ',', ' ') AS lastname,

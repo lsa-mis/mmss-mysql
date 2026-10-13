@@ -3,10 +3,10 @@
 class Admin::Reports::EnrolledStudentDemographicReport < Admin::Reports::Base
   include Admin::Reports::CountryColumn
 
-  self.label = 'Enrolled Students Demographic Report'
-  self.description = 'Country, gender, year in school, demographic and international flag of every enrolled ' \
-                     'student for the camp year (no names).'
-  self.csv_title = 'enrolled_student_demographic_report'
+  self.label = "Enrolled Students Demographic Report"
+  self.description = "Country, gender, year in school, demographic and international flag of every enrolled " \
+                     "student for the camp year (no names)."
+  self.csv_title = "enrolled_student_demographic_report"
   self.sql = <<~SQL
     SELECT ad.country,
     (CASE WHEN ad.gender = '' THEN NULL ELSE

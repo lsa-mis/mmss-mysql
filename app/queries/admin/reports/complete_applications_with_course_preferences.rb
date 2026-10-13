@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 class Admin::Reports::CompleteApplicationsWithCoursePreferences < Admin::Reports::Base
-  self.label = 'Complete Application with Course Preferences'
-  self.description = 'Course preferences (ranking, course, session) of complete applications for the camp year ' \
-                     'that have not been offered a place yet.'
-  self.csv_title = 'complete_applications_with_course_preferences'
+  self.label = "Complete Application with Course Preferences"
+  self.description = "Course preferences (ranking, course, session) of complete applications for the camp year " \
+                     "that have not been offered a place yet."
+  self.csv_title = "complete_applications_with_course_preferences"
   self.sql = <<~SQL
     SELECT u.email, ad.lastname, ad.firstname, cp.ranking, c.title, co.description
       FROM enrollments AS e

@@ -5,7 +5,7 @@
 # Keeping this file for compatibility with existing test references
 
 FactoryBot.define do
-  factory :session, class: 'CampOccurrence' do
+  factory :session, class: "CampOccurrence" do
     association :camp_configuration
 
     sequence(:description) { |n| "Session #{n}" }

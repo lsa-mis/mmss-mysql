@@ -47,7 +47,7 @@ class Admin::Reports::Base
   def filename = Admin::CsvExport.filename("report-#{csv_title}")
 
   def bound_sql
-    ActiveRecord::Base.sanitize_sql_array([sql, { camp_year: Integer(camp.camp_year), camp_id: Integer(camp.id) }])
+    ActiveRecord::Base.sanitize_sql_array([sql, {camp_year: Integer(camp.camp_year), camp_id: Integer(camp.id)}])
   end
 
   private
@@ -56,7 +56,7 @@ class Admin::Reports::Base
 
   def column_index(name) = result.columns.index(name.to_s)
 
-  def money(cents) = Money.new(cents.to_i, 'USD')
+  def money(cents) = Money.new(cents.to_i, "USD")
 
   # "United States of America - US" for ISO codes the countries gem knows; the raw value otherwise.
   def country_name(code)

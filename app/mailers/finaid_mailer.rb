@@ -7,7 +7,7 @@ class FinaidMailer < ApplicationMailer
     @email = finaid.enrollment.user.email
     @balance_due = balance_due
     @student = ApplicantDetail.find_by(user_id: finaid.enrollment.user_id)
-    mail(to: @email, subject: 'University of Michigan - Michigan Math and Science Scholars: Financial Aid Awarded')
+    mail(to: @email, subject: "University of Michigan - Michigan Math and Science Scholars: Financial Aid Awarded")
   end
 
   def fin_aid_rejected_email(finaid, balance_due)
@@ -17,7 +17,7 @@ class FinaidMailer < ApplicationMailer
     @balance_due = balance_due
     @student = ApplicantDetail.find_by(user_id: finaid.enrollment.user_id)
     @camp_config = CampConfiguration.find_by(active: true)
-    mail(to: @email, subject: 'University of Michigan - Michigan Math and Science Scholars: Financial Aid Rejected')
+    mail(to: @email, subject: "University of Michigan - Michigan Math and Science Scholars: Financial Aid Rejected")
   end
 
   def fin_aid_request_email
@@ -25,6 +25,6 @@ class FinaidMailer < ApplicationMailer
     @student = ApplicantDetail.find_by(user_id: @enrollment.user_id)
     @url = new_financial_aid_url
     mail(to: @enrollment.user.email,
-         subject: 'University of Michigan - Michigan Math and Science Scholars: Financial Aid Request Form')
+      subject: "University of Michigan - Michigan Math and Science Scholars: Financial Aid Request Form")
   end
 end

@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 class Admin::Reports::FinaidWithAppAndOfferStatus < Admin::Reports::Base
-  self.label = 'Finaid with App and Offer Status'
-  self.description = 'Applicants with a financial aid request for the camp year, with their application and ' \
-                     'offer status.'
-  self.csv_title = 'finaid_with_app_and_offer_status'
+  self.label = "Finaid with App and Offer Status"
+  self.description = "Applicants with a financial aid request for the camp year, with their application and " \
+                     "offer status."
+  self.csv_title = "finaid_with_app_and_offer_status"
   self.sql = <<~SQL
     SELECT ad.firstname, ad.lastname, u.email, enroll.application_status, enroll.offer_status
       FROM financial_aids AS fa

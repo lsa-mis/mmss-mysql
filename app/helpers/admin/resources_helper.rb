@@ -5,12 +5,12 @@
 # everything else falls back to the conventional `admin_<model>_path`.
 module Admin::ResourcesHelper
   ROUTE_NAMES = {
-    'Enrollment' => 'application',
-    'SessionActivity' => 'session_selection',
-    'EnrollmentActivity' => 'applicant_activity',
-    'FinancialAid' => 'financial_aid_request',
-    'CampOccurrence' => 'session_configuration',
-    'Gender' => 'gender_type'
+    "Enrollment" => "application",
+    "SessionActivity" => "session_selection",
+    "EnrollmentActivity" => "applicant_activity",
+    "FinancialAid" => "financial_aid_request",
+    "CampOccurrence" => "session_configuration",
+    "Gender" => "gender_type"
   }.freeze
 
   def admin_resource_route_name(record)

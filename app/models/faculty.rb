@@ -27,13 +27,13 @@ class Faculty < ApplicationRecord
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable
+    :recoverable, :rememberable, :validatable
 
   validate :faculty_has_courses
 
   # Local part of the email; Course#faculty_uniqname links courses to their faculty.
   def uniqname
-    email.to_s.split('@').first
+    email.to_s.split("@").first
   end
 
   def display_name
@@ -42,9 +42,9 @@ class Faculty < ApplicationRecord
 
   private
 
-    def faculty_has_courses
-      unless Course.current_camp.pluck(:faculty_uniqname).uniq.compact.include?(uniqname)
-        errors.add(:base, "You don't have any courses, please contact the administrator")
-      end
+  def faculty_has_courses
+    unless Course.current_camp.pluck(:faculty_uniqname).uniq.compact.include?(uniqname)
+      errors.add(:base, "You don't have any courses, please contact the administrator")
     end
+  end
 end

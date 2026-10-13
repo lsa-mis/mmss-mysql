@@ -8,18 +8,18 @@ class Admin::RejectionsController < Admin::BaseController
   before_action :set_rejection, only: %i[show edit update destroy]
 
   SORTS = {
-    id: 'rejections.id',
-    enrollment: 'applicant_details.lastname',
-    created_at: 'rejections.created_at',
-    updated_at: 'rejections.updated_at'
+    id: "rejections.id",
+    enrollment: "applicant_details.lastname",
+    created_at: "rejections.created_at",
+    updated_at: "rejections.updated_at"
   }.freeze
 
-  BATCH_ACTIONS = { destroy: 'Delete selected' }.freeze
+  BATCH_ACTIONS = {destroy: "Delete selected"}.freeze
 
   CSV_EXPORT = Admin::CsvExport.define do
     column :id
-    column('Name') { |rejection| rejection.enrollment.applicant_detail&.full_name }
-    column('email') { |rejection| rejection.enrollment.user.email }
+    column("Name") { |rejection| rejection.enrollment.applicant_detail&.full_name }
+    column("email") { |rejection| rejection.enrollment.user.email }
     column :reason
     column :created_at
     column :updated_at
@@ -32,11 +32,12 @@ class Admin::RejectionsController < Admin::BaseController
 
     respond_to do |format|
       format.html { @pagy, @rejections = paginate(relation) }
-      format.csv { send_csv(CSV_EXPORT, relation, filename: 'rejections') }
+      format.csv { send_csv(CSV_EXPORT, relation, filename: "rejections") }
     end
   end
 
-  def show; end
+  def show
+  end
 
   # Entry point from the application's "Reject Applicant" action: ?enrollment_id= prefills the
   # applicant and the form shows the name instead of the select.
@@ -49,14 +50,15 @@ class Admin::RejectionsController < Admin::BaseController
     @rejection = Rejection.new(rejection_params)
 
     if rejectable? && @rejection.save
-      redirect_to admin_rejection_path(@rejection), notice: 'Rejection was recorded and the applicant has been notified.',
-                                                   status: :see_other
+      redirect_to admin_rejection_path(@rejection), notice: "Rejection was recorded and the applicant has been notified.",
+        status: :see_other
     else
       render :new, status: :unprocessable_content
     end
   end
 
-  def edit; end
+  def edit
+  end
 
   # The enrollment is immutable once a rejection exists: reassigning it would leave the old
   # application rejected and reject a second one (the status change runs after commit).
@@ -64,7 +66,7 @@ class Admin::RejectionsController < Admin::BaseController
     @rejection.assign_attributes(rejection_params.slice(:reason))
 
     if rejectable? && @rejection.save
-      redirect_to admin_rejection_path(@rejection), notice: 'Rejection was successfully updated.', status: :see_other
+      redirect_to admin_rejection_path(@rejection), notice: "Rejection was successfully updated.", status: :see_other
     else
       render :edit, status: :unprocessable_content
     end
@@ -72,7 +74,7 @@ class Admin::RejectionsController < Admin::BaseController
 
   def destroy
     @rejection.destroy
-    redirect_to admin_rejections_path, notice: 'Rejection was successfully deleted.', status: :see_other
+    redirect_to admin_rejections_path, notice: "Rejection was successfully deleted.", status: :see_other
   end
 
   def batch
@@ -86,7 +88,7 @@ class Admin::RejectionsController < Admin::BaseController
   # a no-op on update).
   def rejectable?
     enrollment = @rejection.enrollment
-    return true if enrollment.nil? || enrollment.can_transition_application_status?('rejected')
+    return true if enrollment.nil? || enrollment.can_transition_application_status?("rejected")
 
     @rejection.errors.add(:base, "This application is #{enrollment.application_status} and cannot be rejected.")
     false

@@ -11,10 +11,10 @@ module Admin::ApplicationsHelper
   def admin_applicant_link(enrollment, with_email: false)
     return admin_empty_value if enrollment.nil?
 
-    link = link_to(admin_applicant_name(enrollment), admin_application_path(enrollment), class: 'font-medium')
+    link = link_to(admin_applicant_name(enrollment), admin_application_path(enrollment), class: "font-medium")
     return link unless with_email
 
-    safe_join([link, tag.div(enrollment.user.email, class: 'text-xs text-slate-500')])
+    safe_join([link, tag.div(enrollment.user.email, class: "text-xs text-slate-500")])
   end
 
   # Sessions the applicant registered for (the only valid session assignments).
@@ -32,7 +32,7 @@ module Admin::ApplicationsHelper
 
     courses.map do |course|
       rank = rankings[course.id]&.ranking
-      label = "#{course.title}, #{course.camp_occurrence.description}, rank - #{rank || '—'}, available - #{course.remaining_spaces}"
+      label = "#{course.title}, #{course.camp_occurrence.description}, rank - #{rank || "—"}, available - #{course.remaining_spaces}"
       [label, course.id]
     end
   end

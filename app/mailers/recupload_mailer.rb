@@ -17,5 +17,4 @@ class RecuploadMailer < ApplicationMailer
     @student = @recommendation.enrollment.user.applicant_detail
     mail(to: @student_email, subject: "University of Michigan - Michigan Math and Science Scholars: Recommendation received for #{@student.firstname} #{@student.lastname}")
   end
-
 end

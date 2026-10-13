@@ -9,16 +9,16 @@ class Admin::DashboardController < Admin::BaseController
     return unless @active_camp
 
     @recent_applications = Enrollment.current_camp_year_applications
-                                     .includes(:user, :applicant_detail)
-                                     .order(created_at: :desc).limit(RECENT_LIMIT)
+      .includes(:user, :applicant_detail)
+      .order(created_at: :desc).limit(RECENT_LIMIT)
     @recent_payments = Payment.current_camp_payments
-                              .includes(user: :applicant_detail)
-                              .order(created_at: :desc).limit(RECENT_LIMIT)
+      .includes(user: :applicant_detail)
+      .order(created_at: :desc).limit(RECENT_LIMIT)
     balance_due_query = Admin::BalanceDueQuery.new(@active_camp)
     @balance_due = balance_due_query.enrollments(limit: BALANCE_DUE_LIMIT)
     @balance_due_total = balance_due_query.count
-    @pending_financial_aids = FinancialAid.where(enrollment: Enrollment.current_camp_year_applications, status: 'pending')
-                                          .includes(enrollment: %i[user applicant_detail])
+    @pending_financial_aids = FinancialAid.where(enrollment: Enrollment.current_camp_year_applications, status: "pending")
+      .includes(enrollment: %i[user applicant_detail])
     @sessions = CampOccurrence.active.to_a
     @session_stats = session_stats(@sessions)
     @camp_notes = Campnote.currently_open.order(:opendate)

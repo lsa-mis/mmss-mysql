@@ -22,7 +22,7 @@ class FeedbacksController < ApplicationController
 
     if @feedback.save
       FeedbackMailer.with(feedback: @feedback).feedback_email.deliver_now
-      redirect_to root_path, notice: 'Feedback was successfully created.', status: :see_other
+      redirect_to root_path, notice: "Feedback was successfully created.", status: :see_other
     else
       render :new, status: :unprocessable_content
     end
@@ -30,8 +30,7 @@ class FeedbacksController < ApplicationController
 
   private
 
-    def feedback_params
-      params.require(:feedback).permit(:user_id, :genre, :message)
-    end
-
+  def feedback_params
+    params.require(:feedback).permit(:user_id, :genre, :message)
+  end
 end

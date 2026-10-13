@@ -18,111 +18,111 @@
 #
 #  fk_rails_...  (enrollment_id => enrollments.id)
 #
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe Rejection, type: :model do
-  describe 'associations' do
+  describe "associations" do
     it { is_expected.to belong_to(:enrollment) }
   end
 
-  describe 'validations' do
+  describe "validations" do
     subject { build(:rejection) }
 
     it { is_expected.to validate_presence_of(:reason) }
 
-    context 'when reason is blank' do
-      it 'is invalid' do
+    context "when reason is blank" do
+      it "is invalid" do
         rejection = build(:rejection, reason: nil)
         expect(rejection).not_to be_valid
         expect(rejection.errors[:reason]).to include("can't be blank")
       end
 
-      it 'is invalid with empty string' do
-        rejection = build(:rejection, reason: '')
+      it "is invalid with empty string" do
+        rejection = build(:rejection, reason: "")
         expect(rejection).not_to be_valid
         expect(rejection.errors[:reason]).to include("can't be blank")
       end
 
-      it 'is invalid with whitespace only' do
-        rejection = build(:rejection, reason: '   ')
+      it "is invalid with whitespace only" do
+        rejection = build(:rejection, reason: "   ")
         expect(rejection).not_to be_valid
         expect(rejection.errors[:reason]).to include("can't be blank")
       end
     end
 
-    context 'when reason is present' do
-      it 'is valid with a short reason' do
-        rejection = build(:rejection, reason: 'Incomplete application')
+    context "when reason is present" do
+      it "is valid with a short reason" do
+        rejection = build(:rejection, reason: "Incomplete application")
         expect(rejection).to be_valid
       end
 
-      it 'is valid with a long reason' do
-        rejection = build(:rejection, reason: 'A' * 1000)
+      it "is valid with a long reason" do
+        rejection = build(:rejection, reason: "A" * 1000)
         expect(rejection).to be_valid
       end
     end
   end
 
-  describe 'factory' do
-    it 'has a valid factory' do
+  describe "factory" do
+    it "has a valid factory" do
       rejection = build(:rejection)
       expect(rejection).to be_valid
     end
 
-    it 'creates a rejection with an enrollment' do
+    it "creates a rejection with an enrollment" do
       enrollment = create(:enrollment)
       rejection = create(:rejection, enrollment: enrollment)
       expect(rejection.enrollment).to eq(enrollment)
       expect(rejection.reason).to be_present
     end
 
-    it 'creates rejection with incomplete_application trait' do
+    it "creates rejection with incomplete_application trait" do
       rejection = create(:rejection, :incomplete_application)
-      expect(rejection.reason).to eq('Application was incomplete')
+      expect(rejection.reason).to eq("Application was incomplete")
     end
 
-    it 'creates rejection with does_not_meet_requirements trait' do
+    it "creates rejection with does_not_meet_requirements trait" do
       rejection = create(:rejection, :does_not_meet_requirements)
-      expect(rejection.reason).to eq('Does not meet program requirements')
+      expect(rejection.reason).to eq("Does not meet program requirements")
     end
   end
 
-  describe 'callbacks' do
-    describe '#set_rejection_status' do
-      let(:enrollment) { create(:enrollment, application_status: 'submitted') }
+  describe "callbacks" do
+    describe "#set_rejection_status" do
+      let(:enrollment) { create(:enrollment, application_status: "submitted") }
       let(:rejection) { build(:rejection, enrollment: enrollment) }
 
-      context 'when rejection is created' do
-        it 'transitions enrollment status to rejected' do
+      context "when rejection is created" do
+        it "transitions enrollment status to rejected" do
           expect {
             rejection.save!
-          }.to change { enrollment.reload.application_status }.to('rejected')
+          }.to change { enrollment.reload.application_status }.to("rejected")
         end
 
-        it 'sets offer_status to empty string' do
-          enrollment.update(offer_status: 'offered')
+        it "sets offer_status to empty string" do
+          enrollment.update(offer_status: "offered")
           rejection.save!
-          expect(enrollment.reload.offer_status).to eq('')
+          expect(enrollment.reload.offer_status).to eq("")
         end
 
-        it 'updates application_status_updated_on' do
+        it "updates application_status_updated_on" do
           rejection.save!
           expect(enrollment.reload.application_status_updated_on).to eq(Date.current)
         end
       end
 
-      context 'when enrollment has course assignments' do
+      context "when enrollment has course assignments" do
         let(:course) { create(:course) }
         let!(:course_assignment) { create(:course_assignment, enrollment: enrollment, course: course) }
 
-        it 'destroys all course assignments' do
+        it "destroys all course assignments" do
           expect {
             rejection.save!
           }.to change { CourseAssignment.count }.by(-1)
             .and change { enrollment.course_assignments.count }.from(1).to(0)
         end
 
-        it 'destroys multiple course assignments' do
+        it "destroys multiple course assignments" do
           course2 = create(:course)
           create(:course_assignment, enrollment: enrollment, course: course2)
 
@@ -132,18 +132,18 @@ RSpec.describe Rejection, type: :model do
         end
       end
 
-      context 'when enrollment has session assignments' do
+      context "when enrollment has session assignments" do
         let(:camp_occurrence) { create(:camp_occurrence) }
         let!(:session_assignment) { create(:session_assignment, enrollment: enrollment, camp_occurrence: camp_occurrence) }
 
-        it 'destroys all session assignments' do
+        it "destroys all session assignments" do
           expect {
             rejection.save!
           }.to change { SessionAssignment.count }.by(-1)
             .and change { enrollment.session_assignments.count }.from(1).to(0)
         end
 
-        it 'destroys multiple session assignments' do
+        it "destroys multiple session assignments" do
           camp_occurrence2 = create(:camp_occurrence)
           create(:session_assignment, enrollment: enrollment, camp_occurrence: camp_occurrence2)
 
@@ -153,13 +153,13 @@ RSpec.describe Rejection, type: :model do
         end
       end
 
-      context 'when enrollment has both course and session assignments' do
+      context "when enrollment has both course and session assignments" do
         let(:course) { create(:course) }
         let(:camp_occurrence) { create(:camp_occurrence) }
         let!(:course_assignment) { create(:course_assignment, enrollment: enrollment, course: course) }
         let!(:session_assignment) { create(:session_assignment, enrollment: enrollment, camp_occurrence: camp_occurrence) }
 
-        it 'destroys both course and session assignments' do
+        it "destroys both course and session assignments" do
           expect {
             rejection.save!
           }.to change { CourseAssignment.count }.by(-1)
@@ -169,58 +169,58 @@ RSpec.describe Rejection, type: :model do
         end
       end
 
-      context 'when enrollment has no assignments' do
-        it 'does not raise an error' do
+      context "when enrollment has no assignments" do
+        it "does not raise an error" do
           expect { rejection.save! }.not_to raise_error
         end
 
-        it 'still transitions enrollment status' do
+        it "still transitions enrollment status" do
           rejection.save!
-          expect(enrollment.reload.application_status).to eq('rejected')
+          expect(enrollment.reload.application_status).to eq("rejected")
         end
       end
 
-      context 'when callback is triggered after commit' do
-        it 'runs after the record is persisted on create' do
+      context "when callback is triggered after commit" do
+        it "runs after the record is persisted on create" do
           expect(rejection).to receive(:set_rejection_status).and_call_original
           rejection.save!
         end
 
-        it 'does not run again on update' do
+        it "does not run again on update" do
           rejection.save!
           expect(rejection).not_to receive(:set_rejection_status)
-          rejection.update!(reason: 'Updated reason')
+          rejection.update!(reason: "Updated reason")
         end
 
-        it 'leaves assignments, status and timestamps untouched when only the reason changes' do
+        it "leaves assignments, status and timestamps untouched when only the reason changes" do
           rejection.save!
-          expect(enrollment.reload.application_status).to eq('rejected')
+          expect(enrollment.reload.application_status).to eq("rejected")
           # Assignments added after the rejection (e.g. by an admin) must survive a reason edit.
           course_assignment = create(:course_assignment, enrollment: enrollment, course: create(:course))
           session_assignment = create(:session_assignment, enrollment: enrollment, camp_occurrence: create(:camp_occurrence))
-          enrollment.update_columns(application_status_updated_on: Date.new(2020, 1, 1), offer_status: 'offered')
+          enrollment.update_columns(application_status_updated_on: Date.new(2020, 1, 1), offer_status: "offered")
 
-          expect { rejection.update!(reason: 'Updated reason') }.not_to change { ActionMailer::Base.deliveries.size }
+          expect { rejection.update!(reason: "Updated reason") }.not_to change { ActionMailer::Base.deliveries.size }
 
           expect(CourseAssignment.exists?(course_assignment.id)).to be(true)
           expect(SessionAssignment.exists?(session_assignment.id)).to be(true)
           enrollment.reload
-          expect(enrollment.application_status).to eq('rejected')
+          expect(enrollment.application_status).to eq("rejected")
           expect(enrollment.application_status_updated_on).to eq(Date.new(2020, 1, 1))
-          expect(enrollment.offer_status).to eq('offered')
+          expect(enrollment.offer_status).to eq("offered")
         end
       end
 
-      context 'when transition_application_status! is called' do
-        it 'calls transition_application_status! with correct parameters' do
+      context "when transition_application_status! is called" do
+        it "calls transition_application_status! with correct parameters" do
           # Verify the method is called and enrollment status changes
           expect {
             rejection.save!
-          }.to change { enrollment.reload.application_status }.to('rejected')
-            .and change { enrollment.reload.offer_status }.to('')
+          }.to change { enrollment.reload.application_status }.to("rejected")
+            .and change { enrollment.reload.offer_status }.to("")
         end
 
-        it 'handles transition errors gracefully' do
+        it "handles transition errors gracefully" do
           allow_any_instance_of(Enrollment).to receive(:transition_application_status!)
             .and_raise(ActiveRecord::RecordInvalid.new(enrollment))
 
@@ -230,22 +230,22 @@ RSpec.describe Rejection, type: :model do
     end
   end
 
-  describe '#set_rejection_status' do
-    let(:enrollment) { create(:enrollment, application_status: 'submitted') }
+  describe "#set_rejection_status" do
+    let(:enrollment) { create(:enrollment, application_status: "submitted") }
     let(:rejection) { create(:rejection, enrollment: enrollment) }
 
-    it 'is an instance method' do
+    it "is an instance method" do
       expect(Rejection.instance_methods(false)).to include(:set_rejection_status)
     end
 
-    it 'is called after the create commit' do
+    it "is called after the create commit" do
       new_rejection = build(:rejection, enrollment: enrollment)
       expect(new_rejection).to receive(:set_rejection_status).and_call_original
       new_rejection.save!
     end
   end
 
-  describe 'database columns' do
+  describe "database columns" do
     it { is_expected.to have_db_column(:id).of_type(:integer) }
     it { is_expected.to have_db_column(:enrollment_id).of_type(:integer) }
     it { is_expected.to have_db_column(:reason).of_type(:text) }
@@ -253,9 +253,9 @@ RSpec.describe Rejection, type: :model do
     it { is_expected.to have_db_column(:updated_at).of_type(:datetime) }
   end
 
-  describe 'database indexes' do
+  describe "database indexes" do
     it { is_expected.to have_db_index(:enrollment_id) }
   end
 
-  it_behaves_like 'a model with timestamps'
+  it_behaves_like "a model with timestamps"
 end

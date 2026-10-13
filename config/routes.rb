@@ -1,34 +1,34 @@
 Rails.application.routes.draw do
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
-  get "up" => "rails/health#show", as: :rails_health_check
+  get "up" => "rails/health#show", :as => :rails_health_check
 
   mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development? || Rails.env.staging?
 
   devise_for :faculties, controllers: {
-    sessions: 'faculties/sessions'
+    sessions: "faculties/sessions"
   }
 
-  get 'faculty', to: 'faculties#index'
-  get 'faculty/student_list/:id', to: 'faculties#student_list', as: :student_list
-  get 'faculty/student_page/:id', to: 'faculties#student_page', as: :student_page
-  get 'faculty_login', to: 'static_pages#faculty_login', as: :faculty_login
+  get "faculty", to: "faculties#index"
+  get "faculty/student_list/:id", to: "faculties#student_list", as: :student_list
+  get "faculty/student_page/:id", to: "faculties#student_page", as: :student_page
+  get "faculty_login", to: "static_pages#faculty_login", as: :faculty_login
 
   # Recommenders upload letters through the emailed link; everything else is under /admin/recuploads.
   resources :recuploads, only: %i[new create]
   resources :feedbacks
   # resources :payments
-  root to: 'static_pages#index'
+  root to: "static_pages#index"
 
   # Admin authentication (Devise `Admin` model) is served by the new admin at /admin/login etc.
   # Route helper names (new_admin_session_path, destroy_admin_session_path) are unchanged.
-  devise_for :admins, path: 'admin',
-                      path_names: { sign_in: 'login', sign_out: 'logout' },
-                      controllers: { sessions: 'admins/sessions', passwords: 'admins/passwords', unlocks: 'admins/unlocks' }
+  devise_for :admins, path: "admin",
+    path_names: {sign_in: "login", sign_out: "logout"},
+    controllers: {sessions: "admins/sessions", passwords: "admins/passwords", unlocks: "admins/unlocks"}
 
   # New plain-MVC admin. Resources are ported here from app/admin one menu group at a time.
   namespace :admin do
-    root to: 'dashboard#index'
+    root to: "dashboard#index"
 
     # Admins never create enrollments (applicants do, through the public flow), so no new/create.
     resources :applications, except: %i[new create] do
@@ -45,7 +45,7 @@ Rails.application.routes.draw do
     # Money: financial_aid_requests = FinancialAid (the legacy admin's resource name). Applicant details
     # and payments have no destroy (payments are financial records).
     resources :applicant_details, except: :destroy
-    resources :financial_aid_requests, controller: 'financial_aid_requests' do
+    resources :financial_aid_requests, controller: "financial_aid_requests" do
       collection { post :batch }
     end
     resources :payments, except: :destroy
@@ -59,13 +59,13 @@ Rails.application.routes.draw do
     resources :course_preferences do
       collection { post :batch }
     end
-    resources :session_selections, controller: 'session_selections' do
+    resources :session_selections, controller: "session_selections" do
       collection { post :batch }
     end
     resources :session_assignments do
       collection { post :batch }
     end
-    resources :applicant_activities, controller: 'applicant_activities' do
+    resources :applicant_activities, controller: "applicant_activities" do
       collection { post :batch }
     end
     resources :recommendations do
@@ -91,7 +91,7 @@ Rails.application.routes.draw do
     # CSV reports: /admin/reports lists them, /admin/reports/<key> downloads one. Any id reaches the
     # controller (no constraint, no format suffix) so unknown/malformed keys get the controller's
     # redirect instead of falling through to the legacy catch-all below.
-    resources :reports, only: %i[index show], format: false, constraints: { id: %r{[^/]+} }
+    resources :reports, only: %i[index show], format: false, constraints: {id: %r{[^/]+}}
 
     # Camp Setup
     resources :camp_configurations do
@@ -135,10 +135,10 @@ Rails.application.routes.draw do
 
   # The legacy admin ran at /legacy_admin during the cutover. Old bookmarks land on the new
   # admin's dashboard (the legacy URL structure does not map 1:1 onto the new routes).
-  get '/legacy_admin(/*path)', to: redirect('/admin', status: 301), format: false
+  get "/legacy_admin(/*path)", to: redirect("/admin", status: 301), format: false
 
   devise_for :users, controllers: {
-    registrations: 'users/registrations'
+    registrations: "users/registrations"
   }
   # Applicant-facing; the admin listing lives under /admin/applicant_details (no destroy anywhere).
   resources :applicant_details, except: %i[index destroy]
@@ -164,24 +164,20 @@ Rails.application.routes.draw do
   resources :course_preferences
   resources :session_assignments
 
-  post 'accept_session_offer/:id', to: 'session_assignments#accept_session_offer', as: :accept_session_offer
-  post 'decline_session_offer/:id', to: 'session_assignments#decline_session_offer', as: :decline_session_offer
+  post "accept_session_offer/:id", to: "session_assignments#accept_session_offer", as: :accept_session_offer
+  post "decline_session_offer/:id", to: "session_assignments#decline_session_offer", as: :decline_session_offer
 
+  get "static_pages/index"
+  get "static_pages/contact"
+  get "static_pages/privacy"
 
-  get 'static_pages/index'
-  get 'static_pages/contact'
-  get 'static_pages/privacy'
+  get "payment_receipt", to: "payments#payment_receipt"
+  post "payment_receipt", to: "payments#payment_receipt"
+  get "payment_show", to: "payments#payment_show", as: "all_payments"
+  get "make_payment", to: "payments#make_payment"
+  post "make_payment", to: "payments#make_payment"
 
-  get 'payment_receipt', to: 'payments#payment_receipt'
-  post 'payment_receipt', to: 'payments#payment_receipt'
-  get 'payment_show', to: 'payments#payment_show', as: 'all_payments'
-  get 'make_payment', to: 'payments#make_payment'
-  post 'make_payment', to: 'payments#make_payment'
-
-  get 'recupload_error', to: 'recuploads#error'
-  get 'recupload_success', to: 'recuploads#success'
+  get "recupload_error", to: "recuploads#error"
+  get "recupload_success", to: "recuploads#success"
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
-
-
-
 end

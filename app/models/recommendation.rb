@@ -51,7 +51,7 @@ class Recommendation < ApplicationRecord
   before_create :set_upload_token_expiry
 
   validates :email, presence: true, length: {maximum: 255},
-                    format: {with: URI::MailTo::EMAIL_REGEXP, message: "only allows valid emails"}
+    format: {with: URI::MailTo::EMAIL_REGEXP, message: "only allows valid emails"}
   validates :firstname, presence: true
   validates :lastname, presence: true
   validates :organization, presence: true
@@ -78,7 +78,7 @@ class Recommendation < ApplicationRecord
   # still has none once the lock is held, so a link an admin has just emailed is never rotated.
   # Returns true when a token was issued, false when skipped.
   def issue_upload_token!(only_if_missing: false)
-    raise ActiveRecord::RecordNotSaved.new('cannot issue an upload token for an unsaved recommendation', self) unless persisted?
+    raise ActiveRecord::RecordNotSaved.new("cannot issue an upload token for an unsaved recommendation", self) unless persisted?
 
     outcome = transaction do
       lock!
@@ -86,7 +86,7 @@ class Recommendation < ApplicationRecord
       next :skipped if only_if_missing && upload_token.present?
 
       update_columns(upload_token: self.class.generate_unique_secure_token, upload_token_expires_at: UPLOAD_TOKEN_TTL.from_now,
-                     updated_at: Time.current)
+        updated_at: Time.current)
       :issued
     end
     raise LetterAlreadyReceived, "recommendation #{id} already has a letter" if outcome == :letter_received
@@ -117,7 +117,7 @@ class Recommendation < ApplicationRecord
   end
 
   def applicant_name
-    self.enrollment.user.applicant_detail.full_name
+    enrollment.user.applicant_detail.full_name
   end
 
   private

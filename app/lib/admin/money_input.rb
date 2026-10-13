@@ -16,6 +16,6 @@ module Admin::MoneyInput
     text = input.to_s.strip
     return nil unless text.match?(FORMAT)
 
-    (BigDecimal(text.delete(',').delete_prefix('$')) * 100).to_i
+    (BigDecimal(text.delete(",").delete_prefix("$")) * 100).to_i
   end
 end

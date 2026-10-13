@@ -4,19 +4,19 @@
 # flow and matched to a Payment when the receipt callback arrives).
 class Admin::PaymentRequestsController < Admin::BaseController
   SCOPES = [
-    Admin::Scope.new(:all, label: 'All', default: true),
-    Admin::Scope.new(:unmatched, label: 'Unmatched') { |relation| relation.where(payment_id: nil) }
+    Admin::Scope.new(:all, label: "All", default: true),
+    Admin::Scope.new(:unmatched, label: "Unmatched") { |relation| relation.where(payment_id: nil) }
   ].freeze
 
   SORTS = {
-    id: 'payment_requests.id',
-    user: 'users.email',
-    order_number: 'payment_requests.order_number',
-    amount: 'payment_requests.amount_cents',
-    camp_year: 'payment_requests.camp_year',
-    request_timestamp: 'payment_requests.request_timestamp',
-    payment: 'payment_requests.payment_id',
-    created_at: 'payment_requests.created_at'
+    id: "payment_requests.id",
+    user: "users.email",
+    order_number: "payment_requests.order_number",
+    amount: "payment_requests.amount_cents",
+    camp_year: "payment_requests.camp_year",
+    request_timestamp: "payment_requests.request_timestamp",
+    payment: "payment_requests.payment_id",
+    created_at: "payment_requests.created_at"
   }.freeze
 
   def index
@@ -28,7 +28,7 @@ class Admin::PaymentRequestsController < Admin::BaseController
 
     respond_to do |format|
       format.html { @pagy, @payment_requests = paginate(relation) }
-      format.csv { send_csv(csv_export, relation, filename: 'payment-requests') }
+      format.csv { send_csv(csv_export, relation, filename: "payment-requests") }
     end
   end
 
@@ -42,12 +42,12 @@ class Admin::PaymentRequestsController < Admin::BaseController
     view = helpers
     Admin::CsvExport.define do
       column :id
-      column('User') { |request| request.user&.email }
+      column("User") { |request| request.user&.email }
       column :order_number
-      column('Amount') { |request| view.admin_money_from_cents(request.amount_cents) }
+      column("Amount") { |request| view.admin_money_from_cents(request.amount_cents) }
       column :camp_year
-      column('Request time') { |request| request.requested_at }
-      column('Matched payment') { |request| request.payment_id }
+      column("Request time") { |request| request.requested_at }
+      column("Matched payment") { |request| request.payment_id }
       column :created_at
     end
   end

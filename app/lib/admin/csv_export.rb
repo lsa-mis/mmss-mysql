@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'csv'
+require "csv"
 
 # CSV output for the admin.
 #
@@ -29,7 +29,7 @@ class Admin::CsvExport
   end
 
   def self.filename(base)
-    "MMSS-#{base.to_s.parameterize}-#{Date.current.strftime('%-b-%-d-%Y')}.csv"
+    "MMSS-#{base.to_s.parameterize}-#{Date.current.strftime("%-b-%-d-%Y")}.csv"
   end
 
   # `result` is anything responding to #columns and #rows (ActiveRecord::Result) or a Hash-like
@@ -53,10 +53,10 @@ class Admin::CsvExport
   def self.format_cell(value)
     case value
     when nil then nil
-    when ActiveSupport::TimeWithZone, Time, DateTime then value.strftime('%Y-%m-%d %H:%M:%S')
+    when ActiveSupport::TimeWithZone, Time, DateTime then value.strftime("%Y-%m-%d %H:%M:%S")
     when Date then value.iso8601
     when Money then value.format
-    when BigDecimal then value.to_s('F')
+    when BigDecimal then value.to_s("F")
     when Numeric, true, false then value.to_s
     else sanitize_cell(value.to_s)
     end
@@ -76,7 +76,7 @@ class Admin::CsvExport
   FORMULA_PREFIX = /\A(?:\p{Space}|\p{Cf}|[\u0000-\u0008\u000E-\u001F])*[=+\-@\t\r]/
 
   def self.sanitize_cell(value)
-    value.is_a?(String) && value.match?(FORMULA_PREFIX) ? "'#{value}" : value
+    (value.is_a?(String) && value.match?(FORMULA_PREFIX)) ? "'#{value}" : value
   end
 
   def initialize

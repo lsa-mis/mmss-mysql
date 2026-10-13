@@ -2,6 +2,6 @@
 
 module Admins
   class UnlocksController < Devise::UnlocksController
-    layout 'admin_auth'
+    layout "admin_auth"
   end
 end

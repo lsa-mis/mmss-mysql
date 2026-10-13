@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 class Admin::Reports::CourseAssignments < Admin::Reports::Base
-  self.label = 'Course Assignments'
-  self.description = 'Class lists for the camp year: enrolled students per session and course with home town, ' \
-                     'gender, age, year in school and personal statement. Repeated session/course cells are ' \
-                     'left blank so the sheet reads as a list.'
-  self.csv_title = 'course_assignments'
+  self.label = "Course Assignments"
+  self.description = "Class lists for the camp year: enrolled students per session and course with home town, " \
+                     "gender, age, year in school and personal statement. Repeated session/course cells are " \
+                     "left blank so the sheet reads as a list."
+  self.csv_title = "course_assignments"
   self.sql = <<~SQL
     SELECT co.description AS session, cor.title AS course,
     REPLACE(ad.lastname, ',', ' ') AS lastname, REPLACE(ad.firstname, ',', ' ') AS firstname, u.email,
@@ -31,8 +31,8 @@ class Admin::Reports::CourseAssignments < Admin::Reports::Base
     result.rows.map do |row|
       current = row.first(2)
       row = row.dup
-      row[0] = '' if current[0] == previous[0]
-      row[1] = '' if current[1] == previous[1]
+      row[0] = "" if current[0] == previous[0]
+      row[1] = "" if current[1] == previous[1]
       previous = current
       row
     end

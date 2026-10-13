@@ -6,10 +6,10 @@
 class Admin::Reports::EnrolledForMoreThanOneSession < Admin::Reports::Base
   include Admin::Reports::CountryColumn
 
-  self.label = 'Enrolled for More than One Session'
-  self.description = 'Course assignments of enrolled students for the camp year who accepted more than one ' \
-                     'session, by student and session.'
-  self.csv_title = 'enrolled_for_more_than_one_session'
+  self.label = "Enrolled for More than One Session"
+  self.description = "Course assignments of enrolled students for the camp year who accepted more than one " \
+                     "session, by student and session."
+  self.csv_title = "enrolled_for_more_than_one_session"
   self.sql = <<~SQL
     SELECT ad.country,  en.user_id,
       REPLACE(ad.lastname, ',', ' ') AS lastname, REPLACE(ad.firstname, ',', ' ') AS firstname,

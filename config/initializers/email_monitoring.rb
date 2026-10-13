@@ -1,7 +1,7 @@
 # Email monitoring configuration
 Rails.application.config.to_prepare do
   # Subscribe to email delivery events
-  ActiveSupport::Notifications.subscribe('deliver.action_mailer') do |*args|
+  ActiveSupport::Notifications.subscribe("deliver.action_mailer") do |*args|
     event = ActiveSupport::Notifications::Event.new(*args)
 
     # Log successful email deliveries
@@ -14,7 +14,7 @@ Rails.application.config.to_prepare do
   end
 
   # Subscribe to email delivery errors
-  ActiveSupport::Notifications.subscribe('error.action_mailer') do |*args|
+  ActiveSupport::Notifications.subscribe("error.action_mailer") do |*args|
     event = ActiveSupport::Notifications::Event.new(*args)
 
     # Log email delivery errors

@@ -29,6 +29,6 @@ preload_app!
 # before_worker_boot connection handling is required.
 
 before_restart do
-  puts "Refreshing Gemfile"
+  puts "Refreshing Gemfile" # standard:disable Rails/Output -- puma hook, runs outside Rails
   ENV["BUNDLE_GEMFILE"] = "/home/deployer/apps/mmss-mysql/current/Gemfile"
 end

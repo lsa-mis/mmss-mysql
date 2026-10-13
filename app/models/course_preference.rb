@@ -27,20 +27,21 @@ class CoursePreference < ApplicationRecord
   belongs_to :enrollment
   belongs_to :course
 
-  validates :course_id, uniqueness: { scope: :enrollment_id }
+  validates :course_id, uniqueness: {scope: :enrollment_id} # standard:disable Rails/UniqueValidationWithoutIndex -- no DB index yet; adding one is a schema change (see #275 for the payments precedent)
   validates :ranking,
-            numericality: {
-              only_integer: true,
-              allow_nil: true,
-              greater_than_or_equal_to: 1
-            }
+    numericality: {
+      only_integer: true,
+      allow_nil: true,
+      greater_than_or_equal_to: 1
+    }
   validate :ranking_within_session_upper_bound
   validate :ranking_unique_within_enrollment_session
 
   private
 
   def ranking_upper_bound
-    return MAX_RANKING unless course && (enrollment || enrollment_id)
+    return MAX_RANKING unless course
+    return MAX_RANKING unless enrollment || enrollment_id
 
     [session_course_preferences.size, MAX_RANKING].min
   end
@@ -59,7 +60,7 @@ class CoursePreference < ApplicationRecord
       !same_record?(preference) && preference.ranking == ranking
     end
 
-    errors.add(:ranking, 'must be unique within each camp session') if duplicate_rank
+    errors.add(:ranking, "must be unique within each camp session") if duplicate_rank
   end
 
   def session_course_preferences
@@ -77,7 +78,7 @@ class CoursePreference < ApplicationRecord
     CoursePreference.includes(:course)
       .joins(:course)
       .where(enrollment_id: enrollment_id)
-      .where(courses: { camp_occurrence_id: course.camp_occurrence_id })
+      .where(courses: {camp_occurrence_id: course.camp_occurrence_id})
       .to_a
   end
 

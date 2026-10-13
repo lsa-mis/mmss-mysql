@@ -13,23 +13,23 @@ class Admin::PaymentsController < Admin::BaseController
   before_action :set_payment, only: %i[show edit update]
 
   SORTS = {
-    id: 'payments.id',
-    user: 'applicant_details.lastname',
-    transaction_type: 'payments.transaction_type',
-    transaction_status: 'payments.transaction_status',
-    transaction_id: 'payments.transaction_id',
-    total_amount: 'CAST(payments.total_amount AS SIGNED)',
-    transaction_date: 'payments.transaction_date',
-    account_type: 'payments.account_type',
-    result_code: 'payments.result_code',
-    camp_year: 'payments.camp_year',
-    created_at: 'payments.created_at'
+    id: "payments.id",
+    user: "applicant_details.lastname",
+    transaction_type: "payments.transaction_type",
+    transaction_status: "payments.transaction_status",
+    transaction_id: "payments.transaction_id",
+    total_amount: "CAST(payments.total_amount AS SIGNED)",
+    transaction_date: "payments.transaction_date",
+    account_type: "payments.account_type",
+    result_code: "payments.result_code",
+    camp_year: "payments.camp_year",
+    created_at: "payments.created_at"
   }.freeze
 
   # Defaults of a manual payment (the legacy admin pre-filled the same values): a successful (1)
   # web (1) transaction dated now, for the active camp.
-  MANUAL_TRANSACTION_TYPE = '1'
-  MANUAL_TRANSACTION_STATUS = '1'
+  MANUAL_TRANSACTION_TYPE = "1"
+  MANUAL_TRANSACTION_STATUS = "1"
 
   def index
     @filter = Admin::PaymentsFilter.new(params[Admin::Filter::PARAM_KEY])
@@ -38,7 +38,7 @@ class Admin::PaymentsController < Admin::BaseController
 
     respond_to do |format|
       format.html { @pagy, @payments = paginate(relation) }
-      format.csv { send_csv(csv_export, relation, filename: 'payments') }
+      format.csv { send_csv(csv_export, relation, filename: "payments") }
     end
   end
 
@@ -58,7 +58,7 @@ class Admin::PaymentsController < Admin::BaseController
     @payment = Payment.new(payment_params_for_create)
 
     if @payment.save
-      redirect_to admin_payment_path(@payment), notice: 'Payment was successfully created.', status: :see_other
+      redirect_to admin_payment_path(@payment), notice: "Payment was successfully created.", status: :see_other
     else
       # The form carries enrollment_id along so a failed prefilled submission keeps its context.
       @enrollment = prefilled_enrollment
@@ -66,11 +66,12 @@ class Admin::PaymentsController < Admin::BaseController
     end
   end
 
-  def edit; end
+  def edit
+  end
 
   def update
     if @payment.update(payment_params_for_update)
-      redirect_to admin_payment_path(@payment), notice: 'Payment was successfully updated.', status: :see_other
+      redirect_to admin_payment_path(@payment), notice: "Payment was successfully updated.", status: :see_other
     else
       render :edit, status: :unprocessable_content
     end
@@ -95,7 +96,7 @@ class Admin::PaymentsController < Admin::BaseController
     {
       transaction_type: MANUAL_TRANSACTION_TYPE,
       transaction_status: MANUAL_TRANSACTION_STATUS,
-      transaction_date: Time.current.strftime('%Y%m%d%H%M'),
+      transaction_date: Time.current.strftime("%Y%m%d%H%M"),
       camp_year: CampConfiguration.active_camp_year
     }
   end
@@ -105,7 +106,7 @@ class Admin::PaymentsController < Admin::BaseController
   # Nelnet payment request and re-run the status callback against the other applicant.
   def payment_params_for_create
     params.require(:payment).permit(:user_id, :total_amount_dollars, :transaction_id, :account_type, :result_message,
-                                    :transaction_type, :transaction_status, :transaction_date, :camp_year)
+      :transaction_type, :transaction_status, :transaction_date, :camp_year)
   end
 
   def payment_params_for_update
@@ -118,13 +119,13 @@ class Admin::PaymentsController < Admin::BaseController
     view = helpers
     Admin::CsvExport.define do
       column :id
-      column('User') { |payment| payment.user.applicant_detail&.full_name }
-      column('email') { |payment| payment.user.email }
+      column("User") { |payment| payment.user.applicant_detail&.full_name }
+      column("email") { |payment| payment.user.email }
       column :transaction_type
       column :transaction_status
-      column('Transaction status message') { |payment| view.transaction_status_message(payment.transaction_status) }
-      column :transaction_id, header: 'Transaction id'
-      column('Total amount') { |payment| Money.new(payment.total_amount.to_i) if payment.total_amount.present? }
+      column("Transaction status message") { |payment| view.transaction_status_message(payment.transaction_status) }
+      column :transaction_id, header: "Transaction id"
+      column("Total amount") { |payment| Money.new(payment.total_amount.to_i) if payment.total_amount.present? }
       column :transaction_date
       column :account_type
       column :result_code

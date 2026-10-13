@@ -4,10 +4,10 @@
 # Admin::BalanceDueQuery: accepted session costs + costs of activities in those sessions
 # + the camp's application fee when required, minus awarded financial aid and successful payments.
 class Admin::Reports::OfferAcceptedWithBalanceDue < Admin::Reports::Base
-  self.label = 'Offer Accepted with Balance Due'
-  self.description = 'Applicants who accepted their offer for the camp year, with date of birth, gender, parent ' \
-                     'email and the balance still due.'
-  self.csv_title = 'offer_accepted_with_balance_due'
+  self.label = "Offer Accepted with Balance Due"
+  self.description = "Applicants who accepted their offer for the camp year, with date of birth, gender, parent " \
+                     "email and the balance still due."
+  self.csv_title = "offer_accepted_with_balance_due"
   self.sql = <<~SQL
     SELECT
       CONCAT(REPLACE(ad.firstname, ',', ' '), ' ', REPLACE(ad.lastname, ',', ' ')) AS name,

@@ -6,10 +6,10 @@
 class Admin::RecommendationOptions
   def self.current_camp(include: nil)
     recommendations = Recommendation.where(enrollment_id: Enrollment.current_camp_year_applications)
-                                    .preload(enrollment: %i[user applicant_detail]).to_a
+      .preload(enrollment: %i[user applicant_detail]).to_a
     recommendations << include if include && recommendations.none? { |recommendation| recommendation.id == include.id }
     recommendations.map { |recommendation| [label(recommendation), recommendation.id] }
-                   .sort_by { |label, _id| label.downcase }
+      .sort_by { |label, _id| label.downcase }
   end
 
   def self.label(recommendation)
