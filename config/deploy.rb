@@ -1,7 +1,7 @@
 lock "~> 3.17"
 
-# The asdf shims resolve the Ruby pinned in the release's .tool-versions (4.0.6), so that
-# version must be installed on the host (`asdf install ruby 4.0.6`) before deploying.
+# The asdf shims resolve the Ruby pinned in the release's .tool-versions (4.0.9), so that
+# version must be installed on the host (`asdf install ruby 4.0.9`) before deploying.
 SSHKit.config.command_map[:bundle] = "/home/deployer/.asdf/shims/bundle"
 SSHKit.config.command_map[:ruby] = "/home/deployer/.asdf/shims/ruby"
 

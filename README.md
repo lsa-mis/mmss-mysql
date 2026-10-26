@@ -40,7 +40,7 @@ A Ruby on Rails application for managing summer camp applications, enrollments, 
 
 | Layer            | Technology                                                       |
 | ---------------- | ---------------------------------------------------------------- |
-| **Runtime**      | Ruby 4.0.6 (`.ruby-version`, `.tool-versions`, `Gemfile`), Bundler 4 |
+| **Runtime**      | Ruby 4.0.9 (`.ruby-version`, `.tool-versions`, `Gemfile`), Bundler 4 |
 | **Framework**    | Rails 8.1 (`config.load_defaults 8.1`); no Node.js anywhere      |
 | **Database**     | MySQL 8 (mysql2 gem), utf8mb4                                    |
 | **Auth**         | Devise (users, admins, faculties); admins sign in at `/admin/login` |
@@ -58,7 +58,7 @@ A Ruby on Rails application for managing summer camp applications, enrollments, 
 
 ## Prerequisites
 
-- **Ruby** 4.0.6 (recommended: [asdf](https://asdf-vm.com/) or rbenv; `.ruby-version` and `.tool-versions` pin it)
+- **Ruby** 4.0.9 (recommended: [asdf](https://asdf-vm.com/) or rbenv; `.ruby-version` and `.tool-versions` pin it)
 - **MySQL** 8.x (with OpenSSL available for the `mysql2` gem)
 - **Bundler** 4.x (ships with Ruby 4.0; `Gemfile.lock` records the version)
 - **Git**
@@ -230,7 +230,7 @@ Deploy steps:
 
 ```bash
 # 1. once per Ruby bump, on the host as deployer (see below)
-asdf install ruby 4.0.6 && asdf reshim ruby
+asdf install ruby 4.0.9 && asdf reshim ruby
 
 # 2. from your machine, with main checked out and pushed
 bundle exec cap production deploy          # check_revision, bundle, assets:precompile, db:migrate, puma:restart
@@ -252,10 +252,10 @@ environment (systemd unit, see `config/puma_prod.service`) is where `RAILS_ALLOW
 The host provides Ruby through asdf (`capistrano-asdf` reads `.tool-versions`, and
 `config/deploy.rb` points `bundle`/`ruby` at `/home/deployer/.asdf/shims`). Install the
 Ruby version pinned in `.tool-versions` on the host before deploying a release that bumps
-it, e.g. for 4.0.6:
+it, e.g. for 4.0.9:
 
 ```bash
-asdf install ruby 4.0.6        # needs libyaml-dev, libssl-dev, zlib1g-dev, libffi-dev, libmysqlclient-dev
+asdf install ruby 4.0.9        # needs libyaml-dev, libssl-dev, zlib1g-dev, libffi-dev, libmysqlclient-dev
 asdf reshim ruby
 ```
 

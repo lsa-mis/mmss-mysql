@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby "4.0.6"
+ruby "4.0.9"
 
 gem "bootsnap", "~> 1.18", require: false
 gem "country_select", "~> 11.0"
