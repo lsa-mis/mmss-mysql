@@ -40,7 +40,7 @@ A Ruby on Rails application for managing summer camp applications, enrollments, 
 
 | Layer            | Technology                                                       |
 | ---------------- | ---------------------------------------------------------------- |
-| **Runtime**      | Ruby 4.0.6 (`.ruby-version`, `.tool-versions`, `Gemfile`), Bundler 4 |
+| **Runtime**      | Ruby 4.0.9 (`.ruby-version`, `.tool-versions`, `Gemfile`), Bundler 4 |
 | **Framework**    | Rails 8.1 (`config.load_defaults 8.1`); no Node.js anywhere      |
 | **Database**     | MySQL 8 (mysql2 gem), utf8mb4                                    |
 | **Auth**         | Devise (users, admins, faculties); admins sign in at `/admin/login` |
@@ -58,7 +58,7 @@ A Ruby on Rails application for managing summer camp applications, enrollments, 
 
 ## Prerequisites
 
-- **Ruby** 4.0.6 (recommended: [asdf](https://asdf-vm.com/) or rbenv; `.ruby-version` and `.tool-versions` pin it)
+- **Ruby** 4.0.9 (recommended: [asdf](https://asdf-vm.com/) or rbenv; `.ruby-version` and `.tool-versions` pin it)
 - **MySQL** 8.x (with OpenSSL available for the `mysql2` gem)
 - **Bundler** 4.x (ships with Ruby 4.0; `Gemfile.lock` records the version)
 - **Git**
@@ -230,7 +230,7 @@ Deploy steps:
 
 ```bash
 # 1. once per Ruby bump, on the host as deployer (see below)
-asdf install ruby 4.0.6 && asdf reshim ruby
+asdf install ruby 4.0.9 && asdf reshim ruby
 
 # 2. from your machine, with main checked out and pushed
 bundle exec cap production deploy          # check_revision, bundle, assets:precompile, db:migrate, puma:restart
@@ -238,11 +238,25 @@ bundle exec cap production deploy:upload   # only when a linked config file chan
 
 # operations
 bundle exec cap production puma:restart
+bundle exec cap production puma:cold_restart  # systemd cold restart — use after a Ruby pin bump
 bundle exec cap production puma:stop
 bundle exec cap production maintenance:start   # tmp/maintenance.yml from config/maintenance_template.yml
 bundle exec cap production maintenance:stop
 bundle exec cap production rubygems:update
 ```
+
+#### Ruby version bump (Capistrano)
+
+`cap production deploy` ends with `puma:restart` (`pumactl restart` — a **hot** restart). That re-execs the original argv and can keep the **previous** asdf Ruby; the new Gemfile then fails the Ruby version check until systemd `Restart=always` eventually cold-starts the unit. After any deploy that changes `.tool-versions` / `.ruby-version`:
+
+```bash
+asdf install ruby 4.0.9 && asdf reshim ruby   # on the host first
+bundle exec cap production deploy
+bundle exec cap production puma:cold_restart  # sudo systemctl restart puma_prod (override :puma_systemd_unit if needed)
+# or on the host: sudo systemctl restart puma_prod
+```
+
+Confirm `ruby -v` in the new release prints the pinned version and `/up` returns 200. Do **not** rely on hot restart alone for a Ruby bump. Hatchbox staging: prefer `systemctl --user restart <app-unit>` over `reload-or-restart` for the same reason (`reload` uses hot restart).
 
 Before deploy, `deploy:check_revision` ensures local HEAD matches `origin/main`. Migrations run
 through capistrano-rails (`deploy:migrate`, db role) whenever `db/migrate` changed. Puma's
@@ -252,10 +266,10 @@ environment (systemd unit, see `config/puma_prod.service`) is where `RAILS_ALLOW
 The host provides Ruby through asdf (`capistrano-asdf` reads `.tool-versions`, and
 `config/deploy.rb` points `bundle`/`ruby` at `/home/deployer/.asdf/shims`). Install the
 Ruby version pinned in `.tool-versions` on the host before deploying a release that bumps
-it, e.g. for 4.0.6:
+it, e.g. for 4.0.9:
 
 ```bash
-asdf install ruby 4.0.6        # needs libyaml-dev, libssl-dev, zlib1g-dev, libffi-dev, libmysqlclient-dev
+asdf install ruby 4.0.9        # needs libyaml-dev, libssl-dev, zlib1g-dev, libffi-dev, libmysqlclient-dev
 asdf reshim ruby
 ```
 
