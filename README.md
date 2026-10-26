@@ -238,11 +238,25 @@ bundle exec cap production deploy:upload   # only when a linked config file chan
 
 # operations
 bundle exec cap production puma:restart
+bundle exec cap production puma:cold_restart  # systemd cold restart — use after a Ruby pin bump
 bundle exec cap production puma:stop
 bundle exec cap production maintenance:start   # tmp/maintenance.yml from config/maintenance_template.yml
 bundle exec cap production maintenance:stop
 bundle exec cap production rubygems:update
 ```
+
+#### Ruby version bump (Capistrano)
+
+`cap production deploy` ends with `puma:restart` (`pumactl restart` — a **hot** restart). That re-execs the original argv and can keep the **previous** asdf Ruby; the new Gemfile then fails the Ruby version check until systemd `Restart=always` eventually cold-starts the unit. After any deploy that changes `.tool-versions` / `.ruby-version`:
+
+```bash
+asdf install ruby 4.0.9 && asdf reshim ruby   # on the host first
+bundle exec cap production deploy
+bundle exec cap production puma:cold_restart  # sudo systemctl restart puma_prod (override :puma_systemd_unit if needed)
+# or on the host: sudo systemctl restart puma_prod
+```
+
+Confirm `ruby -v` in the new release prints the pinned version and `/up` returns 200. Do **not** rely on hot restart alone for a Ruby bump. Hatchbox staging: prefer `systemctl --user restart <app-unit>` over `reload-or-restart` for the same reason (`reload` uses hot restart).
 
 Before deploy, `deploy:check_revision` ensures local HEAD matches `origin/main`. Migrations run
 through capistrano-rails (`deploy:migrate`, db role) whenever `db/migrate` changed. Puma's

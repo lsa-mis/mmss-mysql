@@ -23,6 +23,9 @@ set :ssh_options, {
 # Capistrano/SSHKit scratch dir for uploading remote scripts (not Rails/Bun TMPDIR).
 set :tmp_dir, "/home/deployer/tmp"
 set :keep_releases, 3
+# systemd unit name for `cap production puma:cold_restart` (Ruby version bumps).
+# Override in stage config if the installed unit differs from config/puma_prod.service.
+set :puma_systemd_unit, "puma_prod"
 
 # tailwindcss-ruby ships a Bun-compiled standalone CLI. Bun extracts native `.node`
 # addons into TMPDIR and dlopens them. Production hosts often mount /tmp noexec
@@ -63,6 +66,18 @@ namespace :puma do
       within current_path do
         execute :bundle, :exec, :pumactl, "-P", "#{current_path}/tmp/pids/puma.pid", :restart
       end
+    end
+  end
+
+  # pumactl `restart` is a hot restart: Puma Kernel.execs the original argv, which
+  # often still points at the previous asdf Ruby install. Across a Ruby pin bump the
+  # new Gemfile then fails with a version mismatch until systemd Restart=always
+  # cold-starts the unit. Use this task (or `sudo systemctl restart <unit>` on the
+  # host) after deploying a Ruby bump; keep puma:restart for same-Ruby deploys.
+  desc "Cold-restart Puma via systemd (Ruby version bumps)"
+  task :cold_restart do
+    on roles(:app) do
+      execute :sudo, :systemctl, :restart, fetch(:puma_systemd_unit)
     end
   end
 
@@ -124,6 +139,9 @@ namespace :deploy do
   #   end
   before "bundler:install", "debug:print_ruby_version"
   before :starting, :check_revision
+  # Hot restart (pumactl). Fine for app deploys on the same Ruby. After a Ruby
+  # version bump, hot restart can re-exec the old interpreter; do a systemd cold
+  # restart on the host instead (see README "Ruby version bump" and puma:cold_restart).
   after :finishing, "puma:restart"
 end
 
