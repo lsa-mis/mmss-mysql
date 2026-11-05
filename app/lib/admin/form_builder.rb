@@ -28,18 +28,23 @@ class Admin::FormBuilder < ActionView::Helpers::FormBuilder
     input_html[:"aria-invalid"] = true if errors.any?
 
     control = build_control(type, attribute, collection: collection, include_blank: include_blank, **input_html)
+    # When a custom id is passed, keep label[for] in sync (SiteImprove LRA-1526).
+    label_html = {for: input_html[:id]}.compact
 
     @template.content_tag(:div, class: class_names("admin-field", wrapper_class)) do
       if type == :boolean
         @template.safe_join([
           @template.content_tag(:div, class: "flex items-center gap-2") do
-            @template.safe_join([control, label(attribute, label, class: "text-sm font-medium text-slate-700")])
+            @template.safe_join([
+              control,
+              label(attribute, label, class: "text-sm font-medium text-slate-700", **label_html)
+            ])
           end,
           hint_tag(hint), error_tag(errors)
         ])
       else
         @template.safe_join([
-          label(attribute, label_text(attribute, label, required), class: "admin-label"),
+          label(attribute, label_text(attribute, label, required), class: "admin-label", **label_html),
           control, hint_tag(hint), error_tag(errors)
         ])
       end

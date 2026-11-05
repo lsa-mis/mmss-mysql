@@ -4,7 +4,7 @@
   <% grouped.each do |group, group_scopes| %>
     <div class="flex flex-wrap items-center gap-1 rounded-lg bg-white p-1 shadow-xs ring-1 ring-slate-200">
       <% if group %>
-        <span class="px-2 text-[11px] font-semibold tracking-wide text-slate-400 uppercase"><%= group.to_s.humanize %></span>
+        <span class="px-2 text-[11px] font-semibold tracking-wide text-slate-600 uppercase"><%= group.to_s.humanize %></span>
       <% end %>
       <% group_scopes.each do |scope| %>
         <% active = current_scope == scope %>

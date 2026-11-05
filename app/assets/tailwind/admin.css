@@ -59,6 +59,17 @@
 }
 
 @layer components {
+  /* First focusable control: visible only when focused (SiteImprove SIA-R87). */
+  .skip-link {
+    /* z-[60]: above the session-timeout banner (z-50) so focused skip link stays visible. */
+    @apply sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded focus:border-2 focus:border-um-blue focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-um-blue focus:shadow-lg focus:outline-none;
+  }
+
+  /* Sticky admin header is h-14; keep skip-link target from landing under it. */
+  #main-content {
+    @apply scroll-mt-14;
+  }
+
   /* Buttons */
   .admin-btn-primary {
     @apply admin-btn border-um-blue bg-um-blue text-white hover:bg-um-blue-light hover:text-white;

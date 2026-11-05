@@ -2,19 +2,23 @@
   <h1 class="text-yellow-um_yellow bg-blue-um_blue p-2">Sign up</h1>
   <div class = "m-2">
 
-    <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
+    <%= form_for(resource, as: resource_name, url: registration_path(resource_name),
+                 html: { data: { controller: "required-stars" } }) do |f| %>
       <%= render "devise/shared/error_messages", resource: resource %>
 
+      <p class="mb-3 text-sm text-gray-700">
+        Required fields are marked with an asterisk (<span class="text-red-700" aria-hidden="true">*</span>).
+      </p>
+
       <div class="field">
-        <% if resource_name.to_s == 'faculty' %>
-          <p>Email (please use your email address here)
-          </p>
-        <% else %>
-          <p>Email (please use the applicant's email address here, not a parent's email)
-          </p>
-        <% end %>
-        <%= f.label :email, class: "hidden"%>
-        <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
+        <% email_label = if resource_name.to_s == 'faculty'
+             "Email (please use your email address here)"
+           else
+             "Email (please use the applicant's email address here, not a parent's email)"
+           end %>
+        <%= f.label :email, email_label %>
+        <%= f.email_field :email, autofocus: true, autocomplete: "email",
+                          required: true, "aria-required": true %>
       </div>
 
       <div class="field">
@@ -22,12 +26,14 @@
         <% if @minimum_password_length %>
         <em>(<%= @minimum_password_length %> characters minimum)</em>
         <% end %>
-        <%= f.password_field :password, autocomplete: "new-password" %>
+        <%= f.password_field :password, autocomplete: "new-password",
+                             required: true, "aria-required": true %>
       </div>
 
       <div class="field">
-        <%= f.label :password_confirmation %>
-        <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
+        <%= f.label :password_confirmation, "Password confirmation" %>
+        <%= f.password_field :password_confirmation, autocomplete: "new-password",
+                             required: true, "aria-required": true %>
       </div>
       
       <div class="actions">

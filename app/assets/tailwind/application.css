@@ -11,9 +11,6 @@
 @plugin "@tailwindcss/forms";
 @tailwind utilities;
 
-/* Third-party styles bundled with the app stylesheet (flatpickr date picker). */
-@import "./flatpickr.css";
-
 /* Explicit sources: the Rails root also holds specs and seeds that would otherwise be
    scanned for class names. */
 @source "../../views";
@@ -445,7 +442,7 @@ form {
   }
 
   &.alert {
-    @apply text-red-700 text-lg mt-2;
+    @apply text-red-700 text-lg mt-2 rounded-sm focus:outline-none focus:ring-2 focus:ring-red-700 focus:ring-offset-2;
   }
 }
 
@@ -462,6 +459,12 @@ form {
   }
 }
 
+/* First focusable control: visible only when focused (SiteImprove SIA-R87). */
+.skip-link {
+  /* z-[60]: above the session-timeout banner (z-50) so focused skip link stays visible. */
+  @apply sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded focus:border-2 focus:border-blue-um_blue focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-blue-um_blue focus:shadow-lg focus:outline-none;
+}
+
 .direction_notes {
   @apply bg-yellow-100 text-gray-700 p-2 border-2 border-gray-400;
 }
@@ -471,7 +474,8 @@ form {
 }
 
 .current-uploaded-docs {
-  @apply bg-yellow-100 border-0 border-blue-500 rounded-lg p-2 text-sm font-mono text-yellow-600 mx-1 my-1 max-w-xl w-auto;
+  /* text-yellow-800 on yellow-100 (~5.5:1) for SiteImprove text contrast (LRA-1459) */
+  @apply bg-yellow-100 border-0 border-blue-500 rounded-lg p-2 text-sm font-mono text-yellow-800 mx-1 my-1 max-w-xl w-auto;
 }
 
 .actions {

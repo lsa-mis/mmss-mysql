@@ -1,6 +1,6 @@
 <%# locals: balance_due, total %>
 <%= admin_panel 'Offer Accepted with Balance Due',
-                actions: link_to('CSV report ↓', admin_report_path(Admin::Reports::OfferAcceptedWithBalanceDue.key), data: { turbo: false }),
+                actions: link_to('Download CSV report', admin_report_path(Admin::Reports::OfferAcceptedWithBalanceDue.key), data: { turbo: false }),
                 body_class: 'divide-y divide-slate-100' do %>
   <% if balance_due.empty? %>
     <%= admin_empty_state 'No offer accepted applications with balance due.' %>

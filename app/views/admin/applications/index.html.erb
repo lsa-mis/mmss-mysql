@@ -3,8 +3,13 @@
   <%= admin_csv_link %>
 <% end %>
 
+<%# Filters before table in DOM for tab order (LRA-1523); xl:order-* keeps filters on the right visually. %>
 <div class="grid gap-5 xl:grid-cols-4">
-  <div class="grid gap-4 xl:col-span-3">
+  <div class="xl:col-span-1 xl:order-last">
+    <%= admin_filter_form @filter, url: admin_applications_path %>
+  </div>
+
+  <div class="grid gap-4 xl:col-span-3 xl:order-first">
     <%= admin_scope_tabs Admin::ApplicationsController::SCOPES, counts: @scope_counts %>
 
     <%= admin_table @applications, pagy: @pagy,
@@ -12,7 +17,7 @@
                     actions: ->(app) { [admin_application_path(app), edit_admin_application_path(app), admin_application_path(app)] } do |t| %>
       <% t.column :updated_at, sort: true %>
       <% t.column 'Applicant', sort: 'applicant' do |app| %>
-        <%= link_to app.applicant_detail&.full_name || app.user.email, admin_application_path(app), class: 'font-medium' %>
+        <%= link_to app.applicant_detail&.full_name || app.user.email, admin_application_path(app), class: 'font-medium underline' %>
         <div class="text-xs text-slate-500"><%= app.user.email %></div>
       <% end %>
       <% t.column 'Transcript' do |app| %>
@@ -43,9 +48,5 @@
         <%= app.campyear %>
       <% end %>
     <% end %>
-  </div>
-
-  <div class="xl:col-span-1">
-    <%= admin_filter_form @filter, url: admin_applications_path %>
   </div>
 </div>

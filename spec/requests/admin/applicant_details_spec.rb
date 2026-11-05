@@ -186,6 +186,7 @@ RSpec.describe "Admin applicant details", type: :request do
       expect(body).not_to include(%(<option value="#{user.id}">#{user.email}</option>))
       expect(body).to include('data-controller="demographic-other"')
       expect(body).to include('id="applicant_detail_demographic"')
+      expect(body).to include('for="applicant_detail_demographic"')
       expect(body).to include('name="applicant_detail[state]"')
       expect(body).to include('name="applicant_detail[parentcountry]"')
     end

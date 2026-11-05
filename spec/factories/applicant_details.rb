@@ -103,7 +103,8 @@ FactoryBot.define do
     # Traits for different scenarios
     trait :international do
       us_citizen { false }
-      country { Faker::Address.country_code }
+      # Faker::Address.country_code can return "US", which the trait's specs assert against.
+      country { %w[CA GB DE FR JP IN BR].sample }
       state { "Non-US" }
       state_non_us { Faker::Address.state }
     end
