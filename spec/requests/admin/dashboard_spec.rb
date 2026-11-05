@@ -53,8 +53,11 @@ RSpec.describe "Admin dashboard", type: :request do
       expect(body).to include("$25.50")
 
       expect(body).to include("Offer Accepted with Balance Due")
+      expect(body).to include("Download CSV report")
       expect(body).to include(admin_report_path("offer_accepted_with_balance_due"))
       expect(body).to include_unescaped("Parent: #{user.applicant_detail.parentname}")
+      expect(body).to include('href="#main-content"')
+      expect(body).to include("Skip to main content")
 
       expect(body).to include("Financial Aid Requests")
       expect(body).to include_unescaped(enrollment.display_name)
