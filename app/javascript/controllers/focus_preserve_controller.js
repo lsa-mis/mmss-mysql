@@ -10,8 +10,11 @@ export default class extends Controller {
     this.restore()
   }
 
-  // Sort header links and Clear filters.
+  // Sort header links and Clear filters. Only same-tab primary navigations
+  // schedule restore — modified clicks open another tab/window and leave this page.
   capture(event) {
+    if (this.modifiedClick(event)) return
+
     const id = event.currentTarget.dataset.focusPreserveId
     if (!id) return
     sessionStorage.setItem(STORAGE_KEY, id)
@@ -51,5 +54,14 @@ export default class extends Controller {
       clearTimeout(this.focusTimer)
       this.focusTimer = null
     }
+  }
+
+  modifiedClick(event) {
+    return event.defaultPrevented ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey ||
+      event.button !== 0
   }
 }
