@@ -24,6 +24,10 @@ export default class extends Controller {
   }
 
   restore() {
+    // Cached preview connects first on revisit; leave the stored id untouched
+    // so the final (non-preview) render can restore focus.
+    if (document.documentElement.hasAttribute("data-turbo-preview")) return
+
     const id = sessionStorage.getItem(STORAGE_KEY)
     if (!id) return
     sessionStorage.removeItem(STORAGE_KEY)
