@@ -12,9 +12,10 @@ RSpec.describe "Wave 3 SiteImprove accessibility (forms & status messages)", typ
       expect(body).to include("Required fields are marked with an asterisk")
       expect(body).to include('data-controller="required-stars"')
       %w[user[email] user[password] user[password_confirmation]].each do |name|
-        # Attribute order is not guaranteed; require both markers on the same <input>.
+        # Attribute order is not guaranteed. `\srequired` avoids matching the
+        # substring inside aria-required; assert aria-required separately.
         expect(body).to match(
-          /<input\b(?=[^>]*\bname="#{Regexp.escape(name)}")(?=[^>]*\brequired\b)(?=[^>]*\baria-required="true")[^>]*>/
+          /<input\b(?=[^>]*\bname="#{Regexp.escape(name)}")(?=[^>]*\srequired(?:\s|=|\/|>))(?=[^>]*\baria-required="true")[^>]*>/
         )
       end
     end
