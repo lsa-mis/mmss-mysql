@@ -21,7 +21,7 @@ RSpec.describe "Wave 4 SiteImprove accessibility (admin tables & filters)", type
       expect(body).to match(/<th\b[^>]*\baria-sort="ascending"[^>]*>/i)
       expect(body).to include('data-focus-preserve-id="admin-sort-applicant"')
       # Inactive sortable headers must not advertise a sort direction.
-      expect(body.scan(/aria-sort="/).size).to eq(1)
+      expect(body.scan('aria-sort="').size).to eq(1)
       expect(body).not_to match(/<a\b[^>]*\baria-sort=/i)
     end
 
@@ -64,10 +64,11 @@ RSpec.describe "Wave 4 SiteImprove accessibility (admin tables & filters)", type
 
       body = response.body
       expect(body).to include('data-controller="session-timeout admin-sidebar focus-preserve"')
-      expect(body).to include("turbo:submit-start->focus-preserve#captureSubmit")
+      # Rails HTML-escapes `>` in helper-generated data-action values (`->` → `-&gt;`).
+      expect(body).to include("turbo:submit-start-&gt;focus-preserve#captureSubmit")
       expect(body).to include('data-focus-preserve-id="admin-filter-submit"')
       expect(body).to include('data-focus-preserve-id="admin-filter-clear"')
-      expect(body).to include("click->focus-preserve#capture")
+      expect(body).to include("click-&gt;focus-preserve#capture")
     end
   end
 
