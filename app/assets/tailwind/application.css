@@ -462,6 +462,11 @@ form {
   }
 }
 
+/* First focusable control: visible only when focused (SiteImprove SIA-R87). */
+.skip-link {
+  @apply sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:border-2 focus:border-blue-um_blue focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-blue-um_blue focus:shadow-lg focus:outline-none;
+}
+
 .direction_notes {
   @apply bg-yellow-100 text-gray-700 p-2 border-2 border-gray-400;
 }

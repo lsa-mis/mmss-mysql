@@ -6,27 +6,24 @@
       <%= render "devise/shared/error_messages", resource: resource %>
 
       <div class="field">
-        <% if resource_name.to_s == 'faculty' %>
-          <p>Email (please use your email address here)
-          </p>
-        <% else %>
-          <p>Email (please use the applicant's email address here, not a parent's email)
-          </p>
-        <% end %>
-        <%= f.label :email, class: "hidden"%>
+        <% email_label = if resource_name.to_s == 'faculty'
+             "Email (please use your email address here)"
+           else
+             "Email (please use the applicant's email address here, not a parent's email)"
+           end %>
+        <%= f.label :email, email_label %>
         <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
       </div>
 
       <div class="field">
-        <%= f.label :password %>
-        <% if @minimum_password_length %>
-        <em>(<%= @minimum_password_length %> characters minimum)</em>
+        <%= f.label :password do %>
+          Password<% if @minimum_password_length %> <em>(<%= @minimum_password_length %> characters minimum)</em><% end %>
         <% end %>
         <%= f.password_field :password, autocomplete: "new-password" %>
       </div>
 
       <div class="field">
-        <%= f.label :password_confirmation %>
+        <%= f.label :password_confirmation, "Password confirmation" %>
         <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
       </div>
       
