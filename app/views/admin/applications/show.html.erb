@@ -24,7 +24,7 @@
       <%= admin_attributes @application do |a| %>
         <% a.row 'Applicant' do |app| %>
           <% if app.applicant_detail %>
-            <%= link_to app.applicant_detail.full_name.titleize, admin_applicant_detail_path(app.applicant_detail) %>
+            <%= link_to app.applicant_detail.full_name.titleize, admin_applicant_detail_path(app.applicant_detail), class: 'underline' %>
           <% end %>
           <span class="text-slate-500"><%= app.user.email %></span>
         <% end %>

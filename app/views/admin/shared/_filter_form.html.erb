@@ -1,5 +1,6 @@
 <%# locals: filter, url, title %>
-<%= form_with url: url, method: :get, class: 'admin-card', data: { turbo_frame: '_top' } do |f| %>
+<%= form_with url: url, method: :get, class: 'admin-card',
+              data: { turbo_frame: '_top', action: 'turbo:submit-start->focus-preserve#captureSubmit' } do |f| %>
   <div class="admin-card-header">
     <h2 class="admin-card-title"><%= title %></h2>
     <% if filter.active? %>
@@ -17,8 +18,10 @@
     <% end %>
 
     <div class="flex items-center gap-2 pt-1">
-      <%= f.button 'Filter', type: :submit, class: 'admin-btn-primary' %>
-      <%= link_to 'Clear', admin_index_path(q: nil, page: nil), class: 'admin-btn-secondary' %>
+      <%= f.button 'Filter', type: :submit, class: 'admin-btn-primary',
+                   data: { focus_preserve_id: 'admin-filter-submit' } %>
+      <%= link_to 'Clear', admin_index_path(q: nil, page: nil), class: 'admin-btn-secondary',
+                  data: { action: 'click->focus-preserve#capture', focus_preserve_id: 'admin-filter-clear' } %>
     </div>
   </div>
 <% end %>

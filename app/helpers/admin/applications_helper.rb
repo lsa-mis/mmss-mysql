@@ -11,7 +11,7 @@ module Admin::ApplicationsHelper
   def admin_applicant_link(enrollment, with_email: false)
     return admin_empty_value if enrollment.nil?
 
-    link = link_to(admin_applicant_name(enrollment), admin_application_path(enrollment), class: "font-medium")
+    link = link_to(admin_applicant_name(enrollment), admin_application_path(enrollment), class: "font-medium underline")
     return link unless with_email
 
     safe_join([link, tag.div(enrollment.user.email, class: "text-xs text-slate-500")])

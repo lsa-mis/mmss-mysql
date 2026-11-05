@@ -27,13 +27,15 @@
             <th>Actions</th>
           <% end %>
           <% columns.each do |column| %>
-            <th class="<%= column.html_class %>">
-              <% if column.sortable? %>
+            <% if column.sortable? %>
+              <%= tag.th class: column.html_class, "aria-sort": admin_aria_sort_for(column.sort_key) do %>
                 <%= admin_sortable_header(column.label, column.sort_key) %>
-              <% else %>
-                <%= column.label %>
               <% end %>
-            </th>
+            <% else %>
+              <th class="<%= column.html_class %>">
+                <%= column.label %>
+              </th>
+            <% end %>
           <% end %>
         </tr>
       </thead>
