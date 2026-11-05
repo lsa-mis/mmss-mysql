@@ -74,11 +74,11 @@
   <div class="field">
     <%= form.label :birthdate %>
     <div class="date_select">
-      <%= form.text_field :birthdate, required: true, data: { 
-        controller: "flatpickr", 
-        flatpickr_min_date_value: (Date.today - 19.years).strftime('%Y-%m-%d'), 
-        flatpickr_max_date_value: (Date.today - 12.years).strftime('%Y-%m-%d') 
-      }, placeholder: "Select your birthdate" %>
+      <%# Native date input: keyboard-operable (LRA-1460) and exposes all 12 months (LRA-1461). %>
+      <%= form.date_field :birthdate,
+            required: true,
+            min: (Date.current - 19.years).strftime("%Y-%m-%d"),
+            max: (Date.current - 12.years).strftime("%Y-%m-%d") %>
     </div>
   </div>
 

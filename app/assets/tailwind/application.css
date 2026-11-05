@@ -11,9 +11,6 @@
 @plugin "@tailwindcss/forms";
 @tailwind utilities;
 
-/* Third-party styles bundled with the app stylesheet (flatpickr date picker). */
-@import "./flatpickr.css";
-
 /* Explicit sources: the Rails root also holds specs and seeds that would otherwise be
    scanned for class names. */
 @source "../../views";
