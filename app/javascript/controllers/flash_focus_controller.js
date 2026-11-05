@@ -18,6 +18,10 @@ export default class extends Controller {
   }
 
   scheduleFocus() {
+    // Cached Turbo preview connects first on revisit; skip so we do not
+    // steal focus during the preview swap (same pattern as focus_preserve).
+    if (document.documentElement.hasAttribute("data-turbo-preview")) return
+
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         this.focusTimer = setTimeout(() => {
