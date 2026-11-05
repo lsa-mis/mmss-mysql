@@ -38,12 +38,12 @@ RSpec.describe "Wave 5 SiteImprove accessibility (course rankings & birthdate)",
 
       expect(body).to include(%(id="#{title_id}"))
       expect(body).to include(%(tabindex="0"))
-      expect(body).to include(%(aria-label="Move #{title} up"))
-      expect(body).to include(%(aria-label="Move #{title} down"))
+      expect(body).to include(%(aria-label="Move up #{title}"))
+      expect(body).to include(%(aria-label="Move down #{title}"))
 
       title_pos = body.index(%(id="#{title_id}"))
-      up_pos = body.index(%(aria-label="Move #{title} up"))
-      down_pos = body.index(%(aria-label="Move #{title} down"))
+      up_pos = body.index(%(aria-label="Move up #{title}"))
+      down_pos = body.index(%(aria-label="Move down #{title}"))
       expect(title_pos).to be < up_pos
       expect(up_pos).to be < down_pos
     end
