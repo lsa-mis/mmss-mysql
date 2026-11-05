@@ -32,14 +32,25 @@ module Admin::TableHelper
   end
 
   # Column header that toggles ?sort=<key>&direction=... while keeping the other query params.
+  # aria-sort lives on the parent <th> (see admin/shared/_table), not on this link (LRA-1524).
   def admin_sortable_header(label, sort_key)
     active = current_sort.to_s == sort_key.to_s
     next_direction = (active && current_sort_direction.to_s == "asc") ? "desc" : "asc"
     url = admin_index_path(sort: sort_key, direction: next_direction, page: nil)
+    focus_id = "admin-sort-#{sort_key}"
 
-    link_to url, class: class_names("group inline-flex items-center gap-1 hover:text-slate-900", "text-um-blue" => active) do
+    link_to url,
+      class: class_names("group inline-flex items-center gap-1 hover:text-slate-900", "text-um-blue" => active),
+      data: {action: "click->focus-preserve#capture", focus_preserve_id: focus_id} do
       safe_join([label, admin_sort_indicator(active, current_sort_direction)])
     end
+  end
+
+  # aria-sort value for a sortable column header, or nil when the column is inactive (LRA-1524).
+  def admin_aria_sort_for(sort_key)
+    return unless current_sort.to_s == sort_key.to_s
+
+    (current_sort_direction.to_s == "asc") ? "ascending" : "descending"
   end
 
   def admin_sort_indicator(active, direction)
@@ -58,8 +69,9 @@ module Admin::TableHelper
     links << link_to("View", show_path, class: "admin-btn-link") if show_path
     links << link_to("Edit", edit_path, class: "admin-btn-link") if edit_path
     if delete_path
+      # min-h/w-6 (≥24×24) satisfies SiteImprove target-size on Actions Delete (LRA-1520).
       links << button_to("Delete", delete_path, method: :delete, form: {data: {turbo_confirm: confirm}},
-        class: "admin-btn-link text-red-700 hover:text-red-900")
+        class: "admin-btn-link min-h-6 min-w-6 px-1.5 py-1 text-red-700 hover:text-red-900")
     end
     safe_join(links, tag.span("·", class: "text-slate-300 mx-1"))
   end
