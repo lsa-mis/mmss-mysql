@@ -445,7 +445,7 @@ form {
   }
 
   &.alert {
-    @apply text-red-700 text-lg mt-2;
+    @apply text-red-700 text-lg mt-2 rounded-sm focus:outline-none focus:ring-2 focus:ring-red-700 focus:ring-offset-2;
   }
 }
 

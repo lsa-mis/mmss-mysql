@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>MMSS Application</title>
+    <title><%= flash[:alert].present? ? "Error — MMSS Application" : "MMSS Application" %></title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 

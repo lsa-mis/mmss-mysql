@@ -1,5 +1,11 @@
 <% flash.each do |key, value| %>
   <% if key == 'alert' or key == 'notice' %>
-    <%= content_tag(:div, value, class: "flash #{key}", id: "#{key}") %>
+    <% is_alert = key.to_s == 'alert' %>
+    <%= content_tag(:div, value,
+          class: "flash #{key}",
+          id: key.to_s,
+          role: (is_alert ? 'alert' : 'status'),
+          tabindex: (is_alert ? -1 : nil),
+          data: (is_alert ? { controller: 'flash-focus' } : nil)) %>
   <% end %>
 <% end %>
