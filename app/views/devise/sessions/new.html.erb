@@ -5,7 +5,8 @@
     <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
       <div class="field">
         <%= f.label :email %>
-        <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
+        <%# Skip autofocus when a flash alert is present so flash-focus can keep focus on the error (LRA-1511). %>
+        <%= f.email_field :email, autofocus: flash[:alert].blank?, autocomplete: "email" %>
       </div>
 
       <div class="field">

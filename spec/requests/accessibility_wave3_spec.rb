@@ -11,9 +11,11 @@ RSpec.describe "Wave 3 SiteImprove accessibility (forms & status messages)", typ
       body = response.body
       expect(body).to include("Required fields are marked with an asterisk")
       expect(body).to include('data-controller="required-stars"')
-      expect(body).to include('aria-required="true"')
       %w[user[email] user[password] user[password_confirmation]].each do |name|
-        expect(body).to match(/name="#{Regexp.escape(name)}"[^>]*\brequired\b/)
+        # Attribute order is not guaranteed; require both markers on the same <input>.
+        expect(body).to match(
+          /<input\b(?=[^>]*\bname="#{Regexp.escape(name)}")(?=[^>]*\brequired\b)(?=[^>]*\baria-required="true")[^>]*>/
+        )
       end
     end
   end
@@ -29,6 +31,8 @@ RSpec.describe "Wave 3 SiteImprove accessibility (forms & status messages)", typ
       expect(body).to include('data-controller="flash-focus"')
       expect(body).to include('tabindex="-1"')
       expect(body).to include("Error — MMSS Application")
+      # Email must not steal focus from the alert after a failed Turbo sign-in.
+      expect(body).not_to match(/<input\b(?=[^>]*\bname="user\[email\]")(?=[^>]*\bautofocus\b)[^>]*>/)
     end
   end
 end
