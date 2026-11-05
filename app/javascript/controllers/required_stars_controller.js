@@ -15,7 +15,7 @@ export default class extends Controller {
       if (label && !label.querySelector(".required-star")) {
         const span = document.createElement("span")
         span.textContent = " *"
-        span.classList.add("required-star", "text-red-500")
+        span.classList.add("required-star", "text-red-700")
         label.appendChild(span)
       }
     })

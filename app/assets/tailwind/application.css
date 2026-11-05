@@ -477,7 +477,8 @@ form {
 }
 
 .current-uploaded-docs {
-  @apply bg-yellow-100 border-0 border-blue-500 rounded-lg p-2 text-sm font-mono text-yellow-600 mx-1 my-1 max-w-xl w-auto;
+  /* text-yellow-800 on yellow-100 (~5.5:1) for SiteImprove text contrast (LRA-1459) */
+  @apply bg-yellow-100 border-0 border-blue-500 rounded-lg p-2 text-sm font-mono text-yellow-800 mx-1 my-1 max-w-xl w-auto;
 }
 
 .actions {
