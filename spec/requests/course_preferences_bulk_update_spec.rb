@@ -61,6 +61,11 @@ RSpec.describe "Course preferences bulk update", type: :request do
       patch bulk_update_enrollment_course_preferences_path(enrollment), params: {rankings: rankings}
       expect(response).to have_http_status(:unprocessable_content)
       expect(enrollment.reload.course_rankings_complete?).to be false
+      body = response.body
+      expect(body).to include('role="alert"')
+      expect(body).to include('id="alert"')
+      expect(body).to include('data-controller="flash-focus"')
+      expect(body).to include("Error — MMSS Application")
     end
   end
 end

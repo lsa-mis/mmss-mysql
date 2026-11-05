@@ -211,6 +211,7 @@ RSpec.describe "Admin applications", type: :request do
       expect(body).to include("enrollment[course_assignments_attributes]")
       expect(body).to include("NEW_RECORD")
       expect(body).to include("application_application_status")
+      expect(body).to include('for="application_application_status"')
       expect(body).to include("Withdraw Enrollment")
     end
   end
