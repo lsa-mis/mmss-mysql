@@ -37,28 +37,26 @@ A Ruby on Rails application for managing summer camp applications, enrollments, 
 
 ## Technology Stack
 
-
-| Layer            | Technology                                                       |
-| ---------------- | ---------------------------------------------------------------- |
-| **Runtime**      | Ruby 4.0.9 (`.ruby-version`, `.tool-versions`, `Gemfile`), Bundler 4 |
-| **Framework**    | Rails 8.1 (`config.load_defaults 8.1`); no Node.js anywhere      |
-| **Database**     | MySQL 8 (mysql2 gem), utf8mb4                                    |
-| **Auth**         | Devise (users, admins, faculties); admins sign in at `/admin/login` |
-| **Admin**        | `Admin::` namespace (`Admin::BaseController`, per-resource filters, scopes, Pagy pagination, batch actions, `Admin::CsvExport`, `Admin::Reports` SQL reports, `Admin::Comment`) |
-| **Server**       | Puma 8 (systemd notify built in)                                 |
+| Layer            | Technology                                                                                                                                                                                                                       |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Runtime**      | Ruby 4.0.10 (`.ruby-version`, `.tool-versions`, `Gemfile`), Bundler 4                                                                                                                                                            |
+| **Framework**    | Rails 8.1 (`config.load_defaults 8.1`); no Node.js anywhere                                                                                                                                                                      |
+| **Database**     | MySQL 8 (mysql2 gem), utf8mb4                                                                                                                                                                                                    |
+| **Auth**         | Devise (users, admins, faculties); admins sign in at `/admin/login`                                                                                                                                                              |
+| **Admin**        | `Admin::` namespace (`Admin::BaseController`, per-resource filters, scopes, Pagy pagination, batch actions, `Admin::CsvExport`, `Admin::Reports` SQL reports, `Admin::Comment`)                                                  |
+| **Server**       | Puma 8 (systemd notify built in)                                                                                                                                                                                                 |
 | **Assets**       | Propshaft (digests + serves `app/assets/builds`, `app/assets/images`, importmap modules), importmap-rails, Hotwire (Turbo Drive + Stimulus), Tailwind CSS 4 (tailwindcss-rails; `tailwind.css` + `admin.css` bundles), Flatpickr |
-| **Money**        | money-rails 3 / money 7 (`monetize` columns, USD)                |
-| **File storage** | Active Storage (local disk / Google Cloud Storage in production) |
-| **Monitoring**   | Skylight, Sentry                                                 |
-| **Testing / CI** | RSpec, FactoryBot, Capybara + Selenium; GitHub Actions (`.github/workflows/ci.yml`) |
-| **Deployment**   | Production: Capistrano 3 + asdf on a UM host. Staging: Hatchbox (DigitalOcean) |
-
+| **Money**        | money-rails 3 / money 7 (`monetize` columns, USD)                                                                                                                                                                                |
+| **File storage** | Active Storage (local disk / Google Cloud Storage in production)                                                                                                                                                                 |
+| **Monitoring**   | Skylight, Sentry                                                                                                                                                                                                                 |
+| **Testing / CI** | RSpec, FactoryBot, Capybara + Selenium; GitHub Actions (`.github/workflows/ci.yml`)                                                                                                                                              |
+| **Deployment**   | Production: Capistrano 3 + asdf on a UM host. Staging: Hatchbox (DigitalOcean)                                                                                                                                                   |
 
 ---
 
 ## Prerequisites
 
-- **Ruby** 4.0.9 (recommended: [asdf](https://asdf-vm.com/) or rbenv; `.ruby-version` and `.tool-versions` pin it)
+- **Ruby** 4.0.10 (recommended: [asdf](https://asdf-vm.com/) or rbenv; `.ruby-version` and `.tool-versions` pin it)
 - **MySQL** 8.x (with OpenSSL available for the `mysql2` gem)
 - **Bundler** 4.x (ships with Ruby 4.0; `Gemfile.lock` records the version)
 - **Git**
@@ -77,21 +75,21 @@ gem install mysql2 -v '0.5.6' -- --with-mysql-dir=/opt/homebrew/opt/mysql --with
 ## Installation
 
 1. **Clone the repository**
-  ```bash
-   git clone git@github.com:lsa-mis/mmss-mysql.git
-   cd mmss-mysql
-  ```
+   ```bash
+    git clone git@github.com:lsa-mis/mmss-mysql.git
+    cd mmss-mysql
+   ```
 2. **Install Ruby dependencies**
-  ```bash
-   bundle install
-  ```
+   ```bash
+    bundle install
+   ```
 3. **Create and configure the database** (see [Configuration](#configuration))
-  ```bash
-   # Set LOCAL_MYSQL_DATABASE_PASSWORD (see below), then:
-   bin/rails db:create
-   bin/rails db:schema:load
-   # Optionally: bin/rails db:seed
-  ```
+   ```bash
+    # Set LOCAL_MYSQL_DATABASE_PASSWORD (see below), then:
+    bin/rails db:create
+    bin/rails db:schema:load
+    # Optionally: bin/rails db:seed
+   ```
 4. **Prepare Rails credentials and config** (see [Configuration](#configuration))
 
 No Node.js or Yarn is required: JavaScript is served through import maps
@@ -105,14 +103,15 @@ standalone binary that ships with the `tailwindcss-rails` gem.
 
 ### Database
 
-- **Development / Test**  
+- **Development / Test**
 Set the MySQL password via environment:
   ```bash
   export LOCAL_MYSQL_DATABASE_PASSWORD='your_local_mysql_password'
   ```
-  Default DB names: `mmss-mysql_development`, `mmss-mysql_test`.  
+
+  Default DB names: `mmss-mysql_development`, `mmss-mysql_test`.
   Edit `config/database.yml` if you use a different user or host.
-- **Production**  
+- **Production**
 Production uses credentials or environment variables for MySQL:
   - `Rails.application.credentials.dig(:mysql, :prod_user)` or `MYSQL_PROD_USER`
   - `Rails.application.credentials.dig(:mysql, :prod_password)` or `MYSQL_PROD_PASSWORD`
@@ -131,9 +130,9 @@ Keep `config/master.key` secure and do not commit it. In deployment it is linked
 
 ### File storage (Active Storage)
 
-- **Development / Test**  
+- **Development / Test**
 Uses local disk (`storage/`, `tmp/storage`).
-- **Production**  
+- **Production**
 Configured for Google Cloud Storage (GCS). A GCS keyfile is expected. Bucket and project are set in `config/storage.yml`.
 
 ### Hosts, SSL and health checks (production and staging)
@@ -157,7 +156,7 @@ directly. Staging also still reads the legacy `STAGING_ALLOWED_HOSTS` variable.
 - **Skylight** — Set `SKYLIGHT_AUTHENTICATION` or use credentials for production/staging.
 - **Sentry** — DSN from credentials (`sentry.dsn`); options in `config/initializers/sentry.rb`.
 - **Redis** — Only referenced by `config/cable.yml` in production (`REDIS_URL`); the app defines no
-  Action Cable channels, so nothing connects unless one is added.
+Action Cable channels, so nothing connects unless one is added.
 
 ---
 
@@ -165,22 +164,23 @@ directly. Staging also still reads the legacy `STAGING_ALLOWED_HOSTS` variable.
 
 1. **Start MySQL** (if not running as a service).
 2. **Start the Rails server and the Tailwind watcher**
-  ```bash
-   bin/dev
-  ```
-   `bin/dev` runs `Procfile.dev` through foreman (installed on first use):
-   `bin/rails server` on port 3000 plus the two Tailwind watchers
-   (`tailwindcss:watch` for the applicant/faculty bundle, `tailwindcss:watch:admin`
-   for `admin.css`), which rebuild `app/assets/builds/*.css` whenever
-   `app/assets/tailwind/` or the views change. Without the watchers, run
-   `bin/rails tailwindcss:build` once after editing styles and start
-   `bin/rails server` on its own.
-   Default: [http://localhost:3000](http://localhost:3000)
+   ```bash
+    bin/dev
+   ```
+
+    `bin/dev` runs `Procfile.dev` through foreman (installed on first use):
+    `bin/rails server` on port 3000 plus the two Tailwind watchers
+    (`tailwindcss:watch` for the applicant/faculty bundle, `tailwindcss:watch:admin`
+    for `admin.css`), which rebuild `app/assets/builds/*.css` whenever
+    `app/assets/tailwind/` or the views change. Without the watchers, run
+    `bin/rails tailwindcss:build` once after editing styles and start
+    `bin/rails server` on its own.
+    Default: [http://localhost:3000](http://localhost:3000)
 3. **Useful URLs (development)**
-  - Root: `/`
-  - Admin: `/admin` (login at `/admin/login`; seed admin `admin@example.com` / `passwordpassword` from `db/seeds.rb`)
-  - Faculty: `/faculty`, `/faculty_login`
-  - Letter opener (development and staging): `/letter_opener` (on staging, protect with HTTP basic auth env vars or network rules)
+   - Root: `/`
+   - Admin: `/admin` (login at `/admin/login`; seed admin `admin@example.com` / `passwordpassword` from `db/seeds.rb`)
+   - Faculty: `/faculty`, `/faculty_login`
+   - Letter opener (development and staging): `/letter_opener` (on staging, protect with HTTP basic auth env vars or network rules)
 
 ---
 
@@ -190,12 +190,14 @@ directly. Staging also still reads the legacy `STAGING_ALLOWED_HOSTS` variable.
   ```bash
   bundle exec rspec
   ```
+
   Ensure the test database exists and is migrated, and that the Tailwind
   build exists (request and system specs render the layouts):
   ```bash
   RAILS_ENV=test bin/rails db:create db:schema:load
   RAILS_ENV=test bin/rails tailwindcss:build
   ```
+
   System specs (`spec/system`) drive headless Chrome through Selenium
   (`SHOW_BROWSER=1` for a visible browser). CI runs everything except the
   system specs on every pull request against a MySQL 8 service
@@ -206,6 +208,7 @@ directly. Staging also still reads the legacy `STAGING_ALLOWED_HOSTS` variable.
   bin/lint                        # = bundle exec standardrb; CI `lint` job fails on any offense
   bin/lint --fix                  # apply safe autocorrections before committing
   ```
+
   Configuration lives in `.standard.yml` (`standard` + `standard-rails`; `db/schema.rb`,
   legacy migrations under `db/migrate`, `bin`, `vendor` and `tmp` are ignored). Prefer a
   targeted `# standard:disable Cop/Name -- reason` over a behaviour change when a cop
@@ -223,14 +226,14 @@ to `main`, which production deploys from.
 - **Repo**: `git@github.com:lsa-mis/mmss-mysql.git`
 - **Branch**: `main`
 - **Server**: `config/deploy/production.rb` (e.g. `mathmmssapp2.miserver.it.umich.edu`), roles: app, db, web; app lives in `/home/deployer/apps/mmss-mysql`.
-- **Linked files** (must exist in shared config on the server):  
+- **Linked files** (must exist in shared config on the server):
 `config/puma.rb`, `config/nginx.conf`, `config/master.key`, `config/lsa-was-base-c096c776ead3.json`, `mysql/InCommon.CA.crt`
 
 Deploy steps:
 
 ```bash
 # 1. once per Ruby bump, on the host as deployer (see below)
-asdf install ruby 4.0.9 && asdf reshim ruby
+asdf install ruby 4.0.10 && asdf reshim ruby
 
 # 2. from your machine, with main checked out and pushed
 bundle exec cap production deploy          # check_revision, bundle, assets:precompile, db:migrate, puma:restart
@@ -250,7 +253,7 @@ bundle exec cap production rubygems:update
 `cap production deploy` ends with `puma:restart` (`pumactl restart` — a **hot** restart). That re-execs the original argv and can keep the **previous** asdf Ruby; the new Gemfile then fails the Ruby version check until systemd `Restart=always` eventually cold-starts the unit. After any deploy that changes `.tool-versions` / `.ruby-version`:
 
 ```bash
-asdf install ruby 4.0.9 && asdf reshim ruby   # on the host first
+asdf install ruby 4.0.10 && asdf reshim ruby   # on the host first
 bundle exec cap production deploy
 bundle exec cap production puma:cold_restart  # sudo systemctl restart puma_prod (override :puma_systemd_unit if needed)
 # or on the host: sudo systemctl restart puma_prod
@@ -266,10 +269,10 @@ environment (systemd unit, see `config/puma_prod.service`) is where `RAILS_ALLOW
 The host provides Ruby through asdf (`capistrano-asdf` reads `.tool-versions`, and
 `config/deploy.rb` points `bundle`/`ruby` at `/home/deployer/.asdf/shims`). Install the
 Ruby version pinned in `.tool-versions` on the host before deploying a release that bumps
-it, e.g. for 4.0.9:
+it, e.g. for 4.0.10:
 
 ```bash
-asdf install ruby 4.0.9        # needs libyaml-dev, libssl-dev, zlib1g-dev, libffi-dev, libmysqlclient-dev
+asdf install ruby 4.0.10        # needs libyaml-dev, libssl-dev, zlib1g-dev, libffi-dev, libmysqlclient-dev
 asdf reshim ruby
 ```
 
@@ -289,17 +292,17 @@ the linked `public/assets` directory.
 
 Hatchbox builds the app from the repository: it reads `.ruby-version`, runs `bundle install` and
 `bin/rails assets:precompile` (Tailwind via the bundled standalone binary, then Propshaft), and runs
-the release command. Set it up as a **separate Hatchbox app** on the **`staging` branch** with a
+the release command. Set it up as a **separate Hatchbox app** on the `staging` **branch** with a
 **deploy webhook**, so every merge to `staging` deploys, and:
 
 1. `RAILS_ENV=staging` so Rails loads [config/environments/staging.rb](config/environments/staging.rb)
+
    (local Active Storage, `letter_opener_web`, no GCS keyfile, HTTP basic auth on `/letter_opener`).
 2. Release command: `bin/rails db:migrate`.
 3. Process: the root [Procfile](Procfile) (`bundle exec puma -C config/puma.default.rb`, binds `$PORT`).
 4. The environment variables below.
 
 **Environment variables**
-
 
 | Variable                                                                      | Purpose                                                                                                                                                                        |
 | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -315,11 +318,9 @@ the release command. Set it up as a **separate Hatchbox app** on the **`staging`
 | `STAGING_FORCE_SSL`                                                           | Defaults to `true` (HTTPS, secure cookies, `assume_ssl`); set `false` only for a plain-HTTP staging box                                                                        |
 | `RAILS_LOG_TO_STDOUT`                                                         | Set so Hatchbox collects the logs                                                                                                                                              |
 
-
 ---
 
 ## Project Structure
-
 
 | Path                        | Purpose                                                                                 |
 | --------------------------- | --------------------------------------------------------------------------------------- |
@@ -336,7 +337,6 @@ the release command. Set it up as a **separate Hatchbox app** on the **`staging`
 | `config/deploy.rb`          | Capistrano (production): puma, maintenance, rubygems and debug tasks                    |
 | `spec/`                     | RSpec tests and support                                                                 |
 | `config/storage.yml`        | Active Storage backends (local, GCS)                                                    |
-
 
 ### Main domain concepts
 
